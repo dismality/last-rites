@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Data matches design bible",
+      "trigger": "PostFileSave",
+      "matcher": "src/data/.*\\.ts$|docs/game-design\\.md$",
+      "action": {
+        "type": "agent",
+        "prompt": "Compare the edited content with docs/game-design.md (the source of truth). List any mismatch in item IDs, recipe inputs/outputs/unlocks, weapon stats, enemy stats, wave compositions, scare event definitions or zone contents. If the code is wrong, fix the code. If the design bible was edited, update the matching src/data file to follow it."
+      }
+    }
+  ]
+}

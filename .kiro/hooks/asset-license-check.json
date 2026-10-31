@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Asset license check",
+      "trigger": "PostFileCreate",
+      "matcher": "public/assets/",
+      "action": {
+        "type": "agent",
+        "prompt": "A new asset was added under public/assets. Check docs/CREDITS.md for an entry naming this file, its author, source URL and license. If missing, add a row with what is known and mark unknown fields as TODO, then remind me to fill them in. Warn loudly if the license is not CC0, CC-BY or the project's own work. Also warn if a .glb is over 3 MB or a texture over 2048px, and suggest compressing it."
+      }
+    }
+  ]
+}

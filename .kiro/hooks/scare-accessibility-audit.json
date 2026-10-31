@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Scare accessibility audit",
+      "trigger": "PostFileSave",
+      "matcher": "src/scene/scares/|src/game/systems/scareDirector\\.ts$|src/scene/enemies/|src/scene/effects/|src/data/scares\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "Audit the edited file against .kiro/steering/horror-design.md and .kiro/steering/accessibility.md. Check: (1) every scare has a 0.5-1.5 s telegraph, (2) Scare Intensity Full/Reduced/Off is respected and Off still shows a subtitle, (3) camera shake, flashing and head bob read their settings, (4) no scare can reduce health to 0, (5) nothing fires while UI is open or paused. Report a short pass/fail checklist. Fix any failures directly."
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Update Kiro usage log",
+      "trigger": "UserPromptSubmit",
+      "matcher": "update kiro log",
+      "action": {
+        "type": "agent",
+        "prompt": "Review what was done in this session (spec tasks completed, hooks that fired and what they caught, steering rules that changed your output, property tests that found bugs, MCP tools used). Append concise entries to docs/kiro-log.md using the format in .kiro/steering/kiro-log.md. Only record things that actually happened."
+      }
+    }
+  ]
+}

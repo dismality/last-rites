@@ -1,0 +1,44 @@
+# Implementation Plan: Exploration and Collecting
+
+- [ ] 1. Item, zone and loot data
+  - `src/data/items.ts`, `zones.ts`, `lootTables.ts` from the design bible
+  - Seeded RNG `src/game/rng.ts`
+  - _Requirements: 7.1, 7.2_
+
+- [ ] 2. Inventory system with property tests
+  - `addItem`, `removeItem`, `hasItems`, `assignHotbar`; key items outside slots
+  - Property tests: stack and slot limits, add/remove inverse, quantity conservation
+  - _Requirements: 2.1, 2.2, 2.3, 2.4, 4.4, 5.4_
+
+- [ ] 3. Loot rolling and daily respawn
+  - `loot.ts`, `spawns.ts`; once-only spawns for keys, relics and pages; night-only locket
+  - Property test: loot quantities within bounds
+  - _Requirements: 7.1, 7.2, 7.3_
+
+- [ ] 4. Interaction raycast and Interactable wrapper
+  - Pulse within lantern radius, outline and rune icon on hover, prompt text
+  - _Requirements: 1.1, 1.2, 1.3, 1.4_
+
+- [ ] 5. Pickups and toasts
+  - Material pickup flow with full-satchel refusal messages
+  - _Requirements: 2.1, 2.2, 2.3, 2.4_
+
+- [ ] 6. Grave digging
+  - `dig.ts` with hold-to-dig, cancel on move or hit, once per day
+  - Emit `digCompleted` for the scare director (hook up in spec 05)
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 7. Examine mode
+  - Overlay canvas, rotate and zoom, hidden-mark clue reveal, pauses simulation
+  - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+
+- [ ] 8. Satchel overlay and hotbar
+  - 12-slot leather UI, drop to world, hotbar 1–4, keyboard-navigable
+  - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+
+- [ ] 9. Self-drawing journal map
+  - `mapReveal.ts` with idempotence property test; ink animation; landmarks; quill marker
+  - _Requirements: 6.1, 6.2, 6.3, 6.4_
+
+- [ ] 10. Checkpoint
+  - Explore by day, collect, dig, examine the crypt key, see the map fill in; all tests pass

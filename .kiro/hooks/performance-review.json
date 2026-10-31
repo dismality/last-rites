@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Performance review",
+      "trigger": "UserPromptSubmit",
+      "matcher": "performance review",
+      "action": {
+        "type": "agent",
+        "prompt": "Review src/scene/** against the performance budget in .kiro/steering/tech.md. Look for: non-instanced repeated meshes, more than 4 shadow-casting lights, per-frame object allocations inside useFrame, React state updates inside useFrame, uncompressed or oversized assets, missing dispose on unmount, and post-processing passes that could be merged. Report the top 5 issues by likely fps impact with file:line, then fix the ones I approve."
+      }
+    }
+  ]
+}

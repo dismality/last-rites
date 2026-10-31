@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Test game logic on save",
+      "trigger": "PostFileSave",
+      "matcher": "src/game/.*\\.ts$|src/data/.*\\.ts$",
+      "action": {
+        "type": "agent",
+        "prompt": "A game logic or data file was just edited. Run `npx vitest run --related` on the edited file. If any test or fast-check property fails, explain the failing case in one or two sentences (include the shrunk counterexample for property failures), fix the code (not the test, unless the test contradicts the spec), and re-run until green. If a fix revealed a real bug, add a one-line note to docs/kiro-log.md under today's date."
+      }
+    }
+  ]
+}
