@@ -6,7 +6,7 @@ inclusion: always
 ## Stack
 | Concern | Choice |
 |---|---|
-| Build | Vite + TypeScript (strict mode) |
+| Build | Vite + TypeScript 6.0 (typescript-eslint does not yet support TS 7) |
 | UI framework | React 19 |
 | 3D | three.js `^0.178` via `@react-three/fiber` `^9.0` and `@react-three/drei` `^10.0` |
 | Physics / character controller | `@react-three/rapier` `^2.0` |
