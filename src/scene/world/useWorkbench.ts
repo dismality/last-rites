@@ -6,15 +6,15 @@
 // Workbench.tsx itself (Esc or E while open).
 
 import { useEffect } from 'react'
-import { useWorldStore } from '../../game/state/worldStore'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 
 /**
  * @param nearWorkbench - true when the player is within interact range of the
  *   workbench (2.5 m, driven by proximity detection in the scene layer).
  */
 export function useWorkbench(nearWorkbench: boolean) {
-  const workbenchOpen = useWorldStore((s) => s.workbenchOpen)
-  const openWorkbench = useWorldStore((s) => s.openWorkbench)
+  const workbenchOpen = useUiWorldStore((s) => s.workbenchOpen)
+  const openWorkbench = useUiWorldStore((s) => s.openWorkbench)
 
   useEffect(() => {
     if (!nearWorkbench || workbenchOpen) return

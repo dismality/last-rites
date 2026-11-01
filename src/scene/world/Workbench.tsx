@@ -18,7 +18,7 @@ import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Instances, Instance, Html } from '@react-three/drei'
 import * as THREE from 'three'
-import { useWorldStore } from '../../game/state/worldStore'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { canCraft } from '../../game/systems/crafting'
@@ -320,9 +320,9 @@ function BenchSurface() {
  * `workbenchOpen` in worldStore gates whether the camera lerps to the bench.
  */
 export function Workbench() {
-  const workbenchOpen = useWorldStore((s) => s.workbenchOpen)
-  const closeWorkbench = useWorldStore((s) => s.closeWorkbench)
-  const lastDamageAt = useWorldStore((s) => s.lastDamageAt)
+  const workbenchOpen = useUiWorldStore((s) => s.workbenchOpen)
+  const closeWorkbench = useUiWorldStore((s) => s.closeWorkbench)
+  const lastDamageAt = useUiWorldStore((s) => s.lastDamageAt)
   const inventory = useInventoryStore((s) => s.inventory)
   const highlightedItems = useCraftingStore((s) => s.highlightedItems)
   const unlockedRecipes = useCraftingStore((s) => s.unlockedRecipes)

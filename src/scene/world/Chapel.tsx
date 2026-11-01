@@ -18,7 +18,7 @@ import { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { playerPositionRef } from './playerPositionRef'
-import { useWorldStore } from '../../game/state/worldStore'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useChapelStore } from '../../game/state/chapelStore'
 
 // ---------------------------------------------------------------------------
@@ -121,9 +121,9 @@ export function Chapel() {
   const altarActive = useChapelStore((s) => s.isAltarActive())
   const altarHealedToday = useChapelStore((s) => s.chapel.altarHealedToday)
   const setAltarHealedToday = useChapelStore((s) => s.setAltarHealedToday)
-  const openChapelRepair = useWorldStore((s) => s.openChapelRepair)
-  const chapelRepairOpen = useWorldStore((s) => s.chapelRepairOpen)
-  const healPlayer = useWorldStore((s) => s.healPlayer)
+  const openChapelRepair = useUiWorldStore((s) => s.openChapelRepair)
+  const chapelRepairOpen = useUiWorldStore((s) => s.chapelRepairOpen)
+  const healPlayer = useUiWorldStore((s) => s.healPlayer)
 
   // Track whether E was already handled this "interaction window" to avoid
   // double-firing. Resets when the player moves away.

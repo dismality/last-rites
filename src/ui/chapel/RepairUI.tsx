@@ -13,7 +13,7 @@
 */
 
 import { useEffect, useRef, useId } from 'react'
-import { useWorldStore } from '../../game/state/worldStore'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { canRepair } from '../../game/systems/repairs'
@@ -48,8 +48,8 @@ function itemName(id: ItemId): string {
  * Mount once at the app level; visibility is gated by `chapelRepairOpen`.
  */
 export function RepairUI() {
-  const chapelRepairOpen = useWorldStore((s) => s.chapelRepairOpen)
-  const closeChapelRepair = useWorldStore((s) => s.closeChapelRepair)
+  const chapelRepairOpen = useUiWorldStore((s) => s.chapelRepairOpen)
+  const closeChapelRepair = useUiWorldStore((s) => s.closeChapelRepair)
   const applyRepair = useChapelStore((s) => s.applyRepair)
   const chapel = useChapelStore((s) => s.chapel)
   const inventory = useInventoryStore((s) => s.inventory)

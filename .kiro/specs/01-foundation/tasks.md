@@ -8,7 +8,7 @@
   - Confirm `npm run build` passes with zero type errors before moving on
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [-] 2. Shared types, event bus and stores
+- [x] 2. Shared types, event bus and stores
   - `src/game/types.ts` — `Phase`, `ItemId`, `Settings`, `PlayerState`, `WorldState`, `LanternState`, `StaminaState`, `GameEvent` union
   - `src/game/events.ts` — typed emit/subscribe helpers; events are value objects, not DOM events
   - zustand stores: `usePlayerStore`, `useWorldStore`, `useLanternStore`, `useSettingsStore`, `useGameStore`

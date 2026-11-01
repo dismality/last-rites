@@ -20,7 +20,7 @@
 import { useCallback, useEffect, useId } from 'react'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
-import { useWorldStore } from '../../game/state/worldStore'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import type { RecipeDef } from '../../data/recipes'
@@ -305,7 +305,7 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
  * Mounts above the R3F canvas via a portal-like fixed-position div.
  */
 export function RecipeBook() {
-  const workbenchOpen = useWorldStore((s) => s.workbenchOpen)
+  const workbenchOpen = useUiWorldStore((s) => s.workbenchOpen)
   const unlockedRecipes = useCraftingStore((s) => s.unlockedRecipes)
   const highlightedItems = useCraftingStore((s) => s.highlightedItems)
   const craftingProgress = useCraftingStore((s) => s.craftingProgress)
