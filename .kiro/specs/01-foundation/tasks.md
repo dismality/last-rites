@@ -1,6 +1,6 @@
 # Implementation Plan: Foundation
 
-- [ ] 1. Scaffold the project
+- [x] 1. Scaffold the project
   - Vite React-TS template; install the cohesive stack: `react@^19`, `react-dom@^19`, `three@^0.178`, `@react-three/fiber@^9.0`, `@react-three/drei@^10.0`, `@react-three/rapier@^2.0`, `@react-three/postprocessing@^3.0`, `zustand`, `howler`
   - Dev deps: `vitest`, `@vitest/coverage-v8`, `fast-check`, `eslint`, `prettier`, `@types/three`, `typescript` (strict mode)
   - Add npm scripts `dev`, `build`, `test`, `test:watch`, `lint`
@@ -8,14 +8,14 @@
   - Confirm `npm run build` passes with zero type errors before moving on
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2. Shared types, event bus and stores
+- [-] 2. Shared types, event bus and stores
   - `src/game/types.ts` — `Phase`, `ItemId`, `Settings`, `PlayerState`, `WorldState`, `LanternState`, `StaminaState`, `GameEvent` union
   - `src/game/events.ts` — typed emit/subscribe helpers; events are value objects, not DOM events
   - zustand stores: `usePlayerStore`, `useWorldStore`, `useLanternStore`, `useSettingsStore`, `useGameStore`
   - All stores use plain setter functions; no mutable state outside stores
   - _Requirements: 5.6, 6.2_
 
-- [ ] 3. Settings system with persistence
+- [~] 3. Settings system with persistence
   - `src/game/systems/settings.ts`: `loadSettings(storage?)` / `saveSettings(s, storage?)`
   - Defaults and ranges from the accessibility steering doc (all 11 settings)
   - `prefers-reduced-motion` check on first load — sets `cameraShake` and `headBob` to `false`
@@ -23,7 +23,7 @@
   - Test: storage throws → returns defaults without throwing
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 4. Pure day/night, lantern and stamina systems with tests
+- [~] 4. Pure day/night, lantern and stamina systems with tests
   - `src/game/systems/dayNight.ts`: `tickDayNight(s, dt, {wavesCleared}) → {state, events[]}`
     - Phases: Day 360 s → Dusk 30 s → Night (until wavesCleared) → Dawn 10 s → next Day
     - Emits `nightStarted`, `dawnStarted`, `phaseChanged`

@@ -1,0 +1,44 @@
+/*
+  Design tokens for Last Rites.
+  Victorian gothic palette: warm amber lantern vs cold moonlight.
+  Import this once in main.tsx; all components consume via var().
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wdth,wght@0,75..125,300..700;1,75..125,300..700&family=Homemade+Apple&display=swap');
+
+:root {
+  /* ── Colour palette ──────────────────────────────────────────── */
+  --ink:            #14110f;
+  --parchment:      #d8c9a3;
+  --parchment-dark: #a8946a;
+  --ember:          #e8913a;
+  --blood:          #7a1f1f;
+  --moon:           #9fb3c8;
+  --holy:           #cfe6d8;
+
+  /* Derived / semantic */
+  --ember-glow:     #f5b878;          /* lighter glow ring */
+  --ember-dim:      #a85a18;          /* dark ember for shadows */
+  --blood-bright:   #c0392b;          /* blood on hover */
+  --ink-mid:        #2a2319;          /* softer dark for overlays */
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-heading:   'IM Fell English SC', Georgia, serif;
+  --font-body:      'IM Fell English', Georgia, serif;
+  --font-hand:      'Homemade Apple', cursive;
+  --font-num:       'Cormorant Garamond', Georgia, serif;
+
+  /* ── Motion ─────────────────────────────────────────────────── */
+  --transition-fast:   150ms ease-out;
+  --transition-normal: 250ms ease-out;
+  --transition-slow:   300ms ease-out;
+}
+
+/* Honour prefers-reduced-motion at token level — components consume this var */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --transition-fast:   0ms;
+    --transition-normal: 0ms;
+    --transition-slow:   0ms;
+  }
+}

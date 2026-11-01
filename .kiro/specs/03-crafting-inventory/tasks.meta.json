@@ -1,0 +1,191 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2. Crafting system with property tests": [
+      {
+        "executionId": "d3be0b95-4cba-42b6-bb10-0f6f193f80e1",
+        "chatSessionId": "sess_a252f5dc-f8b4-42cc-9132-6eb2d23efe3b",
+        "timestamp": 1793469414671
+      },
+      {
+        "executionId": "5b8fd88d-33ef-430f-adcd-9d3673566e38",
+        "chatSessionId": "sess_a252f5dc-f8b4-42cc-9132-6eb2d23efe3b",
+        "timestamp": 1793470071975
+      },
+      {
+        "executionId": "5b8fd88d-33ef-430f-adcd-9d3673566e38",
+        "chatSessionId": "sess_a252f5dc-f8b4-42cc-9132-6eb2d23efe3b",
+        "timestamp": 1793471825554
+      }
+    ],
+    "3. Recipe unlocks": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836232
+      },
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471841527
+      },
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471883221
+      }
+    ],
+    "4. Workbench camera rig and bench layout": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836272
+      },
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471888721
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503606898
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503609883
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503744430
+      }
+    ],
+    "5. Recipe book UI with glow and highlighting": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836319
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503606942
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503747441
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793504288907
+      }
+    ],
+    "6. Crafting animation with hit cancel": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836375
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503606997
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793504292029
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793523526760
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793523760717
+      },
+      {
+        "executionId": "1aa0ff04-3228-4c16-a6c4-bfd2b2191aaf",
+        "chatSessionId": "sess_9b92c916-9b27-4285-bf3e-7621575cdb8a",
+        "timestamp": 1793524624410
+      },
+      {
+        "executionId": "1aa0ff04-3228-4c16-a6c4-bfd2b2191aaf",
+        "chatSessionId": "sess_9b92c916-9b27-4285-bf3e-7621575cdb8a",
+        "timestamp": 1793524680624
+      }
+    ],
+    "7. Durability and consumables": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836416
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503607039
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793523018542
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793523517563
+      }
+    ],
+    "8. Chapel repairs": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836458
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503607077
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793523763618
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793524355577
+      }
+    ],
+    "9. Checkpoint": [
+      {
+        "executionId": "1809c303-69f0-4d7a-8081-2cc596211823",
+        "chatSessionId": "sess_74f07238-849c-4154-bf5e-dde6f8584f5f",
+        "timestamp": 1793471836499
+      },
+      {
+        "executionId": "979c3b48-09ca-4f18-b08b-fc87f62ba0aa",
+        "chatSessionId": "sess_652b3872-48e3-4442-8e40-2869fff4f864",
+        "timestamp": 1793503607121
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793524358597
+      },
+      {
+        "executionId": "a13d775c-54ad-4cff-bb6f-634f96123d81",
+        "chatSessionId": "sess_54c1ad59-610b-4dff-b97d-0d7c652f58bf",
+        "timestamp": 1793524433856
+      }
+    ]
+  }
+}

@@ -1,0 +1,451 @@
+/*
+  RecipeBook.css — parchment ledger overlay for the crafting workbench.
+
+  Palette tokens are defined in src/ui/theme/tokens.css and imported globally.
+  This file uses them via var(). All animation respects prefers-reduced-motion
+  via the token overrides in tokens.css (--transition-* become 0ms).
+*/
+
+/* ── Panel ───────────────────────────────────────────────────────────────── */
+
+.recipe-book {
+  position: fixed;
+  top: 50%;
+  right: 2rem;
+  transform: translateY(-50%);
+  width: clamp(240px, 22vw, 320px);
+  max-height: 80vh;
+
+  display: flex;
+  flex-direction: row;
+
+  /* Slide in from the right */
+  animation: recipe-book-enter var(--transition-slow) ease-out both;
+
+  /* Ensure it sits above the R3F canvas */
+  z-index: 100;
+
+  /* Block pointer events from passing through */
+  pointer-events: all;
+}
+
+@keyframes recipe-book-enter {
+  from { opacity: 0; transform: translateY(-50%) translateX(24px); }
+  to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
+/* ── Spine (decorative left edge) ──────────────────────────────────────── */
+
+.recipe-book__spine {
+  width: 10px;
+  flex-shrink: 0;
+  background: linear-gradient(to bottom, var(--parchment-dark), #7a5c30, var(--parchment-dark));
+  border-radius: 3px 0 0 3px;
+  box-shadow: inset -2px 0 4px rgba(0,0,0,0.4);
+}
+
+/* ── Inner scrollable content ───────────────────────────────────────────── */
+
+.recipe-book__inner {
+  flex: 1;
+  background:
+    /* Faint ink stain texture via radial gradients */
+    radial-gradient(ellipse at 20% 80%, rgba(20,17,15,0.08) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 10%, rgba(20,17,15,0.06) 0%, transparent 50%),
+    linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 40%, #cfc0a8 100%);
+  border: 1px solid var(--parchment-dark);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  padding: 1rem 0.875rem 0.75rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-shadow:
+    4px 4px 16px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+
+  /* Custom scrollbar — parchment look */
+  scrollbar-width: thin;
+  scrollbar-color: var(--parchment-dark) transparent;
+}
+
+.recipe-book__inner::-webkit-scrollbar { width: 6px; }
+.recipe-book__inner::-webkit-scrollbar-track { background: transparent; }
+.recipe-book__inner::-webkit-scrollbar-thumb {
+  background: var(--parchment-dark);
+  border-radius: 3px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.recipe-book__title {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  text-align: center;
+  margin: 0 0 0.25rem;
+  padding: 0;
+}
+
+.recipe-book__divider {
+  text-align: center;
+  color: var(--parchment-dark);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 0.75rem;
+  user-select: none;
+}
+
+.recipe-book__empty {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--parchment-dark);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+/* ── Recipe list ─────────────────────────────────────────────────────────── */
+
+.recipe-book__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.recipe-book__section-sep {
+  text-align: center;
+  color: var(--parchment-dark);
+  font-size: 0.7rem;
+  letter-spacing: 0.4em;
+  padding: 0.25rem 0;
+  user-select: none;
+}
+
+.recipe-book__footer {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--parchment-dark);
+  text-align: center;
+  margin: 0.75rem 0 0;
+  border-top: 1px solid rgba(168,148,106,0.4);
+  padding-top: 0.5rem;
+}
+
+/* ── Unlocked entry base ─────────────────────────────────────────────────── */
+
+.recipe-entry {
+  background: rgba(20, 17, 15, 0.04);
+  border: 1px solid rgba(168, 148, 106, 0.35);
+  border-radius: 3px;
+  padding: 0.5rem 0.6rem;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+  outline: none;
+  position: relative;
+}
+
+.recipe-entry:hover,
+.recipe-entry:focus-visible {
+  background: rgba(20, 17, 15, 0.09);
+  border-color: var(--parchment-dark);
+}
+
+/* Keyboard focus ring — visible, uses ember colour */
+.recipe-entry:focus-visible {
+  box-shadow: 0 0 0 2px var(--ember);
+}
+
+/* ── Craftable state ─────────────────────────────────────────────────────── */
+
+.recipe-entry--craftable {
+  border-color: var(--ember);
+  background: rgba(232, 145, 58, 0.07);
+  animation: ember-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes ember-pulse {
+  0%, 100% { box-shadow: 0 0 6px 0 rgba(232, 145, 58, 0.25); }
+  50%       { box-shadow: 0 0 12px 2px rgba(232, 145, 58, 0.55); }
+}
+
+/* Stop animation if reduced motion is set */
+@media (prefers-reduced-motion: reduce) {
+  .recipe-entry--craftable {
+    animation: none;
+    box-shadow: 0 0 0 1px var(--ember);
+  }
+}
+
+.recipe-entry--craftable:hover,
+.recipe-entry--craftable:focus-visible {
+  background: rgba(232, 145, 58, 0.14);
+  border-color: var(--ember-glow);
+}
+
+/* When this entry is "active" because its items are highlighted on the bench */
+.recipe-entry--hover-active {
+  border-color: var(--ember-glow) !important;
+}
+
+/* ── Output row ──────────────────────────────────────────────────────────── */
+
+.recipe-entry__output {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.recipe-entry__rune {
+  font-size: 0.75rem;
+  color: var(--ember);
+  /* Subtle float animation for craftable rune */
+  animation: rune-float 3s ease-in-out infinite;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes rune-float {
+  0%, 100% { transform: translateY(0);    opacity: 1;    }
+  50%       { transform: translateY(-2px); opacity: 0.75; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .recipe-entry__rune { animation: none; }
+}
+
+.recipe-entry__output-name {
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+}
+
+.recipe-entry--craftable .recipe-entry__output-name {
+  color: var(--ember-dim);
+}
+
+.recipe-entry__output-qty {
+  font-family: var(--font-num);
+  font-size: 0.75rem;
+  color: var(--parchment-dark);
+}
+
+.recipe-entry__upgrade-tag {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.6rem;
+  color: var(--moon);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+/* ── Ingredients list ────────────────────────────────────────────────────── */
+
+.recipe-entry__ingredients {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Smudged variant for locked entries */
+.recipe-entry__ingredients--smudged {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: rgba(20, 17, 15, 0.25);
+  letter-spacing: 0.05em;
+  padding-left: 0;
+}
+
+.recipe-entry__ingredient {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--ink);
+  transition: color var(--transition-fast);
+}
+
+/* Tool requirement — slightly different style */
+.recipe-entry__ingredient--tool::before {
+  content: '↳ ';
+  color: var(--parchment-dark);
+  font-size: 0.65rem;
+}
+
+.ingredient-qty {
+  font-family: var(--font-num);
+  font-size: 0.72rem;
+  color: var(--parchment-dark);
+  min-width: 0.9rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.ingredient-name {
+  flex: 1;
+}
+
+/* ── Missing state ───────────────────────────────────────────────────────── */
+
+.recipe-entry__ingredient--missing .ingredient-name,
+.recipe-entry__ingredient--missing .ingredient-qty {
+  color: var(--blood);
+  font-weight: 600;
+}
+
+.ingredient-missing-label {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.62rem;
+  color: var(--blood);
+  margin-left: 0.2rem;
+  white-space: nowrap;
+}
+
+/* ── Locked entry ────────────────────────────────────────────────────────── */
+
+.recipe-entry--locked {
+  opacity: 0.55;
+  cursor: default;
+  background: rgba(20, 17, 15, 0.02);
+  border-style: dashed;
+  border-color: rgba(168, 148, 106, 0.25);
+}
+
+.recipe-entry--locked:hover,
+.recipe-entry--locked:focus-visible {
+  opacity: 0.75;
+  background: rgba(20, 17, 15, 0.05);
+  border-color: rgba(168, 148, 106, 0.4);
+}
+
+.recipe-entry__output--smudged {
+  font-family: var(--font-hand);
+  font-size: 0.72rem;
+  color: rgba(20, 17, 15, 0.35);
+  /* CSS blur to simulate smearing */
+  filter: blur(1.5px);
+  user-select: none;
+  margin-bottom: 0.25rem;
+}
+
+/* ── Unlock hint ─────────────────────────────────────────────────────────── */
+
+.recipe-entry__unlock-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--parchment-dark);
+  /* Hidden by default; visible on hover/focus of the locked entry */
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  margin-top: 0.25rem;
+}
+
+.recipe-entry--locked:hover .recipe-entry__unlock-hint,
+.recipe-entry--locked:focus-visible .recipe-entry__unlock-hint {
+  opacity: 1;
+}
+
+.recipe-entry__lock-icon {
+  font-size: 0.65rem;
+  color: var(--moon);
+}
+
+/* ── Craft button and progress bar (Req 3.1) ─────────────────────────────── */
+
+.recipe-entry__craft-row {
+  margin-top: 0.5rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Craft button — parchment ledger style */
+.craft-btn {
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  background: linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 60%);
+  border: 1px solid var(--ember);
+  border-radius: 2px;
+  padding: 0.2rem 0.55rem;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast);
+  outline: none;
+}
+
+.craft-btn:hover {
+  background: linear-gradient(160deg, #f5e6be 0%, #e2d4b0 60%);
+  box-shadow: 0 0 8px 1px rgba(232, 145, 58, 0.45);
+  color: var(--ember-dim);
+}
+
+.craft-btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--ember);
+}
+
+.craft-btn:active {
+  box-shadow: 0 0 4px 0 rgba(232, 145, 58, 0.25);
+}
+
+/* Progress bar container */
+.craft-progress {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  background: rgba(20, 17, 15, 0.12);
+  border: 1px solid var(--ember);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* Animated fill — ember colour, glows via box-shadow */
+.craft-progress__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ember-dim) 0%, var(--ember) 70%, var(--ember-glow) 100%);
+  transition: width 0.08s linear; /* smooth within fixed-dt ticks */
+  box-shadow: 0 0 8px 1px rgba(232, 145, 58, 0.55);
+  will-change: width;
+}
+
+/* "Crafting…" label centred over the bar */
+.craft-progress__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.62rem;
+  color: var(--ink);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Respect reduced-motion: keep bar but remove fill transition */
+@media (prefers-reduced-motion: reduce) {
+  .craft-progress__fill {
+    transition: none;
+  }
+}

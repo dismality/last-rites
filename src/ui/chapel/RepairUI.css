@@ -1,0 +1,215 @@
+/*
+  RepairUI.css — Chapel repair overlay.
+  Uses the same parchment + gothic token language as RecipeBook.
+  Respects prefers-reduced-motion via token overrides in tokens.css.
+*/
+
+/* ── Backdrop ─────────────────────────────────────────────────────────────── */
+
+.repair-ui__backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(20, 17, 15, 0.72);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: repair-fade-in var(--transition-normal) ease-out both;
+}
+
+@keyframes repair-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Panel ────────────────────────────────────────────────────────────────── */
+
+.repair-ui {
+  width: clamp(280px, 28vw, 380px);
+  background:
+    radial-gradient(ellipse at 20% 85%, rgba(20,17,15,0.10) 0%, transparent 55%),
+    linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 45%, #cfc0a8 100%);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.7),
+    inset 0 1px 0 rgba(255,255,255,0.15);
+  padding: 1.25rem 1.25rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: repair-slide-up var(--transition-slow) ease-out both;
+  pointer-events: all;
+  /* Focus trap root */
+  outline: none;
+}
+
+@keyframes repair-slide-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+
+.repair-ui__title {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  color: var(--ink);
+  margin: 0;
+  text-align: center;
+}
+
+.repair-ui__divider {
+  text-align: center;
+  color: var(--parchment-dark);
+  font-size: 0.65rem;
+  letter-spacing: 0.3em;
+  user-select: none;
+  margin: -0.25rem 0;
+}
+
+/* ── Stage label + effect ─────────────────────────────────────────────────── */
+
+.repair-ui__stage-label {
+  font-family: var(--font-heading);
+  font-size: 0.88rem;
+  color: var(--ink);
+  margin: 0;
+  letter-spacing: 0.03em;
+}
+
+.repair-ui__effect {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.76rem;
+  color: var(--ink-mid);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* ── Cost list ────────────────────────────────────────────────────────────── */
+
+.repair-ui__cost-heading {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--parchment-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 0 0 0.2rem;
+}
+
+.repair-ui__cost-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.repair-ui__cost-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-family: var(--font-body);
+  font-size: 0.76rem;
+  color: var(--ink);
+}
+
+/* Missing item → blood red */
+.repair-ui__cost-item--missing {
+  color: var(--blood);
+  font-weight: 600;
+}
+
+.repair-ui__cost-qty {
+  font-family: var(--font-num);
+  font-size: 0.76rem;
+  color: var(--parchment-dark);
+  min-width: 1rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.repair-ui__cost-item--missing .repair-ui__cost-qty {
+  color: var(--blood);
+}
+
+.repair-ui__cost-missing-label {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.65rem;
+  color: var(--blood);
+  white-space: nowrap;
+}
+
+/* ── All-complete message ─────────────────────────────────────────────────── */
+
+.repair-ui__complete {
+  font-family: var(--font-body);
+  font-style: italic;
+  color: var(--parchment-dark);
+  font-size: 0.82rem;
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+
+.repair-ui__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.repair-ui__btn {
+  font-family: var(--font-heading);
+  font-size: 0.76rem;
+  letter-spacing: 0.05em;
+  border-radius: 2px;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  border: 1px solid var(--parchment-dark);
+  background: linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 60%);
+  color: var(--ink);
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+  outline: none;
+}
+
+.repair-ui__btn:hover {
+  background: linear-gradient(160deg, #f5e6be 0%, #e2d4b0 60%);
+}
+
+.repair-ui__btn:focus-visible {
+  box-shadow: 0 0 0 2px var(--ember);
+}
+
+/* Confirm button — ember accent when affordable */
+.repair-ui__btn--confirm {
+  border-color: var(--ember);
+  color: var(--ink);
+}
+
+.repair-ui__btn--confirm:hover:not(:disabled) {
+  box-shadow: 0 0 8px 1px rgba(232, 145, 58, 0.45);
+  color: var(--ember-dim);
+}
+
+/* Disabled confirm — greyed out */
+.repair-ui__btn--confirm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--parchment-dark);
+  box-shadow: none;
+}
+
+.repair-ui__btn--cancel {
+  border-color: var(--parchment-dark);
+}
