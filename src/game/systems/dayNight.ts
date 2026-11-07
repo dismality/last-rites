@@ -1,0 +1,87 @@
+// Pure day/night cycle: Day -> Dusk -> Night (until waves cleared) -> Dawn -> Day.
+
+import {
+  DAWN_DURATION_S,
+  DAY_DURATION_S,
+  DUSK_DURATION_S,
+  LAST_NIGHT,
+  NIGHT_FOG_DENSITY,
+} from '../../data/balance'
+import type { GameEvent, Phase, WorldState } from '../types'
+
+export interface DayNightInput {
+  /** Supplied by the wave system; night only ends when this is true. */
+  wavesCleared: boolean
+}
+
+export interface DayNightResult {
+  state: WorldState
+  events: GameEvent[]
+}
+
+/** Fog for a given night number, clamped so out-of-range input can't index past the table. */
+export function fogForNight(nightNumber: number): number {
+  const i = Math.min(Math.max(Math.floor(nightNumber), 1), LAST_NIGHT) - 1
+  return NIGHT_FOG_DENSITY[i]
+}
+
+/** Fixed-length phases; night has no fixed length. */
+function phaseDuration(phase: Phase): number {
+  switch (phase) {
+    case 'day':
+      return DAY_DURATION_S
+    case 'dusk':
+      return DUSK_DURATION_S
+    case 'dawn':
+      return DAWN_DURATION_S
+    case 'night':
+      return Infinity
+  }
+}
+
+export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): DayNightResult {
+  const events: GameEvent[] = []
+  let { phase, phaseTime, nightNumber } = s
+  let remaining = Math.max(0, dt)
+
+  const enter = (next: Phase) => {
+    phase = next
+    phaseTime = 0
+    events.push({ type: 'phaseChanged', phase })
+    if (next === 'night') events.push({ type: 'nightStarted', nightNumber })
+    if (next === 'dawn') events.push({ type: 'dawnStarted', nightNumber })
+  }
+
+  // Loop so a large dt can cross several boundaries without losing time.
+  for (;;) {
+    if (phase === 'night') {
+      phaseTime += remaining
+      if (input.wavesCleared) enter('dawn')
+      break
+    }
+    const left = phaseDuration(phase) - phaseTime
+    if (remaining < left) {
+      phaseTime += remaining
+      break
+    }
+    remaining -= left
+    if (phase === 'day') enter('dusk')
+    else if (phase === 'dusk') enter('night')
+    else {
+      // Increment only after dawn so the dawn summary still refers to the night just survived.
+      nightNumber = Math.min(nightNumber + 1, LAST_NIGHT)
+      enter('day')
+    }
+  }
+
+  return {
+    state: {
+      phase,
+      phaseTime,
+      nightNumber,
+      fogDensity: fogForNight(nightNumber),
+      wavesCleared: input.wavesCleared,
+    },
+    events,
+  }
+}

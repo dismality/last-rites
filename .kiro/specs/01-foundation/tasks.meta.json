@@ -12,6 +12,37 @@
         "chatSessionId": "sess_b26fd96f-01fd-495d-8b5b-f6fa418cff1d",
         "timestamp": 1793532177639
       }
+    ],
+    "3. Settings system with persistence": [
+      {
+        "executionId": "509453f9-f355-465e-b19e-0766a910735d",
+        "chatSessionId": "sess_93904e75-aaf1-4a85-beb3-37b42fec370a",
+        "timestamp": 1794016988549
+      },
+      {
+        "executionId": "509453f9-f355-465e-b19e-0766a910735d",
+        "chatSessionId": "sess_93904e75-aaf1-4a85-beb3-37b42fec370a",
+        "timestamp": 1794017070774
+      }
+    ],
+    "4. Pure day/night, lantern and stamina systems with tests": [
+      {
+        "executionId": "2ef21a67-abc1-408a-a9a8-c6d81098b1e9",
+        "chatSessionId": "sess_f4622492-6f88-4aff-9a93-5582c43651b5",
+        "timestamp": 1794017082161
+      },
+      {
+        "executionId": "2ef21a67-abc1-408a-a9a8-c6d81098b1e9",
+        "chatSessionId": "sess_f4622492-6f88-4aff-9a93-5582c43651b5",
+        "timestamp": 1794017174792
+      }
+    ],
+    "5. Fixed-timestep GameLoop and pause": [
+      {
+        "executionId": "c7d91c14-5ebf-4e13-be3f-8185619d61f8",
+        "chatSessionId": "sess_b5213153-1852-4d0b-820c-d30a0bcc5d6a",
+        "timestamp": 1794017186027
+      }
     ]
   }
 }

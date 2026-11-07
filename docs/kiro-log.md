@@ -73,3 +73,13 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task execution
 - **What happened:** Created `src/game/events.ts` (typed emit/subscribe/subscribeToType/clearSubscribers), five new zustand stores (`playerStore`, `lanternStore`, `settingsStore`, `gameStore`, new day/night `worldStore`), and a barrel `src/game/state/index.ts`. Renamed the existing UI-level worldStore to `uiWorldStore` / `useUiWorldStore` and updated all five consumers (Chapel.tsx, RepairUI.tsx, RecipeBook.tsx, Workbench.tsx, useWorkbench.ts).
 - **What Kiro caught or sped up:** Grep confirmed exactly which files imported the old `useWorldStore` for UI state, preventing any missed rename. Build and all 93 tests passed first run after the changes.
+
+### 2026-11-01: spec 01-foundation task 3: Settings system with persistence
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `src/game/systems/settings.ts` (`loadSettings`/`saveSettings` with injectable storage, clamping, reduced-motion first-run defaults) and `settings.test.ts` with a fast-check round-trip property. `settingsStore` now delegates to these functions, so defaults live in one place.
+- **What Kiro caught or sped up:** Found the store already had duplicated defaults and an unvalidated `JSON.parse` merge; replaced it with the clamped loader.
+
+### 2026-11-01: 01-foundation task 4: Pure day/night, lantern and stamina systems
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `dayNight.ts`, `lantern.ts`, `stamina.ts` with tuning constants in `src/data/balance.ts`, plus unit and fast-check tests (step independence, radius bounds [1.5, 8], fuel/stamina bounds).
+- **What Kiro caught or sped up:** Stamina regen delay is consumed before regen so ticks stay step-independent; dusk uses the night drain rate (a judgment call, noted in code).

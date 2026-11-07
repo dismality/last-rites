@@ -15,7 +15,7 @@
   - All stores use plain setter functions; no mutable state outside stores
   - _Requirements: 5.6, 6.2_
 
-- [~] 3. Settings system with persistence
+- [x] 3. Settings system with persistence
   - `src/game/systems/settings.ts`: `loadSettings(storage?)` / `saveSettings(s, storage?)`
   - Defaults and ranges from the accessibility steering doc (all 11 settings)
   - `prefers-reduced-motion` check on first load — sets `cameraShake` and `headBob` to `false`
@@ -23,7 +23,7 @@
   - Test: storage throws → returns defaults without throwing
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [~] 4. Pure day/night, lantern and stamina systems with tests
+- [x] 4. Pure day/night, lantern and stamina systems with tests
   - `src/game/systems/dayNight.ts`: `tickDayNight(s, dt, {wavesCleared}) → {state, events[]}`
     - Phases: Day 360 s → Dusk 30 s → Night (until wavesCleared) → Dawn 10 s → next Day
     - Emits `nightStarted`, `dawnStarted`, `phaseChanged`
@@ -36,7 +36,7 @@
   - Unit tests for each system; property tests: step independence, radius bounds [1.5, 8], fuel bounds [0, 100]
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 2.4, 2.5, 5.1, 5.3, 5.4, 5.5, 5.6_
 
-- [ ] 5. Fixed-timestep GameLoop and pause
+- [-] 5. Fixed-timestep GameLoop and pause
   - `src/scene/GameLoop.tsx`: `useFrame` accumulator, STEP = 1/60 s, max delta clamp 0.25 s
   - System call order: input → stamina → player → lantern → dayNight
   - Events collected per tick and published to the event bus after all systems run
@@ -44,7 +44,7 @@
   - `useGameStore` action `setPaused(bool)` called by pointer-lock-lost and Esc handler
   - _Requirements: 7.4_
 
-- [ ] 6. First-person controller with input bindings
+- [~] 6. First-person controller with input bindings
   - `src/scene/player/input.ts`: maps `KeyboardEvent.code` → action via `useSettingsStore(s => s.bindings)`; exports `InputSnapshot` sampled once per tick
   - Pointer-lock request on canvas click; `pointerlockchange` → calls `setPaused(true)` on loss
   - `src/scene/player/FirstPersonController.tsx`: Rapier `RigidBody type="kinematic-position-based"`, capsule collider (radius 0.35, halfHeight 0.5)
@@ -54,7 +54,7 @@
   - `<Physics>` must be wrapped in `<Suspense>` — include this at the `GameLoop` level
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 6.5_
 
-- [ ] 7. Lantern rendering
+- [~] 7. Lantern rendering
   - `src/scene/player/Lantern.tsx`: camera-attached `SpotLight` (angle 0.9, penumbra 0.6, castShadow, decay 2) + fill `PointLight` (no shadow)
   - `intensity` driven by `lanternRadius(fuel)` mapped to a 0–1 intensity range
   - At fuel = 0: swap SpotLight for a dim `PointLight` (radius 1.5 m) — ember glow, no shadow
@@ -63,7 +63,7 @@
   - Add comment: "Shadow budget: this SpotLight is slot 1 of 4 maximum"
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [ ] 8. Greybox cemetery
+- [~] 8. Greybox cemetery
   - `src/scene/world/Cemetery.tsx`: four zones with primitive geometry standing in for final models
   - Grounds: flat plane, scattered box headstones (instanced), chapel exterior box
   - Mausoleum Row: narrow corridor of box walls; locked gate collider (static CuboidCollider) until key obtained
