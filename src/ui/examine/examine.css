@@ -1,0 +1,60 @@
+/* Examine mode overlay: dark vignette backdrop, item canvas, parchment caption. */
+.examine {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(ellipse at 50% 45%, rgba(42, 35, 25, 0.88) 0%, rgba(20, 17, 15, 0.96) 80%);
+  animation: examine-fade var(--transition-normal) both;
+}
+@keyframes examine-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.examine__canvas {
+  flex: 1;
+  min-height: 0;
+  cursor: grab;
+}
+.examine__canvas:active { cursor: grabbing; }
+.examine__panel {
+  align-self: center;
+  width: min(560px, 92vw);
+  margin-bottom: 2rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 45%, #cfc0a8 100%);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  text-align: center;
+}
+.examine__title {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+}
+.examine__hint { margin: 0 0 0.5rem; }
+/* Fixed height so the panel does not jump when the clue appears. */
+.examine__clue {
+  min-height: 3em;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-hand);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+.examine__actions { display: flex; gap: 0.75rem; justify-content: center; }
+.examine__btn {
+  padding: 0.4rem 1rem;
+  font: inherit;
+  color: var(--parchment);
+  background: var(--ink-mid);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.examine__btn:hover { border-color: var(--ember); }
+.examine__btn:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }

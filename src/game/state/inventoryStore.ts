@@ -2,6 +2,7 @@
 // Pure zustand, no React / three.js imports.
 
 import { create } from 'zustand'
+import { hotbarItem } from '../systems/satchel'
 import type { Inventory, ItemId, KeyItemId, RelicId } from '../types'
 
 export interface InventoryState {
@@ -18,6 +19,12 @@ export interface InventoryState {
 
   /** Set a hotbar slot binding. */
   setHotbar: (slot: 0 | 1 | 2 | 3, item: ItemId | null) => void
+
+  /** Hotbar slot whose item is in hand; the item itself is derived from `inventory.hotbar`. */
+  equippedSlot: 0 | 1 | 2 | 3 | null
+
+  /** Equip what a hotbar number key points at. Empty slots leave the current item in hand. */
+  equipSlot: (slot: 0 | 1 | 2 | 3) => void
 }
 
 const EMPTY_INVENTORY: Inventory = {
@@ -32,6 +39,10 @@ const EMPTY_INVENTORY: Inventory = {
 
 export const useInventoryStore = create<InventoryState>((set) => ({
   inventory: EMPTY_INVENTORY,
+  equippedSlot: 0,
+
+  equipSlot: (slot) =>
+    set((state) => (hotbarItem(state.inventory, slot) ? { equippedSlot: slot } : state)),
 
   setInventory: (inv) => set({ inventory: inv }),
 

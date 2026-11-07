@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { lanternRadius, tickLantern } from './lantern'
+import { lanternIntensity, lanternRadius, tickLantern } from './lantern'
 import type { LanternState, Phase } from '../types'
 
 const lit = (fuel: number): LanternState => ({ on: true, fuel, flicker: false })
@@ -58,6 +58,18 @@ describe('lantern properties', () => {
           expect(two.fuel).toBeCloseTo(one.fuel, 6)
         },
       ),
+    )
+  })
+})
+
+describe('lanternIntensity', () => {
+  it('is 1 at full fuel and stays within (0, 1] for any fuel', () => {
+    expect(lanternIntensity(100)).toBe(1)
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 100, noNaN: true }), (f) => {
+        const i = lanternIntensity(f)
+        return i > 0 && i <= 1
+      })
     )
   })
 })

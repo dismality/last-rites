@@ -34,6 +34,11 @@ export function playCraftingTick(): void {
  *
  * TODO(audio): load 'public/assets/audio/crafting-cancel.ogg'
  */
+export function playSatchelCreak(opening: boolean): void {
+  // stub. TODO(audio): leather creak, a shorter one when closing (`opening` false).
+  void opening
+}
+
 export function playCraftingCancel(): void {
   // stub
 }

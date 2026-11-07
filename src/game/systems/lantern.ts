@@ -24,6 +24,11 @@ export function tickLantern(s: LanternState, dt: number, phase: Phase): LanternS
   return { on: s.on, fuel, flicker: fuel < LANTERN_FLICKER_BELOW }
 }
 
+/** Light radius normalised to 0..1 of the full-fuel radius, so rendering needs no balance numbers. */
+export function lanternIntensity(fuel: number): number {
+  return lanternRadius(fuel) / LANTERN_RADIUS_MAX_M
+}
+
 /** Linear 2 m..8 m, with a 1.5 m ember at exactly empty so the world is never fully black. */
 export function lanternRadius(fuel: number): number {
   const f = Math.min(LANTERN_MAX_FUEL, Math.max(0, fuel))
