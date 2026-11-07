@@ -219,3 +219,5 @@ export type GameEvent =
   | { type: 'lanternToggled'; on: boolean }
   | { type: 'scareFired';     scareId: string }
   | { type: 'subtitleShown';  text: string; duration: number }
+  | { type: 'digCompleted';   graveId: string; loot: ItemStack[]; scareId: string | null }
+  | { type: 'digCancelled';   graveId: string; reason: 'moved' | 'hit' | 'released' | 'interrupted' }

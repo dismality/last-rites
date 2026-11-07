@@ -42,6 +42,95 @@
         "executionId": "c7d91c14-5ebf-4e13-be3f-8185619d61f8",
         "chatSessionId": "sess_b5213153-1852-4d0b-820c-d30a0bcc5d6a",
         "timestamp": 1794017186027
+      },
+      {
+        "executionId": "c7d91c14-5ebf-4e13-be3f-8185619d61f8",
+        "chatSessionId": "sess_b5213153-1852-4d0b-820c-d30a0bcc5d6a",
+        "timestamp": 1794017262142
+      }
+    ],
+    "6. First-person controller with input bindings": [
+      {
+        "executionId": "2aad50cf-f3c3-4779-aecd-f2599bf550b5",
+        "chatSessionId": "sess_4589bf4c-1f11-4c34-a6fb-d5fde899acb1",
+        "timestamp": 1794017272454
+      },
+      {
+        "executionId": "2aad50cf-f3c3-4779-aecd-f2599bf550b5",
+        "chatSessionId": "sess_4589bf4c-1f11-4c34-a6fb-d5fde899acb1",
+        "timestamp": 1794017627098
+      }
+    ],
+    "7. Lantern rendering": [
+      {
+        "executionId": "0136ac17-6551-4dcc-a932-4aa65c4f2f9b",
+        "chatSessionId": "sess_9a69cd2d-dfb5-492e-848d-3759ae9b6b15",
+        "timestamp": 1794017641702
+      },
+      {
+        "executionId": "0136ac17-6551-4dcc-a932-4aa65c4f2f9b",
+        "chatSessionId": "sess_9a69cd2d-dfb5-492e-848d-3759ae9b6b15",
+        "timestamp": 1794017702803
+      }
+    ],
+    "8. Greybox cemetery": [
+      {
+        "executionId": "b7f1c383-6588-410d-816a-026f6d450acc",
+        "chatSessionId": "sess_2d923d6a-18d5-4ee9-bf1a-c47ad96b364d",
+        "timestamp": 1794017714246
+      },
+      {
+        "executionId": "b7f1c383-6588-410d-816a-026f6d450acc",
+        "chatSessionId": "sess_2d923d6a-18d5-4ee9-bf1a-c47ad96b364d",
+        "timestamp": 1794017892533
+      }
+    ],
+    "9. Sky, fog and phase transitions": [
+      {
+        "executionId": "e4bdae7a-e3b7-47a6-bb55-c00c0c1e4d07",
+        "chatSessionId": "sess_6ace314a-c103-41ef-b67c-33fb691b6a8b",
+        "timestamp": 1794018388126
+      },
+      {
+        "executionId": "e4bdae7a-e3b7-47a6-bb55-c00c0c1e4d07",
+        "chatSessionId": "sess_6ace314a-c103-41ef-b67c-33fb691b6a8b",
+        "timestamp": 1794036769474
+      }
+    ],
+    "10. Screens: content warning, loading, title, pause, settings": [
+      {
+        "executionId": "93f5e6ac-4804-42af-b295-525629a4ec5d",
+        "chatSessionId": "sess_7a81afbb-7d3d-4675-8865-4d8458c144eb",
+        "timestamp": 1794036783561
+      },
+      {
+        "executionId": "79425f65-f709-4e4a-9dab-90abe44532ba",
+        "chatSessionId": "sess_a39cb4e7-00c8-402b-9672-11e4461f9432",
+        "timestamp": 1794037223398
+      },
+      {
+        "executionId": "79425f65-f709-4e4a-9dab-90abe44532ba",
+        "chatSessionId": "sess_a39cb4e7-00c8-402b-9672-11e4461f9432",
+        "timestamp": 1794037654715
+      }
+    ],
+    "11. Baseline HUD and subtitles": [
+      {
+        "executionId": "40705b2a-380f-4b27-8873-c7f80813054c",
+        "chatSessionId": "sess_428d1abb-81dc-47d2-90d3-4377784fbaaa",
+        "timestamp": 1794038184752
+      },
+      {
+        "executionId": "40705b2a-380f-4b27-8873-c7f80813054c",
+        "chatSessionId": "sess_428d1abb-81dc-47d2-90d3-4377784fbaaa",
+        "timestamp": 1794038318080
+      }
+    ],
+    "12. Checkpoint: first playable": [
+      {
+        "executionId": "937037f8-bb1f-41be-8078-bd4121cf058f",
+        "chatSessionId": "sess_b076922e-b5e2-4f82-9b57-9e764562b3f8",
+        "timestamp": 1794038333006
       }
     ]
   }

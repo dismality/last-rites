@@ -1,0 +1,178 @@
+/*
+  Shared styling for all menu screens. Tokens only: no raw colours except overlays.
+  Motion honours prefers-reduced-motion through the --transition-* tokens.
+*/
+.menu__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 17, 15, 0.82);
+}
+.menu__backdrop--screen {
+  background: radial-gradient(ellipse at 50% 40%, var(--ink-mid) 0%, var(--ink) 75%);
+}
+
+.menu {
+  width: clamp(300px, 40vw, 520px);
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 1.75rem 1.75rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--ink);
+  font-family: var(--font-body);
+  background: linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 45%, #cfc0a8 100%);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+  outline: none;
+}
+
+.menu__title {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+}
+.menu__title--hero {
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  letter-spacing: 0.1em;
+}
+.menu__text {
+  margin: 0;
+  line-height: 1.5;
+  font-size: 1.05rem;
+}
+.menu__list {
+  margin: 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+.menu__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.menu__button {
+  padding: 0.65rem 1rem;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+  color: var(--parchment);
+  background: var(--ink);
+  border: 1px solid var(--ink-mid);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.menu__button:hover:not([aria-disabled='true']) {
+  background: var(--blood);
+}
+.menu__button[aria-disabled='true'] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Visible focus on every interactive control (accessibility steering doc). */
+.menu button:focus-visible,
+.menu input:focus-visible,
+.menu select:focus-visible {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+}
+
+/* Settings rows */
+.settings__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.settings__row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  font-size: 1rem;
+}
+.settings__row input[type='range'] {
+  grid-column: 1 / -1;
+  accent-color: var(--ember-dim);
+}
+.settings__value {
+  font-family: var(--font-num);
+  font-weight: 600;
+}
+
+/* Loading screen */
+.loading {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  background: var(--ink);
+  color: var(--parchment);
+  font-family: var(--font-body);
+}
+.loading__lantern {
+  width: 96px;
+  height: 128px;
+}
+.loading__flame {
+  transform-origin: 50% 100%;
+  animation: loading-flicker 1.6s infinite ease-in-out;
+}
+.loading[data-flicker='off'] .loading__flame {
+  animation: none;
+}
+@keyframes loading-flicker {
+  0%, 100% { opacity: 1; transform: scaleY(1); }
+  30% { opacity: 0.8; transform: scaleY(0.92); }
+  55% { opacity: 0.95; transform: scaleY(1.06); }
+  75% { opacity: 0.7; transform: scaleY(0.88); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .loading__flame { animation: none; }
+}
+.loading__bar {
+  width: clamp(200px, 30vw, 360px);
+  height: 8px;
+  background: var(--ink-mid);
+  border: 1px solid var(--parchment-dark);
+}
+.loading__fill {
+  height: 100%;
+  background: var(--ember);
+  transition: width var(--transition-normal);
+}
+.loading__label {
+  margin: 0;
+  font-family: var(--font-num);
+  font-size: 1.1rem;
+}
+.loading__errors {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--blood-bright);
+  font-size: 0.9rem;
+}
+.loading .menu__button {
+  border-color: var(--parchment-dark);
+}
+.loading .menu__button:focus-visible {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+}

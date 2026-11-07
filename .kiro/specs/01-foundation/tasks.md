@@ -36,7 +36,7 @@
   - Unit tests for each system; property tests: step independence, radius bounds [1.5, 8], fuel bounds [0, 100]
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 2.4, 2.5, 5.1, 5.3, 5.4, 5.5, 5.6_
 
-- [-] 5. Fixed-timestep GameLoop and pause
+- [x] 5. Fixed-timestep GameLoop and pause
   - `src/scene/GameLoop.tsx`: `useFrame` accumulator, STEP = 1/60 s, max delta clamp 0.25 s
   - System call order: input → stamina → player → lantern → dayNight
   - Events collected per tick and published to the event bus after all systems run
@@ -44,7 +44,7 @@
   - `useGameStore` action `setPaused(bool)` called by pointer-lock-lost and Esc handler
   - _Requirements: 7.4_
 
-- [~] 6. First-person controller with input bindings
+- [x] 6. First-person controller with input bindings
   - `src/scene/player/input.ts`: maps `KeyboardEvent.code` → action via `useSettingsStore(s => s.bindings)`; exports `InputSnapshot` sampled once per tick
   - Pointer-lock request on canvas click; `pointerlockchange` → calls `setPaused(true)` on loss
   - `src/scene/player/FirstPersonController.tsx`: Rapier `RigidBody type="kinematic-position-based"`, capsule collider (radius 0.35, halfHeight 0.5)
@@ -54,7 +54,7 @@
   - `<Physics>` must be wrapped in `<Suspense>` — include this at the `GameLoop` level
   - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 6.5_
 
-- [~] 7. Lantern rendering
+- [x] 7. Lantern rendering
   - `src/scene/player/Lantern.tsx`: camera-attached `SpotLight` (angle 0.9, penumbra 0.6, castShadow, decay 2) + fill `PointLight` (no shadow)
   - `intensity` driven by `lanternRadius(fuel)` mapped to a 0–1 intensity range
   - At fuel = 0: swap SpotLight for a dim `PointLight` (radius 1.5 m) — ember glow, no shadow
@@ -63,7 +63,7 @@
   - Add comment: "Shadow budget: this SpotLight is slot 1 of 4 maximum"
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-- [~] 8. Greybox cemetery
+- [x] 8. Greybox cemetery
   - `src/scene/world/Cemetery.tsx`: four zones with primitive geometry standing in for final models
   - Grounds: flat plane, scattered box headstones (instanced), chapel exterior box
   - Mausoleum Row: narrow corridor of box walls; locked gate collider (static CuboidCollider) until key obtained
@@ -74,7 +74,7 @@
   - All zone geometry is `RigidBody type="fixed"` with `colliders="trimesh"` or explicit `CuboidCollider`
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 9. Sky, fog and phase transitions
+- [x] 9. Sky, fog and phase transitions
   - `src/scene/world/SkyAndFog.tsx`: reads `useWorldStore(s => s.phase)` and `fogDensity`
   - On phase change, lerp sky colour (background color), ambient light intensity/colour, directional moonlight intensity, and `scene.fog.density` over 5 s using a local timer in `useFrame`
   - Sky palette: day `#6a7d8f`, dusk `#8b3a1f`, night `#0a0c12`, dawn `#4a5560` (approximate — visual tuning expected)
@@ -82,7 +82,7 @@
   - Postprocessing: `<EffectComposer>` with `<Noise premultiplied />`, `<Bloom luminanceThreshold={0.9} intensity={0.4} mipmapBlur />`, `<Vignette offset={0.3} darkness={0.6} />`. Use `mipmapBlur` (v3 API) not `kernelSize`.
   - _Requirements: 5.2, 5.5_
 
-- [ ] 10. Screens: content warning, loading, title, pause, settings
+- [x] 10. Screens: content warning, loading, title, pause, settings
   - `src/ui/menus/ContentWarning.tsx`: warns about jumpscares and flashing lights; buttons "Continue" (→ Loading) and "Settings" (opens Settings panel); must be keyboard-navigable with visible focus ring
   - `src/ui/menus/LoadingScreen.tsx`: uses `useProgress()` from drei 10 for real asset progress; themed with `--parchment` and `--ink` tokens; shows a flickering lantern SVG
   - `src/ui/menus/TitleScreen.tsx`: buttons New Game / Continue (greyed if no save) / Settings / Credits; IM Fell English SC heading
@@ -91,7 +91,7 @@
   - All menus: `role="dialog"`, `aria-modal="true"`, `tabIndex` chain, `onKeyDown` Escape handler, visible `:focus-visible` outline
   - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 6.1_
 
-- [ ] 11. Baseline HUD and subtitles
+- [x] 11. Baseline HUD and subtitles
   - `src/ui/hud/LanternHealth.tsx`: SVG lantern-flame icon; flame height proportional to `health/100`; tinted red below 30 HP; numeric overlay when `settings.accessibleHUD`
   - `src/ui/hud/FuelReservoir.tsx`: glass tube SVG; fill level proportional to `fuel/100`; numeric overlay when `settings.accessibleHUD`
   - `src/ui/hud/Crosshair.tsx`: 4×4 px dot; switches to hand SVG icon when `usePlayerStore` exposes an `interactTarget` within 2.5 m
@@ -100,7 +100,7 @@
   - Stamina bar: shown only when draining or recently drained (fades out 1 s after sprint stops); numeric when `accessibleHUD`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 5.4_
 
-- [ ] 12. Checkpoint: first playable
+- [x] 12. Checkpoint: first playable
   - Manual smoke-test checklist (run before marking done):
     1. `npm run test` passes with zero failures
     2. `npm run build` passes with zero TypeScript errors

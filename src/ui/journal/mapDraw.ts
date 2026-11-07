@@ -1,0 +1,171 @@
+// Canvas 2D drawing for the journal map: pencil-hatched cells, sketched landmark
+// icons and the quill marker. Stateless; the Map component owns animation timing.
+
+import { MAP_CELL_SIZE, MAP_EXTENT, type Landmark, type LandmarkKind } from '../../data/mapLandmarks'
+import { createRng } from '../../game/rng'
+import type { Cell } from '../../game/systems/mapReveal'
+
+export const CELL_PX = 28
+export const MARGIN_PX = 16
+export const MAP_COLS = MAP_EXTENT.maxCx - MAP_EXTENT.minCx + 1
+export const MAP_ROWS = MAP_EXTENT.maxCz - MAP_EXTENT.minCz + 1
+export const MAP_WIDTH = MAP_COLS * CELL_PX + MARGIN_PX * 2
+export const MAP_HEIGHT = MAP_ROWS * CELL_PX + MARGIN_PX * 2
+
+const GRAPHITE = '#3a2f22'
+const WASH = 'rgba(120, 100, 66, 0.16)'
+const STROKES_PER_CELL = 7
+
+/** World metres to canvas pixels. */
+export function toPx(x: number, z: number): [number, number] {
+  return [
+    MARGIN_PX + (x / MAP_CELL_SIZE - MAP_EXTENT.minCx) * CELL_PX,
+    MARGIN_PX + (z / MAP_CELL_SIZE - MAP_EXTENT.minCz) * CELL_PX,
+  ]
+}
+
+export interface MapScene {
+  /** Explored cells with ink progress 0..1. */
+  cells: ReadonlyArray<{ cell: Cell; progress: number }>
+  landmarks: readonly Landmark[]
+  player: { x: number; z: number; yaw: number }
+  /** Fade cells in instead of drawing strokes (prefers-reduced-motion). */
+  reducedMotion: boolean
+}
+
+export function drawMap(ctx: CanvasRenderingContext2D, scene: MapScene): void {
+  ctx.clearRect(0, 0, MAP_WIDTH, MAP_HEIGHT)
+  ctx.lineCap = 'round'
+  ctx.lineJoin = 'round'
+  for (const { cell, progress } of scene.cells) drawCell(ctx, cell, progress, scene.reducedMotion)
+  for (const l of scene.landmarks) {
+    const [px, pz] = toPx(l.position[0], l.position[2])
+    drawIcon(ctx, l.kind, px, pz)
+  }
+  drawQuill(ctx, scene.player)
+}
+
+/** A wobbly pencil outline plus diagonal hatching; the jitter is seeded per cell so it never shimmers. */
+function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, progress: number, reduced: boolean): void {
+  if (progress <= 0) return
+  const x = MARGIN_PX + (cell.cx - MAP_EXTENT.minCx) * CELL_PX
+  const y = MARGIN_PX + (cell.cz - MAP_EXTENT.minCz) * CELL_PX
+  const rng = createRng(cell.cx * 7919 + cell.cz * 104729 + 1891)
+  const j = () => (rng() - 0.5) * 2.2
+
+  ctx.save()
+  ctx.globalAlpha = reduced ? progress : 1
+  ctx.fillStyle = WASH
+  ctx.fillRect(x, y, CELL_PX, CELL_PX)
+  ctx.strokeStyle = GRAPHITE
+  ctx.lineWidth = 1
+
+  // Hatching: draw only the first `progress` share of strokes while animating.
+  const visible = reduced ? STROKES_PER_CELL : Math.ceil(STROKES_PER_CELL * progress)
+  ctx.globalAlpha *= 0.55
+  for (let i = 0; i < visible; i++) {
+    const t = ((i + 0.5) / STROKES_PER_CELL) * CELL_PX * 2
+    ctx.beginPath()
+    ctx.moveTo(x + Math.min(t, CELL_PX) + j(), y + Math.max(0, t - CELL_PX) + j())
+    ctx.lineTo(x + Math.max(0, t - CELL_PX) + j(), y + Math.min(t, CELL_PX) + j())
+    ctx.stroke()
+  }
+
+  // Outline: four sides drawn in order, so it appears to be sketched around the cell.
+  ctx.globalAlpha = reduced ? progress : 1
+  ctx.lineWidth = 1.4
+  const corners: Array<[number, number]> = [
+    [x, y],
+    [x + CELL_PX, y],
+    [x + CELL_PX, y + CELL_PX],
+    [x, y + CELL_PX],
+    [x, y],
+  ]
+  const sides = reduced ? 4 : Math.floor(progress * 4 + 0.001)
+  ctx.beginPath()
+  ctx.moveTo(corners[0][0] + j(), corners[0][1] + j())
+  for (let s = 1; s <= sides; s++) ctx.lineTo(corners[s][0] + j(), corners[s][1] + j())
+  ctx.stroke()
+  ctx.restore()
+}
+
+/** Sketched icons: each kind has its own silhouette so colour is never the only cue. */
+function drawIcon(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: number, y: number): void {
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.fillStyle = 'rgba(216, 201, 163, 0.9)'
+  ctx.strokeStyle = GRAPHITE
+  ctx.lineWidth = 1.6
+  ctx.beginPath()
+  switch (kind) {
+    case 'workbench': // table top on two legs
+      ctx.rect(-7, -4, 14, 4)
+      ctx.moveTo(-5, 0)
+      ctx.lineTo(-5, 6)
+      ctx.moveTo(5, 0)
+      ctx.lineTo(5, 6)
+      break
+    case 'chapel': // gabled house with a cross on top
+      ctx.moveTo(-6, 6)
+      ctx.lineTo(-6, -2)
+      ctx.lineTo(0, -7)
+      ctx.lineTo(6, -2)
+      ctx.lineTo(6, 6)
+      ctx.closePath()
+      ctx.moveTo(0, -7)
+      ctx.lineTo(0, -12)
+      ctx.moveTo(-2.5, -10)
+      ctx.lineTo(2.5, -10)
+      break
+    case 'gate': // arch with bars
+      ctx.moveTo(-6, 7)
+      ctx.lineTo(-6, -1)
+      ctx.arc(0, -1, 6, Math.PI, 0)
+      ctx.lineTo(6, 7)
+      ctx.moveTo(-2, 7)
+      ctx.lineTo(-2, -5)
+      ctx.moveTo(2, 7)
+      ctx.lineTo(2, -5)
+      break
+    case 'relic': // diamond with a mark
+      ctx.moveTo(0, -8)
+      ctx.lineTo(6, 0)
+      ctx.lineTo(0, 8)
+      ctx.lineTo(-6, 0)
+      ctx.closePath()
+      ctx.moveTo(-2.5, 0)
+      ctx.lineTo(2.5, 0)
+      break
+  }
+  ctx.fill()
+  ctx.stroke()
+  ctx.restore()
+}
+
+/** Quill: a feather-shaped pointer aimed along the player's heading. */
+function drawQuill(ctx: CanvasRenderingContext2D, p: { x: number; z: number; yaw: number }): void {
+  const [x, y] = toPx(p.x, p.z)
+  // Camera yaw 0 looks toward -Z (up the map); positive yaw turns left (counter-clockwise).
+  const angle = -p.yaw
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.rotate(angle)
+  ctx.fillStyle = '#e8913a'
+  ctx.strokeStyle = '#14110f'
+  ctx.lineWidth = 1.6
+  ctx.beginPath()
+  ctx.moveTo(0, -11) // nib
+  ctx.quadraticCurveTo(6, -2, 3, 7)
+  ctx.lineTo(0, 4)
+  ctx.lineTo(-3, 7)
+  ctx.quadraticCurveTo(-6, -2, 0, -11)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  // Quill shaft
+  ctx.beginPath()
+  ctx.moveTo(0, -6)
+  ctx.lineTo(0, 11)
+  ctx.stroke()
+  ctx.restore()
+}

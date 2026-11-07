@@ -1,0 +1,165 @@
+.hud {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-corner {
+  position: absolute;
+  left: 24px;
+  bottom: 24px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.hud-gauge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hud-num {
+  color: var(--parchment);
+  font-size: 1rem;
+  text-shadow: 0 1px 2px var(--ink);
+}
+
+.hud-stamina {
+  position: absolute;
+  left: 50%;
+  bottom: 48px;
+  width: 200px;
+  height: 8px;
+  transform: translateX(-50%);
+  border: 1px solid var(--parchment-dark);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.hud-stamina__fill {
+  height: 100%;
+  background: var(--parchment);
+}
+
+.hud-stamina__num {
+  position: absolute;
+  left: 100%;
+  top: -6px;
+  margin-left: 8px;
+}
+
+.hud-crosshair {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+}
+
+.hud-crosshair__dot {
+  width: 4px;
+  height: 4px;
+  background: var(--parchment);
+  box-shadow: 0 0 2px var(--ink);
+}
+
+.hud-prompt {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 36px);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 4px 14px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.7);
+  border: 1px solid var(--parchment-dark);
+  transition: opacity 150ms ease-out;
+}
+
+.hud-prompt__rune {
+  margin-right: 8px;
+  color: var(--ember);
+}
+
+.hud-subtitles {
+  position: absolute;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  max-width: 70vw;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.hud-subtitles__line {
+  margin: 0;
+  padding: 4px 12px;
+  font-family: var(--font-body);
+  font-size: 20px;
+  color: var(--parchment);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.hud-toast-region {
+  position: absolute;
+  right: 24px;
+  top: 24px;
+}
+
+.hud-toast {
+  margin: 0;
+  padding: 8px 18px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 2px solid var(--parchment-dark);
+  animation: hud-toast-in 200ms ease-out;
+}
+
+@keyframes hud-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Fade only, no slide, when reduced motion is requested. */
+@media (prefers-reduced-motion: reduce) {
+  .hud-toast {
+    animation-name: hud-toast-fade;
+  }
+  @keyframes hud-toast-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+.hud-dawn {
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 20px 28px;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--parchment-dark);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.hud-dawn__title {
+  margin: 0 0 8px;
+  font-family: var(--font-heading);
+}
+
+.hud-dawn__list {
+  margin: 0;
+  padding-left: 1.2em;
+}

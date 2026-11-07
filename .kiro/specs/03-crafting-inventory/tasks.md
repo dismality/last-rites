@@ -35,5 +35,5 @@
   - Repair points UI; ordered stages; door blocks zombies; altar save and heal; bell warning
   - _Requirements: 6.1–6.6_
 
-- [ ] 9. Checkpoint
+- [x] 9. Checkpoint
   - Craft a bone club, sharpen the shovel after night 1, repair stage 1; all tests pass

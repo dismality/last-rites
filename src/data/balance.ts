@@ -26,3 +26,6 @@ export const STAMINA_MAX = 100
 export const STAMINA_DRAIN_PER_S = 20
 export const STAMINA_REGEN_PER_S = 15
 export const STAMINA_REGEN_DELAY_S = 1
+
+/** Max distance (m) at which the crosshair can target an interactable. */
+export const INTERACT_RANGE_M = 2.5

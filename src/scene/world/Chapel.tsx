@@ -18,6 +18,7 @@ import { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { playerPositionRef } from './playerPositionRef'
+import { CHAPEL_CENTER } from '../../data/cemeteryLayout'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useChapelStore } from '../../game/state/chapelStore'
 
@@ -26,7 +27,7 @@ import { useChapelStore } from '../../game/state/chapelStore'
 // ---------------------------------------------------------------------------
 
 /** World position of the chapel's geometric centre. */
-const CHAPEL_POS = new THREE.Vector3(10, 0, 5)
+const CHAPEL_POS = new THREE.Vector3(...CHAPEL_CENTER)
 
 /** Interact range in metres (matches design-bible default of 2.5 m). */
 const INTERACT_RANGE = 2.5
@@ -63,20 +64,14 @@ function ChapelGeometry() {
   return (
     <group>
       {/* Nave â€” long axis along Z */}
-      <mesh position={[0, 1.5, 0]} receiveShadow castShadow>
-        <boxGeometry args={[5, 3, 12]} />
-        <meshStandardMaterial color="#5a5550" roughness={0.95} metalness={0.0} />
-      </mesh>
+      {/* Walls and roof now live in Cemetery.tsx as a hollow shell with colliders. */}
 
       {/* Transept â€” crosses the nave near the altar end */}
-      <mesh position={[0, 1.5, 2.5]} receiveShadow castShadow>
-        <boxGeometry args={[10, 3, 4]} />
-        <meshStandardMaterial color="#5a5550" roughness={0.95} metalness={0.0} />
-      </mesh>
+
 
       {/* Floor slab */}
       <mesh position={[0, 0.02, 0]} receiveShadow>
-        <boxGeometry args={[10, 0.1, 13]} />
+        <boxGeometry args={[4.8, 0.1, 11.8]} />
         <meshStandardMaterial color="#3c3530" roughness={1} metalness={0} />
       </mesh>
     </group>

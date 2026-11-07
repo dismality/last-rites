@@ -1,0 +1,128 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Item, zone and loot data": [
+      {
+        "executionId": "4acaaf00-d2c7-4ec5-8d34-fe65a779fb2b",
+        "chatSessionId": "sess_0b0c30f8-511d-4f10-86a0-12331ae42c24",
+        "timestamp": 1794041079115
+      },
+      {
+        "executionId": "4acaaf00-d2c7-4ec5-8d34-fe65a779fb2b",
+        "chatSessionId": "sess_0b0c30f8-511d-4f10-86a0-12331ae42c24",
+        "timestamp": 1794041167920
+      }
+    ],
+    "2. Inventory system with property tests": [
+      {
+        "executionId": "2e2be5dc-25c1-46ce-b468-93b8f30dc18b",
+        "chatSessionId": "sess_632682e2-03da-4af4-9c89-76ee53299dc8",
+        "timestamp": 1794043275956
+      },
+      {
+        "executionId": "2e2be5dc-25c1-46ce-b468-93b8f30dc18b",
+        "chatSessionId": "sess_632682e2-03da-4af4-9c89-76ee53299dc8",
+        "timestamp": 1794043375760
+      }
+    ],
+    "3. Loot rolling and daily respawn": [
+      {
+        "executionId": "d429a902-5044-499f-bfc8-80a2064a8dc1",
+        "chatSessionId": "sess_43283d13-7432-41c1-9631-c267e57e2a24",
+        "timestamp": 1794046039862
+      },
+      {
+        "executionId": "d429a902-5044-499f-bfc8-80a2064a8dc1",
+        "chatSessionId": "sess_43283d13-7432-41c1-9631-c267e57e2a24",
+        "timestamp": 1794046099985
+      }
+    ],
+    "4. Interaction raycast and Interactable wrapper": [
+      {
+        "executionId": "e5d91639-99fe-415f-a6fb-dd671a4d3cbd",
+        "chatSessionId": "sess_de380d72-b0b0-438c-871b-6156e80812be",
+        "timestamp": 1794046109465
+      },
+      {
+        "executionId": "e5d91639-99fe-415f-a6fb-dd671a4d3cbd",
+        "chatSessionId": "sess_de380d72-b0b0-438c-871b-6156e80812be",
+        "timestamp": 1794046236973
+      }
+    ],
+    "5. Pickups and toasts": [
+      {
+        "executionId": "12df4714-a19f-4ade-be38-8429a997b1c5",
+        "chatSessionId": "sess_b0d2891c-85df-44d9-bc27-6f950d78da9a",
+        "timestamp": 1794046247625
+      },
+      {
+        "executionId": "12df4714-a19f-4ade-be38-8429a997b1c5",
+        "chatSessionId": "sess_b0d2891c-85df-44d9-bc27-6f950d78da9a",
+        "timestamp": 1794046368965
+      }
+    ],
+    "6. Grave digging": [
+      {
+        "executionId": "0ab9358d-2ca1-4525-b2b9-cc8189c00213",
+        "chatSessionId": "sess_89825fd9-2713-441b-94cf-61c1d0c9f11e",
+        "timestamp": 1794046387571
+      },
+      {
+        "executionId": "0ab9358d-2ca1-4525-b2b9-cc8189c00213",
+        "chatSessionId": "sess_89825fd9-2713-441b-94cf-61c1d0c9f11e",
+        "timestamp": 1794046491013
+      }
+    ],
+    "7. Examine mode": [
+      {
+        "executionId": "812ba2ed-5ace-49b8-8181-3474c43d5007",
+        "chatSessionId": "sess_4de48033-e5f0-4d35-b3ac-0c5f622c2063",
+        "timestamp": 1794046505880
+      },
+      {
+        "executionId": "812ba2ed-5ace-49b8-8181-3474c43d5007",
+        "chatSessionId": "sess_4de48033-e5f0-4d35-b3ac-0c5f622c2063",
+        "timestamp": 1794047146753
+      }
+    ],
+    "8. Satchel overlay and hotbar": [
+      {
+        "executionId": "f5bc0a86-6fda-4369-807f-51416f4b39e4",
+        "chatSessionId": "sess_610a9256-97bf-4897-8669-a11cd56bd4d2",
+        "timestamp": 1794047155900
+      },
+      {
+        "executionId": "d2643397-90f0-4444-b0ec-93ae6da4f044",
+        "chatSessionId": "sess_a0f7bf97-2e74-47a9-bfd7-08a0e2bf6c67",
+        "timestamp": 1794047866973
+      },
+      {
+        "executionId": "6a4bf709-5fc0-409a-9ce8-993a542b99ac",
+        "chatSessionId": "sess_cbf9045f-5805-4e61-ba0f-2226c2fdd797",
+        "timestamp": 1794047914454
+      },
+      {
+        "executionId": "6c16bd9b-5775-4dc2-a3c8-60f75c3a3da6",
+        "chatSessionId": "sess_39e89ab3-d237-4071-9c14-85a72714b28a",
+        "timestamp": 1794065488626
+      },
+      {
+        "executionId": "6c16bd9b-5775-4dc2-a3c8-60f75c3a3da6",
+        "chatSessionId": "sess_39e89ab3-d237-4071-9c14-85a72714b28a",
+        "timestamp": 1794065904919
+      }
+    ],
+    "9. Self-drawing journal map": [
+      {
+        "executionId": "bbc4ae1a-0249-412a-abf6-a713c277184d",
+        "chatSessionId": "sess_be3b6d21-1df9-4599-a5cf-e8ce08138272",
+        "timestamp": 1794047625049
+      },
+      {
+        "executionId": "bbc4ae1a-0249-412a-abf6-a713c277184d",
+        "chatSessionId": "sess_be3b6d21-1df9-4599-a5cf-e8ce08138272",
+        "timestamp": 1794047850142
+      }
+    ]
+  }
+}
