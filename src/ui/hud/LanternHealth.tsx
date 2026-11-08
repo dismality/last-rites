@@ -1,5 +1,7 @@
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
+import { flameDipFactor } from '../../game/systems/damageFeedback'
+import { useHitAge } from './useHitAge'
 import { formatValue, isLowHealth, toFraction } from './hudMath'
 
 // Flame occupies y from 4 (tip) to 56 (base) in a 40x60 viewBox.
@@ -16,7 +18,8 @@ export function LanternHealth() {
   const low = isLowHealth(health)
   const frac = toFraction(health)
   // Scale the flame vertically from its base so height is proportional to health/100.
-  const scaleY = Math.max(0.08, frac)
+  // The flame dips briefly on every hit (Req 6.1), even with flashing lights off.
+  const scaleY = Math.max(0.08, frac * flameDipFactor(useHitAge()))
   const fill = low ? 'var(--blood-bright)' : 'var(--ember)'
   const glow = low ? 'var(--blood)' : 'var(--ember-glow)'
 

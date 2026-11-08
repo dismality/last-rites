@@ -1,0 +1,135 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "2. Mystery state system with tests": [
+      {
+        "executionId": "56b3040a-3502-41f2-9fd0-0394ff680ef8",
+        "chatSessionId": "sess_e49aff07-dd43-4e83-8a30-2e821c32703c",
+        "timestamp": 1794079694608
+      },
+      {
+        "executionId": "56b3040a-3502-41f2-9fd0-0394ff680ef8",
+        "chatSessionId": "sess_e49aff07-dd43-4e83-8a30-2e821c32703c",
+        "timestamp": 1794079756727
+      }
+    ],
+    "1. Journal, clue, relic and scare data": [
+      {
+        "executionId": "3fa919bc-1c9c-44c0-b993-c006c2e30428",
+        "chatSessionId": "sess_6a7f8c4f-1580-4e5e-a525-c46eae527ad6",
+        "timestamp": 1794079771759
+      },
+      {
+        "executionId": "3fa919bc-1c9c-44c0-b993-c006c2e30428",
+        "chatSessionId": "sess_6a7f8c4f-1580-4e5e-a525-c46eae527ad6",
+        "timestamp": 1794079866932
+      }
+    ],
+    "3. Scare director with property tests": [
+      {
+        "executionId": "50005fb9-f608-4040-8d33-2dee91f0d679",
+        "chatSessionId": "sess_9a6ae84b-8c51-4816-8550-bb19d89a5ca0",
+        "timestamp": 1794080055945
+      },
+      {
+        "executionId": "50005fb9-f608-4040-8d33-2dee91f0d679",
+        "chatSessionId": "sess_9a6ae84b-8c51-4816-8550-bb19d89a5ca0",
+        "timestamp": 1794080629198
+      }
+    ],
+    "4. Scare zones and stager in the scene": [
+      {
+        "executionId": "bb1fc3f0-2610-47f2-9584-a650e9afd078",
+        "chatSessionId": "sess_1932ce05-9e61-416e-9427-5cfde304adac",
+        "timestamp": 1794080638604
+      },
+      {
+        "executionId": "f2264c31-ca8a-48b3-86cd-0d1e2fde6ac9",
+        "chatSessionId": "sess_4b3acd4b-2348-4569-ac95-74e9f03996fb",
+        "timestamp": 1794117884861
+      },
+      {
+        "executionId": "f2264c31-ca8a-48b3-86cd-0d1e2fde6ac9",
+        "chatSessionId": "sess_4b3acd4b-2348-4569-ac95-74e9f03996fb",
+        "timestamp": 1794118341647
+      }
+    ],
+    "5. Keys and gates": [
+      {
+        "executionId": "06edc109-20a8-43be-8d94-a45158233570",
+        "chatSessionId": "sess_94abfceb-7ae9-49b2-8093-832d5685371c",
+        "timestamp": 1794080769564
+      },
+      {
+        "executionId": "c36c97af-0219-4fb2-b7ae-b9af6b845d40",
+        "chatSessionId": "sess_af9e6aff-fe51-49aa-a63b-537c3627104f",
+        "timestamp": 1794118354993
+      },
+      {
+        "executionId": "c36c97af-0219-4fb2-b7ae-b9af6b845d40",
+        "chatSessionId": "sess_af9e6aff-fe51-49aa-a63b-537c3627104f",
+        "timestamp": 1794118669199
+      }
+    ],
+    "6. Tombstones and environmental clues": [
+      {
+        "executionId": "d4c5e396-1e8a-4af3-a300-2eafbc4e2c53",
+        "chatSessionId": "sess_404a964a-4a79-4e24-b6af-b8ebe71203b9",
+        "timestamp": 1794118678794
+      },
+      {
+        "executionId": "d4c5e396-1e8a-4af3-a300-2eafbc4e2c53",
+        "chatSessionId": "sess_404a964a-4a79-4e24-b6af-b8ebe71203b9",
+        "timestamp": 1794118871233
+      }
+    ],
+    "7. Journal UI": [
+      {
+        "executionId": "886eebe4-a6c9-49cd-81f9-50a7f7e05dcc",
+        "chatSessionId": "sess_edb1a739-25fd-40a3-8aa8-242618406b55",
+        "timestamp": 1794118883042
+      },
+      {
+        "executionId": "886eebe4-a6c9-49cd-81f9-50a7f7e05dcc",
+        "chatSessionId": "sess_edb1a739-25fd-40a3-8aa8-242618406b55",
+        "timestamp": 1794119029641
+      }
+    ],
+    "8. Save and continue": [
+      {
+        "executionId": "18ad192e-1384-4c81-acb2-e651d096d5e3",
+        "chatSessionId": "sess_d927da97-15b1-4325-be33-4f6be8df42e8",
+        "timestamp": 1794119042113
+      },
+      {
+        "executionId": "18ad192e-1384-4c81-acb2-e651d096d5e3",
+        "chatSessionId": "sess_d927da97-15b1-4325-be33-4f6be8df42e8",
+        "timestamp": 1794119342553
+      }
+    ],
+    "9. Final rite and endings": [
+      {
+        "executionId": "f3798d9c-e2cc-417b-83d7-7e4c76552632",
+        "chatSessionId": "sess_b7c16f05-f7e2-4278-93f7-e9895f4d6f45",
+        "timestamp": 1794119354812
+      },
+      {
+        "executionId": "f3798d9c-e2cc-417b-83d7-7e4c76552632",
+        "chatSessionId": "sess_b7c16f05-f7e2-4278-93f7-e9895f4d6f45",
+        "timestamp": 1794119800503
+      }
+    ],
+    "10. Checkpoint: full playthrough": [
+      {
+        "executionId": "d8915bf9-7334-4700-8c26-8d5aa9c722d7",
+        "chatSessionId": "sess_c5a06463-bf27-4b27-a5b7-c83a451fd8d7",
+        "timestamp": 1794119809262
+      },
+      {
+        "executionId": "d8915bf9-7334-4700-8c26-8d5aa9c722d7",
+        "chatSessionId": "sess_c5a06463-bf27-4b27-a5b7-c83a451fd8d7",
+        "timestamp": 1794119889117
+      }
+    ]
+  }
+}

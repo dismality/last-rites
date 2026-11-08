@@ -10,8 +10,26 @@
 // wired in a later task) and is pure rendering — no game logic lives here.
 
 import { useRef, useMemo } from 'react'
-import { useFrame } from '@react-three/fiber'
+import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useGameStore, useInventoryStore, usePlayerStore, useSettingsStore } from '../../game/state'
+import { tickHeadBob, type BobState } from '../../game/systems/movement'
+import { hotbarItem } from '../../game/systems/satchel'
+import {
+  SWAP_LOWER_DISTANCE,
+  SWAP_LOWER_TILT,
+  SWAY_REST,
+  createSwapState,
+  swapEase,
+  tickSway,
+  tickSwap,
+  viewmodelBob,
+  type SwapState,
+  type SwayState,
+} from '../../game/systems/viewmodel'
+import type { ItemId } from '../../game/types'
+import { input } from './input'
+import { meleeRuntime } from './meleeRuntime'
 import { isCracked } from '../../game/systems/durability'
 import type { WeaponState } from '../../game/systems/durability'
 import { WEAPON_MAP } from '../../data/weapons'
@@ -125,29 +143,117 @@ function CrackOverlay({ opacity }: CrackOverlayProps) {
   )
 }
 
+function syncCamera(camera: THREE.PerspectiveCamera, fov: number, aspect: number): void {
+  if (camera.fov === fov && camera.aspect === aspect) return
+  camera.fov = fov
+  camera.aspect = aspect
+  camera.updateProjectionMatrix()
+}
+
 // ---------------------------------------------------------------------------
 // Viewmodel (main export)
 // ---------------------------------------------------------------------------
 
 /**
- * Mount this inside the R3F Camera's subtree (or a fixed near-plane group)
- * so it moves with the player's view.
+ * Mount anywhere inside the R3F <Canvas>.
  *
- * The camera group is typically created in FirstPersonController; Viewmodel
- * is a child of that group.
+ * The item lives in its own scene with its own camera, drawn after the world
+ * with the depth buffer cleared. That way it can never clip into walls or
+ * headstones (Req 1.1) and the world camera's near plane stays generous.
+ *
+ * Runs at useFrame priority 2, after the EffectComposer (priority 1) has drawn
+ * the world. Mount it together with <PostEffects />; on its own nothing draws
+ * the world. The viewmodel therefore skips bloom/vignette, which is fine for a held prop.
  */
 export function Viewmodel({ weaponState }: ViewmodelProps) {
   const opacity = useMemo(
     () => (weaponState ? crackOpacity(weaponState) : 0),
     [weaponState],
   )
-
   const cracked = weaponState ? isCracked(weaponState) : false
 
-  return (
-    <group name="viewmodel">
-      <ViewmodelMesh />
-      {cracked && <CrackOverlay opacity={opacity} />}
-    </group>
+  const size = useThree((s) => s.size)
+
+  const scene = useMemo(() => new THREE.Scene(), [])
+  const camera = useMemo(() => new THREE.PerspectiveCamera(75, 1, 0.01, 5), [])
+  const rig = useRef<THREE.Group>(null)
+  const itemGroup = useRef<THREE.Group>(null)
+
+  const swap = useRef<SwapState | null>(null)
+  const sway = useRef<SwayState>(SWAY_REST)
+  const bob = useRef<BobState>({ phase: 0, amplitude: 0 })
+  const lastLook = useRef<{ yaw: number; pitch: number } | null>(null)
+
+  useFrame((state, rawDelta) => {
+    const settings = useSettingsStore.getState()
+    const inv = useInventoryStore.getState()
+    const target: ItemId | null =
+      inv.equippedSlot === null ? null : hotbarItem(inv.inventory, inv.equippedSlot)
+    // Start with whatever is in hand so the first frame doesn't play a swap.
+    swap.current ??= createSwapState(target)
+
+    // Keep the viewmodel FOV in step with the setting and window size.
+    const aspect = size.width / size.height
+    syncCamera(camera, settings.fov, aspect)
+
+    const gs = useGameStore.getState()
+    const frozen = gs.paused || gs.examining || gs.journalOpen
+    const dt = frozen ? 0 : Math.min(rawDelta, 0.1)
+
+    if (dt > 0) {
+      const player = usePlayerStore.getState()
+      const snap = input.peek()
+      const moving = snap.forward !== 0 || snap.strafe !== 0
+
+      const prev = lastLook.current
+      // First frame has no previous angle; treat it as no movement.
+      const dYaw = prev ? player.yaw - prev.yaw : 0
+      const dPitch = prev ? player.pitch - prev.pitch : 0
+      lastLook.current = { yaw: player.yaw, pitch: player.pitch }
+
+      swap.current = tickSwap(swap.current, target, dt)
+      sway.current = tickSway(sway.current, dYaw, dPitch, dt)
+      bob.current = tickHeadBob(bob.current, dt, moving, settings.headBob)
+    }
+
+    const g = rig.current
+    if (g) {
+      const lowered = swapEase(swap.current.progress)
+      const b = viewmodelBob(bob.current)
+      const sw = meleeRuntime.pose
+      g.position.set(
+        sway.current.x + b.x + sw.x,
+        sway.current.y + b.y + sw.y - lowered * SWAP_LOWER_DISTANCE,
+        sw.z,
+      )
+      g.rotation.set(-lowered * SWAP_LOWER_TILT - sw.rotX, 0, sw.rotZ)
+    }
+    // Nothing is drawn while the slot is empty or mid-swap-to-nothing.
+    if (itemGroup.current) itemGroup.current.visible = swap.current.shown !== null
+    // The ending camera is not the player's eyes, so no hands in shot.
+    if (gs.screen === 'ending') return
+
+    // The EffectComposer (priority 1) has already drawn the world to the screen.
+    // Draw the viewmodel over it with a cleared depth buffer so it never clips into walls.
+    const { gl } = state
+    gl.autoClear = false
+    gl.clearDepth()
+    gl.render(scene, camera)
+    gl.autoClear = true
+  }, 2)
+
+  return createPortal(
+    <>
+      {/* The portal scene gets none of the world's lights, so give it a faint warm key. */}
+      <ambientLight intensity={0.6} color="#9fb3c8" />
+      <directionalLight position={[0.5, 1, 1]} intensity={1.2} color="#e8913a" />
+      <group ref={rig} name="viewmodel">
+        <group ref={itemGroup}>
+          <ViewmodelMesh />
+          {cracked && <CrackOverlay opacity={opacity} />}
+        </group>
+      </group>
+    </>,
+    scene
   )
 }

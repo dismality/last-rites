@@ -1,4 +1,4 @@
-﻿// Chapel -- R3F scene component.
+// Chapel -- R3F scene component.
 //
 // Geometry: a cross-shaped footprint built from three overlapping box meshes
 // (nave + transept). This is a placeholder while full model assets are pending.
@@ -21,6 +21,8 @@ import { playerPositionRef } from './playerPositionRef'
 import { CHAPEL_CENTER } from '../../data/cemeteryLayout'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useChapelStore } from '../../game/state/chapelStore'
+import { saveGame } from '../../game/state/gameSave'
+import { readRiteStatus } from '../../game/state/riteStatus'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -94,10 +96,10 @@ function DoorMesh({ barred }: { barred: boolean }) {
   return (
     <mesh
       ref={meshRef}
-      position={[0, 1.0, -5.55]}
+      position={[0, 1.25, -5.85]}
       castShadow
     >
-      <boxGeometry args={[1.4, 2.0, 0.15]} />
+      <boxGeometry args={[1.4, 2.5, 0.15]} />
       <meshStandardMaterial color={DOOR_COLOR_OPEN} roughness={0.85} metalness={0.1} />
     </mesh>
   )
@@ -149,8 +151,10 @@ export function Chapel() {
 
       // Altar check
       const distToAltar = playerPos.current.distanceTo(altarPos.current)
+      // While the final rite is possible, E at the altar is held for the rite, not a heal tap.
       if (
         distToAltar <= INTERACT_RANGE &&
+        readRiteStatus().availability !== 'ready' &&
         altarActive &&
         !altarHealedToday &&
         !altarInteractedRef.current
@@ -158,6 +162,9 @@ export function Chapel() {
         altarInteractedRef.current = true
         healPlayer(25)
         setAltarHealedToday(true)
+        // Stage 2 is repaired here (altarActive), so the altar also saves (Req 7.1).
+        // Saved after the heal so the file holds the healed health and the used-today flag.
+        saveGame()
         // Subtitle placeholder â€” a proper subtitle system will replace this.
         console.info("[Chapel] \"The altar's warmth mends your wounds.\"")
       }

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useGameStore } from '../../game/state'
+import { useUiWorldStore } from '../../game/state/uiWorldStore'
 
 /**
  * Pauses on Esc and on pointer-lock loss. Browsers swallow Esc keydown while
@@ -12,7 +13,11 @@ export function usePauseTriggers(): void {
     const pause = () => {
       // The satchel frees the cursor too, but it owns Esc and never pauses.
       const { examining, journalOpen, satchelOpen } = useGameStore.getState()
-      if (!examining && !journalOpen && !satchelOpen) useGameStore.getState().setPaused(true)
+      // The workbench and chapel repair overlays free the cursor on purpose and own Esc.
+      const { workbenchOpen, chapelRepairOpen } = useUiWorldStore.getState()
+      if (!examining && !journalOpen && !satchelOpen && !workbenchOpen && !chapelRepairOpen) {
+        useGameStore.getState().setPaused(true)
+      }
     }
     const onKey = (e: KeyboardEvent) => {
       if (e.code === 'Escape') pause()

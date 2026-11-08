@@ -95,7 +95,8 @@ export function Interactable({
     const t = state.clock.elapsedTime
     // Slow pulse; held steady when the flashing-lights setting is off.
     const pulse = animate ? 0.5 + 0.5 * Math.sin(t * 2.4) : 0.5
-    const strength = isHover ? 0.45 + 0.2 * pulse : lit ? 0.04 + 0.1 * pulse : 0
+    // Kept faint: the outline and rune carry the highlight. A strong additive box reads as a glowing crate.
+    const strength = isHover ? 0.07 + 0.04 * pulse : lit ? 0.015 + 0.03 * pulse : 0
     if (glow.current) glow.current.opacity = strength
     if (rune.current) rune.current.opacity = isHover ? 1 : lit ? 0.25 + 0.3 * pulse : 0
   })

@@ -7,6 +7,7 @@ import type { Group, Object3D, PointLight, SpotLight } from 'three'
 import { LANTERN_RADIUS_MAX_M } from '../../data/balance'
 import { useGameStore, useLanternStore, useSettingsStore } from '../../game/state'
 import { lanternIntensity, lanternRadius } from '../../game/systems/lantern'
+import { scareRuntime } from '../scares/scareRuntime'
 
 const AMBER = '#e8913a'
 /** Candela scale for three's physical lighting; tuned by eye against fog. */
@@ -40,7 +41,7 @@ export function Lantern() {
     if (spot.current && target.current) spot.current.target = target.current
   }, [])
 
-  useFrame(({ camera }) => {
+  useFrame(({ camera }, delta) => {
     // Follow the camera by copy so the lights need not be reparented into the camera.
     rig.current?.position.copy(camera.position)
     rig.current?.quaternion.copy(camera.quaternion)
@@ -49,7 +50,12 @@ export function Lantern() {
     const empty = fuel <= 0
     const level = on ? lanternIntensity(fuel) : 0
     // Wall-clock time: flicker is purely cosmetic, so it needn't follow the fixed-step sim.
-    const wave = flicker ? 1 - FLICKER_DEPTH * (0.5 + 0.5 * Math.sin(Date.now() * 0.01)) : 1
+    let wave = flicker ? 1 - FLICKER_DEPTH * (0.5 + 0.5 * Math.sin(Date.now() * 0.01)) : 1
+    // Breath-behind telegraph: a strobe, or a steady dip when flashing lights are off.
+    if (scareRuntime.flickerLeft > 0) {
+      scareRuntime.flickerLeft = Math.max(0, scareRuntime.flickerLeft - delta)
+      wave *= scareRuntime.flickerStrobe ? (Math.sin(Date.now() * 0.05) > 0 ? 1 : 0.25) : 0.5
+    }
     const k = level * wave
 
     if (spot.current) {

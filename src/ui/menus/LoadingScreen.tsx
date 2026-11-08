@@ -2,7 +2,12 @@ import { useEffect, useId } from 'react'
 import { useProgress } from '@react-three/drei'
 import { useGameStore } from '../../game/state/gameStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
+import { preloadAllModels } from '../../scene/assets/preloadModels'
 import './menus.css'
+
+// Start fetching at import time so the bar already has real items to count when
+// the screen first renders (otherwise `active` is false and it would skip ahead).
+preloadAllModels()
 
 /** Shortest time the screen shows, so it never flashes by when assets are cached. */
 const MIN_SHOW_MS = 1200

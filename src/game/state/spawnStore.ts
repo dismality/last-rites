@@ -7,9 +7,12 @@ import { pickupMaterial } from '../systems/pickup'
 import { dropStack, pickupDrop, type Vec3, type WorldDrop } from '../systems/satchel'
 import { ITEM_MAP } from '../../data/items'
 import type { ItemId } from '../types'
-import { createSpawnWorld, respawnForDay, type SpawnWorld } from '../systems/spawns'
+import { FIXED_SPAWNS } from '../../data/zones'
+import { collectFixedSpawn, createSpawnWorld, respawnForDay, type SpawnWorld } from '../systems/spawns'
+import { useExamineStore } from './examineStore'
 import { useInventoryStore } from './inventoryStore'
 import { useToastStore } from './toastStore'
+import { useWorldStore } from './worldStore'
 
 interface SpawnStoreState {
   world: SpawnWorld
@@ -21,6 +24,8 @@ interface SpawnStoreState {
   collectDrop: (dropId: string) => void
   /** Try to pick up a stack; shows the toast and only mutates state on success. */
   collectMaterial: (spawnId: string, index: number) => void
+  /** Take a once-only key or relic and open examine mode; closing it files the item in the journal. */
+  collectFixed: (spawnId: string) => void
 }
 
 let dropCounter = 0
@@ -59,6 +64,15 @@ export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
       set({ world: res.world })
     }
     useToastStore.getState().push(res.toast)
+  },
+  collectFixed: (spawnId) => {
+    const spawn = FIXED_SPAWNS.find((s) => s.id === spawnId)
+    if (!spawn) return
+    const before = get().world
+    const world = collectFixedSpawn(before, spawnId, useWorldStore.getState().phase)
+    if (world === before) return
+    set({ world })
+    useExamineStore.getState().open(spawn.item)
   },
 }))
 

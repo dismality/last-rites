@@ -16,6 +16,9 @@ interface GameStoreState {
   /** Satchel overlay is open. Unlike journal/examine this never freezes the simulation (Req 5.5). */
   satchelOpen: boolean
   setSatchelOpen: (open: boolean) => void
+  /** Player reached 0 HP: shows the "You were taken" screen and freezes the sim. */
+  taken: boolean
+  setTaken: (taken: boolean) => void
   setScreen: (screen: Screen) => void
   setPaused: (paused: boolean) => void
 }
@@ -29,6 +32,8 @@ export const useGameStore = create<GameStoreState>((set) => ({
   setJournalOpen: (journalOpen) => set({ journalOpen }),
   satchelOpen: false,
   setSatchelOpen: (satchelOpen) => set({ satchelOpen }),
+  taken: false,
+  setTaken: (taken) => set({ taken }),
   setScreen: (screen) => set({ screen }),
   setPaused: (paused) => set({ paused }),
 }))

@@ -1,0 +1,125 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. Enemy and wave data": [
+      {
+        "executionId": "18889b77-ecb9-4388-9982-1e0bab6c18f9",
+        "chatSessionId": "sess_e320ba47-9796-46cd-94b6-662460b6f06b",
+        "timestamp": 1794067846568
+      },
+      {
+        "executionId": "18889b77-ecb9-4388-9982-1e0bab6c18f9",
+        "chatSessionId": "sess_e320ba47-9796-46cd-94b6-662460b6f06b",
+        "timestamp": 1794067919682
+      }
+    ],
+    "2. Combat math with property tests": [
+      {
+        "executionId": "052f59ce-4b51-4458-9cef-e7bf95d2aa39",
+        "chatSessionId": "sess_e9cf1715-0088-46a7-8727-a052b1046659",
+        "timestamp": 1794067929271
+      },
+      {
+        "executionId": "052f59ce-4b51-4458-9cef-e7bf95d2aa39",
+        "chatSessionId": "sess_e9cf1715-0088-46a7-8727-a052b1046659",
+        "timestamp": 1794068012378
+      }
+    ],
+    "3. Player health, block, death and Retry Night": [
+      {
+        "executionId": "066b9ca5-2d44-4a82-a462-b2074f925ffc",
+        "chatSessionId": "sess_e6e29cf2-8e9b-4285-a748-309abce9c3b8",
+        "timestamp": 1794068028811
+      },
+      {
+        "executionId": "066b9ca5-2d44-4a82-a462-b2074f925ffc",
+        "chatSessionId": "sess_e6e29cf2-8e9b-4285-a748-309abce9c3b8",
+        "timestamp": 1794068198455
+      }
+    ],
+    "4. Viewmodel layer": [
+      {
+        "executionId": "d2066dbe-915f-4bd7-8dbf-f5ca14136a2d",
+        "chatSessionId": "sess_87e0cf35-0ab3-449c-a352-5a19c1e0c132",
+        "timestamp": 1794070119459
+      },
+      {
+        "executionId": "d2066dbe-915f-4bd7-8dbf-f5ca14136a2d",
+        "chatSessionId": "sess_87e0cf35-0ab3-449c-a352-5a19c1e0c132",
+        "timestamp": 1794070313356
+      }
+    ],
+    "5. Melee attacks in the scene": [
+      {
+        "executionId": "b7bd72b7-effa-475d-ad59-fcbd1e771ef6",
+        "chatSessionId": "sess_65b5b1dc-9dea-49da-8bbe-9f8c7ad37fe8",
+        "timestamp": 1794070328385
+      },
+      {
+        "executionId": "b7bd72b7-effa-475d-ad59-fcbd1e771ef6",
+        "chatSessionId": "sess_65b5b1dc-9dea-49da-8bbe-9f8c7ad37fe8",
+        "timestamp": 1794070876328
+      }
+    ],
+    "6. Enemy AI state machines": [
+      {
+        "executionId": "3612464f-adc5-4c29-989c-0f049ce4effe",
+        "chatSessionId": "sess_4ff4b9d4-6067-42a8-8d8b-eec1e2c7e23a",
+        "timestamp": 1794070887374
+      },
+      {
+        "executionId": "3612464f-adc5-4c29-989c-0f049ce4effe",
+        "chatSessionId": "sess_4ff4b9d4-6067-42a8-8d8b-eec1e2c7e23a",
+        "timestamp": 1794071238768
+      }
+    ],
+    "7. Wave director": [
+      {
+        "executionId": "a9f12818-a6c1-4bed-be09-7d5dd0165ada",
+        "chatSessionId": "sess_7952dc10-69f2-4e1e-9234-cefa4e7525cf",
+        "timestamp": 1794071251410
+      },
+      {
+        "executionId": "a9f12818-a6c1-4bed-be09-7d5dd0165ada",
+        "chatSessionId": "sess_7952dc10-69f2-4e1e-9234-cefa4e7525cf",
+        "timestamp": 1794071434724
+      }
+    ],
+    "8. Throwables and placeables": [
+      {
+        "executionId": "ed4db114-c45e-4915-ba46-bff51ba9dd15",
+        "chatSessionId": "sess_4af217c8-3586-45ac-b0d9-5fa70bfc631a",
+        "timestamp": 1794071447933
+      },
+      {
+        "executionId": "ed4db114-c45e-4915-ba46-bff51ba9dd15",
+        "chatSessionId": "sess_4af217c8-3586-45ac-b0d9-5fa70bfc631a",
+        "timestamp": 1794078487035
+      }
+    ],
+    "9. Damage feedback": [
+      {
+        "executionId": "b3d8dc41-af83-4042-b0a4-9f4644046dc6",
+        "chatSessionId": "sess_8e8614b6-235a-49af-9b01-a49cd741fd91",
+        "timestamp": 1794078501797
+      },
+      {
+        "executionId": "b3d8dc41-af83-4042-b0a4-9f4644046dc6",
+        "chatSessionId": "sess_8e8614b6-235a-49af-9b01-a49cd741fd91",
+        "timestamp": 1794078581339
+      }
+    ],
+    "10. Checkpoint": [
+      {
+        "executionId": "c17f5da8-c415-429f-9d8e-6cb5ad71628e",
+        "chatSessionId": "sess_b4691227-d9e8-4141-b0bc-59c3ce9e056e",
+        "timestamp": 1794078593992
+      },
+      {
+        "executionId": "c17f5da8-c415-429f-9d8e-6cb5ad71628e",
+        "chatSessionId": "sess_b4691227-d9e8-4141-b0bc-59c3ce9e056e",
+        "timestamp": 1794079569950
+      }
+    ]
+  }
+}

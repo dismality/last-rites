@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { requestLock } from '../../scene/player/input'
 import { useGameStore } from '../../game/state/gameStore'
 import { MenuDialog } from './MenuDialog'
 import { Settings } from './Settings'
@@ -22,7 +23,7 @@ export function PauseMenu() {
     // handler and would otherwise immediately re-pause.
     setTimeout(() => {
       setPaused(false)
-      document.querySelector('canvas')?.requestPointerLock?.()
+      requestLock(document.querySelector('canvas'))
     }, 0)
   }
 

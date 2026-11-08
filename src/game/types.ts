@@ -59,6 +59,12 @@ export type RelicId =
 /** Any item that can appear in the satchel */
 export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId
 
+/** Ending IDs (design bible §1) */
+export type EndingId = 'rest' | 'uneasy-peace' | 'taken'
+
+/** Journal page numbers */
+export type PageNumber = 1 | 2 | 3 | 4 | 5
+
 /** Recipe IDs */
 export type RecipeId =
   | 'r-bone-club'
@@ -218,6 +224,6 @@ export type GameEvent =
   | { type: 'itemCollected';  itemId: ItemId }
   | { type: 'lanternToggled'; on: boolean }
   | { type: 'scareFired';     scareId: string }
-  | { type: 'subtitleShown';  text: string; duration: number }
+  | { type: 'subtitleShown';  text: string; duration: number; force?: boolean }
   | { type: 'digCompleted';   graveId: string; loot: ItemStack[]; scareId: string | null }
   | { type: 'digCancelled';   graveId: string; reason: 'moved' | 'hit' | 'released' | 'interrupted' }

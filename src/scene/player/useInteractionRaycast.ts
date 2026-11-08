@@ -6,7 +6,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { INTERACT_RANGE_M } from '../../data/balance'
-import { useGameStore } from '../../game/state/gameStore'
+import { isMenuOpen } from '../../game/state/menuState'
 import { useInteractionStore } from '../../game/state/interactionStore'
 import { pickHoverTarget } from '../../game/systems/interaction'
 import { interactableRegistry } from '../world/interactableRegistry'
@@ -26,10 +26,17 @@ function findTag(obj: THREE.Object3D | null): string | null {
 export function useInteractionRaycast(): void {
   const raycaster = useRef(new THREE.Raycaster())
   const wasDown = useRef(false)
+  const wasMenuOpen = useRef(false)
 
   useFrame((state) => {
     const { setHover } = useInteractionStore.getState()
-    if (useGameStore.getState().paused || useGameStore.getState().examining) {
+    // Menus own the keyboard and cursor: no hover, no interact. The frame a menu closes,
+    // the key that closed it (E on the workbench) may still be held; treat it as already
+    // handled so it can't count as a fresh press and reopen the thing under the crosshair.
+    const menuOpen = isMenuOpen()
+    if (menuOpen || wasMenuOpen.current) {
+      wasMenuOpen.current = menuOpen
+      wasDown.current = input.peek().interact
       setHover(null)
       return
     }

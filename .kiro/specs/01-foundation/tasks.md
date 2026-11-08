@@ -100,16 +100,17 @@
   - Stamina bar: shown only when draining or recently drained (fades out 1 s after sprint stops); numeric when `accessibleHUD`
   - _Requirements: 8.1, 8.2, 8.3, 8.4, 5.4_
 
-- [x] 12. Checkpoint: first playable
-  - Manual smoke-test checklist (run before marking done):
-    1. `npm run test` passes with zero failures
-    2. `npm run build` passes with zero TypeScript errors
-    3. Walk all four zones (gates block Mausoleum Row and Catacombs)
-    4. Lantern toggles with F; fuel drains; flicker appears below 20%; ember glow at 0%
-    5. Sprint drains stamina; regen kicks in after 1 s pause
-    6. Esc opens pause, Resume closes it; pointer-lock loss also pauses
-    7. Day → Dusk → Night transition visible (sky, fog, ambient change)
-    8. Settings menu: change mouse sensitivity and head bob; values persist after page reload
-    9. Content warning appears on first load; Settings accessible from it
-    10. Deploy a preview build to Vercel and confirm it loads in Chrome, Edge and Firefox
+- [ ] 12. Checkpoint: first playable
+  - Played in headless Chrome (software GL, Playwright) on 2026-11-08. Item 10 is not done, so the task stays open.
+  - Checklist, with what was actually observed:
+    1. [x] `npm run test`: 45 files, 378 tests pass
+    2. [x] `npm run build`: zero TypeScript errors (lint is clean too)
+    3. [~] Walked to the Mausoleum Row gate: blocked at z=-38.9 without the key, passed to z=-45.1 after adding `rusted-crypt-key`. The Catacombs gate and the Chapel were not walked.
+    4. [~] F toggles the lantern, fuel drains about 1% per 6 s by day, the flicker flag is set at 15%. Fuel 0 (ember glow) was screenshotted but not judged closely.
+    5. [x] Sprint drained stamina about 20/s; after stopping it held for about 1 s, then regenerated at about 15/s
+    6. [x] Esc pauses, Resume (Enter) unpauses, `exitPointerLock` pauses. Clicking Resume with a mouse was not confirmed (Playwright reported another element intercepting the click).
+    7. [~] Day, dusk, night and dawn screenshots show sky, fog and ambient changes. Phases were forced through the store, not waited out (a real day is 6 min).
+    8. [x] Mouse sensitivity and head bob persist across a page reload
+    9. [x] Content warning is the first screen; its Settings button opens the settings dialog
+    10. [ ] Vercel preview and Chrome/Edge/Firefox not done. Only Chrome was used.
   - _Requirements: 1.1, 1.2, 1.3, all of 2–8_

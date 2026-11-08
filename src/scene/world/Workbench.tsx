@@ -1,4 +1,4 @@
-﻿// Workbench â€” the keeper's crafting bench in the hut.
+// Workbench â€” the keeper's crafting bench in the hut.
 //
 // When `workbenchOpen` is true the camera smoothly lerps to a fixed view
 // above the bench (400 ms / eased). Materials in the player's satchel are
@@ -25,6 +25,11 @@ import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManager'
 import type { MaterialId } from '../../game/types'
+import { workbenchCameraRuntime } from './workbenchCameraRuntime'
+import { Interactable } from './Interactable'
+import { requestLock } from '../player/input'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { BENCH_Z } from '../../data/cemeteryLayout'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -34,18 +39,15 @@ import type { MaterialId } from '../../game/types'
  * Fixed camera position and look-at target when the workbench is open.
  * Positioned above the bench surface, looking slightly down along Z.
  */
-const BENCH_CAM_POSITION = new THREE.Vector3(0, 1.8, 0.6)
-const BENCH_CAM_TARGET = new THREE.Vector3(0, 0.85, -0.5)
+const BENCH_CAM_POSITION = new THREE.Vector3(0, 1.8, BENCH_Z + 1.1)
+const BENCH_CAM_TARGET = new THREE.Vector3(0, 0.85, BENCH_Z)
 
-/** Lerp factor per-frame for a ~400 ms transition at 60 fps.
- *  Î± = 1 - (1 - target)^(1/frames) where target â‰ˆ 0.995 in 24 frames. */
-const LERP_ALPHA = 0.12
 
 /**
  * Bench surface grid origin. Materials are laid out in a 4-column grid from
  * left to right, top row first.
  */
-const BENCH_ORIGIN = new THREE.Vector3(-0.55, 0.86, -0.55)
+const BENCH_ORIGIN = new THREE.Vector3(-0.55, 0.86, BENCH_Z - 0.05)
 
 /** Materials in display order. */
 const MATERIAL_ORDER: MaterialId[] = [
@@ -130,48 +132,75 @@ function benchPosition(index: number): THREE.Vector3 {
  * and back to where it was when `open` becomes false.
  * Operates in-place on `state.camera` â€” R3F's default camera.
  */
+type RigPhase = 'idle' | 'opening' | 'returning'
+
+/** Per-second exponential approach rate; roughly a 400 ms ease. */
+const RIG_RATE = 12
+const RIG_POS_EPS = 0.01
+const RIG_ANGLE_EPS = 0.01
+
 function CameraRig({ open }: { open: boolean }) {
   const { camera } = useThree()
-  // Capture the camera position/rotation at the moment the bench opens so we
-  // can return to it faithfully when it closes.
+  const phase = useRef<RigPhase>('idle')
+  // Captured at the moment the bench opens so we can return faithfully.
   const returnPos = useRef(new THREE.Vector3())
   const returnQuat = useRef(new THREE.Quaternion())
-  const wasOpen = useRef(false)
   // Scratch objects pre-allocated to avoid GC.
   const targetPos = useRef(new THREE.Vector3())
   const targetQuat = useRef(new THREE.Quaternion())
   const lookAtMatrix = useRef(new THREE.Matrix4())
 
-  useFrame(() => {
-    if (open && !wasOpen.current) {
-      // Just opened â€” save current camera transform for return trip.
-      returnPos.current.copy(camera.position)
-      returnQuat.current.copy(camera.quaternion)
-      wasOpen.current = true
-    }
-    if (!open && wasOpen.current) {
-      wasOpen.current = false
-    }
+  useEffect(
+    () => () => {
+      workbenchCameraRuntime.active = false
+    },
+    [],
+  )
 
-    if (open) {
-      // Lerp toward bench view.
+  useFrame((_, delta) => {
+    if (open && phase.current !== 'opening') {
+      // Only save the pose when starting from first person, not mid-return.
+      if (phase.current === 'idle') {
+        returnPos.current.copy(camera.position)
+        returnQuat.current.copy(camera.quaternion)
+      }
+      phase.current = 'opening'
+      workbenchCameraRuntime.active = true
+    } else if (!open && phase.current === 'opening') {
+      phase.current = 'returning'
+    }
+    // Not opening or returning: leave the camera alone (the controller owns it).
+    if (phase.current === 'idle') return
+
+    if (phase.current === 'opening') {
       targetPos.current.copy(BENCH_CAM_POSITION)
       lookAtMatrix.current.lookAt(BENCH_CAM_POSITION, BENCH_CAM_TARGET, camera.up)
       targetQuat.current.setFromRotationMatrix(lookAtMatrix.current)
     } else {
-      // Lerp back to the saved first-person position.
       targetPos.current.copy(returnPos.current)
       targetQuat.current.copy(returnQuat.current)
     }
 
-    camera.position.lerp(targetPos.current, LERP_ALPHA)
-    camera.quaternion.slerp(targetQuat.current, LERP_ALPHA)
+    const alpha = 1 - Math.exp(-RIG_RATE * Math.min(delta, 0.1))
+    camera.position.lerp(targetPos.current, alpha)
+    camera.quaternion.slerp(targetQuat.current, alpha)
+
+    if (
+      phase.current === 'returning' &&
+      camera.position.distanceTo(targetPos.current) < RIG_POS_EPS &&
+      camera.quaternion.angleTo(targetQuat.current) < RIG_ANGLE_EPS
+    ) {
+      camera.position.copy(targetPos.current)
+      camera.quaternion.copy(targetQuat.current)
+      phase.current = 'idle'
+      workbenchCameraRuntime.active = false
+    }
   })
 
   return null
 }
 
-// Phase counter — incremented once per MaterialPile mount so each pile starts
+// Phase counter: incremented once per MaterialPile mount so each pile starts
 // at a different point in its animation sine wave. Module-level so it is never
 // called during component render (satisfies react-hooks/purity rule).
 let pilePhaseCounter = 0
@@ -294,22 +323,61 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
 }
 
 // ---------------------------------------------------------------------------
-// BenchSurface
+// BenchModel
 // ---------------------------------------------------------------------------
 
+/** Tabletop is 8 cm thick; its top face is at BENCH_TOP_Y, where the material piles sit. */
+const BENCH_TOP_Y = 0.86
+const BENCH_W = 1.4
+const BENCH_D = 0.8
+const BENCH_LEG = 0.09
+
 /**
- * The physical bench table â€” a flat box the materials sit on.
- * Position matches BENCH_ORIGIN so the camera rig frames it well.
+ * The bench: tabletop, four legs, a back splash against the wall, a lower shelf and a front
+ * apron, so it reads as a heavy workbench rather than a floating plank. Local origin is the
+ * middle of the footprint on the floor. One fixed collider keeps the player out of it.
  */
-function BenchSurface() {
+function BenchModel() {
+  const legH = BENCH_TOP_Y - 0.08
+  const legX = BENCH_W / 2 - BENCH_LEG / 2
+  const legZ = BENCH_D / 2 - BENCH_LEG / 2
   return (
-    <mesh position={[0, 0.8, -0.5]} receiveShadow>
-      <boxGeometry args={[1.4, 0.06, 0.8]} />
-      <meshStandardMaterial color="#5c3d1e" roughness={0.9} metalness={0} />
-    </mesh>
+    <group>
+      <RigidBody type="fixed" colliders={false}>
+        <CuboidCollider
+          args={[BENCH_W / 2, BENCH_TOP_Y / 2, BENCH_D / 2]}
+          position={[0, BENCH_TOP_Y / 2, 0]}
+        />
+      </RigidBody>
+      <mesh position={[0, BENCH_TOP_Y - 0.04, 0]} castShadow receiveShadow>
+        <boxGeometry args={[BENCH_W, 0.08, BENCH_D]} />
+        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
+      </mesh>
+      {([-1, 1] as const).flatMap((sx) =>
+        ([-1, 1] as const).map((sz) => (
+          <mesh key={`${sx}${sz}`} position={[sx * legX, legH / 2, sz * legZ]} castShadow>
+            <boxGeometry args={[BENCH_LEG, legH, BENCH_LEG]} />
+            <meshStandardMaterial color="#3b2713" roughness={1} />
+          </mesh>
+        )),
+      )}
+      {/* Lower shelf and front apron tie the legs together. */}
+      <mesh position={[0, 0.28, 0]} receiveShadow>
+        <boxGeometry args={[BENCH_W - 0.1, 0.05, BENCH_D - 0.1]} />
+        <meshStandardMaterial color="#3b2713" roughness={1} />
+      </mesh>
+      <mesh position={[0, BENCH_TOP_Y - 0.18, BENCH_D / 2 - 0.03]}>
+        <boxGeometry args={[BENCH_W - 0.1, 0.16, 0.05]} />
+        <meshStandardMaterial color="#4a3119" roughness={1} />
+      </mesh>
+      {/* Back splash so tools don't slide off into the wall. */}
+      <mesh position={[0, BENCH_TOP_Y + 0.12, -BENCH_D / 2 + 0.03]} castShadow>
+        <boxGeometry args={[BENCH_W, 0.24, 0.06]} />
+        <meshStandardMaterial color="#4a3119" roughness={1} />
+      </mesh>
+    </group>
   )
 }
-
 // ---------------------------------------------------------------------------
 // Workbench (main export)
 // ---------------------------------------------------------------------------
@@ -322,6 +390,8 @@ function BenchSurface() {
 export function Workbench() {
   const workbenchOpen = useUiWorldStore((s) => s.workbenchOpen)
   const closeWorkbench = useUiWorldStore((s) => s.closeWorkbench)
+  const openWorkbench = useUiWorldStore((s) => s.openWorkbench)
+  const gl = useThree((s) => s.gl)
   const lastDamageAt = useUiWorldStore((s) => s.lastDamageAt)
   const inventory = useInventoryStore((s) => s.inventory)
   const highlightedItems = useCraftingStore((s) => s.highlightedItems)
@@ -357,9 +427,11 @@ export function Workbench() {
         document.exitPointerLock()
       }
     }
-    // Re-acquiring pointer lock is handled by the first-person controller
-    // when it detects workbenchOpen === false.
-  }, [workbenchOpen])
+    return () => {
+      // Closing came from a key press (a user gesture), so the browser allows re-locking.
+      if (workbenchOpen) requestLock(gl.domElement)
+    }
+  }, [workbenchOpen, gl])
 
   // ----- Crafting tick: advance timer and commit when done (Req 3.1) -----
   useFrame((_, delta) => {
@@ -432,7 +504,17 @@ export function Workbench() {
 
       {/* Bench geometry â€” always visible in the scene. */}
       <group name="workbench" position={[0, 0, 0]}>
-        <BenchSurface />
+        <group position={[0, 0, BENCH_Z]}>
+          <Interactable
+            id="workbench"
+            action="open"
+            size={[1.4, 1.1, 0.8]}
+            runeHeight={1.2}
+            onInteract={openWorkbench}
+          >
+            <BenchModel />
+          </Interactable>
+        </group>
 
         {/* Material piles â€” only rendered when the workbench is open so the
             bench isn't cluttered during normal play. */}
@@ -451,7 +533,7 @@ export function Workbench() {
         {/* Point light on the bench surface to warm up the material colours. */}
         {workbenchOpen && (
           <pointLight
-            position={[0, 1.5, -0.5]}
+            position={[0, 1.5, BENCH_Z]}
             intensity={8}
             distance={3}
             color="#e8913a"
