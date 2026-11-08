@@ -5,6 +5,7 @@ import { SPAWN_POINTS } from '../../data/zones'
 import { ITEM_MAP } from '../../data/items'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { Interactable } from './Interactable'
+import { MaterialShape } from './MaterialShape'
 
 export function MaterialPickups() {
   const materials = useSpawnStore((s) => s.world.materials)
@@ -24,10 +25,9 @@ export function MaterialPickups() {
             runeHeight={0.5}
             onInteract={() => collectDrop(d.id)}
           >
-            <mesh name={ITEM_MAP[d.item].name} position={[0, 0.1, 0]}>
-              <boxGeometry args={[0.2, 0.2, 0.2]} />
-              <meshStandardMaterial color="#d8c9a3" />
-            </mesh>
+            <group name={ITEM_MAP[d.item].name}>
+              <MaterialShape item={d.item} />
+            </group>
           </Interactable>
         </group>
       ))}
@@ -41,11 +41,9 @@ export function MaterialPickups() {
               runeHeight={0.5}
               onInteract={() => collect(p.id, i)}
             >
-              {/* Placeholder until item models are wired; name aids debugging. */}
-              <mesh name={ITEM_MAP[stack.item].name} position={[i * 0.35, 0.1, 0]}>
-                <boxGeometry args={[0.2, 0.2, 0.2]} />
-                <meshStandardMaterial color="#d8c9a3" />
-              </mesh>
+              <group name={ITEM_MAP[stack.item].name} position={[i * 0.35, 0, 0]}>
+                <MaterialShape item={stack.item} />
+              </group>
             </Interactable>
           </group>
         )),

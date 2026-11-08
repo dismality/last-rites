@@ -1,13 +1,13 @@
-﻿// Consumables system â€” pure TypeScript, no React / three.js / Howler.
+﻿// Consumables system — pure TypeScript, no React / three.js / Howler.
 //
 // Tracks the in-progress timed use of a consumable item (bandage, lantern-refill).
 // The scene layer (or GameLoop) drives the clock by calling tickUse each fixed step.
 // Effects are only applied when tickUse signals applied=true; cancelling before that
 // produces no effect.
 //
-// Design bible Â§4 consumable specs:
-//   bandage        â€” heals 30 HP, takes 2 s to apply
-//   lantern-refill â€” restores +50% lantern fuel, takes null (instant in design bible
+// Design bible §4 consumable specs:
+//   bandage        — heals 30 HP, takes 2 s to apply
+//   lantern-refill — restores +50% lantern fuel, takes null (instant in design bible
 //                    but still runs through this system for the cancel-on-hit rule)
 //
 // Requirement 5.4.
@@ -33,7 +33,7 @@ export interface ConsumableUseState {
   item: ConsumableId
   /** Total time in seconds required to complete the use. */
   duration: number
-  /** Time elapsed so far in seconds (0 â†’ duration). */
+  /** Time elapsed so far in seconds (0 → duration). */
   elapsed: number
 }
 
@@ -129,7 +129,7 @@ export function tickUse(dt: number, state: ConsumableUseState): TickResult {
 
 /**
  * Cancel an in-progress use (e.g. the player was hit).
- * Returns `null` â€” the caller should discard the use-state entirely.
+ * Returns `null` — the caller should discard the use-state entirely.
  * No effect is applied.
  */
 export function cancelUse(state: ConsumableUseState): null {
@@ -150,7 +150,7 @@ export function isConsumable(id: CraftedItemId): id is ConsumableId {
 }
 
 /**
- * Progress fraction 0â€“1 for UI progress bars.
+ * Progress fraction 0–1 for UI progress bars.
  */
 export function useProgress(state: ConsumableUseState): number {
   if (state.duration <= 0) return 1

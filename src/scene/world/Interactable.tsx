@@ -1,11 +1,10 @@
 // <Interactable action="dig" onInteract={...}> wraps any object so the player can
 // target and use it. Adds a faint pulse (rune sprite + glow) inside lantern range
-// and a stronger drei Outlines + rune on hover. The rune is the shape cue, so
+// and a thin, faint edge frame + full rune on hover. The rune is the shape cue, so
 // the highlight never depends on colour alone.
 
-import { useEffect, useId, useMemo, useRef, type ReactNode } from 'react'
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Outlines } from '@react-three/drei'
 import * as THREE from 'three'
 import { useLanternStore } from '../../game/state/lanternStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
@@ -14,6 +13,10 @@ import { ACTION_RUNE, isWithinLantern, type InteractAction } from '../../game/sy
 import { interactableRegistry } from './interactableRegistry'
 
 const EMBER = '#e8913a'
+// Hover frame: pale parchment edge lines at low opacity. drei <Outlines> on the transparent
+// proxy box showed its whole back-face hull as solid walls, so plain edges are used instead.
+const OUTLINE = '#f5d9a8'
+const OUTLINE_OPACITY = 0.35
 const runeTextures = new Map<InteractAction, THREE.CanvasTexture>()
 
 /** Draws the rune glyph once per action; canvas keeps it offline and font-independent of the 3D layer. */
@@ -61,12 +64,17 @@ export function Interactable({
   const autoId = useId()
   const key = id ?? autoId
   const group = useRef<THREE.Group>(null)
-  const glow = useRef<THREE.MeshBasicMaterial>(null)
   const rune = useRef<THREE.SpriteMaterial>(null)
-  const hovered = useRef(false)
+  const [hovered, setHovered] = useState(false)
   const handler = useRef(onInteract)
   const world = useMemo(() => new THREE.Vector3(), [])
   const map = useMemo(() => runeTexture(action), [action])
+  const [sx, sy, sz] = size
+  const edges = useMemo(
+    () => new THREE.EdgesGeometry(new THREE.BoxGeometry(sx, sy, sz)),
+    [sx, sy, sz],
+  )
+  useEffect(() => () => edges.dispose(), [edges])
 
   useEffect(() => {
     handler.current = onInteract
@@ -90,33 +98,29 @@ export function Interactable({
     const { fuel, on } = useLanternStore.getState()
     const lit = isWithinLantern(dist, fuel, on)
     const isHover = useInteractionStore.getState().hover?.id === key
-    hovered.current = isHover
+    setHovered((h) => (h === isHover ? h : isHover))
     const animate = useSettingsStore.getState().flashingLights
     const t = state.clock.elapsedTime
     // Slow pulse; held steady when the flashing-lights setting is off.
     const pulse = animate ? 0.5 + 0.5 * Math.sin(t * 2.4) : 0.5
-    // Kept faint: the outline and rune carry the highlight. A strong additive box reads as a glowing crate.
-    const strength = isHover ? 0.07 + 0.04 * pulse : lit ? 0.015 + 0.03 * pulse : 0
-    if (glow.current) glow.current.opacity = strength
+    // No glow volume: an additive box read as a glowing crate. The rune pulses instead.
     if (rune.current) rune.current.opacity = isHover ? 1 : lit ? 0.25 + 0.3 * pulse : 0
   })
 
   return (
     <group ref={group}>
       {children}
-      {/* Proxy box: soft glow + outline. raycast disabled so it never blocks the crosshair. */}
-      <mesh raycast={() => null} position={[0, size[1] / 2, 0]}>
-        <boxGeometry args={size} />
-        <meshBasicMaterial
-          ref={glow}
-          color={EMBER}
-          transparent
-          opacity={0}
-          depthWrite={false}
-          blending={THREE.AdditiveBlending}
-        />
-        <Outlines thickness={0.02} color={EMBER} screenspace={false} />
-      </mesh>
+      {/* Hover-only edge frame. raycast disabled so it never blocks the crosshair. */}
+      {hovered && (
+        <lineSegments geometry={edges} position={[0, sy / 2, 0]} raycast={() => null}>
+          <lineBasicMaterial
+            color={OUTLINE}
+            transparent
+            opacity={OUTLINE_OPACITY}
+            depthWrite={false}
+          />
+        </lineSegments>
+      )}
       <sprite position={[0, runeHeight, 0]} scale={[0.25, 0.25, 0.25]} raycast={() => null}>
         <spriteMaterial ref={rune} map={map} transparent opacity={0} depthWrite={false} />
       </sprite>

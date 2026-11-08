@@ -12,7 +12,15 @@ import {
 describe('respawnForDay', () => {
   it('refills every material spawn point', () => {
     const w = respawnForDay(createSpawnWorld(), createRng(7))
-    for (const p of SPAWN_POINTS) expect(w.materials[p.id].length).toBeGreaterThan(0)
+    for (const p of SPAWN_POINTS.filter((q) => q.lootTable !== 'grave-dig')) {
+      expect(w.materials[p.id].length).toBeGreaterThan(0)
+    }
+  })
+  it('leaves graves empty until they are dug', () => {
+    const w = respawnForDay(createSpawnWorld(), createRng(7))
+    for (const p of SPAWN_POINTS.filter((q) => q.lootTable === 'grave-dig')) {
+      expect(w.materials[p.id]).toEqual([])
+    }
   })
 
   it('refills points emptied the previous day', () => {

@@ -11,7 +11,7 @@ Drafts for the Devpost form. Fill in the brackets near the end of the project.
 You are the new gravekeeper of Hollowmere Cemetery. Your predecessor vanished, and the dead have started digging *out*. By day you search the cemetery for bones, nails, wax and holy water, examine clues in 3D and read the missing keeper's torn journal. By night you survive waves of the unrested dead with weapons you crafted yourself, and some of them wait in the dark alleys between the mausoleums.
 
 **Why it fits Costume Contest:** the spooky interface is how you play.
-- Your **health is the lantern flame**, and your light radius *is* your fuel gauge.
+- The **lantern flame is your oil**, and your light radius shrinks with it. A blood-red **health bar** drains with a visible chunk of recent damage after every hit.
 - The **workbench glows** to show what you can craft.
 - The **map is the keeper's pencil sketch**, inking itself in as you explore.
 - The **journal underlines clues** in ink as you find them.
@@ -47,7 +47,7 @@ Fill each section from `docs/kiro-log.md`. Give concrete examples and numbers.
 | 0:00–0:10 | Black, then a lantern flicks on in fog | "The last gravekeeper of Hollowmere vanished. Now it's your job." |
 | 0:10–0:30 | Daytime exploration, pick up bones, examine the crypt key in 3D | Show the self-drawing map and the hidden-mark clue |
 | 0:30–0:50 | Workbench: items glow, craft the bone club | "The UI is part of the world: what glows, you can make." |
-| 0:50–1:10 | Dusk bell, sky turns red, fall back to the chapel | Show the lantern-flame health and fuel |
+| 0:50–1:10 | Dusk bell, sky turns red, fall back to the chapel | Show the health bar's damage chunk and the lantern-flame oil gauge |
 | 1:10–1:40 | Night wave: melee, holy-water flask, wailer scream | Fast cuts |
 | 1:40–2:00 | Mausoleum alley: telegraph, then lurker jumpscare | Let it land; no voice-over |
 | 2:00–2:15 | Settings: scare intensity Off, same scare plays with subtitle only | "Horror for everyone." |

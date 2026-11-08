@@ -10,6 +10,7 @@ import { Toast } from './Toast'
 import { DuskHint } from './DuskHint'
 import { WaveTally } from './WaveTally'
 import { RiteMeter } from './RiteMeter'
+import { DigBar } from './DigBar'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
 
@@ -30,6 +31,7 @@ export function Hud() {
       <StaminaBar />
       <WaveTally />
       <RiteMeter />
+      <DigBar />
       <Subtitles />
       <Toast />
       <DuskHint />

@@ -59,16 +59,16 @@ const DOOR_COLOR_BARRED = '#5c3d1e'
  * Dimensions chosen to look plausible as a small Victorian chapel.
  *
  *      [transept]
- *  â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•  y = 0 floor
+ *  ══════════════════  y = 0 floor
  *       [nave]
  */
 function ChapelGeometry() {
   return (
     <group>
-      {/* Nave â€” long axis along Z */}
+      {/* Nave — long axis along Z */}
       {/* Walls and roof now live in Cemetery.tsx as a hollow shell with colliders. */}
 
-      {/* Transept â€” crosses the nave near the altar end */}
+      {/* Transept — crosses the nave near the altar end */}
 
 
       {/* Floor slab */}
@@ -127,7 +127,7 @@ export function Chapel() {
   const doorInteractedRef = useRef(false)
   const altarInteractedRef = useRef(false)
 
-  // Scratch vectors â€” avoid allocations inside useFrame.
+  // Scratch vectors — avoid allocations inside useFrame.
   const playerPos = useRef(new THREE.Vector3())
   const doorPos = useRef(new THREE.Vector3().copy(CHAPEL_POS).add(DOOR_OFFSET))
   const altarPos = useRef(new THREE.Vector3().copy(CHAPEL_POS).add(ALTAR_OFFSET))
@@ -165,7 +165,7 @@ export function Chapel() {
         // Stage 2 is repaired here (altarActive), so the altar also saves (Req 7.1).
         // Saved after the heal so the file holds the healed health and the used-today flag.
         saveGame()
-        // Subtitle placeholder â€” a proper subtitle system will replace this.
+        // Subtitle placeholder — a proper subtitle system will replace this.
         console.info("[Chapel] \"The altar's warmth mends your wounds.\"")
       }
     }

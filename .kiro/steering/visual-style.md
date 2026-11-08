@@ -25,8 +25,8 @@ Victorian gothic cemetery in perpetual autumn: wet stone, iron fences, dead oaks
 - Minimum UI text size 16 px; subtitles 20 px with a dark backing.
 
 ## UI is diegetic (in-world) where possible
-- **Health** = the lantern flame icon in the bottom-left. Bright and tall when healthy, guttering and red-tinged when low. A numeric value is shown in the accessible HUD mode.
-- **Lantern fuel** = the glass reservoir level under the flame.
+- **Health** = a horizontal blood-red bar at the bottom left with current / max HP as numbers, always shown. A pale chunk drains behind the fill after a hit (see design bible §11).
+- **Lantern fuel** = the lantern flame icon: its height and brightness follow fuel, labelled with the oil percentage. The flame never shows health.
 - **Satchel** = a leather bag opening with a creak; items lie on cloth as small 3D renders or illustrated icons.
 - **Journal** = aged paper pages with ink, stains and torn edges. Clues are underlined by hand as they are discovered.
 - **Map** = the keeper's pencil sketch that inks itself in as zones are explored.

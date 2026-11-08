@@ -32,13 +32,54 @@ export interface ItemDef {
 
 const ITEM_MODEL_DIR = 'assets/models/items'
 
-function material(id: MaterialId, name: string): ItemDef {
-  return { id, name, kind: 'material', stackLimit: MATERIAL_STACK_LIMIT, icon: `rune-${id}` }
+// Materials and crafted items have no bespoke art, so they borrow props from the
+// world kit (examine view only; they are never spawned from these paths).
+const WORLD_MODEL_DIR = 'assets/models/world'
+
+/** Stand-in prop for each item without its own hero model. */
+const BORROWED_MODEL: Partial<Record<ItemId, string>> = {
+  bone: 'debris',
+  'iron-nail': 'iron-fence-bar',
+  'candle-wax': 'candle',
+  'holy-water': 'detail-chalice',
+  cloth: 'detail-plate',
+  'lamp-oil': 'lantern-glass',
+  'grave-salt': 'detail-bowl',
+  'rusty-shovel': 'shovel',
+  'sharpened-shovel': 'shovel',
+  'bone-club': 'debris-wood',
+  'holy-water-flask': 'urn-round',
+  'nail-bomb': 'urn-square',
+  'lantern-trap': 'fire-basket',
+  'salt-circle': 'detail-bowl',
+  'tallow-candle': 'candle-multiple',
+  bandage: 'detail-plate',
+  'lantern-refill': 'lantern-candle',
 }
 
-function crafted(id: CraftedItemId, name: string, kind: 'weapon' | 'consumable' | 'placeable'): ItemDef {
+function borrowedModel(id: ItemId): string | undefined {
+  const file = BORROWED_MODEL[id]
+  return file ? `${WORLD_MODEL_DIR}/${file}.glb` : undefined
+}
+
+function material(id: MaterialId, name: string): ItemDef {
+  return {
+    id,
+    name,
+    kind: 'material',
+    stackLimit: MATERIAL_STACK_LIMIT,
+    icon: `rune-${id}`,
+    model: borrowedModel(id),
+  }
+}
+
+function crafted(
+  id: CraftedItemId,
+  name: string,
+  kind: 'weapon' | 'consumable' | 'placeable',
+): ItemDef {
   // One crafted item per slot (design bible §3).
-  return { id, name, kind, stackLimit: 1, icon: `rune-${id}` }
+  return { id, name, kind, stackLimit: 1, icon: `rune-${id}`, model: borrowedModel(id) }
 }
 
 function key(id: KeyItemId, name: string, extra: Partial<ItemDef> = {}): ItemDef {
@@ -90,7 +131,13 @@ export const ITEMS: readonly ItemDef[] = [
   }),
   key('bone-whistle', "Sexton's Bone Whistle", { model: `${ITEM_MODEL_DIR}/bone-whistle.glb` }),
   key('iron-ossuary-key', 'Iron Ossuary Key', { model: `${ITEM_MODEL_DIR}/iron-ossuary-key.glb` }),
-  { id: 'parish-ledger', name: 'Parish Ledger', kind: 'lore', stackLimit: 1, icon: 'rune-parish-ledger' },
+  {
+    id: 'parish-ledger',
+    name: 'Parish Ledger',
+    kind: 'lore',
+    stackLimit: 1,
+    icon: 'rune-parish-ledger',
+  },
 
   // Journal pages
   page(1),

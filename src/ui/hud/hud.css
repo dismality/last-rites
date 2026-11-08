@@ -250,3 +250,36 @@
   height: 100%;
   background: var(--ember);
 }
+
+.hud-dig {
+  position: absolute;
+  bottom: 28vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(20rem, 70vw);
+  padding: 0.5rem 1rem;
+  text-align: center;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.8);
+  border: 1px solid var(--parchment-dark);
+}
+.hud-dig__label,
+.hud-dig__time {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+.hud-dig__time {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+.hud-dig__bar {
+  height: 8px;
+  margin: 0.4rem 0;
+  background: var(--ink-mid);
+  border: 1px solid var(--parchment-dark);
+}
+.hud-dig__fill {
+  height: 100%;
+  background: var(--ember);
+}

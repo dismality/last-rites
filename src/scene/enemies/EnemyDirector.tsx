@@ -10,18 +10,14 @@ import { useEnemyStore, useGameStore, usePlayerStore, useSettingsStore } from '.
 import { useLanternStore } from '../../game/state'
 import { useEndingStore } from '../../game/state/endingStore'
 import { hurtPlayer } from '../../game/state/retryNight'
-import type { Vec2 } from '../../game/systems/combat'
 import { loopCue, tickEnemies, type AIEvent } from '../../game/systems/enemyAI'
 import { LUNGE_SPEED_FULL, capScareDamage, intensityProfile } from '../../game/systems/scareDirector'
 import { forwardFromYaw } from '../../game/systems/melee'
 import { EnemyModels } from './EnemyModels'
 import { isScareEnemy } from './scareEnemy'
+import { makeWallProbe } from './wallProbe'
 
 const MAX_DT = 0.1
-/** Wall probes run at roughly knee height so low headstones still count. */
-const PROBE_Y = 0.6
-/** Probes stop short of their end point so the player's own capsule never reads as a wall. */
-const PROBE_END_MARGIN_M = 0.5
 /** Audio sources sit at head height. */
 const AUDIO_Y = 1.4
 const SUBTITLE_S = 2.5
@@ -41,17 +37,7 @@ export function EnemyDirector() {
     }
 
     const dt = Math.min(rawDelta, MAX_DT)
-    const blocked = (a: Vec2, b: Vec2): boolean => {
-      const dx = b.x - a.x
-      const dz = b.z - a.z
-      const len = Math.hypot(dx, dz) - PROBE_END_MARGIN_M
-      if (len <= 0) return false
-      const ray = new rapier.Ray(
-        { x: a.x, y: PROBE_Y, z: a.z },
-        { x: dx / (len + PROBE_END_MARGIN_M), y: 0, z: dz / (len + PROBE_END_MARGIN_M) },
-      )
-      return world.castRay(ray, len, true) !== null
-    }
+    const blocked = makeWallProbe(world, rapier)
 
     const result = tickEnemies(store.enemies, dt, {
       playerPos: { x: player.position[0], z: player.position[2] },

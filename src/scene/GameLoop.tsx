@@ -4,6 +4,7 @@ import { Suspense, useRef, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { emit } from '../game/events'
+import { useDigStore } from '../game/state/digStore'
 import {
   useGameStore,
   useLanternStore,
@@ -67,6 +68,8 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       useLanternStore.getState().applyLanternState(r.lantern)
       useWorldStore.getState().applyWorldState(r.world)
       pending.push(...r.events)
+      // Same fixed step as everything else, so a dig takes DIG_DURATION_S of sim time.
+      useDigStore.getState().step(STEP, input.peek().interact)
     }
 
     // Publish after all systems have run so subscribers see consistent state.

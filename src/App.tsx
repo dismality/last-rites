@@ -45,6 +45,7 @@ import { ClueSpots } from './scene/world/ClueSpots'
 import { FixedSpawns } from './scene/world/FixedSpawns'
 import { Tombstones } from './scene/world/Tombstones'
 import { LanternTraps } from './scene/world/LanternTraps'
+import { GraveMounds } from './scene/world/GraveMounds'
 import { MaterialPickups } from './scene/world/MaterialPickups'
 import { SaltCircles } from './scene/world/SaltCircles'
 import { SkyAndFog } from './scene/world/SkyAndFog'
@@ -67,6 +68,7 @@ function GameScreen() {
           <Tombstones />
           <ClueSpots />
           <MaterialPickups />
+          <GraveMounds />
           <Workbench />
           <EnemyDirector />
           <WaveDirector />

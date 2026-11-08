@@ -75,7 +75,9 @@ export function assetUrl(path: string): string {
 
 /** URLs of every hero item model (keys and relics), taken from items.ts. */
 export function itemModelUrls(): string[] {
-  return ITEMS.flatMap((i) => (i.model ? [assetUrl(i.model)] : []))
+  return ITEMS.flatMap((i) =>
+    i.model && (i.kind === 'key' || i.kind === 'relic') ? [assetUrl(i.model)] : [],
+  )
 }
 
 /** Rigged zombie shared by all three enemy types (see docs/enemy-models.md). */
