@@ -1,11 +1,11 @@
 ﻿/*
-  RecipeBook â€” parchment ledger overlay shown while the workbench is open.
+  RecipeBook — parchment ledger overlay shown while the workbench is open.
 
   Layout: fixed panel on the right side of the screen, scrollable list of
   recipe entries. Unlocked recipes show full detail; locked recipes are smudged.
 
-  Visual language (Req 2.1â€“2.4):
-  - Craftable entry:  ember-coloured heading + rune icon (âœ¦) + ember glow pulse.
+  Visual language (Req 2.1–2.4):
+  - Craftable entry:  ember-coloured heading + rune icon (✦) + ember glow pulse.
   - Hovering an entry: highlights matching material IDs on the bench via
     craftingStore.setHighlight; shows missing quantities in blood red.
   - Locked entries:   blurred text, sepia, with a small unlock hint.
@@ -88,7 +88,7 @@ function unlockHint(recipe: RecipeDef): string {
 // ---------------------------------------------------------------------------
 
 /**
- * A locked recipe row â€” smudged text, blurred, with a faint unlock hint
+ * A locked recipe row — smudged text, blurred, with a faint unlock hint
  * visible on hover so curious players know how to unlock it.
  */
 function LockedEntry({ recipe }: { recipe: RecipeDef }) {
@@ -100,17 +100,17 @@ function LockedEntry({ recipe }: { recipe: RecipeDef }) {
       aria-label={`Locked recipe. ${hint}`}
       tabIndex={0}
     >
-      {/* Smudged output name â€” deliberately illegible */}
+      {/* Smudged output name — deliberately illegible */}
       <div className="recipe-entry__output recipe-entry__output--smudged" aria-hidden="true">
-        â–“â–“â–“â–“â–“â–“â–“â–“â–“
+        ▓▓▓▓▓▓▓▓▓
       </div>
       {/* Smudged ingredient list */}
       <div className="recipe-entry__ingredients recipe-entry__ingredients--smudged" aria-hidden="true">
-        â–’â–’â–’â–’ Ã— â–’ Â· â–’â–’â–’â–’â–’ Ã— â–’
+        ▒▒▒▒ × ▒ · ▒▒▒▒▒ × ▒
       </div>
-      {/* Unlock hint â€” visible at low opacity, stronger on focus/hover */}
+      {/* Unlock hint — visible at low opacity, stronger on focus/hover */}
       <div className="recipe-entry__unlock-hint">
-        <span className="recipe-entry__lock-icon" aria-hidden="true">âš¿</span>
+        <span className="recipe-entry__lock-icon" aria-hidden="true">⚿</span>
         {hint}
       </div>
     </li>
@@ -128,14 +128,14 @@ interface UnlockedEntryProps {
   highlighted: boolean
   /** True when this recipe is the one currently being crafted. */
   isCrafting: boolean
-  /** Craft progress 0â€“1 (only meaningful when isCrafting is true). */
+  /** Craft progress 0–1 (only meaningful when isCrafting is true). */
   craftProgress: number
   onCraft: (recipeId: RecipeId) => void
 }
 
 /**
  * A visible, unlocked recipe row.
- * - Craftable: ember glow pulse + rune icon (âœ¦).
+ * - Craftable: ember glow pulse + rune icon (✦).
  * - Hover: calls setHighlight / clearHighlight on the crafting store.
  * - Missing items shown in blood red with "missing" label.
  * - "Craft" button fires `startCrafting` and shows a progress bar.
@@ -164,9 +164,9 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
   const missingMap = new Map(missing.map((m) => [m.item, m.qty]))
 
   const ariaLabel = [
-    craftable ? 'Craftable.' : 'Cannot craft â€” missing ingredients.',
+    craftable ? 'Craftable.' : 'Cannot craft — missing ingredients.',
     `Output: ${itemName(recipe.output.item)}`,
-    recipe.output.qty > 1 ? `(Ã—${recipe.output.qty})` : '',
+    recipe.output.qty > 1 ? `(×${recipe.output.qty})` : '',
     'Requires:',
     recipe.inputs.map((i) => `${i.qty} ${itemName(i.item)}`).join(', '),
     recipe.consumesTool ? `and ${itemName(recipe.consumesTool)}` : '',
@@ -191,17 +191,17 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
       {/* Output row */}
       <div className="recipe-entry__output">
         {craftable && (
-          <span className="recipe-entry__rune" aria-hidden="true" title="Craftable">âœ¦</span>
+          <span className="recipe-entry__rune" aria-hidden="true" title="Craftable">✦</span>
         )}
         <span className="recipe-entry__output-name">
           {itemName(recipe.output.item)}
           {recipe.output.qty > 1 && (
-            <span className="recipe-entry__output-qty"> Ã—{recipe.output.qty}</span>
+            <span className="recipe-entry__output-qty"> ×{recipe.output.qty}</span>
           )}
         </span>
         {recipe.consumesTool && (
           <span className="recipe-entry__upgrade-tag" title="Upgrades an existing tool">
-            âŸ³ upgrade
+            ⟳ upgrade
           </span>
         )}
       </div>
@@ -272,7 +272,7 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
                 style={{ width: `${craftProgress * 100}%` }}
               />
               <span className="craft-progress__label" aria-hidden="true">
-                Craftingâ€¦
+                Crafting…
               </span>
             </div>
           ) : (
@@ -287,7 +287,7 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
               onMouseDown={(e) => e.stopPropagation()}
               aria-label={`Craft ${itemName(recipe.output.item)}`}
             >
-              âœ¦ Craft
+              ✦ Craft
             </button>
           )}
         </div>
@@ -362,7 +362,7 @@ export function RecipeBook() {
           Workbench Formulae
         </h2>
         <div className="recipe-book__divider" aria-hidden="true">
-          âœ¦ Â· Â· âœ¦ Â· Â· âœ¦
+          ✦ · · ✦ · · ✦
         </div>
 
         {RECIPES.length === 0 && (
@@ -396,7 +396,7 @@ export function RecipeBook() {
           {/* Separator between unlocked and locked sections */}
           {locked.length > 0 && orderedUnlocked.length > 0 && (
             <li className="recipe-book__section-sep" aria-hidden="true" role="presentation">
-              <span>Â· Â· Â·</span>
+              <span>· · ·</span>
             </li>
           )}
 
@@ -407,7 +407,7 @@ export function RecipeBook() {
         </ul>
 
         <p className="recipe-book__footer">
-          Craft at the bench â€” 1.5 s â€” world runs.
+          Craft at the bench — 1.5 s — world runs.
         </p>
       </div>
     </div>

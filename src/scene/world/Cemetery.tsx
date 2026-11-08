@@ -93,9 +93,6 @@ const LAMP_PLACEMENTS = LAMP_POSTS.map((l) => unit(l.position, l.rotationY))
 const COFFIN_PLACEMENTS = SPAWN_POINTS.filter((p) => p.lootTable === 'broken-coffin').map((p, i) =>
   unit([p.position[0], 0, p.position[2] + 1.2], 0.5 + i * 0.9),
 )
-const GRAVE_MOUND_PLACEMENTS = SPAWN_POINTS.filter((p) => p.lootTable === 'grave-dig').map((p, i) =>
-  unit([p.position[0], 0, p.position[2]], i * 0.4),
-)
 
 const CRYPT_PLACEMENTS = [unit(craneCryptPosition())]
 
@@ -240,12 +237,11 @@ function LampPosts() {
   )
 }
 
-/** Dressing for spawn points: broken coffins and fresh-dug mounds. No colliders (walk over). */
+/** Dressing for spawn points: broken coffins (diggable mounds are in GraveMounds.tsx). No colliders (walk over). */
 function SpawnDressing() {
   return (
     <>
       <InstancedModel model="coffin-old" placements={COFFIN_PLACEMENTS} />
-      <InstancedModel model="grave" placements={GRAVE_MOUND_PLACEMENTS} />
     </>
   )
 }

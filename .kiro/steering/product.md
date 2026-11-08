@@ -10,13 +10,13 @@ You are the new gravekeeper of Hollowmere Cemetery. The previous keeper, Elias T
 
 ## Pillars (every feature must serve at least one)
 1. **Dread over gore.** Darkness, sound and anticipation do the work. Little blood, no gratuitous violence.
-2. **Spooky UI is functional UI.** Every visual effect carries information: the lantern flame is your health, the glow on the workbench shows what's craftable, the map is hand-drawn and fills in as you explore.
+2. **Spooky UI is functional UI.** Every visual effect carries information: the health bar drains with a visible chunk of recent damage, the lantern flame is your oil, the glow on the workbench shows what's craftable, the map is hand-drawn and fills in as you explore.
 3. **Curiosity is rewarded.** Exploring finds materials, lore and keys. The mystery pulls the player forward.
 4. **Fair scares.** Every jumpscare is telegraphed by a flicker, creak or silence. Players can set the intensity.
 5. **Finishable scope.** One cemetery, three zones, five nights. Polish beats size.
 
 ## Core loop
-Day (explore, collect, investigate, craft) → Dusk (bell tolls, prepare, set traps) → Night (waves of zombies, scares in the alleys) → Dawn (new recipe, next journal chapter). Five nights, ending decided by relics collected.
+Day (explore, collect, investigate, craft) → Dusk (bell tolls, prepare, set traps) → Night (waves of zombies, scares in the alleys) → Dawn (new recipe, next journal chapter, pick an upgrade, visit the merchant). Five nights, ending decided by relics collected.
 
 ## Target
 - Desktop browsers (Chrome, Edge, Firefox) on mid-range laptops, keyboard and mouse.

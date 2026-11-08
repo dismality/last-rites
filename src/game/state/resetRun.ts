@@ -4,6 +4,7 @@
 import { useChapelStore } from './chapelStore'
 import { useCraftingStore } from './craftingStore'
 import { useEndingStore } from './endingStore'
+import { useDigStore } from './digStore'
 import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
 import { useInventoryStore } from './inventoryStore'
@@ -40,6 +41,7 @@ const RUN_STORES: readonly Resettable[] = [
 
 export function resetRun(): void {
   for (const store of RUN_STORES) store.setState(store.getInitialState() as never, true)
+  useDigStore.getState().reset()
   useEndingStore.getState().reset() // also bumps runId
   useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, satchelOpen: false })
 }

@@ -9,7 +9,7 @@
 // Architecture: this component reads durability from the player store (to be
 // wired in a later task) and is pure rendering — no game logic lives here.
 
-import { useRef, useMemo } from 'react'
+import { useRef, useMemo, useState } from 'react'
 import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGameStore, useInventoryStore, usePlayerStore, useSettingsStore } from '../../game/state'
@@ -82,10 +82,70 @@ function crackOpacity(weaponState: WeaponState): number {
  * Currently a placeholder low-poly box; this will be replaced with a proper
  * GLTF viewmodel in a later art pass.
  */
-function ViewmodelMesh() {
+const HELD_POSITION: [number, number, number] = [0.22, -0.18, -0.4]
+const HELD_ROTATION: [number, number, number] = [0.1, -0.15, 0]
+/** Cylinders stand along Y; this lays them along the view axis (-Z is away from the player). */
+const ALONG_Z: [number, number, number] = [Math.PI / 2, 0, 0]
+
+/** Wooden shaft with a flat blade at the far end. Sharpened: paler steel and a pointed tip. */
+function ShovelMesh({ sharpened }: { sharpened: boolean }) {
+  const steel = sharpened ? '#9aa3ab' : '#6b5a4a'
   return (
-    <mesh position={[0.22, -0.18, -0.4]} rotation={[0.1, -0.15, 0]}>
-      {/* Rough box approximation of a held shovel/club */}
+    <group position={HELD_POSITION} rotation={HELD_ROTATION}>
+      <mesh rotation={ALONG_Z}>
+        <cylinderGeometry args={[0.014, 0.016, 0.5, 8]} />
+        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
+      </mesh>
+      {/* D-grip at the near end */}
+      <mesh position={[0, 0, 0.25]}>
+        <boxGeometry args={[0.08, 0.018, 0.018]} />
+        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0, -0.3]}>
+        <boxGeometry args={[0.11, 0.012, 0.13]} />
+        <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
+      </mesh>
+      <mesh position={[0, 0, -0.385]} rotation={[-Math.PI / 2, Math.PI / 4, 0]} scale={[1, 1, sharpened ? 1.4 : 0.6]}>
+        <coneGeometry args={[0.078, 0.07, 4]} />
+        <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
+      </mesh>
+    </group>
+  )
+}
+
+/** A thigh bone: tapered shaft, a heavy knob at the striking end, a small knob at the grip. */
+function BoneClubMesh() {
+  const bone = '#d8d2c0'
+  return (
+    <group position={HELD_POSITION} rotation={HELD_ROTATION}>
+      <mesh rotation={ALONG_Z}>
+        <cylinderGeometry args={[0.03, 0.017, 0.42, 8]} />
+        <meshStandardMaterial color={bone} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0, -0.22]}>
+        <sphereGeometry args={[0.055, 10, 8]} />
+        <meshStandardMaterial color={bone} roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0, 0.21]}>
+        <sphereGeometry args={[0.026, 8, 6]} />
+        <meshStandardMaterial color={bone} roughness={0.9} />
+      </mesh>
+      {/* Cloth wrap on the grip */}
+      <mesh position={[0, 0, 0.12]} rotation={ALONG_Z}>
+        <cylinderGeometry args={[0.024, 0.024, 0.12, 8]} />
+        <meshStandardMaterial color="#6e6048" roughness={1} />
+      </mesh>
+    </group>
+  )
+}
+
+function ViewmodelMesh({ item }: { item: ItemId | null }) {
+  if (item === 'rusty-shovel') return <ShovelMesh sharpened={false} />
+  if (item === 'sharpened-shovel') return <ShovelMesh sharpened />
+  if (item === 'bone-club') return <BoneClubMesh />
+  return (
+    <mesh position={HELD_POSITION} rotation={HELD_ROTATION}>
+      {/* Stand-in for items without their own held model (flasks, bandages, ...). */}
       <boxGeometry args={[0.06, 0.06, 0.45]} />
       <meshStandardMaterial color="#5c3d1e" roughness={0.9} metalness={0} />
     </mesh>
@@ -178,6 +238,8 @@ export function Viewmodel({ weaponState }: ViewmodelProps) {
   const camera = useMemo(() => new THREE.PerspectiveCamera(75, 1, 0.01, 5), [])
   const rig = useRef<THREE.Group>(null)
   const itemGroup = useRef<THREE.Group>(null)
+  // What is drawn follows the swap (not the hotbar), so the old item lowers before the new one rises.
+  const [shownItem, setShownItem] = useState<ItemId | null>(null)
 
   const swap = useRef<SwapState | null>(null)
   const sway = useRef<SwayState>(SWAY_REST)
@@ -230,6 +292,7 @@ export function Viewmodel({ weaponState }: ViewmodelProps) {
     }
     // Nothing is drawn while the slot is empty or mid-swap-to-nothing.
     if (itemGroup.current) itemGroup.current.visible = swap.current.shown !== null
+    setShownItem((cur) => (cur === swap.current?.shown ? cur : (swap.current?.shown ?? null)))
     // The ending camera is not the player's eyes, so no hands in shot.
     if (gs.screen === 'ending') return
 
@@ -249,7 +312,7 @@ export function Viewmodel({ weaponState }: ViewmodelProps) {
       <directionalLight position={[0.5, 1, 1]} intensity={1.2} color="#e8913a" />
       <group ref={rig} name="viewmodel">
         <group ref={itemGroup}>
-          <ViewmodelMesh />
+          <ViewmodelMesh item={shownItem} />
           {cracked && <CrackOverlay opacity={opacity} />}
         </group>
       </group>

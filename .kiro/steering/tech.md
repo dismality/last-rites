@@ -12,7 +12,7 @@ inclusion: always
 | Physics / character controller | `@react-three/rapier` `^2.0` |
 | Post-processing | `@react-three/postprocessing` `^3.0` (bloom, vignette, noise) |
 | State | `zustand` |
-| Audio | `howler` (spatial audio via Howler's 3D API) |
+| Audio | `howler` (spatial audio via Howler's 3D API). Music, rain, thunder and other sounds without a file are procedural Web Audio on Howler's shared `AudioContext` (`Howler.ctx`), routed through the same volume settings. |
 | Unit tests | `vitest` |
 | Property-based tests | `fast-check` with vitest |
 | Lint / format | ESLint + Prettier |

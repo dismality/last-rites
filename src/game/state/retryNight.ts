@@ -7,6 +7,8 @@ import { loadSnapshot, pickData, saveSnapshot, type SnapshotData } from '../syst
 import { damagePlayer } from '../systems/playerHealth'
 import { useChapelStore } from './chapelStore'
 import { useCraftingStore } from './craftingStore'
+import { useDigStore } from './digStore'
+import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
 import { useInventoryStore } from './inventoryStore'
 import { useLanternStore } from './lanternStore'
@@ -14,6 +16,7 @@ import { useMapStore } from './mapStore'
 import { usePlayerStore } from './playerStore'
 import { useSpawnStore } from './spawnStore'
 import { useUiWorldStore } from './uiWorldStore'
+import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
 interface Snapshotable {
@@ -76,6 +79,11 @@ export function retryNight(): void {
     useUiWorldStore.setState({ playerHealth: PLAYER_MAX_HEALTH })
     useWorldStore.getState().applyWorldState({ phase: 'dusk', phaseTime: 0, wavesCleared: false })
   }
+  // Neither store is in the snapshot: without this, the zombies and wave progress from the
+  // failed night would still be alive during the replayed dusk.
+  useEnemyStore.getState().setEnemies([])
+  useDigStore.getState().reset()
+  useWaveStore.getState().reset()
   useGameStore.getState().setTaken(false)
   useGameStore.getState().setPaused(false)
 }

@@ -1,4 +1,4 @@
-// Workbench â€” the keeper's crafting bench in the hut.
+// Workbench — the keeper's crafting bench in the hut.
 //
 // When `workbenchOpen` is true the camera smoothly lerps to a fixed view
 // above the bench (400 ms / eased). Materials in the player's satchel are
@@ -12,7 +12,7 @@
 //     immediately without consuming any inputs.
 //
 // Architecture note: state lives in worldStore / inventoryStore / craftingStore.
-// This component is *rendering only* â€” it reads stores and drives visuals.
+// This component is *rendering only* — it reads stores and drives visuals.
 
 import { useRef, useMemo, useEffect } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
@@ -71,7 +71,7 @@ const MATERIAL_COLOR: Record<MaterialId, string> = {
   'grave-salt': '#ddd8cc',
 }
 
-/** Geometry scale per material type â€” gives each pile a distinct silhouette. */
+/** Geometry scale per material type — gives each pile a distinct silhouette. */
 const MATERIAL_SCALE: Record<MaterialId, [number, number, number]> = {
   'bone': [0.04, 0.12, 0.04],
   'iron-nail': [0.02, 0.06, 0.02],
@@ -83,8 +83,8 @@ const MATERIAL_SCALE: Record<MaterialId, [number, number, number]> = {
 }
 
 /**
- * Map qty 1â€“10 to 1â€“5 pile meshes so piles grow visually with count.
- * qty â‰¤ 2 â†’ 1, â‰¤ 4 â†’ 2, â‰¤ 6 â†’ 3, â‰¤ 8 â†’ 4, else 5.
+ * Map qty 1–10 to 1–5 pile meshes so piles grow visually with count.
+ * qty ≤ 2 → 1, ≤ 4 → 2, ≤ 6 → 3, ≤ 8 → 4, else 5.
  */
 function pileCount(qty: number): number {
   if (qty <= 2) return 1
@@ -130,7 +130,7 @@ function benchPosition(index: number): THREE.Vector3 {
 /**
  * Lerps the default camera toward the bench view when `open` is true,
  * and back to where it was when `open` becomes false.
- * Operates in-place on `state.camera` â€” R3F's default camera.
+ * Operates in-place on `state.camera` — R3F's default camera.
  */
 type RigPhase = 'idle' | 'opening' | 'returning'
 
@@ -243,7 +243,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
 
     let intensity = 0.15 // base
     if (craftable) {
-      // Slow ember pulse: 0.35 â†’ 0.65 at ~0.6 Hz
+      // Slow ember pulse: 0.35 → 0.65 at ~0.6 Hz
       intensity = 0.35 + Math.sin(timeRef.current * 3.8) * 0.15
     }
     if (highlighted) {
@@ -280,7 +280,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
         ))}
       </Instances>
 
-      {/* Rune sprite above craftable pile â€” floats up slowly */}
+      {/* Rune sprite above craftable pile — floats up slowly */}
       {craftable && (
         <Html
           position={[position.x, position.y + 0.28, position.z]}
@@ -296,7 +296,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
             transition: 'opacity 150ms ease-out',
           }}
         >
-          âœ¦
+          ✦
         </Html>
       )}
 
@@ -502,7 +502,7 @@ export function Workbench() {
           lerp is smooth. */}
       <CameraRig open={workbenchOpen} />
 
-      {/* Bench geometry â€” always visible in the scene. */}
+      {/* Bench geometry — always visible in the scene. */}
       <group name="workbench" position={[0, 0, 0]}>
         <group position={[0, 0, BENCH_Z]}>
           <Interactable
@@ -516,7 +516,7 @@ export function Workbench() {
           </Interactable>
         </group>
 
-        {/* Material piles â€” only rendered when the workbench is open so the
+        {/* Material piles — only rendered when the workbench is open so the
             bench isn't cluttered during normal play. */}
         {workbenchOpen &&
           materialPiles.map(({ id, qty, position }) => (
