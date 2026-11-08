@@ -2,10 +2,14 @@ import { useGameStore } from '../../game/state/gameStore'
 import { LanternHealth } from './LanternHealth'
 import { FuelReservoir } from './FuelReservoir'
 import { StaminaBar } from './StaminaBar'
+import { DamageFeedback } from './DamageFeedback'
 import { Crosshair } from './Crosshair'
 import { InteractPrompt } from './InteractPrompt'
 import { Subtitles } from './Subtitles'
 import { Toast } from './Toast'
+import { DuskHint } from './DuskHint'
+import { WaveTally } from './WaveTally'
+import { RiteMeter } from './RiteMeter'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
 
@@ -15,6 +19,7 @@ export function Hud() {
   if (screen !== 'game') return null
   return (
     <div className="hud">
+      <DamageFeedback />
       <Crosshair />
       <InteractPrompt />
       <div className="hud-corner">
@@ -23,8 +28,11 @@ export function Hud() {
       </div>
       <Hotbar />
       <StaminaBar />
+      <WaveTally />
+      <RiteMeter />
       <Subtitles />
       <Toast />
+      <DuskHint />
     </div>
   )
 }

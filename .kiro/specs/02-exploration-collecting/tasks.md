@@ -42,3 +42,12 @@
 
 - [x] 10. Checkpoint
   - Explore by day, collect, dig, examine the crypt key, see the map fill in; all tests pass
+
+- [x] 11. Replace greybox with real models
+  - Read `docs/world-models.md`, `docs/hero-items.md` and `docs/CREDITS.md` first; do not edit any `.glb` file
+  - World: in `Cemetery.tsx` swap primitive graves, fences, walls, crypts, trees and lamps for the `.glb` files in `public/assets/models/world/`; keep existing colliders and layout positions; use `<Instances>` for repeated graves and fences; use crooked pines and trunks where the design mentions dead oaks; crypts are built from `crypt-large`, `crypt-large-door` and `crypt-large-roof` (raised 2.4 m)
+  - Hero items: show the 8 relics and keys from `public/assets/models/items/` in the world and in examine mode, using the file names already in `src/data/items.ts`; clue normal is `[0, 0, -1]`
+  - Draco: copy `node_modules/three/examples/jsm/libs/draco/gltf/` to `public/draco/` and load with `/draco/` so nothing comes from a CDN
+  - Preload models during the loading screen
+  - Run test, build and lint, and log the change in `docs/kiro-log.md`
+  - _Requirements: 1.1, 4.1, 4.2_

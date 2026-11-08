@@ -4,7 +4,9 @@ import { Suspense, useEffect, useMemo, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { OrbitControls, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { assetUrl } from '../../data/assets'
 import { ITEM_MAP } from '../../data/items'
+import '../assets/preloadModels'
 import { useExamineStore } from '../../game/state/examineStore'
 import {
   INITIAL_CLUE_STATE,
@@ -21,14 +23,17 @@ const MAX_ZOOM = 5
 const START_DISTANCE = 3
 
 function ItemModel({ path }: { path: string }) {
-  const { scene } = useGLTF(`/${path}`)
+  const { scene } = useGLTF(assetUrl(path))
   const { object, scale } = useMemo(() => {
     const clone = scene.clone(true)
     const box = new THREE.Box3().setFromObject(clone)
     const size = box.getSize(new THREE.Vector3())
     const centre = box.getCenter(new THREE.Vector3())
-    clone.position.sub(centre)
-    return { object: clone, scale: FIT_SIZE / Math.max(size.x, size.y, size.z, 1e-3) }
+    const scale = FIT_SIZE / Math.max(size.x, size.y, size.z, 1e-3)
+    // Position is applied after scale, so centre in scaled units; hero items are
+    // centimetres across and would otherwise sit far off-centre.
+    clone.position.copy(centre).multiplyScalar(-scale)
+    return { object: clone, scale }
   }, [scene])
   return <primitive object={object} scale={scale} />
 }

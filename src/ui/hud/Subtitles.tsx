@@ -15,9 +15,10 @@ export function Subtitles() {
   const timers = useRef(new Set<ReturnType<typeof setTimeout>>())
 
   useEffect(() => {
-    if (!enabled) return
     const pending = timers.current
     const unsubscribe = subscribeToType('subtitleShown', (e) => {
+      // `force` is for scares at intensity Off: the caption is then the only description of the event.
+      if (!enabled && !e.force) return
       const id = nextId.current++
       setCaptions((c) => [...c, { id, text: e.text }])
       const t = setTimeout(() => {
@@ -34,7 +35,7 @@ export function Subtitles() {
     }
   }, [enabled])
 
-  if (!enabled || captions.length === 0) return null
+  if (captions.length === 0) return null
 
   return (
     <div className="hud-subtitles" role="log" aria-live="polite">

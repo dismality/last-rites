@@ -55,3 +55,84 @@
 }
 .journal__close:hover { border-color: var(--ember); }
 .journal__close:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+
+/* ---- Tabbed journal ---- */
+.journal__page--book { width: min(60rem, 94vw); align-items: stretch; }
+.journal__panel { min-height: 20rem; padding: 0.75rem 0; }
+.journal__subtitle { margin: 0 0 0.5rem; font-family: var(--font-heading); font-size: 1.25rem; }
+.journal__count { margin: 0 0 0.75rem; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.journal__empty { font-style: italic; }
+.journal__hand { font-family: var(--font-hand); font-size: 1rem; line-height: 2; margin: 0; }
+
+.journal-tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--parchment-dark); }
+.journal-tabs__tab {
+  padding: 0.4rem 1.1rem;
+  font: inherit;
+  font-family: var(--font-heading);
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+  cursor: pointer;
+}
+.journal-tabs__tab:hover { border-color: var(--parchment-dark); }
+/* Selected tab is raised, bold and underlined, so it never relies on colour alone. */
+.journal-tabs__tab[aria-selected='true'] {
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  background: rgba(255, 248, 225, 0.45);
+  border-color: var(--parchment-dark);
+}
+.journal-tabs__tab:focus-visible,
+.journal-pages__item:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+
+.journal-pages { display: flex; gap: 1.25rem; align-items: flex-start; }
+.journal-pages__list { list-style: none; margin: 0; padding: 0; min-width: 13rem; }
+.journal-pages__item {
+  display: block;
+  width: 100%;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-left: 3px solid transparent;
+  cursor: pointer;
+}
+.journal-pages__item[aria-current='page'] { font-weight: 700; border-left-color: var(--ink); }
+.journal-pages__sheet { flex: 1; }
+
+.journal-clues__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+/* Hand-drawn underline: a background line that grows left to right. */
+.journal-clues__text {
+  background: linear-gradient(var(--blood), var(--blood)) no-repeat 0 100% / 100% 2px;
+  padding-bottom: 2px;
+  animation: ink-underline 700ms ease-out both;
+}
+@keyframes ink-underline {
+  from { background-size: 0 2px; }
+  to { background-size: 100% 2px; }
+}
+
+.journal-relics__grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.75rem;
+}
+.journal-relic {
+  display: flex; flex-direction: column; align-items: center; gap: 0.2rem;
+  padding: 0.6rem; text-align: center;
+  border: 2px solid var(--parchment-dark); border-radius: 4px;
+}
+.journal-relic--missing { border-style: dashed; opacity: 0.8; }
+.journal-relic__icon { width: 3rem; height: 3rem; color: var(--ink); }
+.journal-relic__name { font-family: var(--font-heading); }
+.journal-relic__state { font-size: 1rem; font-weight: 700; }
+.journal-relic__desc { font-size: 1rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .journal { animation: none; }
+  .journal-clues__text { animation: none; }
+}

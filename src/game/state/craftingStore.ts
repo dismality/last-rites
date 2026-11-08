@@ -105,7 +105,7 @@ export interface CraftingState {
 // ---------------------------------------------------------------------------
 
 export const useCraftingStore = create<CraftingState>((set, get) => ({
-  // Start with no unlocked recipes; GameLoop dispatches 'gameStart' on mount.
+  // Start with no unlocked recipes; TitleScreen dispatches 'gameStart' on New Game / Continue.
   unlockedRecipes: [],
 
   highlightedItems: new Set<ItemId>(),

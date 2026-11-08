@@ -1,0 +1,62 @@
+// Ending state: run stats, whether the final rite has begun, and which ending is playing.
+// Pure zustand, no React / three.js imports.
+
+import { create } from 'zustand'
+import { subscribeToType } from '../events'
+import type { EndingId } from '../types'
+import {
+  createRunStats,
+  finalizeStats,
+  recordBanished,
+  recordNightSurvived,
+  type RunStats,
+} from '../systems/runStats'
+
+/** sequence = camera path playing; summary = stats, credits and the exit buttons. */
+export type EndingStage = 'sequence' | 'summary'
+
+interface EndingStoreState {
+  stats: RunStats
+  /** Bumped on every reset; the scene is keyed on it so the player body returns to spawn. */
+  runId: number
+  /** Night 5's waves are cleared. Held here, not in worldStore, so night 5 does not drift to dawn. */
+  nightFiveCleared: boolean
+  /** The player has begun the rite (the chapel door no longer holds). */
+  riteStarted: boolean
+  ending: EndingId | null
+  stage: EndingStage
+  banish: () => void
+  surviveNight: (night: number) => void
+  setNightFiveCleared: (v: boolean) => void
+  setRiteStarted: (v: boolean) => void
+  /** Locks in the ending; stats are finalised so the summary matches it. */
+  beginEnding: (ending: EndingId) => void
+  showSummary: () => void
+  reset: () => void
+}
+
+const INITIAL = {
+  stats: createRunStats(),
+  runId: 0,
+  nightFiveCleared: false,
+  riteStarted: false,
+  ending: null,
+  stage: 'sequence' as EndingStage,
+}
+
+/** Counts a night as survived when its dawn arrives. Returns the unsubscribe function. */
+export function installRunStats(): () => void {
+  return subscribeToType('dawnStarted', (e) => useEndingStore.getState().surviveNight(e.nightNumber))
+}
+
+export const useEndingStore = create<EndingStoreState>((set, get) => ({
+  ...INITIAL,
+  banish: () => set({ stats: recordBanished(get().stats) }),
+  surviveNight: (night) => set({ stats: recordNightSurvived(get().stats, night) }),
+  setNightFiveCleared: (nightFiveCleared) => set({ nightFiveCleared }),
+  setRiteStarted: (riteStarted) => set({ riteStarted }),
+  beginEnding: (ending) =>
+    set({ ending, stage: 'sequence', stats: finalizeStats(get().stats, ending) }),
+  showSummary: () => set({ stage: 'summary' }),
+  reset: () => set({ ...INITIAL, stats: createRunStats(), runId: get().runId + 1 }),
+}))

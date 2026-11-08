@@ -1,18 +1,9 @@
 import { useId, useState } from 'react'
 import { useGameStore } from '../../game/state/gameStore'
+import { useCraftingStore } from '../../game/state/craftingStore'
+import { canContinue, loadGame } from '../../game/state/gameSave'
 import { MenuDialog } from './MenuDialog'
 import { Settings } from './Settings'
-
-/** Full game saves arrive in a later spec; until then this key is never written. */
-const SAVE_KEY = 'last-rites-save'
-
-function hasSave(): boolean {
-  try {
-    return localStorage.getItem(SAVE_KEY) !== null
-  } catch {
-    return false
-  }
-}
 
 type Panel = 'none' | 'settings' | 'credits'
 
@@ -22,11 +13,20 @@ export function TitleScreen() {
   const setScreen = useGameStore((s) => s.setScreen)
   const setPaused = useGameStore((s) => s.setPaused)
   const [panel, setPanel] = useState<Panel>('none')
-  const saveExists = hasSave()
+  // Re-read each render: a missing or corrupt save hides Continue (Req 7.3).
+  const saveExists = canContinue()
 
   function start() {
     setPaused(false)
+    // Starting recipes (bone club, bandage, candle, refill). Without this the recipe book
+    // shows only locked entries.
+    useCraftingStore.getState().applyUnlockEvent({ type: 'gameStart' })
     setScreen('game')
+  }
+
+  function continueGame() {
+    // Load first so the saved unlocks are in place before the starting recipes merge in.
+    if (loadGame()) start()
   }
 
   if (panel === 'settings') return <Settings onClose={() => setPanel('none')} />
@@ -61,14 +61,11 @@ export function TitleScreen() {
         <button type="button" className="menu__button" onClick={start}>
           New Game
         </button>
-        <button
-          type="button"
-          className="menu__button"
-          aria-disabled={!saveExists}
-          onClick={() => saveExists && start()}
-        >
-          Continue
-        </button>
+        {saveExists && (
+          <button type="button" className="menu__button" onClick={continueGame}>
+            Continue
+          </button>
+        )}
         <button type="button" className="menu__button" onClick={() => setPanel('settings')}>
           Settings
         </button>

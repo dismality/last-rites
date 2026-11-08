@@ -2,7 +2,7 @@
 // Pure data: no logic, no React / three.js imports.
 
 import type { RelicId } from '../game/types'
-import { CHAPEL_CENTER, CORRIDORS, PLAYABLE_BOUNDS, type Vec3 } from './cemeteryLayout'
+import { BENCH_Z, CHAPEL_CENTER, CORRIDORS, PLAYABLE_BOUNDS, type Vec3 } from './cemeteryLayout'
 import { FIXED_SPAWNS } from './zones'
 
 /** Side of one map cell in metres (Requirement 6.1). */
@@ -56,7 +56,7 @@ const RELIC_SITES: Landmark[] = FIXED_SPAWNS.flatMap((s) =>
 )
 
 export const LANDMARKS: readonly Landmark[] = [
-  { id: 'workbench', kind: 'workbench', name: 'Workbench', position: [0, 0, -0.5] },
+  { id: 'workbench', kind: 'workbench', name: 'Workbench', position: [0, 0, BENCH_Z] },
   { id: 'chapel', kind: 'chapel', name: 'Chapel', position: CHAPEL_CENTER },
   ...CORRIDORS.map((c) => ({
     id: `gate-${c.id}`,

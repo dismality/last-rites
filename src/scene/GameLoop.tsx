@@ -36,8 +36,9 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
 
   useFrame((_state, delta) => {
     // Paused: skip entirely and drop the backlog so resume doesn't fast-forward.
-    const { paused, examining, journalOpen } = useGameStore.getState()
-    if (paused || examining || journalOpen) {
+    const { paused, examining, journalOpen, screen } = useGameStore.getState()
+    // The ending sequence plays over a frozen world.
+    if (paused || examining || journalOpen || screen === 'ending') {
       accumulator.current = 0
       return
     }

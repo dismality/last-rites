@@ -4,9 +4,12 @@
 import { create } from 'zustand'
 import { ITEM_MAP, usesSatchelSlot } from '../../data/items'
 import { addItem } from '../systems/inventory'
-import type { ItemId } from '../types'
+import { playPageTurn } from '../../audio/AudioManager'
+import type { ItemId, PageNumber } from '../types'
+import { useCraftingStore } from './craftingStore'
 import { useGameStore } from './gameStore'
 import { useInventoryStore } from './inventoryStore'
+import { useMysteryStore } from './mysteryStore'
 import { useToastStore } from './toastStore'
 
 interface ExamineState {
@@ -36,6 +39,14 @@ export const useExamineStore = create<ExamineState>((set, get) => ({
     const res = addItem(useInventoryStore.getState().inventory, id, 1)
     useInventoryStore.getState().setInventory(res.inv)
     useToastStore.getState().push(`Added to journal: ${ITEM_MAP[id].name}`)
+    const pageMatch = /^journal-page-([1-5])$/.exec(id)
+    if (pageMatch) {
+      const page = Number(pageMatch[1]) as PageNumber
+      useMysteryStore.getState().collectPage(page)
+      // Page 3 teaches the Salt Circle; the unlock keys off the page being read.
+      useCraftingStore.getState().applyUnlockEvent({ type: 'journalRead', page })
+      playPageTurn()
+    }
     set({ item: null, clueRevealed: false })
     useGameStore.getState().setExamining(false)
   },

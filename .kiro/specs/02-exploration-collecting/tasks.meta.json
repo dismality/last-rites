@@ -123,6 +123,18 @@
         "chatSessionId": "sess_be3b6d21-1df9-4599-a5cf-e8ce08138272",
         "timestamp": 1794047850142
       }
+    ],
+    "11. Replace greybox with real models": [
+      {
+        "executionId": "7cf07f46-33cc-4315-ab2d-9d491b638122",
+        "chatSessionId": "sess_39e89ab3-d237-4071-9c14-85a72714b28a",
+        "timestamp": 1794066554465
+      },
+      {
+        "executionId": "7cf07f46-33cc-4315-ab2d-9d491b638122",
+        "chatSessionId": "sess_39e89ab3-d237-4071-9c14-85a72714b28a",
+        "timestamp": 1794067833690
+      }
     ]
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Color, FogExp2 } from 'three'
+import { Color, FogExp2, SRGBColorSpace } from 'three'
 import type { AmbientLight, DirectionalLight, Scene } from 'three'
 import { MOON_COLOR, MOON_POSITION, SKY_LOOKS } from '../../data/skyPalette'
 import { useWorldStore } from '../../game/state'
@@ -24,10 +24,11 @@ function removeSkyAndFog(scene: Scene): void {
   scene.background = null
 }
 
+// hexToRgb yields sRGB values; setRGB defaults to linear, which washes everything out pale.
 function applySky(scene: Scene, blend: SkyBlend): void {
-  if (scene.background instanceof Color) scene.background.setRGB(...blend.sky)
+  if (scene.background instanceof Color) scene.background.setRGB(...blend.sky, SRGBColorSpace)
   if (scene.fog instanceof FogExp2) {
-    scene.fog.color.setRGB(...blend.sky)
+    scene.fog.color.setRGB(...blend.sky, SRGBColorSpace)
     scene.fog.density = blend.fogDensity
   }
 }
@@ -67,7 +68,7 @@ export function SkyAndFog() {
 
     applySky(scene, blend)
     if (ambient.current) {
-      ambient.current.color.setRGB(...blend.ambientColor)
+      ambient.current.color.setRGB(...blend.ambientColor, SRGBColorSpace)
       ambient.current.intensity = blend.ambientIntensity
     }
     if (moon.current) moon.current.intensity = blend.moonIntensity

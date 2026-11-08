@@ -27,5 +27,27 @@ export const STAMINA_DRAIN_PER_S = 20
 export const STAMINA_REGEN_PER_S = 15
 export const STAMINA_REGEN_DELAY_S = 1
 
+// --- Combat (design bible §4 and §7; combat-waves requirements 2.1, 3.3, 4.5) ---
+/** Melee swing reach in metres. */
+export const MELEE_RANGE_M = 1.8
+/** Full width of the melee swing cone in degrees. */
+export const MELEE_ARC_DEG = 70
+/** Damage multiplier on zombies while the player's lantern fuel is 0. */
+export const DARKNESS_DAMAGE_MULT = 0.5
+/** Damage multiplier a holy water flask deals to Wailers. */
+export const FLASK_WAILER_DAMAGE_MULT = 2
+
+// --- Player health (design bible §6; combat-waves requirements 2.4, 6.1, 6.2) ---
+export const PLAYER_MAX_HEALTH = 100
+/** Share of incoming melee damage removed while blocking. */
+export const BLOCK_DAMAGE_REDUCTION = 0.6
+/** Movement speed multiplier while blocking. */
+export const BLOCK_MOVE_MULT = 0.5
+/** HP below this value starts the heartbeat and desaturation. */
+export const LOW_HEALTH_THRESHOLD = 30
+
+/** sessionStorage key for the state saved at the start of each dusk (Retry Night). */
+export const DUSK_SNAPSHOT_KEY = 'lastrites:dusk'
+
 /** Max distance (m) at which the crosshair can target an interactable. */
 export const INTERACT_RANGE_M = 2.5

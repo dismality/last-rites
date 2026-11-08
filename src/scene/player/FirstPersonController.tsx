@@ -14,7 +14,14 @@ import {
   tickHeadBob,
   type BobState,
 } from '../../game/systems/movement'
+import { shakeMagnitude } from '../../game/systems/melee'
+import { meleeRuntime } from './meleeRuntime'
+import { scareRuntime } from '../scares/scareRuntime'
+import { slowFactor } from '../../game/systems/scareStaging'
 import { playerPositionRef } from '../world/playerPositionRef'
+import { endingCameraRuntime } from '../effects/endingCameraRuntime'
+import { workbenchCameraRuntime } from '../world/workbenchCameraRuntime'
+import { isMenuOpen } from '../../game/state/menuState'
 import { input, installInput } from './input'
 import { useInteractionRaycast } from './useInteractionRaycast'
 
@@ -72,8 +79,9 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     const rb = body.current
     const kcc = controller.current
     if (!rb || !kcc) return
-    const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen) return
+    // No movement or look while any menu holds the cursor. The workbench rig owns
+    // the camera while opening, open and returning.
+    if (isMenuOpen() || workbenchCameraRuntime.active || endingCameraRuntime.active) return
 
     const dt = Math.min(rawDelta, MAX_FRAME_DT)
     const settings = useSettingsStore.getState()
@@ -89,7 +97,10 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
       settings.invertY
     )
 
-    const speed = moveSpeed(snap.sprint, player.stamina)
+    // A grave hand holds the ankle: halve speed for its duration, then tick it down.
+    const speed = moveSpeed(snap.sprint, player.stamina) * slowFactor(scareRuntime.slowLeft)
+    scareRuntime.slowLeft = Math.max(0, scareRuntime.slowLeft - dt)
+    scareRuntime.shakeAge += dt
     const [vx, vz] = moveVelocity(look.yaw, snap.forward, snap.strafe, speed)
 
     const collider = rb.collider(0)
@@ -107,6 +118,12 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     camera.position.set(next.x, next.y + EYE_OFFSET + headBobOffset(bob.current), next.z)
     camera.rotation.order = 'YXZ' // yaw first, then pitch, so looking up doesn't roll the view
     camera.rotation.set(look.pitch, look.yaw, 0)
+    // Hit shake is applied after the base pose and never written back to the player.
+    const shake = Math.max(shakeMagnitude(meleeRuntime.shakeAge), shakeMagnitude(scareRuntime.shakeAge))
+    if (shake > 0) {
+      camera.position.x += (Math.random() - 0.5) * 2 * shake
+      camera.position.y += (Math.random() - 0.5) * 2 * shake
+    }
 
     playerPositionRef.current.set(next.x, next.y - CENTRE_Y, next.z)
     // Only write the store when something changed, to spare subscribers.
