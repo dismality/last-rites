@@ -1,0 +1,52 @@
+/* Objective tracker: top left. Text on a dark backing so it reads over fog. */
+.hud-objective {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  box-sizing: border-box;
+  /* Never run under the compass, which is centred and min(34rem, 60vw) wide. */
+  max-width: min(26rem, calc(50vw - min(17rem, 30vw) - 1.75rem));
+  padding: 0.4rem 0.8rem;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.7);
+  border-left: 3px solid var(--ember);
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.hud-objective__live {
+  margin: 0;
+}
+
+.hud-objective__main {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  line-height: 1.2;
+  animation: hud-objective-fade 220ms ease-out;
+}
+
+.hud-objective__second {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--parchment-dark);
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes hud-objective-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Reduced motion: switch instantly, no fade. */
+@media (prefers-reduced-motion: reduce) {
+  .hud-objective__main {
+    animation: none;
+  }
+}

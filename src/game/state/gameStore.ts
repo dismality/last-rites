@@ -19,6 +19,8 @@ interface GameStoreState {
   /** Player reached 0 HP: shows the "You were taken" screen and freezes the sim. */
   taken: boolean
   setTaken: (taken: boolean) => void
+  /** Bumped by Retry Night so the health bar restarts without a drain animation. */
+  retryEpoch: number
   setScreen: (screen: Screen) => void
   setPaused: (paused: boolean) => void
 }
@@ -34,6 +36,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
   setSatchelOpen: (satchelOpen) => set({ satchelOpen }),
   taken: false,
   setTaken: (taken) => set({ taken }),
+  retryEpoch: 0,
   setScreen: (screen) => set({ screen }),
   setPaused: (paused) => set({ paused }),
 }))

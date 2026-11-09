@@ -1,0 +1,665 @@
+{
+  "pbtResults": {
+    "2.9 Side contracts": {
+      "status": "passed",
+      "lastRunTimestamp": 1794193663256
+    },
+    "2.14 Storm rolls and lightning schedule": {
+      "status": "passed",
+      "lastRunTimestamp": 1794193836505
+    }
+  },
+  "executionHistory": {
+    "1.1 Types, events, seeds and shared constants": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124354
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193133624
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193193290
+      }
+    ],
+    "1.2 Upgrade and score data": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124429
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193198768
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193362246
+      }
+    ],
+    "1.3 Coin, merchant and contract data": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124477
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193198839
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193362790
+      }
+    ],
+    "1.4 Mode and achievement data": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124527
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193198913
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193363296
+      }
+    ],
+    "1.5 Storm, music, caption and sound data": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124584
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193198981
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193364124
+      }
+    ],
+    "1.6 Layout clearance and bible equality": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124628
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193369536
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193589645
+      }
+    ],
+    "2.1 Dawn upgrades: offer, pick and modifiers": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124671
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193369595
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193590397
+      }
+    ],
+    "2.2 Dawn hold, day length and last night": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124717
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193596678
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193762287
+      }
+    ],
+    "2.3 Mode multipliers and lantern drain": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124769
+      }
+    ],
+    "2.4 Endless wave generator, plan and best score": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124826
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193596739
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193762345
+      }
+    ],
+    "2.5 Score and combo": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124889
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193369644
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193589584
+      }
+    ],
+    "2.6 Run stats": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124939
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193596909
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193762413
+      }
+    ],
+    "2.7 Grave coins": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193124986
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193369925
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193590948
+      }
+    ],
+    "2.8 Merchant stock and purchases": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125030
+      }
+    ],
+    "2.9 Side contracts": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125072
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193597414
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193762958
+      }
+    ],
+    "2.10 Achievements": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125116
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193597672
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193763521
+      }
+    ],
+    "2.11 Music layer": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125183
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193370327
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193589826
+      }
+    ],
+    "2.12 Music mixer": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125248
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193773737
+      }
+    ],
+    "2.13 Scare silence schedule": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125297
+      }
+    ],
+    "2.14 Storm rolls and lightning schedule": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125348
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193773796
+      }
+    ],
+    "2.15 Lightning envelope, storm end and modifiers": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125399
+      }
+    ],
+    "2.16 Satchel slot limit": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125452
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193773852
+      }
+    ],
+    "2.17 Stamina regen, dig time and flask radius hooks": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125501
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193773949
+      }
+    ],
+    "2.18 Progression save sanitising": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125547
+      }
+    ],
+    "3.1 Sim clock, overlay store and toast duration": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125602
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193774379
+      }
+    ],
+    "3.2 Progression store and persistence list": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125652
+      }
+    ],
+    "3.3 Score and coin stores": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125719
+      }
+    ],
+    "3.4 Achievement store and Endless best": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125768
+      }
+    ],
+    "3.5 Derived stats": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125816
+      }
+    ],
+    "3.6 Progression actions": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125860
+      }
+    ],
+    "3.7 Progression events: kills, shots, digs and pickups": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125907
+      }
+    ],
+    "3.8 Progression events: contracts, achievements, dawn and storms": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193125961
+      }
+    ],
+    "3.9 Progression tick and runtime objects": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126020
+      }
+    ],
+    "3.10 Install order": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126078
+      }
+    ],
+    "4.1 Game loop wiring": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126127
+      }
+    ],
+    "4.2 Wave director: plan, mode, elites and night cleared": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126176
+      }
+    ],
+    "4.3 Stats move and banish removal": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126234
+      }
+    ],
+    "5.1 Melee hit event and flask radius": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126303
+      }
+    ],
+    "5.2 Scare stager silence wiring": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126351
+      }
+    ],
+    "5.3 Merchant, cart and compass marker": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126395
+      }
+    ],
+    "5.4 Coin piles": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126448
+      }
+    ],
+    "5.5 Weather: rain and thunder": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126496
+      }
+    ],
+    "5.6 Lightning and storm fog": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126544
+      }
+    ],
+    "5.7 Music driver": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126595
+      }
+    ],
+    "5.8 Pause triggers and menu state": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126642
+      }
+    ],
+    "5.9 Mount the new scene components": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126690
+      }
+    ],
+    "6.1 Menu dialog autofocus": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126739
+      }
+    ],
+    "6.2 Mode select": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126788
+      }
+    ],
+    "6.3 Dawn picker and dawn card": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126857
+      }
+    ],
+    "6.4 Merchant menu": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126903
+      }
+    ],
+    "6.5 Contracts tab": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193126954
+      }
+    ],
+    "6.6 Score, combo and coins panel": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127003
+      }
+    ],
+    "6.7 Achievement toasts": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127056
+      }
+    ],
+    "6.8 Achievements menu": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127119
+      }
+    ],
+    "6.9 Stats screen, ending and taken screens": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127165
+      }
+    ],
+    "6.10 Title and pause menu wiring": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127212
+      }
+    ],
+    "6.11 Assemble the new HUD": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127262
+      }
+    ],
+    "6.12 Satchel grid and dig bar": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127315
+      }
+    ],
+    "7.1 Music graph": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127359
+      }
+    ],
+    "7.2 Rain noise": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127412
+      }
+    ],
+    "7.3 Thunder and bus checks": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127461
+      }
+    ],
+    "8.1 Save and load wiring": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127509
+      }
+    ],
+    "8.2 Retry Night snapshot and night clear": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127561
+      }
+    ],
+    "8.3 New Game and run end": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127609
+      }
+    ],
+    "8.4 Process and structure tests": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127658
+      }
+    ],
+    "8.5 Integration flows": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127712
+      }
+    ],
+    "9. Checkpoint: playtest in a real browser": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193127792
+      }
+    ],
+    "1. Progression data and data tests": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193589689
+      }
+    ]
+  }
+}

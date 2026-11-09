@@ -3,7 +3,7 @@
 // so nothing is stacked or stretched. Mount inside <Physics>. Door and repair logic: Chapel.tsx.
 
 import { RigidBody } from '@react-three/rapier'
-import { CHAPEL, CHAPEL_CENTER, type Placement } from '../../data/cemeteryLayout'
+import { CHAPEL, CHAPEL_CENTER, CHAPEL_DOORS, type Placement } from '../../data/cemeteryLayout'
 import { GableRoof, Slab } from './buildingParts'
 import { PART_MATERIALS } from './partMaterials'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -50,6 +50,12 @@ export function ChapelBuilding() {
   const { halfX, halfZ, height: h, wallThickness: t, doorWidth } = CHAPEL
   const sideW = halfX - doorWidth / 2
   const sideX = doorWidth / 2 + sideW / 2
+  // Vestry opening in chapel-local Z, derived from the shared door spec so combat and walls agree.
+  const vestry = CHAPEL_DOORS.vestry
+  const vestryW = vestry.width
+  const vestryZ = vestry.point[2] - CHAPEL_CENTER[2]
+  const westALen = vestryZ - vestryW / 2 + halfZ
+  const westBLen = halfZ - (vestryZ + vestryW / 2)
   const ridge = h + ROOF_RISE
   // The belfry sits on the ridge over the door end.
   const belfryZ = -halfZ + 1.1
@@ -82,7 +88,14 @@ export function ChapelBuilding() {
           material="stone"
         />
         <Slab position={[0, h / 2, halfZ]} size={[halfX * 2, h, t]} material="stone" />
-        <Slab position={[-halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="stone" />
+        {/* West wall split around the vestry opening, with a lintel over it. */}
+        <Slab position={[-halfX, h / 2, westALen / 2 - halfZ]} size={[t, h, westALen]} material="stone" />
+        <Slab position={[-halfX, h / 2, halfZ - westBLen / 2]} size={[t, h, westBLen]} material="stone" />
+        <Slab
+          position={[-halfX, DOOR_HEIGHT + (h - DOOR_HEIGHT) / 2, vestryZ]}
+          size={[t, h - DOOR_HEIGHT, vestryW]}
+          material="stone"
+        />
         <Slab position={[halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="stone" />
         {/* Ceiling: keeps anything from climbing onto the roof. */}
         <Slab
@@ -110,6 +123,25 @@ export function ChapelBuilding() {
         castShadow
       >
         <boxGeometry args={[doorWidth + FRAME.post * 2, FRAME.lintel, FRAME.depth]} />
+      </mesh>
+
+      {/* Vestry frame: same posts and lintel as the front, on the west wall. */}
+      {([-1, 1] as const).map((side) => (
+        <mesh
+          key={side}
+          position={[-halfX - 0.05, DOOR_HEIGHT / 2, vestryZ + side * (vestryW / 2 + FRAME.post / 2)]}
+          material={PART_MATERIALS.trim}
+          castShadow
+        >
+          <boxGeometry args={[FRAME.depth, DOOR_HEIGHT, FRAME.post]} />
+        </mesh>
+      ))}
+      <mesh
+        position={[-halfX - 0.05, DOOR_HEIGHT + FRAME.lintel / 2, vestryZ]}
+        material={PART_MATERIALS.trim}
+        castShadow
+      >
+        <boxGeometry args={[FRAME.depth, FRAME.lintel, vestryW + FRAME.post * 2]} />
       </mesh>
 
       <GableRoof

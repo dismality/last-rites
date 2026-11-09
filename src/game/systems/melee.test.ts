@@ -66,6 +66,24 @@ describe('resolveMelee', () => {
     expect(r.enemies[1]).toMatchObject({ hp: 60, stagger: 0 })
   })
 
+  it('a heavy hit knocks survivors down and caps Brute stagger', () => {
+    const brute = { ...zombie('b', 0, -1, 300), type: 'brute' as const }
+    const crane = { ...zombie('c', 0, -1.2, 1500), type: 'father-crane' as const }
+    const r = resolveMelee({ x: 0, z: 0 }, { x: 0, z: -1 }, 70, [brute, crane, zombie('s', 0, -1.4)], ctx, { knockdownS: 1.5 })
+    expect(r.enemies[0]).toMatchObject({ hp: 230, knockdown: 1.5, stagger: 0.3 })
+    expect(r.enemies[1]).toMatchObject({ hp: 1430, stagger: 0 })
+    expect(r.enemies[1].knockdown).toBeUndefined()
+    expect(r.enemies[2]).toMatchObject({ hp: 0 })
+    expect(r.enemies[2].knockdown).toBeUndefined()
+  })
+
+  it('a light hit applies no knockdown and resets rather than extends', () => {
+    const down = { ...zombie('a', 0, -1), knockdown: 5 }
+    const r = resolveMelee({ x: 0, z: 0 }, { x: 0, z: -1 }, 10, [down], ctx, { knockdownS: 1.2 })
+    expect(r.enemies[0].knockdown).toBe(1.2)
+    expect(resolveMelee({ x: 0, z: 0 }, { x: 0, z: -1 }, 10, [zombie('a', 0, -1)], ctx).enemies[0].knockdown).toBeUndefined()
+  })
+
   it('reports kills', () => {
     const r = resolveMelee({ x: 0, z: 0 }, { x: 0, z: -1 }, 100, [zombie('a', 0, -1, 10)], ctx)
     expect(r.killedUids).toEqual(['a'])

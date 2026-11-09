@@ -12,6 +12,7 @@ import { useSettingsStore } from './game/state'
 import { useEndingStore } from './game/state/endingStore'
 import { EndingScreen } from './ui/menus/EndingScreen'
 import { EndingCamera } from './scene/effects/EndingCamera'
+import { IntroCamera } from './scene/effects/IntroCamera'
 import { FinalRite } from './scene/world/FinalRite'
 import { ContentWarning } from './ui/menus/ContentWarning'
 import { LoadingScreen } from './ui/menus/LoadingScreen'
@@ -33,6 +34,13 @@ import { EnemyDirector } from './scene/enemies/EnemyDirector'
 import { WaveDirector } from './scene/enemies/WaveDirector'
 import { FirstPersonController } from './scene/player/FirstPersonController'
 import { Lantern } from './scene/player/Lantern'
+import { MuzzleLight } from './scene/player/MuzzleLight'
+import { UseController } from './scene/player/UseController'
+import { WeaponController } from './scene/player/WeaponController'
+import { DamageNumbers } from './scene/effects/DamageNumbers'
+import { GraveGas } from './scene/effects/GraveGas'
+import { ChapelDoors } from './scene/world/ChapelDoors'
+import { WeaponPickups } from './scene/world/WeaponPickups'
 import { MeleeAttack } from './scene/player/MeleeAttack'
 import { ThrowControls } from './scene/player/ThrowControls'
 import { Viewmodel } from './scene/player/Viewmodel'
@@ -61,9 +69,13 @@ function GameScreen() {
         <SkyAndFog />
         <GameLoop>
           <FirstPersonController />
+          {/* After the controller so the intro path wins the camera while it plays. */}
+          <IntroCamera />
           <Lantern />
           <Cemetery />
           <Chapel />
+          <ChapelDoors />
+          <WeaponPickups />
           <FixedSpawns />
           <Tombstones />
           <ClueSpots />
@@ -77,6 +89,9 @@ function GameScreen() {
           <ScareProps />
           <ScareStager />
           <MeleeAttack />
+          {/* After EnemyDirector so shots and uses read this frame's enemy positions. */}
+          <WeaponController />
+          <UseController />
           <ThrowControls />
           <ThrownItems />
           <LanternTraps />
@@ -84,6 +99,9 @@ function GameScreen() {
           <SaltCircles />
           <DustBurst />
           <GraveBurst />
+          <DamageNumbers />
+          <GraveGas />
+          <MuzzleLight />
         </GameLoop>
         {/* Viewmodel (priority 2) draws over the composer (priority 1); no weapon durability store yet. */}
         <Viewmodel weaponState={null} />

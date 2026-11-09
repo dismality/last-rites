@@ -89,6 +89,31 @@ describe('lantern-refill — timed use', () => {
 })
 
 // ---------------------------------------------------------------------------
+// Unit tests — instant effect consumables (Req 12.1, 12.2)
+// ---------------------------------------------------------------------------
+
+describe('blessed-rounds and kola-tonic — instant use', () => {
+  it('blessed-rounds has duration 0 and applies at once with its effect id', () => {
+    const state = startUse('blessed-rounds')
+    expect(state.duration).toBe(0)
+    const result = tickUse(0, state)
+    expect(result.applied).toBe(true)
+    expect(result.effect).toEqual({ healHp: 0, addFuel: 0, effect: 'blessed-rounds' })
+  })
+
+  it('kola-tonic applies adrenaline at once', () => {
+    const result = tickUse(0, startUse('kola-tonic'))
+    expect(result.applied).toBe(true)
+    expect(result.effect!.effect).toBe('adrenaline')
+  })
+
+  it('bandage and refill carry no effect id', () => {
+    expect(tickUse(10, startUse('bandage')).effect!.effect).toBeUndefined()
+    expect(tickUse(10, startUse('lantern-refill')).effect!.effect).toBeUndefined()
+  })
+})
+
+// ---------------------------------------------------------------------------
 // Unit tests — useProgress
 // ---------------------------------------------------------------------------
 

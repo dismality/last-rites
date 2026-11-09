@@ -48,7 +48,7 @@ In the cholera winter of **1849**, parish priest **Father Aldous Crane** sealed 
 | 2. Relight the altar | 3 candle wax, 1 holy water | Saves the game at the altar and heals 25 HP per visit per day |
 | 3. Rehang the bell | 6 iron nails, 2 cloth | Bell rings 20 s before each wave and reveals spawn directions on the map (and on the compass **(06)**) |
 
-Until stage 1 is built (spec 07), it keeps its old effect: zombies cannot enter the chapel at all.
+Before stage 1 is built, the chapel doors stand open and the chapel is not safe. Until spec 07 is in the game, a built stage 1 keeps its old effect: zombies cannot enter the chapel at all.
 
 ### Barricades (07)
 The chapel has two doors: the **front door** and the **vestry door** in the side wall.
@@ -238,8 +238,8 @@ Taking damage: brief red vignette (disabled when flashing lights is off) and a h
 | `shambler` | Shambler | 60 | 1.4 m/s | 10 | Walks straight at the player in groups. Basic wave fodder. | Wet dragging footsteps, groans |
 | `lurker` | Lurker | 90 | 0 → 6 m/s lunge | 20 | Waits motionless in dark alleys and niches. Lunges when the player is within 4 m and not facing it, or when the lantern is low. **Used by the scare director.** | Silence, then a sharp breath |
 | `wailer` | Wailer | 50 | 2.0 m/s | 5 | Keeps its distance. Screams every 8 s, pulling all zombies within 25 m toward the player. Priority target. | Rising wail, audible from 40 m |
-| `bloater` | Bloater | 80 | 1.0 m/s | 15 | Swollen and slow. On death it swells for 0.8 s, then bursts in a cloud of grave gas: 25 damage within 3 m to the player **and** other zombies. Kill it at range. **(07)** | Wet gurgle; a rising hiss before it bursts |
-| `brute` | Brute | 300 | 1.1 m/s | 30 | Slow and tough. Light hits and kicks don't stagger it. Heavy attacks and point-blank shotgun blasts knock it down. Breaks barricade boards twice as fast. **(07)** | Heavy thudding steps, a low grunt |
+| `bloater` | Bloater | 80 | 1.0 m/s | 15 | Swollen and slow. On death it swells for 0.8 s, then bursts in a cloud of grave gas: 25 damage within 3 m to the player **and** other zombies. A Bloater the burst takes to 0 HP swells and bursts in turn. Kill it at range. **(07)** | Wet gurgle; a rising hiss before it bursts |
+| `brute` | Brute | 300 | 1.1 m/s | 30 | Slow and tough. Light hits and kicks only stagger it for 0.3 s and never push it. Heavy attacks and shotgun blasts from 3 m or closer knock it down. Breaks barricade boards twice as fast. **(07)** | Heavy thudding steps, a low grunt |
 | `father-crane` | Father Aldous Crane | 1500 | 1.2 → 1.7 m/s | 30 / 20 | Boss, night 5 only. See *Boss*. **(07)** | Chains of a censer, and a bell that isn't there |
 
 ### Looks (07)
@@ -277,11 +277,42 @@ Treat him as a tragic figure who did a terrible thing, never as a joke. The rite
 | Phase | HP | Speed | Attacks |
 |---|---|---|---|
 | 1 | 100–60% | 1.2 m/s | **Censer Swing**: 1.0 s wind-up, 120° arc, 3 m, 30 damage. **Call the Congregation** every 25 s: 3 Shamblers rise from the chapel floor (1 s telegraph and a subtitle). |
-| 2 | 60–25% | 1.5 m/s | Adds **The Toll** every 12 s: he raises a hand for 1.2 s (subtitle "[a great bell tolls]"), then a ring 8 m wide deals 20 damage and pushes 3 m. A dodge through the ring avoids it. |
+| 2 | 60–25% | 1.5 m/s | Adds **The Toll** every 12 s: he raises a hand for 1.2 s (subtitle "[a great bell tolls]"), then a ring of radius 8 m around him deals 20 damage and pushes 3 m. A dodge whose invulnerable window covers the moment the ring lands avoids it. |
 | 3 | under 25% | 1.7 m/s | Censer Swing twice in a row; Congregation every 18 s |
 
 - He ignores kicks, knockdowns and salt circles block him only at half speed (he slows inside one instead of being stopped).
 - **Death:** he kneels and crumbles to dust. 4 s of quiet, then the subtitle "Forgive them. Not me." The rite can be completed.
+- **Rising clock:** the 10 s counts sim time from the moment the rite starts, whether or not Interact is held.
+
+### Placements and tuning (07)
+| Thing | Value |
+|---|---|
+| Vestry door | West chapel wall, 1.4 m wide, at (7.5, 0, 9.5). Zombies stand at (6.5, 9.5) to attack it, and at (10, −2) for the front door. A waypoint `chapel-vestry` at (5.5, 0, 9.5) links to `hut` and `grounds-south`. |
+| Service Revolver | Vestry cupboard, inside the chapel at (7.9, 0.9, 7.6) |
+| Double-Barrel Shotgun | Gatekeeper's lodge at the mouth of Mausoleum Row, centre (−23.8, 0, −41.5), pickup at 0.9 m |
+| Wood Axe and woodpile | (−5.0, 0, 2.0), west of the hut |
+| Silver Sabre | The Crane crypt's front step (−18.9, 0.35, −59.3) |
+| Powder tin | Hut shelf (−1.8, 0.8, −1.0), once only; the bell tower store at (29, 0.4, −24) |
+| Father Crane rises | Stair (10, 0, 10.3) if revealed, otherwise floor break (11.7, 0, 9.6) |
+| Congregation | Rises at (9, 0, 3), (11, 0, 3) and (10, 0, 1.5) |
+| Zombie hit capsule | Radius 0.35 m × the larger of scale x and z; height = model height × scale y; 0.5 m tall while knocked down |
+| Bloater and Brute attacks | Range 1.2 m, cooldown 1.5 s. Any Brute blow cancels a reload. |
+| Shotgun knockdown on a Brute | 1.5 s |
+| Door attackers | Shamblers and Brutes only (Wailers keep their distance, Lurkers ambush) |
+| Nailing cancels | After more than 0.05 m of travel |
+| Boss swings | Aim locks when the wind-up starts; phase 3 swings are 0.3 s apart; 2.0 s cooldown after a swing |
+| Kick | Uses the melee cone (70°, 1.8 m) and hits the nearest zombie in it. A kick that hits nothing still costs stamina and starts its cooldown. |
+| Dodge cooldown | Counted from the start of the dash |
+| Choke and aiming | The shotgun's aimed spread is never wider than its hip spread |
+| Hit marker | 0.15 s, ×1.5 for a kill; 0.3 s steady with flashing lights off |
+| Damage numbers | Rise at 1.2 m/s; at most 24 on screen |
+| Muzzle flash | 0.06 s with a light pop; with flashing lights off 0.3 s at 35% and no light |
+| Aim blend | 0.12 s |
+| Blessed Rounds, Kola Tonic | Take effect at once (no use time). "Too tired" cue 1 s. |
+| Effect glyphs | ✝ Blessed Rounds, ⚡ Adrenaline, ◎ Salt Circle |
+| Nailing prompt | "E: Board up" with rune ᚾ |
+| Extra captions | "[the axe handle splinters]", "[something worse rises]" (elite), "[heavy footsteps]" (brute), "[a gunshot]", "[a shotgun blast]", "[reloading]", "[a wet hiss]" (bloater), "[dead shuffle rising from the floor]" (congregation) |
+| Audio | At most 16 voices; loops every 0.9 s (Brute step), 2.5 s (Bloater gurgle), 1.4 s (Crane's chains) |
 
 Zombies take 50% less damage while the player stands in darkness (lantern fuel 0) and flinch away from tallow candles for 1 s.
 
@@ -489,7 +520,7 @@ Each dawn offers 3 different upgrades. The player picks 1, and dawn waits until 
 Coins drop as a small pile that collects itself within 1.5 m and fades after 60 s.
 
 ### The dawn merchant
-**Silas Vane, a travelling undertaker,** brings his hearse cart (built from simple meshes) to the cemetery gate each dawn. He stays for the first 90 s of the day, and the compass shows him while he is there. Stock is 2 fixed rows plus 3 drawn from the pool, each with a daily quantity.
+**Silas Vane, a travelling undertaker,** brings his hearse cart (built from simple meshes) to the cemetery gate each dawn: the cart stands inside the south fence at (−9, 0, 37) and Silas at (−7.2, 0, 36.2). There is no dawn before day 1, so he first comes on day 2. He stays for the first 90 s of the day, and the compass shows him while he is there. Stock is 2 fixed rows plus 3 drawn from the pool, each with a daily quantity.
 
 | Item | Price | Daily qty | Stock |
 |---|---|---|---|
@@ -505,7 +536,7 @@ Coins drop as a small pile that collects itself within 1.5 m and fades after 60 
 | Silver Filings | 20 | 1 | Pool |
 
 ### Side contracts
-Each dawn deals 2 contracts that are possible right now: one needing a weapon the player doesn't own is never dealt. Progress counts until the next dawn, and the reward is paid on completion with a toast.
+Each dawn deals 2 contracts that are possible right now, and the first two are dealt when the run starts, so day 1 has contracts too. A contract is never dealt if it needs a weapon the player doesn't own, if it is `c-boards-3` before the barricades exist, or if it is `c-wailer-2` when the coming night has fewer than 2 Wailers. Progress counts until the next dawn, and the reward is paid on completion with a toast.
 
 | ID | Goal | Reward |
 |---|---|---|
@@ -577,3 +608,22 @@ A storm can also roll on a day (15%).
 - **Lightning:** every 20–45 s, a 0.15 s cold-white light that lights the whole cemetery, then thunder 1–4 s later (procedural rumble, subtitle "[thunder]").
 - **With flashing lights off,** lightning is a slow 1.5 s brightening to 30% with no flash. Thunder is unchanged.
 - **Camera shake** from close thunder follows the camera-shake setting and is off at Reduced and Off scare intensity.
+
+### Placements and tuning (08)
+| Thing | Value |
+|---|---|
+| After the dawn pick | 2 s of dawn remain |
+| Time survived | Not counted while the upgrade pick is open |
+| `c-melee-10` | Melee and heavy-melee kills; kicks, thrown items and traps don't count |
+| `c-gather-8` | One count per pickup |
+| Father Crane | Not scaled by the mode. His kill scores nothing; `bossDefeated` scores the 1000 once |
+| Elite coins | The +5 is paid even when a Shambler's 50% roll fails |
+| Endless | New Game in Endless skips the intro. Fog stays at 0.06 after night 5 |
+| Coin piles | Piles within 1 m merge; at most 32 (the oldest is banked, not lost); a pile shrinks in its last 2 s |
+| Storms | Last from their roll to the next phase change; rain fades over 3 s; none at dusk or dawn |
+| Lightning | Lights the scene by boosting the existing ambient and moon lights, so no new light. With flashing lights off: 1.5 s up to 30%, 1.5 s down |
+| Close thunder | Thunder that follows its flash within 2 s |
+| Rain | 600 streaks in a 36 × 20 × 36 m box around the camera |
+| Music | Layers add up: calm drone; + unease; + tension (drone at 0.8); + danger. "Wave running" means a wave is active, so the gap between waves is a release. Fade back in after a scare's silence: 2 s |
+| Merchant | Leaves with the subtitle "[the hearse cart rolls away]"; compass marker ⚱ "Silas"; prompt "E: Trade" with rune ᛗ |
+| Seeds | One run seed chosen at New Game (1849 for old saves); every random stream derives from it, so Retry Night replays the same offers, stock and storms |

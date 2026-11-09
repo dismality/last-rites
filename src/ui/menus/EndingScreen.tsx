@@ -2,12 +2,12 @@ import { useEffect, useId, useMemo, useState } from 'react'
 import creditsMarkdown from '../../../docs/CREDITS.md?raw'
 import { CLUES } from '../../data/clues'
 import { ENDING_MAP } from '../../data/endings'
-import { useCraftingStore } from '../../game/state/craftingStore'
 import { useEndingStore } from '../../game/state/endingStore'
 import { useGameStore } from '../../game/state/gameStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { resetRun } from '../../game/state/resetRun'
+import { newGame } from '../../game/state/runFlow'
 import { parseCredits } from '../../game/systems/credits'
 import { activeLine, fadeAlpha } from '../../game/systems/endingSequence'
 import { countRelics } from '../../game/systems/finalRite'
@@ -73,12 +73,6 @@ function Summary() {
   if (!ending) return null
   const def = ENDING_MAP[ending]
   const rows = summaryRows(stats, countRelics(inventoryRelics, mystery.relics), mystery.clues.size, CLUES.length)
-
-  function newGame() {
-    resetRun()
-    useCraftingStore.getState().applyUnlockEvent({ type: 'gameStart' })
-    setScreen('game')
-  }
 
   function toTitle() {
     resetRun()

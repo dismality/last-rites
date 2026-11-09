@@ -1,4 +1,7 @@
 .hud {
+  /* Compass strip height; the wave tally and rite meter sit below it. */
+  --hud-compass-h: 5rem;
+  --hud-below-compass: calc(0.75rem + var(--hud-compass-h) + 0.5rem);
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -12,14 +15,9 @@
   left: 24px;
   bottom: 24px;
   display: flex;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-.hud-gauge {
-  display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .hud-num {
@@ -167,8 +165,8 @@
 /* Wave tally: hand-scratched strokes; cleared waves are inked in, pending ones faint. */
 .hud-tally {
   position: absolute;
-  /* Top centre: the bottom right belongs to the hotbar. */
-  top: 20px;
+  /* Top centre under the compass: the bottom right belongs to the hotbar. */
+  top: var(--hud-below-compass);
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -206,6 +204,18 @@
   background: rgba(20, 17, 15, 0.7);
 }
 
+/* Boss bar and door status. Starts below the tally (about 4rem) and the rite meter (4.5rem + about 7rem). */
+.hud-top-stack {
+  position: absolute;
+  top: calc(var(--hud-below-compass) + 12rem);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, 60vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .hud-hit-vignette {
   position: absolute;
   inset: 0;
@@ -220,7 +230,7 @@
 /* Final rite prompt (Req 5.3) */
 .hud-rite {
   position: absolute;
-  top: 8vh;
+  top: calc(var(--hud-below-compass) + 4.5rem);
   left: 50%;
   transform: translateX(-50%);
   width: min(26rem, 80vw);

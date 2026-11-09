@@ -50,12 +50,69 @@ describe('tickDayNight', () => {
 describe('tickDayNight properties', () => {
   it('step independence while waves are not cleared', () => {
     fc.assert(
-      fc.property(fc.double({ min: 0, max: 600, noNaN: true }), fc.double({ min: 0, max: 600, noNaN: true }), (a, b) => {
-        const two = tickDayNight(tickDayNight(start, a, open).state, b, open)
-        const one = tickDayNight(start, a + b, open)
-        expect(two.state.phase).toBe(one.state.phase)
-        expect(two.state.nightNumber).toBe(one.state.nightNumber)
-        expect(two.state.phaseTime).toBeCloseTo(one.state.phaseTime, 6)
+      fc.property(
+        fc.double({ min: 0, max: 600, noNaN: true }),
+        fc.double({ min: 0, max: 600, noNaN: true }),
+        (a, b) => {
+          const two = tickDayNight(tickDayNight(start, a, open).state, b, open)
+          const one = tickDayNight(start, a + b, open)
+          expect(two.state.phase).toBe(one.state.phase)
+          expect(two.state.nightNumber).toBe(one.state.nightNumber)
+          expect(two.state.phaseTime).toBeCloseTo(one.state.phaseTime, 6)
+        },
+      ),
+    )
+  })
+})
+
+describe('Property 5: a pending pick holds dawn and nothing else', () => {
+  // **Validates: Requirements 1.5, 7.7, 12.11**
+  const dawnState = (phaseTime: number, nightNumber: number): WorldState => ({
+    phase: 'dawn',
+    phaseTime,
+    nightNumber,
+    fogDensity: 0.02,
+    wavesCleared: true,
+  })
+  const steps = fc.array(fc.double({ min: 0, max: 50, noNaN: true }), {
+    minLength: 1,
+    maxLength: 8,
+  })
+
+  it('a held dawn never changes phase or time and emits nothing', () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: 0, max: 9.9, noNaN: true }),
+        fc.integer({ min: 1, max: 5 }),
+        steps,
+        (t, n, dts) => {
+          let s = dawnState(t, n)
+          for (const dt of dts) {
+            const r = tickDayNight(s, dt, { wavesCleared: true, holdDawn: true })
+            expect(r.events).toEqual([])
+            expect(r.state.phase).toBe('dawn')
+            expect(r.state.phaseTime).toBe(t)
+            s = r.state
+          }
+        },
+      ),
+    )
+  })
+
+  it('an unheld dawn ends after its duration', () => {
+    const r = tickDayNight(dawnState(0, 2), 10, { wavesCleared: true, holdDawn: false })
+    expect(r.state.phase).toBe('day')
+    expect(r.state.nightNumber).toBe(3)
+  })
+
+  it('day lasts dayLengthS and the night number never exceeds lastNight', () => {
+    fc.assert(
+      fc.property(fc.integer({ min: 5, max: 600 }), fc.integer({ min: 1, max: 8 }), (len, last) => {
+        const input = { wavesCleared: false, dayLengthS: len, lastNight: last }
+        expect(tickDayNight(start, len - 0.5, input).state.phase).toBe('day')
+        expect(tickDayNight(start, len, input).state.phase).toBe('dusk')
+        const d = tickDayNight(dawnState(0, last), 10, { ...input, wavesCleared: true })
+        expect(d.state.nightNumber).toBeLessThanOrEqual(last)
       }),
     )
   })

@@ -1,8 +1,9 @@
-import type { ItemKind } from '../../data/items'
+﻿import type { ItemKind } from '../../data/items'
 
 // Small rune per item kind so a pocket is readable by shape, not colour alone.
 const GLYPHS: Record<ItemKind, string> = {
   material: '❖',
+  ammo: '⁂',
   weapon: '†',
   consumable: '✚',
   placeable: '◈',

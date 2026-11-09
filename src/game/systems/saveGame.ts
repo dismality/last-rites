@@ -2,9 +2,13 @@
 // Storage is injected so tests run in Node and failures can be simulated.
 
 import { SATCHEL_SLOTS as MAX_SATCHEL_SLOTS } from '../../data/items'
+import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { Inventory, Phase, PlayerState, WorldState } from '../types'
 import type { ChapelState } from './repairs'
 import type { MysteryGateId, MysteryState } from './mystery'
+import { sanitizeInventorySlots } from './combatSave'
+import type { CombatSave } from './combatSave'
+import { parseTutorial, serializeTutorial } from './tutorial'
 
 export const SAVE_KEY = 'lastrites:save'
 export const SAVE_VERSION = 1
@@ -18,11 +22,20 @@ export interface SaveState {
   chapel: ChapelState
   /** Recipes unlocked by surviving nights / reading pages; the starting recipes are re-applied on load. */
   recipes: string[]
+  /** First-day tutorial steps done. Optional on input (defaults empty) so older callers still compile; always set on read. */
+  tutorial?: ReadonlySet<TutorialStepId>
+  /** Intro cutscene already seen. Optional on input (derived from the world); always set on read. */
+  introSeen?: boolean
+  /** Combat block (spec 07). Optional on input; on read it is the raw saved block, sanitised by the loader with sanitizeCombat. */
+  combat?: CombatSave
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
-export interface SaveFile extends Omit<SaveState, 'mystery'> {
+export interface SaveFile extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat'> {
+  combat: CombatSave
   version: typeof SAVE_VERSION
+  tutorial: number[]
+  introSeen: boolean
   mystery: Omit<MysteryState, 'pages' | 'clues' | 'relics'> & {
     pages: number[]
     clues: string[]
@@ -33,6 +46,10 @@ export interface SaveFile extends Omit<SaveState, 'mystery'> {
 const PHASES: readonly Phase[] = ['day', 'dusk', 'night', 'dawn']
 const GATES: readonly MysteryGateId[] = ['mausoleum-row', 'catacombs', 'ossuary']
 const ENDINGS = ['rest', 'uneasy-peace', 'taken']
+
+/** Saves from before the intro existed: past night 1 day means the player has seen it. */
+export const hasPassedFirstDay = (world: Pick<WorldState, 'nightNumber' | 'phase'>): boolean =>
+  world.nightNumber > 1 || world.phase !== 'day'
 
 export function toSaveFile(state: SaveState): SaveFile {
   const { mystery } = state
@@ -49,6 +66,15 @@ export function toSaveFile(state: SaveState): SaveFile {
     },
     chapel: state.chapel,
     recipes: state.recipes,
+    tutorial: serializeTutorial(state.tutorial ?? new Set()),
+    introSeen: state.introSeen ?? hasPassedFirstDay(state.world),
+    combat: state.combat ?? {
+      firearms: {},
+      durability: {},
+      upgrades: [],
+      takenPickups: [],
+      doors: { built: false, front: [], vestry: [] },
+    },
   }
 }
 
@@ -110,7 +136,8 @@ function validMystery(v: unknown): boolean {
     isObj(v.gates) &&
     GATES.every((g) => typeof (v.gates as Obj)[g] === 'boolean') &&
     isNum(v.riteProgress) &&
-    (v.ending === undefined || ENDINGS.includes(v.ending as string))
+    (v.ending === undefined || ENDINGS.includes(v.ending as string)) &&
+    (v.craneRested === undefined || typeof v.craneRested === 'boolean')
   )
 }
 
@@ -124,9 +151,13 @@ function validChapel(v: unknown): v is ChapelState {
 }
 
 /** Returns the restored state, or null if the version or any part of the shape is wrong. */
-export function fromSaveFile(raw: unknown): SaveState | null {
+export function fromSaveFile(
+  raw: unknown,
+): (SaveState & { tutorial: ReadonlySet<TutorialStepId>; introSeen: boolean }) | null {
   if (!isObj(raw) || raw.version !== SAVE_VERSION) return null
-  const { world, player, inventory, mystery, chapel, recipes } = raw
+  const { world, player, mystery, chapel, recipes } = raw
+  // Bad slot entries are dropped one by one (Req 19.4); a wrong overall shape still fails below.
+  const inventory = sanitizeInventorySlots(raw.inventory)
   if (
     !validWorld(world) ||
     !validPlayer(player) ||
@@ -144,8 +175,12 @@ export function fromSaveFile(raw: unknown): SaveState | null {
     inventory,
     chapel,
     recipes,
+    tutorial: parseTutorial(raw.tutorial),
+    introSeen: typeof raw.introSeen === 'boolean' ? raw.introSeen : hasPassedFirstDay(world),
+    combat: raw.combat as CombatSave | undefined,
     mystery: {
       ...m,
+      craneRested: m.craneRested ?? false,
       pages: new Set(m.pages) as MysteryState['pages'],
       clues: new Set(m.clues),
       relics: new Set(m.relics) as MysteryState['relics'],
@@ -156,7 +191,10 @@ export function fromSaveFile(raw: unknown): SaveState | null {
 // ── Storage ─────────────────────────────────────────────────────────────────
 
 /** Returns false when storage is missing or throws (private mode, quota). */
-export function writeSave(storage: Pick<Storage, 'setItem'> | undefined, state: SaveState): boolean {
+export function writeSave(
+  storage: Pick<Storage, 'setItem'> | undefined,
+  state: SaveState,
+): boolean {
   try {
     if (!storage) return false
     storage.setItem(SAVE_KEY, JSON.stringify(toSaveFile(state)))

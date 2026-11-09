@@ -1,0 +1,101 @@
+.compass {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(34rem, 60vw);
+  height: var(--hud-compass-h, 3.75rem);
+  pointer-events: none;
+  color: var(--parchment);
+  font-family: 'Cormorant Garamond', serif;
+  font-variant-numeric: tabular-nums;
+  background: linear-gradient(to bottom, rgb(20 17 15 / 0.7), rgb(20 17 15 / 0.35));
+  border: 1px solid var(--parchment-dark);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.compass__track {
+  position: absolute;
+  inset: 0 3.5rem;
+}
+
+.compass__tick {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 0.5rem;
+  background: var(--parchment-dark);
+}
+
+.compass__tick--letter {
+  height: 0.9rem;
+  width: 2px;
+  background: var(--parchment);
+}
+
+.compass__letter {
+  position: absolute;
+  top: 0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'IM Fell English SC', serif;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.compass__markers {
+  position: absolute;
+  inset: 0;
+}
+
+.compass__marker {
+  position: absolute;
+  bottom: 0.15rem;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+  font-size: 1rem;
+  line-height: 1.1;
+  text-shadow: 0 0 3px var(--ink);
+}
+
+.compass__marker[hidden] {
+  display: none;
+}
+
+/* Second lane for markers that would overlap a neighbour. */
+.compass__marker[data-lane='1'] {
+  bottom: 1.6rem;
+}
+
+.compass__marker--objective {
+  color: var(--ember);
+}
+
+.compass__marker--spawn {
+  color: var(--moon);
+}
+
+/* Pinned markers keep their arrow so they are not mistaken for visible ones. */
+.compass__marker[data-pinned='left'] {
+  transform: translateX(0);
+  padding-left: 0;
+}
+
+/* Pinned markers sit inside the track so their text is never clipped by the strip. */
+.compass__marker[data-pinned='right'] {
+  transform: translateX(-100%);
+  flex-direction: row-reverse;
+}
+
+.compass__center {
+  position: absolute;
+  top: -0.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1rem;
+  color: var(--ember);
+}

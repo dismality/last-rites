@@ -3,6 +3,7 @@
 // Requirements 2.1, 2.2, 2.3.
 import type { Vec2, CombatEnemy, DamageContext } from './combat'
 import { applyDamage, meleeHits } from './combat'
+import { applyKnockdown, applyStagger } from './knockdown'
 import { MELEE_ARC_DEG, MELEE_RANGE_M } from '../../data/balance'
 
 /** Hits are checked halfway through the swing, when the weapon is at full extension. */
@@ -95,21 +96,29 @@ export interface MeleeResolution<T extends StaggerEnemy> {
   killedUids: string[]
 }
 
+export interface MeleeOptions {
+  /** Heavy attack: survivors are knocked down for this long. */
+  knockdownS?: number
+}
+
 export function resolveMelee<T extends StaggerEnemy>(
   origin: Vec2,
   dir: Vec2,
   damage: number,
   enemies: readonly T[],
   ctx: DamageContext,
+  opts: MeleeOptions = {},
 ): MeleeResolution<T> {
   const hitUids = meleeHits(origin, dir, MELEE_ARC_DEG, MELEE_RANGE_M, enemies)
   const hitSet = new Set(hitUids)
   const killedUids: string[] = []
   const next = enemies.map((e) => {
     if (!hitSet.has(e.uid)) return e
-    const hurt = applyDamage(e, damage, { ...ctx, source: 'melee' })
+    // Damage first: the blow that knocks a zombie down does not get the x1.25.
+    const hurt = applyDamage(e, damage, { ...ctx, source: opts.knockdownS ? 'heavy' : 'melee' })
     if (hurt.hp <= 0) killedUids.push(e.uid)
-    return { ...hurt, stagger: STAGGER_S }
+    const staggered = applyStagger(hurt, STAGGER_S)
+    return opts.knockdownS && hurt.hp > 0 ? applyKnockdown(staggered, opts.knockdownS) : staggered
   })
   return { enemies: next, hitUids, killedUids }
 }

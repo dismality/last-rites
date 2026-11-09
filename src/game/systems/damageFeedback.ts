@@ -3,12 +3,10 @@
 
 import { LOW_HEALTH_THRESHOLD } from '../../data/balance'
 
-/** How long the red vignette and flame dip last after a hit. */
+/** How long the red vignette lasts after a hit. */
 export const HIT_FEEDBACK_MS = 600
 /** Peak vignette opacity right after a hit. */
 export const VIGNETTE_PEAK = 0.55
-/** Fraction of flame height lost at the instant of a hit. */
-export const FLAME_DIP_PEAK = 0.35
 /** Saturation change (postprocessing HueSaturation scale, -1..1) at 0 HP. */
 export const MAX_DESATURATION = 0.35
 /** Heartbeat interval at the threshold and at 0 HP, in seconds. */
@@ -28,11 +26,6 @@ export function hitDecay(msSinceHit: number): number {
 export function vignetteOpacity(msSinceHit: number, flashingLights: boolean): number {
   if (!flashingLights) return 0
   return hitDecay(msSinceHit) * VIGNETTE_PEAK
-}
-
-/** Multiplier (0..1) applied to flame height; the dip is kept even with flashing off. */
-export function flameDipFactor(msSinceHit: number): number {
-  return 1 - hitDecay(msSinceHit) * FLAME_DIP_PEAK
 }
 
 /** Negative saturation offset, 0 at or above the threshold, growing as health falls. */

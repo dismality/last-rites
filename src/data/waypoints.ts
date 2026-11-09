@@ -17,6 +17,8 @@ export const WAYPOINT_NODES: readonly WaypointNode[] = [
   { id: 'grounds-south', x: 10, z: 25 },
   // Chapel door (door is in the -Z face, centred on the chapel's x)
   { id: 'chapel-door', x: 10, z: -3 },
+  // Vestry door (west wall of the chapel, 2 m outside the opening)
+  { id: 'chapel-vestry', x: 5.5, z: 9.5 },
   // Mausoleum Row (x = -20, runs toward -Z)
   { id: 'row-mouth', x: -20, z: -37 },
   { id: 'row-1', x: -20, z: -45 },
@@ -35,6 +37,8 @@ export const WAYPOINT_EDGES: ReadonlyArray<readonly [string, string]> = [
   ['hut', 'chapel-door'],
   ['grounds-east', 'chapel-door'],
   ['grounds-east', 'grounds-south'],
+  ['chapel-vestry', 'hut'],
+  ['chapel-vestry', 'grounds-south'],
   ['grounds-west', 'row-mouth'],
   ['row-mouth', 'row-1'],
   ['row-1', 'row-2'],

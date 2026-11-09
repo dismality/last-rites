@@ -9,6 +9,7 @@ import { ITEM_MAP } from '../../data/items'
 import type { ItemId } from '../types'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { collectFixedSpawn, createSpawnWorld, respawnForDay, type SpawnWorld } from '../systems/spawns'
+import { emit } from '../events'
 import { useExamineStore } from './examineStore'
 import { useInventoryStore } from './inventoryStore'
 import { useToastStore } from './toastStore'
@@ -54,16 +55,19 @@ export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
       drops: s.drops.flatMap((d) => (d.id !== dropId ? [d] : res.remaining ? [res.remaining] : [])),
     }))
     useToastStore.getState().push(`+${res.added} ${ITEM_MAP[drop.item].name}`)
+    emit({ type: 'itemCollected', itemId: drop.item })
   },
   collectMaterial: (spawnId, index) => {
     const inv = useInventoryStore.getState().inventory
+    const itemId = get().world.materials[spawnId]?.[index]?.item
     const res = pickupMaterial(inv, get().world, spawnId, index)
-    if (!res) return
+    if (!res || !itemId) return
     if (res.added > 0) {
       useInventoryStore.getState().setInventory(res.inv)
       set({ world: res.world })
     }
     useToastStore.getState().push(res.toast)
+    if (res.added > 0) emit({ type: 'itemCollected', itemId })
   },
   collectFixed: (spawnId) => {
     const spawn = FIXED_SPAWNS.find((s) => s.id === spawnId)
@@ -72,6 +76,7 @@ export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
     const world = collectFixedSpawn(before, spawnId, useWorldStore.getState().phase)
     if (world === before) return
     set({ world })
+    emit({ type: 'itemCollected', itemId: spawn.item })
     useExamineStore.getState().open(spawn.item)
   },
 }))

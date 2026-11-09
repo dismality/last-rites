@@ -7,10 +7,12 @@ import { useEndingStore } from './endingStore'
 import { useDigStore } from './digStore'
 import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
+import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useLanternStore } from './lanternStore'
 import { useMapStore } from './mapStore'
 import { useMysteryStore } from './mysteryStore'
+import { clearNightState } from './nightState'
 import { usePlayerStore } from './playerStore'
 import { useProjectileStore } from './projectileStore'
 import { useSpawnStore } from './spawnStore'
@@ -41,7 +43,9 @@ const RUN_STORES: readonly Resettable[] = [
 
 export function resetRun(): void {
   for (const store of RUN_STORES) store.setState(store.getInitialState() as never, true)
+  clearNightState()
   useDigStore.getState().reset()
+  useGuidanceStore.getState().reset()
   useEndingStore.getState().reset() // also bumps runId
   useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, satchelOpen: false })
 }

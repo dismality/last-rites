@@ -7,16 +7,14 @@
 //
 // The 1.5 s animation timer lives in the scene layer (Req 3.1).
 
-import type { Inventory, ItemId, ItemStack, RecipeId } from '../types'
+import type { FirearmId, Inventory, ItemId, ItemStack, RecipeId } from '../types'
 import type { RecipeDef } from '../../data/recipes'
 import { RECIPES } from '../../data/recipes'
+import { ITEM_MAP, SATCHEL_SLOTS } from '../../data/items'
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-
-/** Maximum number of satchel slots. */
-export const SATCHEL_SLOTS = 12
 
 /** Maximum stack size for material items. */
 export const MATERIAL_STACK_LIMIT = 10
@@ -86,8 +84,7 @@ export function canCraft(inv: Inventory, recipe: RecipeDef): CanCraftResult {
 // ---------------------------------------------------------------------------
 
 export type CraftResult =
-  | { ok: true; inv: Inventory }
-  | { ok: false; error: 'missing-inputs' | 'no-capacity' }
+  { ok: true; inv: Inventory } | { ok: false; error: 'missing-inputs' | 'no-capacity' }
 
 /**
  * Attempt to craft `recipe` from `inv`.
@@ -98,11 +95,15 @@ export type CraftResult =
  * Rules (from design bible & Req 3.2, 3.4):
  * - If the player lacks any input, return `{ok:false, error:'missing-inputs'}`.
  * - Simulate removing inputs + consumesTool, then adding the output.
- * - If the simulated inventory would exceed 12 slots, return `{ok:false, error:'no-capacity'}`.
+ * - If the simulated inventory would exceed the slot limit (12 by default), return `{ok:false, error:'no-capacity'}`.
  * - Only if simulation succeeds, return a new inventory with the mutations applied.
  * - When `consumesTool` is present, the output replaces the tool in the same hotbar slot (Req 3.4).
  */
-export function craft(inv: Inventory, recipe: RecipeDef): CraftResult {
+export function craft(
+  inv: Inventory,
+  recipe: RecipeDef,
+  slotLimit: number = SATCHEL_SLOTS,
+): CraftResult {
   // --- Step 1: check inputs are available ---
   const check = canCraft(inv, recipe)
   if (!check.ok) {
@@ -123,8 +124,11 @@ export function craft(inv: Inventory, recipe: RecipeDef): CraftResult {
   }
 
   // Add the output to the simulation
-  const addResult = addItem(sim, recipe.output.item, recipe.output.qty)
-  if (!addResult.ok) {
+  // Ammo crafts are partial: top the stack up to its limit; refuse only when nothing fits.
+  const addResult = addCapped(sim, recipe.output.item, recipe.output.qty, slotLimit)
+  const fits =
+    recipe.outputCap === 'partial' ? addResult.added > 0 : addResult.added === recipe.output.qty
+  if (!fits) {
     // Output doesn't fit
     return { ok: false, error: 'no-capacity' }
   }
@@ -146,6 +150,7 @@ export type UnlockEvent =
   | { type: 'gameStart' }
   | { type: 'dawnStarted'; night: 1 | 2 | 3 | 4 }
   | { type: 'journalRead'; page: number }
+  | { type: 'weaponPickedUp'; weapon: FirearmId }
 
 /**
  * Return the subset of recipe IDs that become unlocked by `event`.
@@ -160,6 +165,8 @@ export function unlockRecipes(event: UnlockEvent): RecipeId[] {
         return r.unlock.type === 'night' && r.unlock.night === event.night
       case 'journalRead':
         return r.unlock.type === 'journal' && r.unlock.page === event.page
+      case 'weaponPickedUp':
+        return r.unlock.type === 'pickup' && r.unlock.weapon === event.weapon
     }
   }).map((r) => r.id)
 }
@@ -170,9 +177,7 @@ export function unlockRecipes(event: UnlockEvent): RecipeId[] {
 
 /** Count how many of `item` are in the inventory slots. */
 function countItem(inv: Inventory, item: ItemId): number {
-  return inv.slots
-    .filter((s) => s.item === item)
-    .reduce((acc, s) => acc + s.qty, 0)
+  return inv.slots.filter((s) => s.item === item).reduce((acc, s) => acc + s.qty, 0)
 }
 
 /**
@@ -204,53 +209,55 @@ function removeItems(inv: Inventory, item: ItemId, qty: number): Inventory {
 }
 
 interface AddResult {
-  ok: boolean
+  /** Inventory with as much of the request added as fits. */
   inv: Inventory
+  /** How many units were actually added. */
+  added: number
+}
+
+/** Per-stack limit for an item, from the item data (materials 10, ammo 36 / 20). */
+function stackLimitOf(item: ItemId): number {
+  return ITEM_MAP[item]?.stackLimit ?? MATERIAL_STACK_LIMIT
 }
 
 /**
- * Add `qty` of `item` to inventory slots.
- *
- * Rules:
- * - If the item already has a stack with room (< MATERIAL_STACK_LIMIT), fill it.
- * - Otherwise open a new slot if fewer than SATCHEL_SLOTS are occupied.
- * - Returns `{ok:false}` if there is no room.
+ * Add up to `qty` of `item`, never exceeding the item's stack limit or the
+ * satchel slot count. Fills existing stacks first, then opens new slots.
+ * Returns how many units fit; the caller decides whether that is enough.
  */
-function addItem(inv: Inventory, item: ItemId, qty: number): AddResult {
+function addCapped(inv: Inventory, item: ItemId, qty: number, slotLimit: number): AddResult {
   if (!usesSlot(item)) {
-    // Key items and relics never go into slots (they have dedicated arrays).
-    // For crafting purposes we treat this as always succeeding at the slot level.
-    return { ok: true, inv }
+    // Key items and relics live in dedicated arrays, not slots.
+    return { inv, added: qty }
   }
 
+  const limit = stackLimitOf(item)
+  // Ammunition is a single stack per type (design bible §3): the held total is
+  // capped at the limit, so overflow never opens a second stack.
+  if (ITEM_MAP[item]?.kind === 'ammo') {
+    const held = inv.slots.filter((s) => s.item === item).reduce((a, s) => a + s.qty, 0)
+    qty = Math.max(0, Math.min(qty, limit - held))
+  }
   let remaining = qty
   const newSlots: ItemStack[] = inv.slots.map((s) => ({ ...s }))
 
-  // Try to fill existing stacks first
   for (const slot of newSlots) {
     if (remaining === 0) break
     if (slot.item !== item) continue
-    const room = MATERIAL_STACK_LIMIT - slot.qty
-    if (room <= 0) continue
-    const add = Math.min(room, remaining)
+    const add = Math.min(limit - slot.qty, remaining)
+    if (add <= 0) continue
     slot.qty += add
     remaining -= add
   }
 
-  // Open new slots for the remainder
-  while (remaining > 0) {
-    if (newSlots.filter((s) => usesSlot(s.item)).length >= SATCHEL_SLOTS) {
-      // No room
-      return { ok: false, inv }
-    }
-    const add = Math.min(MATERIAL_STACK_LIMIT, remaining)
+  while (remaining > 0 && newSlots.filter((s) => usesSlot(s.item)).length < slotLimit) {
+    const add = Math.min(limit, remaining)
     newSlots.push({ item, qty: add })
     remaining -= add
   }
 
-  return { ok: true, inv: { ...inv, slots: newSlots } }
+  return { inv: { ...inv, slots: newSlots }, added: qty - remaining }
 }
-
 /**
  * When `consumesTool` is consumed and replaced by `outputItem`, find the
  * hotbar slot that held `consumesTool` (if any) and rebind it to `outputItem`.

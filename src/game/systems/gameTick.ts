@@ -9,6 +9,8 @@ import { tickStamina } from './stamina'
 /** Input sampled once per tick (task 6 supplies the real source). */
 export interface TickInput {
   sprinting: boolean
+  /** Scales sprint drain only; Adrenaline halves it. Defaults to 1. */
+  sprintDrainMult?: number
 }
 
 export interface TickSnapshot {
@@ -27,7 +29,7 @@ export function runTick(s: TickSnapshot, input: TickInput, dt: number): TickResu
 
   // Sprinting needs stamina left, otherwise the player is forced to walk.
   const sprinting = input.sprinting && s.stamina.stamina > 0
-  const stamina = tickStamina(s.stamina, dt, sprinting)
+  const stamina = tickStamina(s.stamina, dt, sprinting, input.sprintDrainMult ?? 1)
 
   // Player movement is applied by the Rapier controller (task 6); only mirror stamina here.
   const player: PlayerState = { ...s.player, stamina: stamina.stamina }

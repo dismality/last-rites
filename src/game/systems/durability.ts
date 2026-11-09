@@ -9,8 +9,12 @@
 //
 // Requirements 5.1 – 5.3.
 
-import type { CraftedItemId } from '../types'
+import type { CraftedItemId, UpgradeId } from '../types'
 import { WEAPON_MAP } from '../../data/weapons'
+import { upgradedStat } from './heavyAttack'
+
+/** Below this fraction of its hits a weapon is flagged as nearly broken. */
+const LOW_DURABILITY_FRACTION = 0.2
 
 // ---------------------------------------------------------------------------
 // WeaponState
@@ -79,20 +83,40 @@ export function applyHit(weaponState: WeaponState): HitResult {
 }
 
 // ---------------------------------------------------------------------------
-// createWeaponState
+// spendSwing
 // ---------------------------------------------------------------------------
 
 /**
+ * Spend durability for one swing: exactly 1 if it hit at least one zombie,
+ * none otherwise, however many zombies were hit (Req 8.10). Infinite weapons
+ * (the Sabre) are unchanged because applyHit leaves them alone.
+ */
+export function spendSwing(weaponState: WeaponState, hits: number): HitResult {
+  if (!(hits > 0)) return { weaponState, broke: false }
+  return applyHit(weaponState)
+}
+
+// ---------------------------------------------------------------------------
+// maxDurability / createWeaponState
+// ---------------------------------------------------------------------------
+
+/** Durability maximum for `id`, honouring bought upgrades (e.g. Iron-Banded Haft). */
+export function maxDurability(id: CraftedItemId, upgrades: readonly UpgradeId[] = []): number | null {
+  const base = WEAPON_MAP[id].durability
+  if (base === null) return null
+  return upgradedStat(id, 'durability', base, upgrades)
+}
+
+/**
  * Construct a fresh WeaponState for `id` by reading the design-bible max
- * durability from WEAPON_MAP.
+ * durability from WEAPON_MAP (plus upgrades).
  *
  * Single-use items (durability: 1 in weapons.ts) are NOT tracked here — they
  * are removed from inventory on use.  This helper is intended for melee weapons
  * (bone-club, sharpened-shovel) and the rusty-shovel (infinite).
  */
-export function createWeaponState(id: CraftedItemId): WeaponState {
-  const def = WEAPON_MAP[id]
-  return { id, durability: def.durability }
+export function createWeaponState(id: CraftedItemId, upgrades: readonly UpgradeId[] = []): WeaponState {
+  return { id, durability: maxDurability(id, upgrades) }
 }
 
 // ---------------------------------------------------------------------------
@@ -105,13 +129,12 @@ export function createWeaponState(id: CraftedItemId): WeaponState {
  *
  * Always false for infinite-durability weapons.
  */
-export function isCracked(weaponState: WeaponState): boolean {
+export function isCracked(weaponState: WeaponState, upgrades: readonly UpgradeId[] = []): boolean {
   const { durability, id } = weaponState
   if (durability === null) return false
 
-  const def = WEAPON_MAP[id]
-  const max = def.durability
+  const max = maxDurability(id, upgrades)
   if (max === null || max === 0) return false
 
-  return durability / max < 0.2
+  return durability / max < LOW_DURABILITY_FRACTION
 }

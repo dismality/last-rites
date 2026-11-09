@@ -1,7 +1,7 @@
-import { useId, useState } from 'react'
-import { useGameStore } from '../../game/state/gameStore'
-import { useCraftingStore } from '../../game/state/craftingStore'
-import { canContinue, loadGame } from '../../game/state/gameSave'
+import { useEffect, useId, useState } from 'react'
+import { bootAudioOnce } from '../../audio/audioBoot'
+import { canContinue } from '../../game/state/gameSave'
+import { continueGame, newGame } from '../../game/state/runFlow'
 import { MenuDialog } from './MenuDialog'
 import { Settings } from './Settings'
 
@@ -10,24 +10,24 @@ type Panel = 'none' | 'settings' | 'credits'
 export function TitleScreen() {
   const titleId = useId()
   const creditsId = useId()
-  const setScreen = useGameStore((s) => s.setScreen)
-  const setPaused = useGameStore((s) => s.setPaused)
   const [panel, setPanel] = useState<Panel>('none')
   // Re-read each render: a missing or corrupt save hides Continue (Req 7.3).
   const saveExists = canContinue()
 
-  function start() {
-    setPaused(false)
-    // Starting recipes (bone club, bandage, candle, refill). Without this the recipe book
-    // shows only locked entries.
-    useCraftingStore.getState().applyUnlockEvent({ type: 'gameStart' })
-    setScreen('game')
-  }
-
-  function continueGame() {
-    // Load first so the saved unlocks are in place before the starting recipes merge in.
-    if (loadGame()) start()
-  }
+  // The first click (or key press, for keyboard-only players) is the gesture that unlocks audio.
+  useEffect(() => {
+    const unlock = (): void => {
+      bootAudioOnce()
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+    window.addEventListener('pointerdown', unlock)
+    window.addEventListener('keydown', unlock)
+    return () => {
+      window.removeEventListener('pointerdown', unlock)
+      window.removeEventListener('keydown', unlock)
+    }
+  }, [])
 
   if (panel === 'settings') return <Settings onClose={() => setPanel('none')} />
   if (panel === 'credits') {
@@ -58,7 +58,7 @@ export function TitleScreen() {
         Hollowmere Cemetery, 1891
       </p>
       <div className="menu__actions">
-        <button type="button" className="menu__button" onClick={start}>
+        <button type="button" className="menu__button" onClick={newGame}>
           New Game
         </button>
         {saveExists && (

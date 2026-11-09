@@ -5,6 +5,8 @@
 export const DAY_DURATION_S = 360
 export const DUSK_DURATION_S = 30
 export const DAWN_DURATION_S = 10
+/** Seconds of dawn left once the player has picked an upgrade (design bible §12). */
+export const DAWN_AFTER_PICK_S = 2
 export const LAST_NIGHT = 5
 
 /** Fog density per night number, index 0 = night 1. */

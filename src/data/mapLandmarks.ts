@@ -8,6 +8,12 @@ import { FIXED_SPAWNS } from './zones'
 /** Side of one map cell in metres (Requirement 6.1). */
 export const MAP_CELL_SIZE = 8
 
+/** Map sheet pixel layout; shared by the canvas drawing and the pure world-to-map projection. */
+export const MAP_PX = {
+  cellPx: 28,
+  marginPx: 16,
+} as const
+
 /** Inclusive cell range covering the whole playable area, used to size the sheet. */
 export const MAP_EXTENT = {
   minCx: Math.floor(-PLAYABLE_BOUNDS.halfX / MAP_CELL_SIZE),

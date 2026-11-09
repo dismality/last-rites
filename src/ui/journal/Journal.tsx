@@ -4,6 +4,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { CLUES } from '../../data/clues'
 import { JOURNAL_PAGES } from '../../data/journal'
+import { emit } from '../../game/events'
 import { RELICS } from '../../data/relics'
 import {
   useGameStore,
@@ -233,6 +234,7 @@ export function Journal() {
           // Ink the cell the player is standing in even if they haven't moved yet.
           useMapStore.getState().reveal(usePlayerStore.getState().position)
           gs.setJournalOpen(true)
+          emit({ type: 'journalOpened' })
         }
       } else if (e.code === 'Escape' && gs.journalOpen) {
         // Capture phase so the pause trigger never sees it.

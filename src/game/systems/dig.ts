@@ -51,6 +51,8 @@ export interface DigInput {
   day: number
   phase: Phase
   rng: Rng
+  /** Dig time in seconds (Gravedigger shortens it). Defaults to DIG_DURATION_S. */
+  durationS?: number
 }
 
 export interface DigResult {
@@ -71,8 +73,8 @@ export function canDig(state: DigState, graveId: string, day: number): boolean {
 }
 
 /** 0–1 progress for the HUD ring. */
-export function digProgress(state: DigState): number {
-  return Math.min(1, state.progress / DIG_DURATION_S)
+export function digProgress(state: DigState, durationS: number = DIG_DURATION_S): number {
+  return Math.min(1, state.progress / durationS)
 }
 
 export function handScareChance(phase: Phase): number {
@@ -105,8 +107,9 @@ export function tickDig(state: DigState, dt: number, input: DigInput): DigResult
     }
 
     const progress = state.progress + dt
+    const duration = input.durationS ?? DIG_DURATION_S
     // Epsilon absorbs float drift from summing 1/60 s steps.
-    if (progress < DIG_DURATION_S - 1e-9) return { state: { ...state, progress }, events: [] }
+    if (progress < duration - 1e-9) return { state: { ...state, progress }, events: [] }
 
     const table = LOOT_TABLE_MAP[target.lootTable ?? DEFAULT_GRAVE_LOOT_TABLE]
     const loot = rollLoot(table, input.rng)

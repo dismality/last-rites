@@ -21,6 +21,7 @@ import * as THREE from 'three'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
+import { emit } from '../../game/events'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManager'
@@ -69,6 +70,10 @@ const MATERIAL_COLOR: Record<MaterialId, string> = {
   'cloth': '#c4b090',
   'lamp-oil': '#b8860b',
   'grave-salt': '#ddd8cc',
+  'wood-plank': '#8a6a45',
+  'black-powder': '#2a2622',
+  'lead-shot': '#6b6f7a',
+  'silver-filings': '#c9ced6',
 }
 
 /** Geometry scale per material type — gives each pile a distinct silhouette. */
@@ -80,6 +85,10 @@ const MATERIAL_SCALE: Record<MaterialId, [number, number, number]> = {
   'cloth': [0.10, 0.03, 0.10],
   'lamp-oil': [0.07, 0.09, 0.07],
   'grave-salt': [0.08, 0.04, 0.08],
+  'wood-plank': [0.12, 0.02, 0.04],
+  'black-powder': [0.06, 0.05, 0.06],
+  'lead-shot': [0.05, 0.04, 0.05],
+  'silver-filings': [0.05, 0.03, 0.05],
 }
 
 /**
@@ -450,6 +459,7 @@ export function Workbench() {
     if (completed && recipeId !== null) {
       const result = commitCraft(recipeId)
       if (result.ok) {
+        emit({ type: 'craftCompleted', recipeId })
         playCraftingComplete()
       } else if (result.error === 'no-capacity') {
         // TODO(ui): surface a "satchel full" toast message to the player.

@@ -254,6 +254,111 @@ describe('wailer', () => {
   })
 })
 
+describe('knockdown (Property 16, disarm half)', () => {
+  const near = () => withState(createEnemy('k', 'shambler', { x: 1, z: 0 }), { state: 'chase' })
+
+  it('does not move or attack until the timer ends, then resumes', () => {
+    const down = withState(near(), { knockdown: 1.2 })
+    const lying = run(down, 1.1)
+    expect(lying.enemy.state).toBe('down')
+    expect(lying.enemy.pos).toEqual({ x: 1, z: 0 })
+    expect(lying.events).toHaveLength(0)
+    const up = run(lying.enemy, 0.2)
+    expect(up.enemy.state).not.toBe('down')
+    expect(up.enemy.knockdown).toBe(0)
+  })
+
+  it('never attacks while down, for any duration (property)', () => {
+    fc.assert(
+      fc.property(fc.double({ min: 0.1, max: 3, noNaN: true }), (s) => {
+        const r = run(withState(near(), { knockdown: s, state: 'attack', hitDealt: false }), s - 0.05)
+        expect(r.events.filter((ev) => ev.type === 'enemyAttack')).toHaveLength(0)
+      }),
+      { numRuns: 20 },
+    )
+  })
+
+  it('wakes a dormant lurker that is knocked down', () => {
+    const l = withState(createEnemy('l', 'lurker', { x: 0, z: -20 }), { knockdown: 1 })
+    const r = tickEnemy(l, DT, baseCtx)
+    expect(r.enemy.state).toBe('down')
+    expect(r.events).toEqual([expect.objectContaining({ type: 'lurkerTriggered' })])
+    expect(run(r.enemy, 1.1).enemy.state).toBe('chase')
+  })
+
+  it('down zombies are silent and ignore wailer screams', () => {
+    const d = withState(createEnemy('d', 'shambler', { x: 5, z: 0 }), { state: 'down', knockdown: 1 })
+    expect(loopCue(d)).toBeNull()
+    expect(applyWailerScream([d], { x: 0, z: 0 }, 'w')[0].boost).toBe(0)
+  })
+})
+
+describe('bloater swell', () => {
+  const dead = () => withState(createEnemy('b', 'bloater', { x: 5, z: 0 }), { state: 'chase', hp: 0 })
+
+  it('swells for 0.8 s without moving, then bursts exactly once and dies', () => {
+    const first = tickEnemy(dead(), DT, baseCtx)
+    expect(first.enemy.state).toBe('swell')
+    expect(first.events.map((ev) => ev.type)).toEqual(['bloaterSwell', 'enemyCollapsed'])
+    const mid = run(first.enemy, 0.7)
+    expect(mid.enemy.state).toBe('swell')
+    expect(mid.events).toHaveLength(0)
+    expect(mid.enemy.pos).toEqual({ x: 5, z: 0 })
+    const rest = run(mid.enemy, 3)
+    expect(rest.events.filter((ev) => ev.type === 'bloaterBurst')).toHaveLength(1)
+    expect(rest.enemy.state).toBe('dead')
+  })
+
+  it('other types go straight to dying without a swell', () => {
+    const r = tickEnemy(withState(createEnemy('s', 'shambler', { x: 5, z: 0 }), { hp: 0 }), DT, baseCtx)
+    expect(r.enemy.state).toBe('dying')
+    expect(r.events.map((ev) => ev.type)).toEqual(['enemyCollapsed'])
+  })
+})
+
+describe('noise and door targets', () => {
+  it('investigate steers toward the noise and clears within 1.2 m', () => {
+    const z = withState(createEnemy('n', 'shambler', { x: 10, z: 0 }), {
+      state: 'chase',
+      investigate: { x: 10, z: 8 },
+    })
+    const moved = run(z, 1)
+    expect(moved.enemy.pos.z).toBeGreaterThan(1)
+    expect(moved.enemy.investigate).not.toBeNull()
+    const arrived = run(withState(z, { pos: { x: 10, z: 7 } }), 0.1)
+    expect(arrived.enemy.investigate).toBeNull()
+  })
+
+  it('a door target moves the attack goal and the event names the door', () => {
+    const ctx = ctxAt({ doors: { front: { x: 10, z: 0 }, vestry: { x: 0, z: 30 } } })
+    // Player is 10 m away, but the zombie stands at its door.
+    const z = withState(createEnemy('d', 'shambler', { x: 10.5, z: 0 }), { state: 'chase', target: 'front' })
+    const r = run(z, 0.6, ctx)
+    expect(r.events).toEqual([
+      expect.objectContaining({ type: 'enemyAttack', target: 'front', enemyType: 'shambler' }),
+    ])
+    // Without the door the same zombie is simply chasing a distant player.
+    const away = run(withState(z, { target: 'player' }), 0.6, ctx)
+    expect(away.events).toHaveLength(0)
+  })
+
+  it('damage and speed scale with their multipliers; speedOverride wins', () => {
+    const e = createEnemy('e', 'shambler', { x: 30, z: 0 }, { elite: true })
+    expect(e.maxHp).toBe(120)
+    const chasing = withState(e, { state: 'chase' })
+    expect(30 - run(chasing, 1).enemy.pos.x).toBeCloseTo(1.4 * 1.15, 1)
+    const over = run(chasing, 1, ctxAt({ speedOverride: () => 3 }))
+    expect(30 - over.enemy.pos.x).toBeCloseTo(3, 1)
+    const hit = run(withState(chasing, { pos: { x: 1, z: 0 } }), 0.6)
+    expect(hit.events).toEqual([expect.objectContaining({ damage: 12.5 })])
+  })
+
+  it('Father Crane never emits enemyAttack', () => {
+    const c = withState(createEnemy('c', 'father-crane', { x: 2, z: 0 }), { state: 'chase' })
+    expect(run(c, 4).events.filter((ev) => ev.type === 'enemyAttack')).toHaveLength(0)
+  })
+})
+
 describe('audio signatures', () => {
   it('each awake type loops its own cue; sleeping, rising and dying are silent', () => {
     const at = (type: 'shambler' | 'lurker' | 'wailer', state: AIEnemy['state']) =>

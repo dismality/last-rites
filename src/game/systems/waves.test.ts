@@ -1,14 +1,29 @@
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
-import { LIVE_ENEMY_CAP, NIGHTS, SPAWN_MIN_DISTANCE, WAVE_GAP, type NightNumber } from '../../data/waves'
+import {
+  BASE_WAVES,
+  LIVE_ENEMY_CAP,
+  NIGHT_MAP,
+  NIGHTS,
+  SPAWN_MIN_DISTANCE,
+  WAVE_GAP,
+  waveAdditions,
+  waveSize,
+  type NightNumber,
+  type WaveComposition,
+} from '../../data/waves'
 import { createRng } from '../rng'
+import { doorAttackerCount } from './barricade'
 import {
   createWaveState,
   eligibleGraves,
+  expandWave,
   nightTotal,
   startNight,
+  startRiteAssault,
   tickWaves,
   type WaveEvent,
+  type WaveSpawn,
   type WaveState,
 } from './waves'
 
@@ -110,6 +125,124 @@ describe('tickWaves', () => {
       { id: 'b', x: 15, z: 0 },
     ]
     expect(eligibleGraves(graves, FAR).map((g) => g.id)).toEqual(['b'])
+  })
+})
+
+/** Runs a night recording every spawn per wave; zombies die at once, so only the cap paces spawns. */
+function spawnsByWave(night: number, seed: number, eliteSeed: number | null) {
+  const rng = createRng(seed)
+  const eliteRng = eliteSeed === null ? undefined : createRng(eliteSeed)
+  let state = startNight(night)
+  const waves: WaveSpawn[][] = [[]]
+  for (let t = 0; t < 100000 && state.phase !== 'done'; t++) {
+    const r = tickWaves(state, 1, { playerPos: FAR, liveCount: 0, rng, eliteRng })
+    if (r.events.some((e) => e.type === 'waveCleared')) waves.push([])
+    waves[waves.length - 1].push(...r.spawns)
+    state = r.state
+  }
+  return waves.filter((w) => w.length > 0)
+}
+
+describe('elites and door attackers in waves', () => {
+  it('never rolls an elite without an eliteRng', () => {
+    const all = [2, 3, 4, 5].flatMap((n) => spawnsByWave(n, 11, null).flat())
+    expect(all.some((s) => s.elite)).toBe(false)
+  })
+
+  it('resets the per-wave state at every wave start', () => {
+    expect(startNight(2)).toMatchObject({ eliteSpawned: false, attackersLeft: 1 })
+    expect(startNight(1).attackersLeft).toBe(1) // floor(4 / 3), no night-2 minimum
+    expect(startRiteAssault()).toMatchObject({ eliteSpawned: false, attackersLeft: 5 })
+  })
+
+  it('assigns Door_Attackers only to shamblers and brutes', () => {
+    const spawns = spawnsByWave(5, 3, null).flat()
+    spawns.filter((s) => s.doorAttacker).forEach((s) => expect(['shambler', 'brute']).toContain(s.type))
+  })
+
+  it('assigns max(floor(N / 3), 1 from night 2) attackers per wave', () => {
+    // **Validates: Requirements 16.9**
+    fc.assert(
+      fc.property(fc.constantFrom(1, 2, 3, 4, 5), fc.integer(), (night, seed) => {
+        const waves = spawnsByWave(night, seed, null)
+        waves.forEach((w) => {
+          const expected = doorAttackerCount(w.length, night)
+          expect(w.filter((s) => s.doorAttacker)).toHaveLength(expected)
+        })
+      }),
+      { numRuns: 25 },
+    )
+  })
+
+  it('Property 23: elites respect night, type and the one-per-wave limit', () => {
+    // **Validates: Requirements 15.1, 15.2, 15.3, 15.4, 15.5, 15.11, 15.12**
+    fc.assert(
+      fc.property(fc.constantFrom(1, 2, 3, 4, 5), fc.integer(), fc.integer(), (night, seed, eliteSeed) => {
+        const waves = spawnsByWave(night, seed, eliteSeed)
+        waves.forEach((w) => {
+          const elites = w.filter((s) => s.elite)
+          expect(elites.length).toBeLessThanOrEqual(1)
+          if (night === 1) expect(elites).toHaveLength(0)
+          elites.forEach((s) => expect(['shambler', 'bloater', 'brute']).toContain(s.type))
+        })
+        const none = spawnsByWave(night, seed, null)
+        expect(none.flat().some((s) => s.elite)).toBe(false)
+        // The base rng stream is untouched by elite rolls.
+        expect(waves.flat().map((s) => [s.type, s.x, s.z])).toEqual(
+          none.flat().map((s) => [s.type, s.x, s.z]),
+        )
+      }),
+      { numRuns: 40 },
+    )
+  })
+
+  it('Property 23: elites show up for some seeds from night 2', () => {
+    const any = Array.from({ length: 60 }, (_, i) => spawnsByWave(4, 1, i).flat()).some((s) =>
+      s.some((x) => x.elite),
+    )
+    expect(any).toBe(true)
+  })
+
+  it('Property 29: waves equal the §8 base composition plus the additions', () => {
+    // **Validates: Requirements 18.1, 18.2, 18.3, 18.4, 18.5, 18.6, 18.7, 18.9**
+    const counts = (ws: readonly WaveComposition[]) => ws.map((w) => waveSize(w))
+    expect(NIGHTS.map((n) => n.waves.length)).toEqual([2, 3, 3, 4, 5])
+    fc.assert(
+      fc.property(fc.constantFrom<NightNumber>(1, 2, 3, 4, 5), (night) => {
+        const base = BASE_WAVES[night]
+        const add = waveAdditions(night)
+        const waves = NIGHT_MAP[night].waves
+        expect(waves).toHaveLength(base.length)
+        waves.forEach((w, i) => {
+          const a = add[i] ?? {}
+          expect(w.shambler).toBe(base[i].shambler)
+          expect(w.wailer).toBe(base[i].wailer)
+          expect(w.lurker).toBe(base[i].lurker)
+          expect(w.bloater).toBe(a.bloater ?? 0)
+          expect(w.brute).toBe(a.brute ?? 0)
+        })
+        expect(nightTotal(night)).toBe(counts(waves).reduce((x, y) => x + y, 0))
+      }),
+    )
+    expect(NIGHT_MAP[3].waves[2].bloater).toBe(1)
+    expect(NIGHT_MAP[4].waves[3]).toMatchObject({ bloater: 1, brute: 1 })
+    expect(NIGHT_MAP[5].waves.map((w) => [w.bloater, w.brute])).toEqual([
+      [0, 0],
+      [0, 0],
+      [0, 0],
+      [2, 1],
+      [2, 1],
+    ])
+    expect(waveAdditions(0)).toEqual([])
+    expect(waveAdditions(6)).toEqual([])
+    expect(startNight(6)).toEqual(createWaveState())
+    expect(startNight(3).plan).toBe(NIGHT_MAP[3].waves)
+  })
+
+  it('expands a wave lurkers, shamblers, brutes, bloaters, wailers', () => {
+    expect(
+      expandWave({ shambler: 1, wailer: 1, lurker: 1, bloater: 1, brute: 1 }),
+    ).toEqual(['lurker', 'shambler', 'brute', 'bloater', 'wailer'])
   })
 })
 

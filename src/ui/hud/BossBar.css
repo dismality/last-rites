@@ -1,0 +1,67 @@
+/* Top centre, below the compass. Hud.tsx (5.7) places it in .hud-top-stack. */
+.boss-bar {
+  box-sizing: border-box;
+  width: min(640px, 60vw);
+  margin: 0.5rem auto 0;
+  color: var(--parchment);
+  text-align: center;
+  text-shadow: 0 1px 2px #000;
+}
+
+.boss-bar__name {
+  font-family: var(--font-heading);
+  font-size: 1.25rem;
+  letter-spacing: 0.05em;
+}
+
+.boss-bar__frame {
+  position: relative;
+  box-sizing: border-box;
+  height: 22px;
+  background: var(--ink);
+  border: 2px solid var(--ink-mid);
+  outline: 1px solid var(--parchment-dark);
+  overflow: hidden;
+}
+
+.boss-bar__fill {
+  height: 100%;
+  background: var(--blood);
+  transition: width 150ms ease-out;
+}
+
+/* Phase marks are ticks plus text labels, so they never rely on colour. */
+.boss-bar__mark {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--parchment);
+}
+
+.boss-bar__labels {
+  position: relative;
+  height: 1.4rem;
+}
+
+.boss-bar__label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-family: var(--font-num);
+  font-size: 1rem;
+  line-height: 1.4rem;
+  white-space: nowrap;
+}
+
+.boss-bar__hp {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boss-bar__fill {
+    transition: none;
+  }
+}

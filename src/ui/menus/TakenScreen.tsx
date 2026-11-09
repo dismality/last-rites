@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useEffect, useId } from 'react'
 import { useGameStore } from '../../game/state/gameStore'
 import { retryNight } from '../../game/state/retryNight'
 import { requestLock } from '../../scene/player/input'
@@ -14,6 +14,12 @@ export function TakenScreen() {
   const screen = useGameStore((s) => s.screen)
   const setScreen = useGameStore((s) => s.setScreen)
   const setTaken = useGameStore((s) => s.setTaken)
+
+  // While the pointer is locked every click goes to the canvas, so the buttons below would
+  // be unreachable by mouse. Found in a real-browser playtest (spec 06 task 7).
+  useEffect(() => {
+    if (taken && document.pointerLockElement) document.exitPointerLock()
+  }, [taken])
 
   if (!taken || screen !== 'game') return null
 

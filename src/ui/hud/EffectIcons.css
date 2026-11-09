@@ -1,0 +1,77 @@
+/* Bottom right, above the ammo readout. */
+.effect-icons {
+  position: absolute;
+  right: 24px;
+  bottom: 200px;
+  display: flex;
+  flex-direction: row-reverse;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 40vw;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--parchment);
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 1px 2px #000;
+}
+
+.effect-icons__item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 52px;
+}
+
+.effect-icons__ring {
+  width: 44px;
+  height: 44px;
+}
+
+.effect-icons__track {
+  fill: rgb(20 17 15 / 0.7);
+  stroke: var(--ink-mid);
+  stroke-width: 3;
+}
+
+.effect-icons__arc {
+  fill: none;
+  stroke: var(--ember);
+  stroke-width: 3;
+  stroke-linecap: butt;
+}
+
+.effect-icons__glyph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 52px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.effect-icons__time {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+.effect-icons__item[data-pulse='true'] .effect-icons__arc {
+  animation: effect-icons-pulse 1s ease-in-out infinite;
+}
+
+@keyframes effect-icons-pulse {
+  50% {
+    stroke: var(--parchment);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .effect-icons__item[data-pulse='true'] .effect-icons__arc {
+    animation: none;
+  }
+}

@@ -107,6 +107,29 @@
   grid-column: 1 / -1;
   accent-color: var(--ember-dim);
 }
+.controls__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.controls__title {
+  margin: 0.8rem 0 0.2rem;
+}
+.controls__hint {
+  margin: 0 0 0.3rem;
+}
+.controls__alert {
+  min-height: 1.4em;
+  margin: 0 0 0.3rem;
+  color: var(--blood);
+  font-weight: 600;
+}
+.controls__key {
+  min-width: 8rem;
+}
 .settings__value {
   font-family: var(--font-num);
   font-weight: 600;

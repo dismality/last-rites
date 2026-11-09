@@ -91,6 +91,86 @@ export function tickSway(s: SwayState, dYaw: number, dPitch: number, dt: number)
 }
 
 // ---------------------------------------------------------------------------
+// Weapon poses (reload, firing kick, heavy charge, aim)
+// Offsets in the viewmodel rig's local space, added to the rest pose.
+// Requirement 23.9.
+// ---------------------------------------------------------------------------
+
+export interface WeaponPose {
+  x: number
+  y: number
+  /** Positive z pulls the weapon toward the player. */
+  z: number
+  /** Pitch (rad); positive tips the muzzle up, matching meleeRuntime.pose. */
+  rotX: number
+  rotZ: number
+}
+
+export const POSE_REST: WeaponPose = { x: 0, y: 0, z: 0, rotX: 0, rotZ: 0 }
+
+/** Reload: how far the weapon drops (m) and tips (rad) at the middle of the reload. */
+export const RELOAD_DROP = 0.14
+export const RELOAD_TILT = 0.55
+/** Fraction of the reload spent lowering and raising; the rest holds the low pose. */
+export const RELOAD_EDGE = 0.2
+
+/** Firing kick: how far the weapon is pushed back (m) and tipped up (rad) at the shot. */
+export const KICK_BACK = 0.05
+export const KICK_TIP = 0.12
+
+/** Heavy charge: pull-back (m) and raise (m) at a full charge. */
+export const CHARGE_BACK = 0.12
+export const CHARGE_RAISE = 0.08
+export const CHARGE_TILT = 0.5
+
+/** Aim: the firearm's rest is x 0.22; this moves it to the centre line. */
+export const AIM_SHIFT_X = -0.22
+export const AIM_SHIFT_Y = 0.045
+export const AIM_SHIFT_Z = 0.05
+
+const unit = (v: number): number => (Number.isFinite(v) ? Math.min(1, Math.max(0, v)) : 0)
+
+/** 0 → 1 → 0 across the reload, flat at 1 in the middle. Progress is elapsed ÷ reloadS. */
+export function reloadAmount(progress: number): number {
+  const p = unit(progress)
+  if (p < RELOAD_EDGE) return swapEase(p / RELOAD_EDGE)
+  if (p > 1 - RELOAD_EDGE) return swapEase((1 - p) / RELOAD_EDGE)
+  return 1
+}
+
+export function reloadPose(progress: number): WeaponPose {
+  const a = reloadAmount(progress)
+  return { x: 0, y: -RELOAD_DROP * a, z: 0, rotX: -RELOAD_TILT * a, rotZ: 0.2 * a }
+}
+
+/** Kick at the shot, decaying with the same quadratic as the camera recoil. Zero once recovered. */
+export function firingKickPose(ageS: number, recoverS: number): WeaponPose {
+  if (!(recoverS > 0) || !(ageS >= 0) || ageS >= recoverS) return POSE_REST
+  const k = (1 - ageS / recoverS) ** 2
+  return { x: 0, y: 0, z: KICK_BACK * k, rotX: KICK_TIP * k, rotZ: 0 }
+}
+
+/** Pulls back and raises in proportion to the charge fraction (0..1). */
+export function heavyChargePose(fraction: number): WeaponPose {
+  const f = unit(fraction)
+  return { x: 0, y: CHARGE_RAISE * f, z: CHARGE_BACK * f, rotX: CHARGE_TILT * f, rotZ: -0.25 * f }
+}
+
+/** Brings a firearm to the centre as the aim blend (0..1) rises. */
+export function aimPose(blend: number): WeaponPose {
+  const b = unit(blend)
+  return { x: AIM_SHIFT_X * b, y: AIM_SHIFT_Y * b, z: AIM_SHIFT_Z * b, rotX: 0, rotZ: 0 }
+}
+
+/** Sum of poses; every channel is additive. */
+export function addPoses(...poses: WeaponPose[]): WeaponPose {
+  return poses.reduce(
+    (t, p) => ({ x: t.x + p.x, y: t.y + p.y, z: t.z + p.z, rotX: t.rotX + p.rotX, rotZ: t.rotZ + p.rotZ }),
+    POSE_REST,
+  )
+}
+
+// ---------------------------------------------------------------------------
 // Walking bob
 // ---------------------------------------------------------------------------
 

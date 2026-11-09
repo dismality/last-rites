@@ -4,15 +4,23 @@
 import { PLAYER_MAX_HEALTH } from '../../data/balance'
 import { emit, subscribeToType } from '../events'
 import { loadSnapshot, pickData, saveSnapshot, type SnapshotData } from '../systems/duskSnapshot'
+import { isInvulnerable } from '../systems/dodge'
 import { damagePlayer } from '../systems/playerHealth'
 import { useChapelStore } from './chapelStore'
+import { COMBAT_PERSISTED } from './combatPersistence'
+import { useCombatStore } from './combatStore'
+import { useDoorStore } from './doorStore'
+import { useMysteryStore } from './mysteryStore'
+import { useProjectileStore } from './projectileStore'
 import { useCraftingStore } from './craftingStore'
 import { useDigStore } from './digStore'
 import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
+import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useLanternStore } from './lanternStore'
 import { useMapStore } from './mapStore'
+import { clearNightState } from './nightState'
 import { usePlayerStore } from './playerStore'
 import { useSpawnStore } from './spawnStore'
 import { useUiWorldStore } from './uiWorldStore'
@@ -24,8 +32,37 @@ interface Snapshotable {
   setState: (partial: never) => void
 }
 
+/** A view of a store limited to the listed data fields (live timers are never snapshotted). */
+function fieldsOf(
+  store: { getState: () => object; setState: (partial: never) => void },
+  keys: readonly string[],
+): Snapshotable {
+  return {
+    getState: () =>
+      Object.fromEntries(Object.entries(store.getState()).filter(([k]) => keys.includes(k))),
+    setState: (partial) => store.setState(partial),
+  }
+}
+
+/**
+ * Adapter for the one mystery field the snapshot needs. `pickData` cannot snapshot the
+ * mystery state's nested Sets, so only the rite progress number goes through (Req 20.4).
+ */
+export const riteProgress: Snapshotable = {
+  getState: () => ({ riteProgress: useMysteryStore.getState().mystery.riteProgress }),
+  setState: (partial) => {
+    const { riteProgress: value } = partial as { riteProgress?: unknown }
+    if (typeof value !== 'number' || !Number.isFinite(value)) return
+    useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, riteProgress: value } }))
+  },
+}
+
 /** Every store except settings. Transient crafting UI state is omitted. */
-const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: readonly string[] }> = {
+export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: readonly string[] }> = {
+  // Built from COMBAT_PERSISTED so a field the Save keeps cannot be forgotten here (Req 20.3).
+  combat: { store: fieldsOf(useCombatStore, COMBAT_PERSISTED.combat) },
+  doors: { store: fieldsOf(useDoorStore, COMBAT_PERSISTED.doors) },
+  riteProgress: { store: riteProgress },
   inventory: { store: useInventoryStore as unknown as Snapshotable },
   crafting: { store: useCraftingStore as unknown as Snapshotable, omit: ['craftingProgress'] },
   chapel: { store: useChapelStore as unknown as Snapshotable },
@@ -77,8 +114,13 @@ export function retryNight(): void {
   } else {
     usePlayerStore.getState().setHealth(PLAYER_MAX_HEALTH)
     useUiWorldStore.setState({ playerHealth: PLAYER_MAX_HEALTH })
-    useWorldStore.getState().applyWorldState({ phase: 'dusk', phaseTime: 0, wavesCleared: false })
+    useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, riteProgress: 0 } }))
   }
+  // Always the start of dusk, whatever phaseTime the snapshot caught: the full 30 s (Req 20.5).
+  useWorldStore.getState().applyWorldState({ phase: 'dusk', phaseTime: 0, wavesCleared: false })
+  // Every path, snapshot or fallback, ends with an empty night (Req 20.2, 20.6).
+  clearNightState()
+  useProjectileStore.getState().reset()
   // Neither store is in the snapshot: without this, the zombies and wave progress from the
   // failed night would still be alive during the replayed dusk.
   useEnemyStore.getState().setEnemies([])
@@ -86,16 +128,49 @@ export function retryNight(): void {
   useWaveStore.getState().reset()
   useGameStore.getState().setTaken(false)
   useGameStore.getState().setPaused(false)
+  // Night-only HUD state restarts: the health bar re-initialises on the new epoch (no drain
+  // animation) and a zone card from the failed night must not linger. tutorialDone and
+  // introSeen are deliberately left alone: guidanceStore is not in SNAPSHOT_STORES.
+  useGameStore.setState((s) => ({ retryEpoch: s.retryEpoch + 1 }))
+  useGuidanceStore.setState({ card: null })
 }
 
-/** Apply one hit to the player. Shows the "You were taken" screen on death. */
-export function hurtPlayer(dmg: number, blocking: boolean): void {
+/** Who dealt the hit. A Brute blow cancels a reload in progress (Req 4.5). */
+export type HurtSource = 'zombie' | 'brute' | 'burst' | 'toll' | 'swing' | 'scare'
+
+/**
+ * Apply one hit to the player. Shows the "You were taken" screen on death.
+ * Returns true when damage was applied; false while taken or during a dodge's
+ * invulnerable window, which covers blows, the Bloater burst and the Toll (Req 9.5, 17.9).
+ */
+export function hurtPlayer(dmg: number, blocking: boolean, source?: HurtSource): boolean {
+  if (useGameStore.getState().taken) return false
+  if (isInvulnerable(useCombatStore.getState().live.dodge)) return false
   const player = usePlayerStore.getState()
-  const res = damagePlayer(player.health, dmg, blocking)
-  if (res.dealt <= 0) return
+  // A raised melee guard turns aside blows, not gas or the Toll's shockwave (Req 5.3).
+  const guards =
+    source === undefined ||
+    source === 'zombie' ||
+    source === 'brute' ||
+    source === 'swing' ||
+    source === 'scare'
+  const res = damagePlayer(
+    player.health,
+    dmg,
+    blocking || (guards && useCombatStore.getState().live.blocking),
+  )
+  if (res.dealt <= 0) return false
   player.setHealth(res.health)
   useUiWorldStore.setState({ playerHealth: res.health })
   useUiWorldStore.getState().registerHit()
+  if (source === 'brute' && useCombatStore.getState().live.reload) {
+    useCombatStore.getState().patchLive({ reload: null })
+  }
   emit({ type: 'playerDamaged', amount: res.dealt })
-  if (res.died) useGameStore.getState().setTaken(true)
+  if (res.died) {
+    // Nothing from the failed night may carry into the retry (Req 12.8, 20.2).
+    clearNightState()
+    useGameStore.getState().setTaken(true)
+  }
+  return true
 }

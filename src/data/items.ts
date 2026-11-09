@@ -1,15 +1,22 @@
 // Item definitions — mirrored from docs/game-design.md §3 and §4.
 // Pure data: no logic, no side effects.
 
-import type { CraftedItemId, ItemId, KeyItemId, MaterialId, RelicId } from '../game/types'
+import type { AmmoId, CraftedItemId, ItemId, KeyItemId, MaterialId, RelicId } from '../game/types'
 
 export type { MaterialId } from '../game/types'
 
-export type ItemKind = 'material' | 'weapon' | 'consumable' | 'placeable' | 'key' | 'relic' | 'lore'
+export type ItemKind = 'material' | 'ammo' | 'weapon' | 'consumable' | 'placeable' | 'key' | 'relic' | 'lore'
 
 /** Satchel limits (design bible §3). */
 export const SATCHEL_SLOTS = 12
+/** Slot ceiling after the Deep Pockets upgrade (12 + 2). */
+export const SATCHEL_SLOTS_MAX = 14
 export const MATERIAL_STACK_LIMIT = 10
+/** Ammunition stack limits (design bible §3, Ammunition). */
+export const AMMO_STACK_LIMITS: Readonly<Record<AmmoId, number>> = {
+  'revolver-cartridge': 36,
+  'shotgun-shell': 20,
+}
 
 /** A hidden mark on an item that reveals clue text when it faces the camera. */
 export interface ClueDef {
@@ -73,6 +80,11 @@ function material(id: MaterialId, name: string): ItemDef {
   }
 }
 
+function ammo(id: AmmoId, name: string): ItemDef {
+  // Each ammo stack takes one satchel slot.
+  return { id, name, kind: 'ammo', stackLimit: AMMO_STACK_LIMITS[id], icon: `rune-${id}` }
+}
+
 function crafted(
   id: CraftedItemId,
   name: string,
@@ -111,6 +123,14 @@ export const ITEMS: readonly ItemDef[] = [
   material('cloth', 'Cloth'),
   material('lamp-oil', 'Lamp Oil'),
   material('grave-salt', 'Grave Salt'),
+  material('wood-plank', 'Wood Planks'),
+  material('black-powder', 'Black Powder'),
+  material('lead-shot', 'Lead Shot'),
+  material('silver-filings', 'Silver Filings'),
+
+  // Ammunition
+  ammo('revolver-cartridge', 'Revolver Cartridges'),
+  ammo('shotgun-shell', 'Shotgun Shells'),
 
   // Weapons, tools and consumables
   crafted('rusty-shovel', 'Rusty Shovel', 'weapon'),
@@ -123,6 +143,12 @@ export const ITEMS: readonly ItemDef[] = [
   crafted('tallow-candle', 'Tallow Candle', 'placeable'),
   crafted('bandage', 'Bandage', 'consumable'),
   crafted('lantern-refill', 'Lantern Refill', 'consumable'),
+  crafted('revolver', 'Service Revolver', 'weapon'),
+  crafted('shotgun', 'Double-Barrel Shotgun', 'weapon'),
+  crafted('wood-axe', 'Wood Axe', 'weapon'),
+  crafted('silver-sabre', 'Silver Sabre', 'weapon'),
+  crafted('blessed-rounds', 'Blessed Rounds', 'consumable'),
+  crafted('kola-tonic', 'Kola Tonic', 'consumable'),
 
   // Key items
   key('rusted-crypt-key', 'Rusted Crypt Key', {

@@ -62,6 +62,17 @@ describe('tickDig', () => {
     expect(done.state.graveId).toBeNull()
   })
 
+  it('a shorter durationS finishes the dig sooner and scales progress', () => {
+    const durationS = DIG_DURATION_S * 0.7
+    const ticks = Math.round(durationS / DT)
+    const done = run(createDigState(), ticks, () => input({ durationS }))
+    expect(done.events).toHaveLength(1)
+    // Same ticks at the default duration are not enough.
+    expect(run(createDigState(), ticks, () => input()).events).toEqual([])
+    const half = run(createDigState(), 5, () => input({ durationS }))
+    expect(digProgress(half.state, durationS)).toBeGreaterThan(digProgress(half.state))
+  })
+
   it('grants loot from the grave table using the seeded rng', () => {
     const done = run(createDigState(), TICKS_FOR_DIG, () => input({ rng: createRng(7) }))
     const ev = done.events[0]

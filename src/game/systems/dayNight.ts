@@ -12,6 +12,12 @@ import type { GameEvent, Phase, WorldState } from '../types'
 export interface DayNightInput {
   /** Supplied by the wave system; night only ends when this is true. */
   wavesCleared: boolean
+  /** True while the dawn upgrade pick is pending; dawn then freezes. */
+  holdDawn?: boolean
+  /** Day length in seconds (Endless uses a shorter day). */
+  dayLengthS?: number
+  /** Highest night number; Endless passes Infinity. */
+  lastNight?: number
 }
 
 export interface DayNightResult {
@@ -26,10 +32,10 @@ export function fogForNight(nightNumber: number): number {
 }
 
 /** Fixed-length phases; night has no fixed length. */
-function phaseDuration(phase: Phase): number {
+function phaseDuration(phase: Phase, dayLengthS: number): number {
   switch (phase) {
     case 'day':
-      return DAY_DURATION_S
+      return dayLengthS
     case 'dusk':
       return DUSK_DURATION_S
     case 'dawn':
@@ -43,6 +49,8 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
   const events: GameEvent[] = []
   let { phase, phaseTime, nightNumber } = s
   let remaining = Math.max(0, dt)
+  const dayLengthS = input.dayLengthS ?? DAY_DURATION_S
+  const lastNight = input.lastNight ?? LAST_NIGHT
 
   const enter = (next: Phase) => {
     phase = next
@@ -59,7 +67,9 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
       if (input.wavesCleared) enter('dawn')
       break
     }
-    const left = phaseDuration(phase) - phaseTime
+    // A pending pick freezes dawn: no time passes and no event fires.
+    if (phase === 'dawn' && input.holdDawn) break
+    const left = phaseDuration(phase, dayLengthS) - phaseTime
     if (remaining < left) {
       phaseTime += remaining
       break
@@ -69,7 +79,7 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
     else if (phase === 'dusk') enter('night')
     else {
       // Increment only after dawn so the dawn summary still refers to the night just survived.
-      nightNumber = Math.min(nightNumber + 1, LAST_NIGHT)
+      nightNumber = Math.min(nightNumber + 1, lastNight)
       enter('day')
     }
   }

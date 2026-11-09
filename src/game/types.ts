@@ -1,6 +1,8 @@
 // Shared domain types for Last Rites.
 // Pure TypeScript — no React, three.js or Howler imports.
 
+import type { EnemyId } from '../data/enemies'
+
 export type Phase = 'day' | 'dusk' | 'night' | 'dawn'
 
 // ---------------------------------------------------------------------------
@@ -22,6 +24,50 @@ export type MaterialId =
   | 'cloth'
   | 'lamp-oil'
   | 'grave-salt'
+  | 'wood-plank'
+  | 'black-powder'
+  | 'lead-shot'
+  | 'silver-filings'
+
+/** Ammunition IDs (each stack takes one satchel slot) */
+export type AmmoId = 'revolver-cartridge' | 'shotgun-shell'
+
+/** Firearm IDs */
+export type FirearmId = 'revolver' | 'shotgun'
+
+/** Heavy melee weapon IDs */
+export type HeavyMeleeId = 'wood-axe' | 'silver-sabre'
+
+/** Chapel door IDs */
+export type DoorId = 'front' | 'vestry'
+
+/** Timed effect IDs */
+export type EffectId = 'blessed-rounds' | 'adrenaline' | 'salt-circle'
+
+/** Weapon upgrade IDs */
+export type UpgradeId =
+  | 'up-revolver-cylinder'
+  | 'up-revolver-speedloader'
+  | 'up-revolver-barrel'
+  | 'up-shotgun-choke'
+  | 'up-shotgun-belt'
+  | 'up-shotgun-heavy'
+  | 'up-axe-haft'
+  | 'up-axe-edge'
+  | 'up-sabre-blessed'
+  | 'up-sabre-hilt'
+
+/** What dealt damage to a zombie */
+export type DamageSource =
+  | 'melee'
+  | 'heavy'
+  | 'kick'
+  | 'revolver'
+  | 'shotgun'
+  | 'holy-water-flask'
+  | 'nail-bomb'
+  | 'lantern-trap'
+  | 'burst'
 
 /** Crafted weapon / tool / consumable IDs */
 export type CraftedItemId =
@@ -35,6 +81,10 @@ export type CraftedItemId =
   | 'bandage'
   | 'tallow-candle'
   | 'lantern-refill'
+  | FirearmId
+  | HeavyMeleeId
+  | 'blessed-rounds'
+  | 'kola-tonic'
 
 /** Key item IDs — do not occupy satchel slots */
 export type KeyItemId =
@@ -57,7 +107,7 @@ export type RelicId =
   | 'reliquary-heart'
 
 /** Any item that can appear in the satchel */
-export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId
+export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId | AmmoId
 
 /** Ending IDs (design bible §1) */
 export type EndingId = 'rest' | 'uneasy-peace' | 'taken'
@@ -76,6 +126,9 @@ export type RecipeId =
   | 'r-lantern-trap'
   | 'r-nail-bomb'
   | 'r-salt-circle'
+  | 'r-revolver-cartridge'
+  | 'r-shotgun-shell'
+  | 'r-blessed-rounds'
 
 // ---------------------------------------------------------------------------
 // Inventory
@@ -203,6 +256,10 @@ export interface Settings {
   brightness: number
   /** Show numeric values alongside visual indicators in the HUD */
   accessibleHUD: boolean
+  /** Show first-day tutorial prompts in the objective tracker */
+  tutorialPrompts: boolean
+  /** Show floating damage numbers on hits */
+  damageNumbers: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }
@@ -222,8 +279,38 @@ export type GameEvent =
   | { type: 'phaseChanged';   phase: Phase }
   | { type: 'playerDamaged';  amount: number }
   | { type: 'itemCollected';  itemId: ItemId }
+  | { type: 'craftCompleted'; recipeId: RecipeId }
+  | { type: 'hotbarBound';    slot: 0 | 1 | 2 | 3 }
+  | { type: 'journalOpened' }
   | { type: 'lanternToggled'; on: boolean }
   | { type: 'scareFired';     scareId: string }
   | { type: 'subtitleShown';  text: string; duration: number; force?: boolean }
   | { type: 'digCompleted';   graveId: string; loot: ItemStack[]; scareId: string | null }
   | { type: 'digCancelled';   graveId: string; reason: 'moved' | 'hit' | 'released' | 'interrupted' }
+  | { type: 'enemyKilled';    uid: string; enemy: EnemyId; source: DamageSource; headshot: boolean; elite: boolean }
+  | { type: 'firearmFired';   weapon: FirearmId; hit: boolean }
+  | { type: 'boardNailed';    door: DoorId }
+  | { type: 'boardBroken';    door: DoorId }
+  | { type: 'bossRisen' }
+  | { type: 'bossDefeated' }
+  | { type: 'meleeHit';       uid: string }
+  | { type: 'nightCleared';   nightNumber: number }
+  | { type: 'thunderRolled';  close: boolean }
+
+// ---------------------------------------------------------------------------
+// Progression and atmosphere ids (spec 08)
+// ---------------------------------------------------------------------------
+
+export type ModeId = 'easy' | 'normal' | 'hard' | 'endless'
+export type DawnUpgradeId =
+  | 'iron-constitution' | 'steady-hands' | 'long-wick' | 'deep-pockets' | 'second-wind'
+  | 'gravedigger' | 'hardened-boards' | 'grim-harvest' | 'marksman' | 'blessed-reach'
+export type ContractId =
+  | 'c-dig-3' | 'c-shotgun-5' | 'c-revolver-head-3' | 'c-melee-10'
+  | 'c-wailer-2' | 'c-boards-3' | 'c-gather-8' | 'c-unhurt'
+export type AchievementId =
+  | 'a-first-light' | 'a-grave-robber' | 'a-marksman' | 'a-close-shave' | 'a-combo'
+  | 'a-barricade' | 'a-pages' | 'a-relics' | 'a-crane' | 'a-rest' | 'a-endless-10' | 'a-patron'
+export type MerchantRowId =
+  | 'bandage' | 'lamp-oil' | 'revolver-cartridges' | 'shotgun-shells' | 'holy-water'
+  | 'black-powder' | 'lead-shot' | 'wood-planks' | 'kola-tonic' | 'silver-filings'

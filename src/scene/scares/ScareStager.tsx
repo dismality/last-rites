@@ -26,7 +26,7 @@ import {
   useSettingsStore,
   useWorldStore,
 } from '../../game/state'
-import { isMenuOpen } from '../../game/state/menuState'
+import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
 import { createEnemy } from '../../game/systems/enemyAI'
 import {
   createScareDirectorState,
@@ -96,7 +96,7 @@ export function ScareStager() {
 
   useFrame((_s, rawDelta) => {
     const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen || gs.taken) return
+    if (isSimFrozen() || gs.taken) return
     const state = director.current
     const random = rng.current
     if (!state || !random) return

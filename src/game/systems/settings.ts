@@ -27,14 +27,18 @@ type BooleanKey =
   | 'invertY'
   | 'subtitles'
   | 'accessibleHUD'
+  | 'tutorialPrompts'
+  | 'damageNumbers'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
+  'damageNumbers',
   'flashingLights',
   'cameraShake',
   'headBob',
   'invertY',
   'subtitles',
   'accessibleHUD',
+  'tutorialPrompts',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -51,6 +55,8 @@ export const DEFAULT_SETTINGS: Settings = {
   sfxVolume: 80,
   brightness: 1.0,
   accessibleHUD: false,
+  tutorialPrompts: true,
+  damageNumbers: true,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',
@@ -60,6 +66,10 @@ export const DEFAULT_SETTINGS: Settings = {
     Interact: 'KeyE',
     Attack: 'MouseLeft',
     Block: 'MouseRight',
+    Reload: 'KeyR',
+    Kick: 'KeyQ',
+    Dodge: 'KeyC',
+    HeavyAttack: 'KeyV',
     Hotbar1: 'Digit1',
     Hotbar2: 'Digit2',
     Hotbar3: 'Digit3',
@@ -68,6 +78,8 @@ export const DEFAULT_SETTINGS: Settings = {
     Journal: 'KeyJ',
     Lantern: 'KeyF',
     Pause: 'Escape',
+    // Skips the intro cutscene; Enter is always accepted too.
+    Skip: 'Space',
   },
 }
 

@@ -29,6 +29,8 @@ function extractSettings(current: SettingsStoreState): Settings {
     sfxVolume: current.sfxVolume,
     brightness: current.brightness,
     accessibleHUD: current.accessibleHUD,
+    tutorialPrompts: current.tutorialPrompts,
+    damageNumbers: current.damageNumbers,
     bindings: current.bindings,
   }
 }

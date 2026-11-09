@@ -6,6 +6,7 @@ import { useFrame } from '@react-three/fiber'
 import type { Group, Object3D, PointLight, SpotLight } from 'three'
 import { LANTERN_RADIUS_MAX_M } from '../../data/balance'
 import { useGameStore, useLanternStore, useSettingsStore } from '../../game/state'
+import { useIntroStore } from '../../game/state/introStore'
 import { lanternIntensity, lanternRadius } from '../../game/systems/lantern'
 import { scareRuntime } from '../scares/scareRuntime'
 
@@ -29,6 +30,7 @@ export function Lantern() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.repeat || useGameStore.getState().paused || useGameStore.getState().examining) return
+      if (useIntroStore.getState().playing) return
       if (e.code !== useSettingsStore.getState().bindings.Lantern) return
       const { on, setOn } = useLanternStore.getState()
       setOn(!on)

@@ -1,4 +1,4 @@
-﻿/*
+/*
   RecipeBook — parchment ledger overlay shown while the workbench is open.
 
   Layout: fixed panel on the right side of the screen, scrollable list of
@@ -17,12 +17,14 @@
   - Missing quantities are announced via aria-live on the entry.
 */
 
-import { useCallback, useEffect, useId } from 'react'
+import { useCallback, useEffect, useId, useState } from 'react'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
+import { ITEM_MAP } from '../../data/items'
+import { UpgradeList } from './UpgradeList'
 import type { RecipeDef } from '../../data/recipes'
 import type { ItemId, RecipeId } from '../../game/types'
 import './RecipeBook.css'
@@ -31,44 +33,8 @@ import './RecipeBook.css'
 // Helpers
 // ---------------------------------------------------------------------------
 
-/** Human-readable item names. Keep in sync with types.ts. */
-const ITEM_NAMES: Record<ItemId, string> = {
-  'bone':               'Bone',
-  'iron-nail':          'Iron Nails',
-  'candle-wax':         'Candle Wax',
-  'holy-water':         'Holy Water',
-  'cloth':              'Cloth',
-  'lamp-oil':           'Lamp Oil',
-  'grave-salt':         'Grave Salt',
-  'rusty-shovel':       'Rusty Shovel',
-  'bone-club':          'Bone Club',
-  'sharpened-shovel':   'Sharpened Shovel',
-  'holy-water-flask':   'Holy Water Flask',
-  'lantern-trap':       'Lantern Trap',
-  'nail-bomb':          'Consecrated Nail Bomb',
-  'salt-circle':        'Salt Circle',
-  'bandage':            'Bandage',
-  'tallow-candle':      'Tallow Candle',
-  'lantern-refill':     'Lantern Refill',
-  // Key items & relics (not craftable but appear as consumesTool inputs)
-  'rusted-crypt-key':      'Rusted Crypt Key',
-  'bone-whistle':          'Bone Whistle',
-  'iron-ossuary-key':      'Iron Ossuary Key',
-  'parish-ledger':         'Parish Ledger',
-  'journal-page-1':        'Journal Page I',
-  'journal-page-2':        'Journal Page II',
-  'journal-page-3':        'Journal Page III',
-  'journal-page-4':        'Journal Page IV',
-  'journal-page-5':        'Journal Page V',
-  'crane-rosary':          "Crane's Rosary",
-  'sextons-bell-clapper':  "Sexton's Bell Clapper",
-  'childs-locket':         "Child's Locket",
-  'burial-shroud':         'Burial Shroud',
-  'reliquary-heart':       'Reliquary Heart',
-}
-
 function itemName(id: ItemId): string {
-  return ITEM_NAMES[id] ?? id
+  return ITEM_MAP[id]?.name ?? id
 }
 
 /** Human-readable hint text for locked recipe unlock conditions. */
@@ -78,6 +44,8 @@ function unlockHint(recipe: RecipeDef): string {
       return 'Available from the start'
     case 'night':
       return `Unlocks after surviving Night ${recipe.unlock.night}`
+    case 'pickup':
+      return `Unlocks when you find the ${itemName(recipe.unlock.weapon)}`
     case 'journal':
       return `Unlocks upon reading Journal Page ${recipe.unlock.page}`
   }
@@ -314,6 +282,7 @@ export function RecipeBook() {
   // Clear highlight when workbench closes.
   const clearHighlight = useCraftingStore((s) => s.clearHighlight)
   const titleId = useId()
+  const [tab, setTab] = useState<'recipes' | 'upgrades'>('recipes')
 
   useEffect(() => {
     if (!workbenchOpen) clearHighlight()
@@ -365,11 +334,18 @@ export function RecipeBook() {
           ✦ · · ✦ · · ✦
         </div>
 
-        {RECIPES.length === 0 && (
+        <div role="group" aria-label="Workbench sections" className="recipe-book__tabs">
+          <button type="button" className="craft-btn" aria-pressed={tab === 'recipes'} onClick={() => setTab('recipes')}>Recipes</button>
+          <button type="button" className="craft-btn" aria-pressed={tab === 'upgrades'} onClick={() => setTab('upgrades')}>Upgrades</button>
+        </div>
+
+        {tab === 'upgrades' && <UpgradeList />}
+
+        {tab === 'recipes' && RECIPES.length === 0 && (
           <p className="recipe-book__empty">No recipes known yet.</p>
         )}
 
-        <ul className="recipe-book__list" aria-label="Recipe list">
+        {tab === 'recipes' && (<ul className="recipe-book__list" aria-label="Recipe list">
           {/* Unlocked recipes first */}
           {orderedUnlocked.map((recipe) => {
             const result = craftability.get(recipe.id)!
@@ -404,7 +380,7 @@ export function RecipeBook() {
           {locked.map((recipe) => (
             <LockedEntry key={recipe.id} recipe={recipe} />
           ))}
-        </ul>
+        </ul>)}
 
         <p className="recipe-book__footer">
           Craft at the bench — 1.5 s — world runs.

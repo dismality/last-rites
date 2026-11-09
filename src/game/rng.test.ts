@@ -1,6 +1,27 @@
 import { describe, it, expect } from 'vitest'
 import fc from 'fast-check'
-import { createRng, randInt } from './rng'
+import { createRng, randInt, deriveSeed } from './rng'
+
+describe('deriveSeed', () => {
+  it('is deterministic', () => {
+    expect(deriveSeed(1849, 'storm', 2)).toBe(deriveSeed(1849, 'storm', 2))
+  })
+
+  it('differs for different tags and n', () => {
+    expect(deriveSeed(1849, 'storm', 2)).not.toBe(deriveSeed(1849, 'stock', 2))
+    expect(deriveSeed(1849, 'storm', 2)).not.toBe(deriveSeed(1849, 'storm', 3))
+    expect(deriveSeed(1849, 'storm', 2)).not.toBe(deriveSeed(1850, 'storm', 2))
+  })
+
+  it('returns an unsigned 32-bit integer', () => {
+    fc.assert(
+      fc.property(fc.integer(), fc.string(), fc.integer({ min: 0, max: 1000 }), (s, tag, n) => {
+        const v = deriveSeed(s, tag, n)
+        return Number.isInteger(v) && v >= 0 && v <= 0xffffffff
+      }),
+    )
+  })
+})
 
 describe('createRng', () => {
   it('produces the same sequence for the same seed', () => {

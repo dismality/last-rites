@@ -5,7 +5,6 @@ import {
   HEARTBEAT_SLOW_S,
   HIT_FEEDBACK_MS,
   desaturation,
-  flameDipFactor,
   heartbeatInterval,
   vignetteOpacity,
 } from './damageFeedback'
@@ -18,8 +17,6 @@ describe('damageFeedback', () => {
 
   it('fades out after the feedback window', () => {
     expect(vignetteOpacity(HIT_FEEDBACK_MS, true)).toBe(0)
-    expect(flameDipFactor(HIT_FEEDBACK_MS)).toBe(1)
-    expect(flameDipFactor(0)).toBeLessThan(1)
   })
 
   it('heartbeat and desaturation only start below 30 HP', () => {
@@ -36,9 +33,6 @@ describe('damageFeedback', () => {
         const v = vignetteOpacity(ms, true)
         expect(v).toBeGreaterThanOrEqual(0)
         expect(v).toBeLessThanOrEqual(1)
-        const f = flameDipFactor(ms)
-        expect(f).toBeGreaterThan(0)
-        expect(f).toBeLessThanOrEqual(1)
         expect(desaturation(hp)).toBeLessThanOrEqual(0)
         const i = heartbeatInterval(hp)
         if (i !== null) {

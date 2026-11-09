@@ -85,6 +85,12 @@ describe('blasts', () => {
     expect(r.enemies[1].hp).toBe(60)
   })
 
+  it('flask radiusBonusM widens the splash by that much', () => {
+    const es = [zombie('edge', 2.5, 0)]
+    expect(resolveFlask({ x: 0, z: 0 }, es, 100, 2).hitUids).toEqual([])
+    expect(resolveFlask({ x: 0, z: 0 }, es, 100, 2, 1).hitUids).toEqual(['edge'])
+  })
+
   it('flask deals double damage to wailers', () => {
     const r = resolveFlask({ x: 0, z: 0 }, [zombie('w', 1, 0, 'wailer')], 100, 2)
     expect(r.enemies[0].hp).toBe(0)

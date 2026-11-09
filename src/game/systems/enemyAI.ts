@@ -9,6 +9,7 @@
 
 import type { AudioCueId, EnemyId } from '../../data/enemies'
 import {
+  BLOATER,
   ENEMY_ATTACK_DURATION_S,
   ENEMY_ATTACK_LEEWAY_M,
   ENEMY_ATTACK_WINDUP_S,
@@ -30,6 +31,8 @@ import {
   WAILER_SCREAM_DURATION_S,
   WAILER_SCREAM_INTERVAL,
 } from '../../data/enemies'
+import { ELITE } from '../../data/elites'
+import type { DoorId } from '../types'
 import type { Vec2 } from './combat'
 import type { StaggerEnemy } from './melee'
 import { DEFAULT_GRAPH, nextTarget, type NavGraph, type SegmentBlocked } from './navigation'
@@ -43,10 +46,27 @@ export type AIState =
   | 'stagger'
   | 'keepDistance'
   | 'scream'
+  | 'down'
+  | 'swell'
   | 'dying'
   | 'dead'
 
+/** Noise destinations count as reached inside this distance (m). */
+export const INVESTIGATE_CLEAR_M = 1.2
+
 export interface AIEnemy extends StaggerEnemy {
+  /** Full health, for health bars and elite scaling. */
+  maxHp: number
+  elite: boolean
+  speedMult: number
+  damageMult: number
+  /** Seconds lying down; 0 = standing. Narrows the optional field on CombatEnemy. */
+  knockdown: number
+  /** Gunfire destination; steers a chasing zombie until reached. */
+  investigate: Vec2 | null
+  /** Who this zombie is hunting; set each frame by the door director. */
+  target: 'player' | DoorId
+  doorAttacker: boolean
   state: AIState
   /** Seconds spent in the current state. */
   stateTime: number
@@ -75,13 +95,26 @@ export interface AIContext {
   graph?: NavGraph
   /** 1 = full, <1 = slower lunge for the reduced scare setting. */
   lungeSpeedScale?: number
+  /** World points zombies stand at to hit each chapel door. */
+  doors?: Record<DoorId, Vec2>
+  /** Absolute speed for a zombie (the boss director sets Father Crane's); skips `speedMult`. */
+  speedOverride?: (e: AIEnemy) => number | undefined
 }
 
 export type AIEvent =
-  | { type: 'enemyAttack'; uid: string; damage: number; pos: Vec2 }
+  | {
+      type: 'enemyAttack'
+      uid: string
+      enemyType: EnemyId
+      damage: number
+      pos: Vec2
+      target: 'player' | DoorId
+    }
   | { type: 'wailerScream'; uid: string; pos: Vec2 }
   | { type: 'lurkerTriggered'; uid: string; pos: Vec2 }
-  | { type: 'enemyCollapsed'; uid: string; enemyType: EnemyId; pos: Vec2 }
+  | { type: 'bloaterSwell'; uid: string; pos: Vec2 }
+  | { type: 'bloaterBurst'; uid: string; pos: Vec2 }
+  | { type: 'enemyCollapsed'; uid: string; enemyType: EnemyId; pos: Vec2; elite: boolean }
 
 export interface AITick {
   enemy: AIEnemy
@@ -94,12 +127,35 @@ export const SEPARATION_WEIGHT = 1.5
 export const WALL_PROBE_M = 1.5
 const WALL_TURNS = [Math.PI / 4, -Math.PI / 4, Math.PI / 2, -Math.PI / 2]
 
-export function createEnemy(uid: string, type: EnemyId, pos: Vec2): AIEnemy {
+export interface CreateEnemyOptions {
+  elite?: boolean
+  hpMult?: number
+  speedMult?: number
+  damageMult?: number
+}
+
+export function createEnemy(
+  uid: string,
+  type: EnemyId,
+  pos: Vec2,
+  opts: CreateEnemyOptions = {},
+): AIEnemy {
   const def = ENEMY_MAP[type]
+  const elite = opts.elite ?? false
+  // Elite modifiers stack on top of explicit multipliers (mode and night scaling).
+  const hp = def.hp * (opts.hpMult ?? 1) * (elite ? ELITE.hpMult : 1)
   return {
     uid,
     type,
-    hp: def.hp,
+    hp,
+    maxHp: hp,
+    elite,
+    speedMult: (opts.speedMult ?? 1) * (elite ? ELITE.speedMult : 1),
+    damageMult: (opts.damageMult ?? 1) * (elite ? ELITE.damageMult : 1),
+    knockdown: 0,
+    investigate: null,
+    target: 'player',
+    doorAttacker: false,
     pos,
     stagger: 0,
     state: type === 'lurker' ? 'dormant' : 'rise',
@@ -212,6 +268,22 @@ function boostMult(e: AIEnemy): number {
   return e.boost > 0 ? WAILER_BOOST_MULT : 1
 }
 
+/** The door a zombie is hunting, or the player when it has no door or the door has no stand point. */
+function effectiveTarget(e: AIEnemy, ctx: AIContext): 'player' | DoorId {
+  return e.target !== 'player' && ctx.doors?.[e.target] ? e.target : 'player'
+}
+
+/** Where a blow must land: its door's stand point, otherwise the player. */
+function attackGoalOf(e: AIEnemy, ctx: AIContext): Vec2 {
+  const t = effectiveTarget(e, ctx)
+  return t === 'player' ? ctx.playerPos : (ctx.doors as Record<DoorId, Vec2>)[t]
+}
+
+/** An override is an absolute speed; otherwise the type's speed scales by `speedMult`. */
+function speedFor(e: AIEnemy, base: number, ctx: AIContext): number {
+  return ctx.speedOverride?.(e) ?? base * e.speedMult
+}
+
 export function tickEnemy(enemy: AIEnemy, dt: number, ctx: AIContext): AITick {
   const events: AIEvent[] = []
   if (enemy.state === 'dead') return { enemy, events }
@@ -224,14 +296,48 @@ export function tickEnemy(enemy: AIEnemy, dt: number, ctx: AIContext): AITick {
     boost: Math.max(0, enemy.boost - dt),
   }
 
-  // Death overrides every other state.
-  if (e.hp <= 0 && e.state !== 'dying') {
-    e = { ...enter(e, 'dying'), stagger: 0 }
-    events.push({ type: 'enemyCollapsed', uid: e.uid, enemyType: e.type, pos: e.pos })
+  // Death overrides every other state. A Bloater swells first; the kill is still
+  // reported now (enemyCollapsed) so score and drops don't wait for the burst.
+  if (e.hp <= 0 && e.state !== 'dying' && e.state !== 'swell') {
+    const bloater = e.type === 'bloater'
+    e = { ...enter(e, bloater ? 'swell' : 'dying'), stagger: 0, knockdown: 0 }
+    if (bloater) events.push({ type: 'bloaterSwell', uid: e.uid, pos: e.pos })
+    events.push({
+      type: 'enemyCollapsed',
+      uid: e.uid,
+      enemyType: e.type,
+      pos: e.pos,
+      elite: e.elite,
+    })
     return { enemy: e, events }
+  }
+  if (e.state === 'swell') {
+    // Motionless and harmless until the gas goes off.
+    if (e.stateTime < BLOATER.swellS) return { enemy: e, events }
+    events.push({ type: 'bloaterBurst', uid: e.uid, pos: e.pos })
+    return { enemy: enter(e, 'dying'), events }
   }
   if (e.state === 'dying') {
     return { enemy: e.stateTime >= ENEMY_DYING_S ? enter(e, 'dead') : e, events }
+  }
+
+  // Knockdown overrides stagger: the zombie lies still until the timer ends.
+  if (e.knockdown > 0 && e.state !== 'down') {
+    if (e.state === 'rise') {
+      e = { ...e, knockdown: 0 }
+    } else {
+      if (e.state === 'dormant') {
+        // A knocked-down lurker is awake, like a struck one.
+        e = enter(e, 'chase')
+        events.push({ type: 'lurkerTriggered', uid: e.uid, pos: e.pos })
+      }
+      e = { ...enter(e, 'down'), stagger: 0 }
+    }
+  }
+  if (e.state === 'down') {
+    const left = Math.max(0, e.knockdown - dt)
+    e = { ...e, knockdown: left }
+    return { enemy: left <= 0 ? enter(e, resumeState(e.type)) : e, events }
   }
 
   // Stagger (set by melee hits and flask stuns) interrupts anything except rising.
@@ -280,32 +386,51 @@ export function tickEnemy(enemy: AIEnemy, dt: number, ctx: AIContext): AITick {
         e = enter(e, 'chase')
         break
       }
-      e = moveToward(e, ctx.playerPos, def.speed * (ctx.lungeSpeedScale ?? 1), dt, ctx)
+      e = moveToward(e, ctx.playerPos, speedFor(e, def.speed * (ctx.lungeSpeedScale ?? 1), ctx), dt, ctx)
       break
     }
 
     case 'chase': {
-      if (toPlayer <= def.attackRange) {
-        e = face(e, ctx.playerPos)
+      const attackGoal = attackGoalOf(e, ctx)
+      const toGoal = dist(e.pos, attackGoal)
+      // Noise: head for the shot until close, or until the player is in reach.
+      if (e.investigate && (dist(e.pos, e.investigate) <= INVESTIGATE_CLEAR_M || toPlayer <= def.attackRange)) {
+        e = { ...e, investigate: null }
+      }
+      if (e.investigate) {
+        const base = e.type === 'lurker' ? LURKER_CHASE_SPEED : def.speed
+        e = moveToward(e, e.investigate, speedFor(e, base, ctx) * boostMult(e), dt, ctx)
+      } else if (toGoal <= def.attackRange) {
+        e = face(e, attackGoal)
         if (e.cooldown <= 0) e = { ...enter(e, 'attack'), cooldown: def.attackCooldown }
       } else {
         const base = e.type === 'lurker' ? LURKER_CHASE_SPEED : def.speed
-        e = moveToward(e, ctx.playerPos, base * boostMult(e), dt, ctx)
+        e = moveToward(e, attackGoal, speedFor(e, base, ctx) * boostMult(e), dt, ctx)
       }
       break
     }
 
-    case 'attack':
-      e = face(e, ctx.playerPos)
+    case 'attack': {
+      const attackGoal = attackGoalOf(e, ctx)
+      e = face(e, attackGoal)
       if (!e.hitDealt && e.stateTime >= ENEMY_ATTACK_WINDUP_S) {
         e = { ...e, hitDealt: true }
-        // The blow whiffs if the player backed away during the wind-up.
-        if (toPlayer <= def.attackRange + ENEMY_ATTACK_LEEWAY_M) {
-          events.push({ type: 'enemyAttack', uid: e.uid, damage: def.damage, pos: e.pos })
+        // The blow whiffs if the player backed away during the wind-up. Father Crane's
+        // blows belong to the boss director, so he never emits one from here.
+        if (dist(e.pos, attackGoal) <= def.attackRange + ENEMY_ATTACK_LEEWAY_M && e.type !== 'father-crane') {
+          events.push({
+            type: 'enemyAttack',
+            uid: e.uid,
+            enemyType: e.type,
+            damage: def.damage * e.damageMult,
+            pos: e.pos,
+            target: effectiveTarget(e, ctx),
+          })
         }
       }
       if (e.stateTime >= ENEMY_ATTACK_DURATION_S) e = enter(e, 'chase')
       break
+    }
 
     case 'keepDistance': {
       const screamTimer = e.screamTimer - dt
@@ -315,7 +440,7 @@ export function tickEnemy(enemy: AIEnemy, dt: number, ctx: AIContext): AITick {
         events.push({ type: 'wailerScream', uid: e.uid, pos: e.pos })
         break
       }
-      const speed = def.speed * boostMult(e)
+      const speed = speedFor(e, def.speed, ctx) * boostMult(e)
       if (toPlayer < WAILER_KEEP_DISTANCE_MIN) {
         const away = norm({ x: e.pos.x - ctx.playerPos.x, z: e.pos.z - ctx.playerPos.z })
         const retreat = { x: e.pos.x + away.x * 10, z: e.pos.z + away.z * 10 }
@@ -352,6 +477,7 @@ export function applyWailerScream(
   return enemies.map((z) => {
     if (z.uid === sourceUid) return z
     if (z.state === 'dormant' || z.state === 'dying' || z.state === 'dead') return z
+    if (z.state === 'down' || z.state === 'swell') return z
     if (dist(z.pos, source) > WAILER_PULL_RADIUS) return z
     return { ...z, boost: WAILER_BOOST_S }
   })
@@ -363,6 +489,7 @@ export function applyWailerScream(
  */
 export function loopCue(e: AIEnemy): AudioCueId | null {
   if (e.state === 'dormant' || e.state === 'dying' || e.state === 'dead') return null
+  if (e.state === 'down' || e.state === 'swell') return null
   if (e.state === 'rise') return null
   return ENEMY_MAP[e.type].audio
 }

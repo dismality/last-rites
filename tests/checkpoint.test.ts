@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { craft, unlockRecipes } from '../src/game/systems/crafting'
-import { repair, isDoorBarred } from '../src/game/systems/repairs'
+import { repair, isBarricadeBuilt } from '../src/game/systems/repairs'
 import { RECIPE_MAP } from '../src/data/recipes'
 import type { Inventory } from '../src/game/types'
 import type { ChapelState } from '../src/game/systems/repairs'
@@ -201,7 +201,7 @@ describe('Scenario C: Chapel repair stage 1 — bar the door', () => {
     expect(result.ok).toBe(true)
     if (!result.ok) return
 
-    expect(isDoorBarred(result.chapel)).toBe(true)
+    expect(isBarricadeBuilt(result.chapel)).toBe(true)
   })
 
   it('materials are consumed: 0 iron-nail and 0 bone remain', () => {
@@ -241,6 +241,6 @@ describe('Scenario C: Chapel repair stage 1 — bar the door', () => {
 
     // Rite not active → door should be barred
     expect(result.chapel.finalRiteActive).toBe(false)
-    expect(isDoorBarred(result.chapel)).toBe(true)
+    expect(isBarricadeBuilt(result.chapel)).toBe(true)
   })
 })

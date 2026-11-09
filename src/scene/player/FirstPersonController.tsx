@@ -2,10 +2,14 @@
 // Rules (speeds, clamps, bob) live in src/game/systems/movement.ts; this file only wires them up.
 
 import { useEffect, useRef } from 'react'
+import type * as THREE from 'three'
 import { useFrame, useThree } from '@react-three/fiber'
 import { CapsuleCollider, RigidBody, useRapier, type RapierRigidBody } from '@react-three/rapier'
 import type { KinematicCharacterController } from '@dimforge/rapier3d-compat'
 import { useGameStore, useMapStore, usePlayerStore, useSettingsStore } from '../../game/state'
+import { useCombatStore } from '../../game/state/combatStore'
+import { useEffectStore } from '../../game/state/effectStore'
+import { takePlayerPush } from '../../game/state/playerPush'
 import {
   applyLook,
   headBobOffset,
@@ -15,11 +19,22 @@ import {
   type BobState,
 } from '../../game/systems/movement'
 import { shakeMagnitude } from '../../game/systems/melee'
+import { blockMoveMultiplier } from '../../game/systems/playerHealth'
+import { dodgeVelocity } from '../../game/systems/dodge'
+import { effectMods } from '../../game/systems/effects'
+import {
+  aimFovDeg,
+  aimMoveMult,
+  impactShakeAllowed,
+  recoilOffsetRad,
+} from '../../game/systems/recoil'
+import { weaponRuntime } from './weaponRuntime'
 import { meleeRuntime } from './meleeRuntime'
 import { scareRuntime } from '../scares/scareRuntime'
 import { slowFactor } from '../../game/systems/scareStaging'
 import { playerPositionRef } from '../world/playerPositionRef'
 import { endingCameraRuntime } from '../effects/endingCameraRuntime'
+import { introCameraRuntime } from '../effects/introCameraRuntime'
 import { workbenchCameraRuntime } from '../world/workbenchCameraRuntime'
 import { isMenuOpen } from '../../game/state/menuState'
 import { input, installInput } from './input'
@@ -29,7 +44,10 @@ const CAPSULE_RADIUS = 0.35
 const CAPSULE_HALF_HEIGHT = 0.5
 /** Capsule centre height above the feet. */
 const CENTRE_Y = CAPSULE_HALF_HEIGHT + CAPSULE_RADIUS
-/** Eye level 1.6 m above the feet, relative to the capsule centre. */
+/**
+ * Eye level 1.6 m above the feet, relative to the capsule centre.
+ * INTRO_END_POSE (data/introCutscene.ts) must equal the spawn eye: feet y 0.05 + 1.6 = 1.65.
+ */
 const EYE_OFFSET = 1.6 - CENTRE_Y
 const GRAVITY = 9.81
 /** Cap frame delta so a tab-switch hitch can't tunnel the player through geometry. */
@@ -81,7 +99,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     if (!rb || !kcc) return
     // No movement or look while any menu holds the cursor. The workbench rig owns
     // the camera while opening, open and returning.
-    if (isMenuOpen() || workbenchCameraRuntime.active || endingCameraRuntime.active) return
+    if (isMenuOpen() || workbenchCameraRuntime.active || endingCameraRuntime.active || introCameraRuntime.active) return
 
     const dt = Math.min(rawDelta, MAX_FRAME_DT)
     const settings = useSettingsStore.getState()
@@ -98,15 +116,27 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     )
 
     // A grave hand holds the ankle: halve speed for its duration, then tick it down.
-    const speed = moveSpeed(snap.sprint, player.stamina) * slowFactor(scareRuntime.slowLeft)
+    const live = useCombatStore.getState().live
+    const speed =
+      moveSpeed(snap.sprint, player.stamina) *
+      slowFactor(scareRuntime.slowLeft) *
+      effectMods(useEffectStore.getState().effects).moveSpeed *
+      aimMoveMult(weaponRuntime.aiming) *
+      blockMoveMultiplier(live.blocking)
     scareRuntime.slowLeft = Math.max(0, scareRuntime.slowLeft - dt)
     scareRuntime.shakeAge += dt
-    const [vx, vz] = moveVelocity(look.yaw, snap.forward, snap.strafe, speed)
+    const walk = moveVelocity(look.yaw, snap.forward, snap.strafe, speed)
+    // A running dodge replaces walking; Rapier still stops the dash at walls (Req 9.9).
+    const dash = live.dodge ? dodgeVelocity(live.dodge) : null
+    const vx = dash ? dash.x : walk[0]
+    const vz = dash ? dash.z : walk[1]
+    // The Toll's shove is a one-frame displacement, so the controller still honours walls.
+    const push = takePlayerPush()
 
     const collider = rb.collider(0)
     const grounded = kcc.computedGrounded()
     fallSpeed.current = grounded ? 0 : fallSpeed.current + GRAVITY * dt
-    kcc.computeColliderMovement(collider, { x: vx * dt, y: -fallSpeed.current * dt, z: vz * dt })
+    kcc.computeColliderMovement(collider, { x: vx * dt + (push?.x ?? 0), y: -fallSpeed.current * dt, z: vz * dt + (push?.z ?? 0) })
     const m = kcc.computedMovement()
     const t = rb.translation()
     const next = { x: t.x + m.x, y: t.y + m.y, z: t.z + m.z }
@@ -117,9 +147,19 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
 
     camera.position.set(next.x, next.y + EYE_OFFSET + headBobOffset(bob.current), next.z)
     camera.rotation.order = 'YXZ' // yaw first, then pitch, so looking up doesn't roll the view
-    camera.rotation.set(look.pitch, look.yaw, 0)
+    // Recoil is a visual kick on top of the player's own pitch; it is never written back.
+    camera.rotation.set(look.pitch + recoilOffsetRad(weaponRuntime.recoil), look.yaw, 0)
+    const fov = aimFovDeg(settings.fov, weaponRuntime.aimBlend)
+    const perspective = camera as THREE.PerspectiveCamera
+    if (perspective.isPerspectiveCamera && perspective.fov !== fov) {
+      perspective.fov = fov
+      perspective.updateProjectionMatrix()
+    }
     // Hit shake is applied after the base pose and never written back to the player.
-    const shake = Math.max(shakeMagnitude(meleeRuntime.shakeAge), shakeMagnitude(scareRuntime.shakeAge))
+    const impact = impactShakeAllowed(settings.cameraShake, settings.scareIntensity)
+      ? shakeMagnitude(scareRuntime.shakeAge)
+      : 0
+    const shake = Math.max(shakeMagnitude(meleeRuntime.shakeAge), impact)
     if (shake > 0) {
       camera.position.x += (Math.random() - 0.5) * 2 * shake
       camera.position.y += (Math.random() - 0.5) * 2 * shake

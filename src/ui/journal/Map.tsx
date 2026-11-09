@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { LANDMARKS, MAP_INK } from '../../data/mapLandmarks'
 import { useMapStore, usePlayerStore, useWorldStore } from '../../game/state'
+import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { cellKey, discoveredLandmarks, exploredCells } from '../../game/systems/mapReveal'
 import { MAP_HEIGHT, MAP_WIDTH, drawMap } from './mapDraw'
 
@@ -18,6 +19,7 @@ export function JournalMap() {
   const phase = useWorldStore((s) => s.phase)
   const px = usePlayerStore((s) => s.position)
   const yaw = usePlayerStore((s) => s.yaw)
+  const objective = useGuidanceStore((s) => s.objective)
 
   // Locket marker is night-only, like the item itself.
   const landmarks = useMemo(
@@ -49,7 +51,7 @@ export function JournalMap() {
         if (progress < 1) done = false
         return { cell, progress }
       })
-      drawMap(ctx, { cells: drawn, landmarks, player: { x: px[0], z: px[2], yaw }, reducedMotion: reduced })
+      drawMap(ctx, { cells: drawn, landmarks, player: { x: px[0], z: px[2], yaw }, objective, reducedMotion: reduced })
       if (done) {
         pendingKeys.current = []
         useMapStore.getState().markSeen()
@@ -59,7 +61,7 @@ export function JournalMap() {
     }
     raf = requestAnimationFrame(frame)
     return () => cancelAnimationFrame(raf)
-  }, [map, landmarks, px, yaw])
+  }, [map, landmarks, px, yaw, objective])
 
   const explored = exploredCells(map).length
   return (

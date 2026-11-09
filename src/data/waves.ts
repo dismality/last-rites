@@ -1,11 +1,11 @@
 // Night / wave definitions — source of truth mirrored from docs/game-design.md §8.
 // Pure data: no logic, no side effects.
 
-import type { EnemyId } from './enemies'
+import type { WaveEnemyId } from './enemies'
 
 export type NightNumber = 1 | 2 | 3 | 4 | 5
 
-export type WaveComposition = Record<EnemyId, number>
+export type WaveComposition = Record<WaveEnemyId, number>
 
 export interface NightDef {
   night: NightNumber
@@ -44,16 +44,20 @@ export const WAVE_GRAVES: readonly WaveGrave[] = [
   { id: 'wg-southeast', x: 28, z: 32 },
 ]
 
+/** Base composition: the §8 columns that existed before spec 07. */
 const wave = (shambler: number, wailer = 0, lurker = 0): WaveComposition => ({
   shambler,
   wailer,
   lurker,
+  bloater: 0,
+  brute: 0,
 })
 
 const repeat = (count: number, w: WaveComposition): WaveComposition[] =>
   Array.from({ length: count }, () => ({ ...w }))
 
-export const NIGHTS: readonly NightDef[] = [
+/** Base rows (shambler, wailer, lurker only), kept literally equal to the §8 base columns. */
+const BASE_NIGHTS: readonly NightDef[] = [
   { night: 1, fog: 0.02, waves: repeat(2, wave(4)) },
   // The wailer joins the last wave only.
   { night: 2, fog: 0.03, waves: [wave(5), wave(5), wave(5, 1)] },
@@ -62,11 +66,40 @@ export const NIGHTS: readonly NightDef[] = [
   { night: 5, fog: 0.06, waves: repeat(5, wave(8, 2, 2)), finalRite: true },
 ]
 
+const NONE: Partial<WaveComposition> = {}
+
+/** §8 "Added in spec 07" column, indexed by wave. Missing waves add nothing. */
+export const WAVE_ADDITIONS: Readonly<Record<NightNumber, readonly Partial<WaveComposition>[]>> = {
+  1: [],
+  2: [],
+  3: [NONE, NONE, { bloater: 1 }],
+  4: [NONE, NONE, NONE, { bloater: 1, brute: 1 }],
+  5: [NONE, NONE, NONE, { bloater: 2, brute: 1 }, { bloater: 2, brute: 1 }],
+}
+
+/** Additions for a night; empty outside nights 1..5. */
+export function waveAdditions(night: number): readonly Partial<WaveComposition>[] {
+  return WAVE_ADDITIONS[night as NightNumber] ?? []
+}
+
+export const NIGHTS: readonly NightDef[] = BASE_NIGHTS.map((n) => ({
+  ...n,
+  waves: n.waves.map((w, i) => {
+    const add = waveAdditions(n.night)[i] ?? NONE
+    return { ...w, bloater: w.bloater + (add.bloater ?? 0), brute: w.brute + (add.brute ?? 0) }
+  }),
+}))
+
+/** The pre-spec-07 compositions, for tests that pin the base columns. */
+export const BASE_WAVES: Readonly<Record<NightNumber, readonly WaveComposition[]>> =
+  Object.fromEntries(BASE_NIGHTS.map((n) => [n.night, n.waves])) as Readonly<
+    Record<NightNumber, readonly WaveComposition[]>
+  >
 export const NIGHT_MAP: Readonly<Record<NightNumber, NightDef>> = Object.fromEntries(
   NIGHTS.map((n) => [n.night, n]),
 ) as Readonly<Record<NightNumber, NightDef>>
 
 /** Total enemies a wave spawns. */
 export function waveSize(w: WaveComposition): number {
-  return w.shambler + w.wailer + w.lurker
+  return w.shambler + w.wailer + w.lurker + w.bloater + w.brute
 }

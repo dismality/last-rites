@@ -15,6 +15,24 @@ export function createRng(seed: number): Rng {
   }
 }
 
+/**
+ * Derives an independent stream seed from the run seed, so every random
+ * stream replays identically on Retry Night. FNV-1a over the tag, mixed
+ * with the seed and index.
+ */
+export function deriveSeed(seed: number, tag: string, n: number): number {
+  let h = 0x811c9dc5
+  for (let i = 0; i < tag.length; i++) {
+    h ^= tag.charCodeAt(i)
+    h = Math.imul(h, 0x01000193)
+  }
+  h ^= seed >>> 0
+  h = Math.imul(h, 0x01000193)
+  h ^= n >>> 0
+  h = Math.imul(h, 0x01000193)
+  return h >>> 0
+}
+
 /** Integer in [min, max], both inclusive. */
 export function randInt(rng: Rng, min: number, max: number): number {
   return min + Math.floor(rng() * (max - min + 1))

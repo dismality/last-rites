@@ -8,8 +8,9 @@ describe('content data integrity', () => {
     expect(new Set(ITEMS.map((i) => i.id)).size).toBe(ITEMS.length)
   })
 
-  it('stacks materials to the limit and everything else singly', () => {
+  it('stacks materials to the limit, ammo to its own limit, and everything else singly', () => {
     for (const item of ITEMS) {
+      if (item.kind === 'ammo') continue // limits checked in combatItemsData.test.ts
       expect(item.stackLimit).toBe(item.kind === 'material' ? MATERIAL_STACK_LIMIT : 1)
     }
   })

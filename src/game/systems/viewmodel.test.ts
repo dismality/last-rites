@@ -3,6 +3,16 @@ import fc from 'fast-check'
 import {
   SWAP_DURATION,
   SWAY_MAX,
+  POSE_REST,
+  RELOAD_DROP,
+  KICK_BACK,
+  CHARGE_BACK,
+  AIM_SHIFT_Z,
+  reloadPose,
+  firingKickPose,
+  heavyChargePose,
+  aimPose,
+  addPoses,
   createSwapState,
   swapEase,
   tickSwap,
@@ -98,5 +108,50 @@ describe('viewmodelBob', () => {
   it('moves when amplitude is non-zero', () => {
     const o = viewmodelBob({ phase: Math.PI / 2, amplitude: 0.04 })
     expect(o.y).toBeLessThan(0)
+  })
+})
+
+describe('weapon poses', () => {
+  it('reload starts and ends at rest and is lowest in the middle', () => {
+    expect(reloadPose(0).y).toBeCloseTo(0)
+    expect(reloadPose(0).rotX).toBeCloseTo(0)
+    expect(reloadPose(1).y).toBeCloseTo(0)
+    expect(reloadPose(0.5).y).toBeCloseTo(-RELOAD_DROP)
+    expect(reloadPose(0.5).rotX).toBeLessThan(0)
+  })
+
+  it('firing kick pushes back at the shot and is gone once recovered', () => {
+    expect(firingKickPose(0, 0.3).z).toBeCloseTo(KICK_BACK)
+    expect(firingKickPose(0.3, 0.3)).toEqual(POSE_REST)
+    expect(firingKickPose(0.1, 0)).toEqual(POSE_REST)
+  })
+
+  it('heavy charge pulls back in proportion to the fraction', () => {
+    expect(heavyChargePose(0).z).toBe(0)
+    expect(heavyChargePose(0.5).z).toBeCloseTo(CHARGE_BACK / 2)
+    expect(heavyChargePose(1).z).toBeCloseTo(CHARGE_BACK)
+  })
+
+  it('aim moves the weapon to the centre line (rest x 0.22)', () => {
+    expect(0.22 + aimPose(1).x).toBeCloseTo(0)
+    expect(aimPose(0).x).toBeCloseTo(0)
+  })
+
+  it('addPoses sums every channel', () => {
+    const s = addPoses(aimPose(1), heavyChargePose(1))
+    expect(s.z).toBeCloseTo(AIM_SHIFT_Z + CHARGE_BACK)
+  })
+
+  it('every pose is finite and bounded for any input', () => {
+    fc.assert(
+      fc.property(fc.double({ noNaN: false }), fc.double({ noNaN: false }), (a, b) => {
+        for (const p of [reloadPose(a), firingKickPose(a, b), heavyChargePose(a), aimPose(a)]) {
+          for (const v of Object.values(p)) {
+            expect(Number.isFinite(v)).toBe(true)
+            expect(Math.abs(v)).toBeLessThanOrEqual(1)
+          }
+        }
+      }),
+    )
   })
 })

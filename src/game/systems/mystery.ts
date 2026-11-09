@@ -23,6 +23,8 @@ export interface MysteryState {
   /** Seconds of rite completed, 0..RITE_DURATION */
   riteProgress: number
   ending?: EndingId
+  /** Father Crane was put to rest. Optional so older saves load; endings still depend only on relics. */
+  craneRested?: boolean
 }
 
 export function createMysteryState(): MysteryState {

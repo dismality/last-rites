@@ -115,11 +115,12 @@ export function repair(inv: Inventory, chapel: ChapelState): RepairResult {
 // Selectors (pure helpers used by the scene layer)
 // ---------------------------------------------------------------------------
 
-/** True when stage 1 is done AND the final rite is not in progress (Req 6.4). */
-export function isDoorBarred(chapel: ChapelState): boolean {
-  return (
-    chapel.completedStages.includes('barDoor') && !chapel.finalRiteActive
-  )
+/**
+ * True once stage 1 is done. Frames persist through the final rite; the rite
+ * only doubles board damage elsewhere, so there is no rite exception here.
+ */
+export function isBarricadeBuilt(chapel: ChapelState): boolean {
+  return chapel.completedStages.includes('barDoor')
 }
 
 /** True when stage 2 is done (Req 6.5). */

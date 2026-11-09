@@ -1,8 +1,18 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { createMysteryState } from './mystery'
-import { SAVE_KEY, SAVE_VERSION, hasValidSave, readSave, toSaveFile, writeSave } from './saveGame'
+import {
+  SAVE_KEY,
+  SAVE_VERSION,
+  fromSaveFile,
+  hasPassedFirstDay,
+  hasValidSave,
+  readSave,
+  toSaveFile,
+  writeSave,
+} from './saveGame'
 import type { SaveState } from './saveGame'
+import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { PageNumber, RelicId } from '../types'
 
 function memoryStorage(initial?: string) {
@@ -44,7 +54,10 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   }),
   inventory: fc.record({
     slots: fc.array(
-      fc.record({ item: fc.constantFrom('bone' as const, 'cloth' as const), qty: fc.integer({ min: 1, max: 10 }) }),
+      fc.record({
+        item: fc.constantFrom('bone' as const, 'cloth' as const),
+        qty: fc.integer({ min: 1, max: 10 }),
+      }),
       { maxLength: 12 },
     ),
     keyItems: fc.subarray(['rusted-crypt-key', 'bone-whistle'] as const),
@@ -61,16 +74,37 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
       pages: fc.subarray([1, 2, 3, 4, 5] as PageNumber[]),
       clues: fc.subarray(['clue-a', 'clue-b', 'clue-c']),
       relics: fc.subarray(relicIds),
-      gates: fc.record({ 'mausoleum-row': fc.boolean(), catacombs: fc.boolean(), ossuary: fc.boolean() }),
+      gates: fc.record({
+        'mausoleum-row': fc.boolean(),
+        catacombs: fc.boolean(),
+        ossuary: fc.boolean(),
+      }),
       riteProgress: fc.integer({ min: 0, max: 45 }),
+      craneRested: fc.boolean(),
     })
-    .map((m) => ({ ...m, pages: new Set(m.pages), clues: new Set(m.clues), relics: new Set(m.relics) })),
+    .map((m) => ({
+      ...m,
+      pages: new Set(m.pages),
+      clues: new Set(m.clues),
+      relics: new Set(m.relics),
+    })),
   chapel: fc.record({
-    completedStages: fc.subarray(['barDoor', 'altarSave', 'bellWarning'] as const).map((a) => [...a]),
+    completedStages: fc
+      .subarray(['barDoor', 'altarSave', 'bellWarning'] as const)
+      .map((a) => [...a]),
     altarHealedToday: fc.boolean(),
     finalRiteActive: fc.boolean(),
   }),
   recipes: fc.subarray(['r-bone-club', 'r-bandage']),
+  tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7] as TutorialStepId[]).map((a) => new Set(a)),
+  introSeen: fc.boolean(),
+  combat: fc.constant({
+    firearms: { revolver: { magazine: 3 } },
+    durability: { 'wood-axe': 10 },
+    upgrades: ['up-axe-edge'],
+    takenPickups: ['wood-axe'],
+    doors: { built: true, front: [60, 20], vestry: [] },
+  }),
 }) as unknown as fc.Arbitrary<SaveState>
 
 describe('saveGame', () => {
@@ -125,5 +159,70 @@ describe('saveGame', () => {
     expect(readSave(throwing)).toBeNull()
     expect(writeSave(undefined, state)).toBe(false)
     expect(readSave(undefined)).toBeNull()
+  })
+})
+
+const RUNS = { numRuns: 100 }
+const junk = fc.anything()
+
+describe('saveGame new fields', () => {
+  it('Feature: 06-clarity-and-hud, Property 28: save round trip with new fields', () => {
+    fc.assert(
+      fc.property(saveStateArb, (s) => {
+        expect(fromSaveFile(JSON.parse(JSON.stringify(toSaveFile(s))))).toEqual(s)
+      }),
+      RUNS,
+    )
+  })
+
+  it('Feature: 06-clarity-and-hud, Property 29: old saves load with defaults', () => {
+    fc.assert(
+      fc.property(saveStateArb, (s) => {
+        const old = JSON.parse(JSON.stringify(toSaveFile(s)))
+        delete old.tutorial
+        delete old.introSeen
+        const loaded = fromSaveFile(old)
+        expect(loaded).not.toBeNull()
+        expect(loaded?.tutorial.size).toBe(0)
+        expect(loaded?.introSeen).toBe(s.world.nightNumber > 1 || s.world.phase !== 'day')
+        expect(loaded?.introSeen).toBe(hasPassedFirstDay(s.world))
+      }),
+      RUNS,
+    )
+  })
+
+  it('Feature: 06-clarity-and-hud, Property 30: corrupt saves are rejected safely', () => {
+    fc.assert(
+      fc.property(saveStateArb, fc.string(), (s, text) => {
+        // Arbitrary text never throws and is never a valid save.
+        expect(readSave(memoryStorage(text))).toBeNull()
+        // Wrongly typed existing field.
+        const broken = JSON.parse(JSON.stringify(toSaveFile(s)))
+        expect(readSave(memoryStorage(JSON.stringify({ ...broken, world: 'x' })))).toBeNull()
+      }),
+      RUNS,
+    )
+    fc.assert(
+      fc.property(saveStateArb, junk, junk, (s, t, i) => {
+        const file = JSON.parse(JSON.stringify(toSaveFile(s)))
+        file.tutorial = t
+        file.introSeen = i
+        const loaded = fromSaveFile(
+          JSON.parse(JSON.stringify({ ...file, tutorial: t, introSeen: i })),
+        )
+        expect(loaded).not.toBeNull()
+        for (const step of loaded?.tutorial ?? []) expect([1, 2, 3, 4, 5, 6, 7]).toContain(step)
+        if (typeof i !== 'boolean') expect(loaded?.introSeen).toBe(hasPassedFirstDay(s.world))
+      }),
+      RUNS,
+    )
+  })
+
+  it('keeps SAVE_VERSION at 1 and always writes both fields', () => {
+    const s = fc.sample(saveStateArb, 1)[0] as SaveState
+    const file = toSaveFile({ ...s, tutorial: undefined, introSeen: undefined })
+    expect(SAVE_VERSION).toBe(1)
+    expect(file.tutorial).toEqual([])
+    expect(typeof file.introSeen).toBe('boolean')
   })
 })
