@@ -1,10 +1,14 @@
 import { ITEM_MAP } from '../../data/items'
 import { useInventoryStore } from '../../game/state'
 import { hotbarItem } from '../../game/systems/satchel'
-import { itemGlyph } from './itemGlyph'
+import { ItemIcon } from './ItemIcon'
 import './satchel.css'
 
-/** Four-slot quick bar; the equipped slot is marked with a border and a "held" label. */
+/**
+ * Four-slot quick bar; the equipped slot is marked with a thick border and a "held" label.
+ * The item name is not printed here: it is the aria-label, and the shared item-name label
+ * shows it for 2 s when the slot changes.
+ */
 export function Hotbar() {
   const inventory = useInventoryStore((s) => s.inventory)
   const equipped = useInventoryStore((s) => s.equippedSlot)
@@ -20,15 +24,13 @@ export function Hotbar() {
             key={i}
             className={`hotbar__slot${held ? ' hotbar__slot--held' : ''}`}
             aria-current={held ? 'true' : undefined}
+            aria-label={def ? `Slot ${i + 1}: ${def.name}${held ? ', held' : ''}` : `Slot ${i + 1}: empty`}
           >
             <span className="hotbar__key">{i + 1}</span>
-            {def && (
-              <>
-                <span aria-hidden="true">{itemGlyph(def.kind)}</span>
-                <span className="hotbar__name">{def.name}</span>
-                {held && <span className="hotbar__held">held</span>}
-              </>
-            )}
+            {id && <ItemIcon id={id} />}
+            <span className="hotbar__held" aria-hidden="true">
+              {held ? 'held' : ''}
+            </span>
           </li>
         )
       })}

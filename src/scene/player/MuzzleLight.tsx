@@ -18,6 +18,7 @@ const FORWARD_M = 0.8
 export function MuzzleLight() {
   const flashing = useSettingsStore((s) => s.flashingLights)
   const ref = useRef<THREE.PointLight>(null)
+  const lightEnabled = muzzleProfile(flashing).light
 
   useFrame(() => {
     const light = ref.current
@@ -25,7 +26,8 @@ export function MuzzleLight() {
     const events = weaponRuntime.muzzleEvents
     const newest = events[events.length - 1]
     const a = newest ? muzzleOpacity(muzzleProfile(true), newest.ageS) : 0
-    light.intensity = PEAK_INTENSITY * a
+    // Stays mounted even with Flashing lights off (light count must never change); just dark.
+    light.intensity = lightEnabled ? PEAK_INTENSITY * a : 0
     const { position, direction } = weaponRuntime.camera
     light.position.set(
       position[0] + direction[0] * FORWARD_M,
@@ -34,7 +36,6 @@ export function MuzzleLight() {
     )
   })
 
-  if (!flashing || !muzzleProfile(flashing).light) return null
   return (
     <pointLight
       ref={ref}

@@ -141,7 +141,13 @@ export function ScareStager() {
     })
     for (const cue of due) {
       if (cue.phase === 'telegraph') {
-        musicRuntime.silence = announceMajor(musicRuntime.silence, cue, queue.current, now, simClock.now)
+        musicRuntime.silence = announceMajor(
+          musicRuntime.silence,
+          cue,
+          queue.current,
+          now,
+          simClock.now,
+        )
         telegraph(cue, random, picked.current)
       } else {
         musicRuntime.silence = fireMajor(musicRuntime.silence, cue, simClock.now)
@@ -196,8 +202,9 @@ function telegraph(cue: ScareCue, random: Rng, picked: Map<ScareEventId, Pending
       scareRuntime.flickerStrobe = useSettingsStore.getState().flashingLights
       break
     case 'door-slam': {
-      const doors = SCARE_DOORS.map((d, index) => ({ ...d, index }))
-        .filter((d) => d.zoneId === zone?.id)
+      const doors = SCARE_DOORS.map((d, index) => ({ ...d, index })).filter(
+        (d) => d.zoneId === zone?.id,
+      )
       const door = pickBehind(pos, p.yaw, doors)
       if (door) {
         info.doorIndex = door.index
@@ -233,7 +240,10 @@ function beat(cue: ScareCue, picked: Map<ScareEventId, Pending>, lurkers: { n: n
     case 'statue-turn': {
       const zoneId = info.zoneId
       if (zoneId && SCARE_STATUES.some((s) => s.zoneId === zoneId)) {
-        stagedProps.statues.set(zoneId, triggerStatue(stagedProps.statues.get(zoneId) ?? { status: 'away', waited: 0 }))
+        stagedProps.statues.set(
+          zoneId,
+          triggerStatue(stagedProps.statues.get(zoneId) ?? { status: 'away', waited: 0 }),
+        )
       }
       break
     }
@@ -288,7 +298,11 @@ function spawnLurker(zoneId: string | undefined, vol: number, lurkers: { n: numb
   const uid = `${SCARE_ENEMY_PREFIX}lurker-${lurkers.n++}`
   const lurker = createEnemy(uid, 'lurker', { x: niche.position[0], z: niche.position[2] })
   // Skip most of the AI's own motionless breath: the director's silence was the telegraph.
-  const awake = { ...lurker, state: 'lunge' as const, stateTime: LURKER_TELEGRAPH_S - S.lurkerPreLungeS }
+  const awake = {
+    ...lurker,
+    state: 'lunge' as const,
+    stateTime: LURKER_TELEGRAPH_S - S.lurkerPreLungeS,
+  }
   const store = useEnemyStore.getState()
   store.setEnemies([...store.enemies, awake])
   playScareSound('breath-behind', niche.position[0], AUDIO_Y, niche.position[2], vol)
@@ -300,7 +314,10 @@ function tickProps(dt: number, position: readonly number[], yaw: number): void {
   for (const st of SCARE_STATUES) {
     const cur = stagedProps.statues.get(st.zoneId)
     if (cur) {
-      stagedProps.statues.set(st.zoneId, tickStatue(cur, dt, player, yaw, { x: st.position[0], z: st.position[2] }))
+      stagedProps.statues.set(
+        st.zoneId,
+        tickStatue(cur, dt, player, yaw, { x: st.position[0], z: st.position[2] }),
+      )
     }
   }
   stagedProps.doors.forEach((d, i) => stagedProps.doors.set(i, tickDoor(d, dt)))

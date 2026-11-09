@@ -450,7 +450,55 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 11.6, 11.7, 14.5_
 
-- [~] 9. Checkpoint: playtest in a real browser
+- [x] 10. Playtest fixes (from the real-browser run of spec 08; task 9 stays open until all of these are played in a real browser)
+  - [x] 10.1 Nights after a cleared night are skipped
+    - `world.wavesCleared` stays true from a cleared night until the next `nightStarted`; `tickDayNight` entering night continues the same loop and sees `input.wavesCleared` still true, so it enters dawn in the same tick. Clear `wavesCleared` when dawn ends or the day starts, and make sure a night can never end on the tick it begins. Hide the "All N waves cleared" tally when the day starts.
+    - Test: play night 1 to clear, run through the day and dusk with the real `runTick` and expect night 2 to stay in night with its waves. Play nights 1, 2 and 3 in a row in a browser.
+  - [x] 10.2 Melee kills pay nothing
+    - `MeleeAttack.tsx` emits `meleeHit` but never `enemyKilled`. Emit `enemyKilled` exactly once per zombie killed by a light or heavy swing with the right `source`. Audit every other way a zombie dies (holy water flask, nail bomb, lantern trap, salt, anything else) and make each report the kill exactly once.
+    - Test: a melee kill pays score and one coin pile once. Check in a browser.
+  - [x] 10.3 Zombies stuck flipping between two points
+    - With the player at the hut start (0, 0) all 4 night 1 zombies stalled 21 to 44 m away in state chase, alternating between two points each frame (`nextTarget` recomputes from the nearest visible node every frame; inside `WAYPOINT_REACHED_M` it steers to a next node that leads back out). Make waypoint following stable (per-zombie current waypoint with hysteresis) and pick routes that do not start by walking away from the goal.
+    - Test with the real waypoint graph and wall layout: spawn a zombie at every wave spawn point with the player at the hut start, the chapel and the open grounds; each must get within attack range in a sensible time. Check in a browser by standing still at the start at night.
+  - [x] 10.4 New Game keeps the last run's combat state
+    - `resetRun` does not reset `useCombatStore` or `useDoorStore` (takenPickups, upgrades, durability, magazines carry over; revolver and wood axe never reappear). Reset every per-run store, including those spec 08 added.
+    - Test: play a run, take pickups, start New Game, expect them back.
+  - [x] 10.5 Retry Night leaves the player where they died
+    - `retryNight` restores `usePlayerStore.position` but the rigid body never moves and the controller overwrites the store next frame. Move the rigid body and camera to the dusk position. Also check Continue from a save.
+  - [x] 10.6 Materials never respawn
+    - `respawnForDay` only runs when `spawnStore` is created. Run it at the start of each new day under the existing rules, without wiping uncollected loot on dug graves.
+    - Test: materials return on day 2.
+  - [x] 10.7 Zombies look like bright orange cartoons up close
+    - Darken and desaturate zombie materials or reduce the lantern's effect on them so they stay pale and corpse-like at 1 to 2 m but visible. Use cloned materials as in `docs/enemy-models.md`. Check at night in a browser.
+  - [x] 10.8 Objective tracker during the final rite
+    - Once the rite has started show "Put Father Crane to rest" while he is alive, then "Finish the rite at the altar", never "Survive: Wave 1 of 5". Show the matching compass marker at night too.
+  - [x] 10.9 Boss name card covers the boss health bar
+    - Move the name card clear of the bar for its 3 s.
+  - [x] 10.10 Interactable rune glows in the ending shot
+    - Hide runes and hover cues during the intro and endings.
+  - [x] 10.11 Ending sequence runs too long
+    - It ran past 70 s without reaching the end screen. Make sure it finishes on its own without Skip and trim it to about 45 s.
+  - [x] 10.12 Endless Survival shows story content
+    - Use objectives suited to Endless (not "Read the page Elias left in the hut") and hide stats rows that cannot apply (Father Crane, Relics). Best combo must read "�1.00" when there were no combos, in every mode.
+  - [x] 10.13 Check barricade strength against the design bible
+    - In a real night 3 test the front door's 3 boards and the vestry door's 2 boards were gone about 20 s after 6 zombies arrived. Compare with `docs/game-design.md` (board health 60, damage per blow, Brutes double, rite double). If it matches the design leave it and say so in the report; otherwise correct it. Do not change repairing, nailing with E or door breaking.
+  - [x] 10.14 Per-item pixel-art icons and the shared item name label
+    - Icons are already in `public/assets/icons/items/` (one PNG per item id, all five journal-page-N ids share `journal-page.png`). Do not redraw, recolour or resize. Wire them through a `Record` keyed by item id (a missing icon is a compile error) in `src/data/assets.ts` style paths; show them in the Hotbar, Satchel and any other item list at exactly 64 CSS px (128 where there is room) with `image-rendering: pixelated`; hotbar slots fit 64.
+    - Remove item name text under icons; keep stack counts and slot numbers; put the name in `aria-label`, not `title`. Add one shared HUD item name label, centred horizontally and slightly below the middle, clear of the crosshair and interact prompt, in the HUD font. Show on hover (Satchel, merchant, other menus) and when the hotbar slot changes by number key or scroll wheel; hold 2 s then fade over 0.6 s; a new name replaces the current at once and restarts the timer; empty slot shows nothing; moving the cursor away does not cut it early; hidden during intro and endings.
+    - Any item without an icon points at a clearly named placeholder and is listed in the report. Test: every item has an icon file. Check hotbar, satchel, hover, slot switch and fade in a real browser.
+  - [x] 10.15 First workbench open freezes about 0.7 s
+    - Keep the `pointLight` in `Workbench.tsx` mounted at intensity 0 and raise it when the bench opens; find other lights that mount or unmount during play and treat them the same; precompile shaders during loading if it helps. Measure the first bench open in a real browser and report the longest frame.
+  - [x] 10.16 Log the playtest fixes
+    - Append `docs/kiro-log.md` entries with the real date for items 1 to 15, including the item 13 conclusion and the item 14 placeholder list. Do not mark task 9 done.
+- [ ] 11. Real-browser verification of the playtest fixes (user approved Playwright as a devDependency and a dev-only debug hook)
+  - [x] 11.1 Browser harness
+    - Add `@playwright/test` (or `playwright`) as a pinned exact-version devDependency only, using the system Chrome (`channel: 'chrome'`) so no browser download is needed if possible. Add a dev-only debug hook (compiled out of production builds with `import.meta.env.DEV`, exposed as `window.__lastRites`) that can start a run in a chosen mode, set the phase and night, skip to dusk or night, spawn zombies at given points, give items, teleport the player, read store snapshots (world, waves, enemies, progression, inventory, combat, doors, spawn, player) and read the longest frame time. Add `npm run e2e` that starts the dev server and runs the Playwright specs under `e2e/`. Exclude `e2e/` from vitest and lint config as needed. Document in `docs/` only if asked.
+    - Test: the hook is absent from a production build (structure test or a grep of `dist`).
+    - Do not touch task 9
+  - [-] 11.2 Verify playtest items 1 to 15 in Chrome
+    - Write Playwright specs and run them headed-or-headless in real Chrome for: nights 1, 2 and 3 in a row (items 1), a shovel kill paying score and a coin pile (2), zombies standing at the start reaching the player at night (3), New Game restoring the revolver and axe pickups (4), Retry Night and Continue moving the body (5), materials back on day 2 (6), zombie appearance screenshots at 1 to 2 m (7, saved for the user to look at), final rite objective text (8), boss name card vs bar bounding boxes (9), no rune during intro and ending (10), ending reaching the end screen unskipped in about 45 s (11), Endless objective, stats rows and Best combo (12), barricade timing observed in a night 3 setup (13), icons in hotbar and satchel at 64 px, hover and slot-switch names, the 2 s hold and 0.6 s fade (14), and the longest frame on the first workbench open (15). Report each result honestly; where Playwright cannot decide (visual taste), save screenshots under `e2e/screenshots/` and say so. Fix real bugs found, with tests.
+    - Append `docs/kiro-log.md` entries with the real date. Do not mark task 9 done
+- [ ] 9. Checkpoint: playtest in a real browser
   - This task is only marked done after a human, or a real Chrome session driven against the dev server, has played at least one full night in a real browser and observed each item below working. Unit tests, lint and build passing are not enough.
   - Observe and confirm:
     - Mode select with each mode's text, Normal by default

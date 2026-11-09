@@ -1,6 +1,7 @@
 import { useGameStore } from '../../game/state/gameStore'
 import { useWaveStore } from '../../game/state/waveStore'
-import { tallyGroups } from './hudMath'
+import { useWorldStore } from '../../game/state/worldStore'
+import { tallyGroups, tallyVisible } from './hudMath'
 
 /**
  * Wave counter as a chalk-style tally: one stroke per wave cleared, fives struck through.
@@ -11,7 +12,8 @@ export function WaveTally() {
   const phase = useWaveStore((s) => s.waves.phase)
   const waveIndex = useWaveStore((s) => s.waves.waveIndex)
   const total = useWaveStore((s) => s.totalWaves)
-  if (screen !== 'game' || total === 0 || phase === 'idle') return null
+  const worldPhase = useWorldStore((s) => s.phase)
+  if (screen !== 'game' || total === 0 || phase === 'idle' || !tallyVisible(worldPhase)) return null
 
   // During a gap the index already points at the next wave, so everything before it is cleared.
   const cleared = phase === 'done' ? total : waveIndex

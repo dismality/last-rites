@@ -28,6 +28,7 @@ import { useLanternStore } from './lanternStore'
 import { useMapStore } from './mapStore'
 import { clearNightState } from './nightState'
 import { usePlayerStore } from './playerStore'
+import { queueTeleportToStore } from './playerTeleport'
 import { useSpawnStore } from './spawnStore'
 import { useUiWorldStore } from './uiWorldStore'
 import { useWaveStore } from './waveStore'
@@ -143,6 +144,9 @@ export function retryNight(): void {
   useEnemyStore.getState().setEnemies([])
   useDigStore.getState().reset()
   useWaveStore.getState().reset()
+  // Fallback path keeps the death position; the snapshot path restores the dusk one. Either
+  // way the body must follow the store, or the controller writes the old spot back.
+  if (snap) queueTeleportToStore()
   useGameStore.getState().setTaken(false)
   useGameStore.getState().setPaused(false)
   // Night-only HUD state restarts: the health bar re-initialises on the new epoch (no drain

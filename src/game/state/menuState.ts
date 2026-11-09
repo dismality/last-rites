@@ -24,6 +24,32 @@ export function isSimFrozen(): boolean {
   return g.paused || g.examining || g.journalOpen || useIntroStore.getState().playing
 }
 
+/** Camera hand-off flags owned by scene code (kept as arguments so this module stays scene-free). */
+export interface CameraFlags {
+  ending?: boolean
+  intro?: boolean
+}
+
+function cinematicOf(screen: string, introPlaying: boolean, cam?: CameraFlags): boolean {
+  return introPlaying || screen === 'ending' || cam?.ending === true || cam?.intro === true
+}
+
+/**
+ * A scripted camera shot (intro cutscene or an ending) is showing. Every interactable cue
+ * (rune, pulse, outline, hand crosshair, prompt, craftable glow) must be hidden then, so any
+ * new cue component asks this one predicate.
+ */
+export function cinematicActive(cam?: CameraFlags): boolean {
+  return cinematicOf(useGameStore.getState().screen, useIntroStore.getState().playing, cam)
+}
+
+/** Reactive form for HUD components; the camera flags are covered by the store flags they follow. */
+export function useCinematic(): boolean {
+  const screen = useGameStore((s) => s.screen)
+  const playing = useIntroStore((s) => s.playing)
+  return cinematicOf(screen, playing)
+}
+
 /** An 08 overlay (merchant, achievements, mode select, dawn pick) has freed the cursor on purpose. */
 export function isOverlayOpen(): boolean {
   const o = useOverlayStore.getState()

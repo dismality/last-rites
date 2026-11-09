@@ -22,3 +22,7 @@ Thumbs.db
 *.log
 
 # IMPORTANT: never ignore .kiro/ — the hackathon requires it in the repo.
+
+# Playwright output
+test-results/
+playwright-report/

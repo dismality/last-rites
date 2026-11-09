@@ -17,27 +17,12 @@ import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { canRepair } from '../../game/systems/repairs'
-import type { ItemId } from '../../game/types'
+import { NamedItemIcon } from '../satchel/NamedItemIcon'
 import './RepairUI.css'
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-/** Human-readable item names — a subset; key items don't appear in repair costs. */
-const ITEM_NAMES: Partial<Record<ItemId, string>> = {
-  'bone':       'Bone',
-  'iron-nail':  'Iron Nails',
-  'candle-wax': 'Candle Wax',
-  'holy-water': 'Holy Water',
-  'cloth':      'Cloth',
-  'lamp-oil':   'Lamp Oil',
-  'grave-salt': 'Grave Salt',
-}
-
-function itemName(id: ItemId): string {
-  return ITEM_NAMES[id] ?? id
-}
 
 // ---------------------------------------------------------------------------
 // RepairUI
@@ -182,8 +167,8 @@ export function RepairUI() {
                         hasMissing ? 'repair-ui__cost-item--missing' : '',
                       ].join(' ')}
                     >
-                      <span className="repair-ui__cost-qty">{req.qty}</span>
-                      <span>{itemName(req.item)}</span>
+                      <NamedItemIcon id={req.item} />
+                      <span className="repair-ui__cost-qty">×{req.qty}</span>
                       {hasMissing && (
                         <span
                           className="repair-ui__cost-missing-label"

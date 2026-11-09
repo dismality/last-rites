@@ -27,7 +27,11 @@ export function ArcPreview({ points, landing, radius }: ArcPreviewProps) {
         depthTest={false}
       />
       {landing && (
-        <mesh position={[landing.x, 0.05, landing.z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={2}>
+        <mesh
+          position={[landing.x, 0.05, landing.z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          renderOrder={2}
+        >
           <ringGeometry args={[Math.max(0.05, radius - 0.08), radius, 40]} />
           <meshBasicMaterial color="#cfe6d8" transparent opacity={0.6} depthTest={false} />
         </mesh>

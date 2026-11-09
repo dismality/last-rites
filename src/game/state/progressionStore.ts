@@ -7,6 +7,8 @@ import type { DealtContract } from '../systems/contracts'
 import type { Stock } from '../systems/merchant'
 import { DEFAULT_SEED, type NightSummary } from '../systems/progressionSave'
 import { createRunStats, type RunStats } from '../systems/runStats'
+import { setStoryProbe } from './guidanceStore'
+import { MODES } from '../../data/modes'
 import { setDawnPickProbe } from './menuState'
 import { registerStatsPort } from './statsPort'
 
@@ -56,7 +58,8 @@ const clampCoins = (n: number): number => (Number.isFinite(n) ? Math.max(0, Math
 export const useProgressionStore = create<ProgressionState>((set) => ({
   ...initialProgression(),
   patch: (p) => set(p),
-  addCoins: (delta) => set((s) => ({ coins: clampCoins(s.coins + (Number.isFinite(delta) ? delta : 0)) })),
+  addCoins: (delta) =>
+    set((s) => ({ coins: clampCoins(s.coins + (Number.isFinite(delta) ? delta : 0)) })),
   setCoins: (coins) => set({ coins: clampCoins(coins) }),
   setContractList: (contracts) => set({ contracts }),
   reset: () => set(initialProgression()),
@@ -65,6 +68,7 @@ export const useProgressionStore = create<ProgressionState>((set) => ({
 // menuState cannot import this store (it would be circular), so the store registers itself.
 setDawnPickProbe(() => useProgressionStore.getState().pendingPick !== null)
 
+setStoryProbe(() => MODES[useProgressionStore.getState().mode].story)
 registerStatsPort({
   get: () => useProgressionStore.getState().stats,
   set: (stats) => useProgressionStore.getState().patch({ stats }),

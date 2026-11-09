@@ -1,0 +1,19 @@
+/* Centred, just below the middle: under the crosshair and the interact prompt
+   (50% + 36px, about 36px tall) and above the boss name card (70%) and the subtitles. */
+.item-name-label {
+  position: fixed;
+  left: 50%;
+  top: calc(50% + 5rem);
+  transform: translateX(-50%);
+  z-index: 500;
+  max-width: 80vw;
+  padding: 0.25rem 1rem;
+  font-family: var(--font-body);
+  font-size: 1.25rem;
+  text-align: center;
+  color: var(--parchment);
+  background: rgb(20 17 15 / 0.7);
+  border-bottom: 1px solid var(--parchment-dark);
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+}

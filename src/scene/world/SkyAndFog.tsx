@@ -7,7 +7,12 @@ import type { AmbientLight, DirectionalLight, Scene } from 'three'
 import { MOON_COLOR, MOON_POSITION, SKY_LOOKS } from '../../data/skyPalette'
 import { useWorldStore } from '../../game/state'
 import { stormRuntime } from '../../game/state/stormRuntime'
-import { ambientFlashFactor, flashTint, moonFlashFactor, stormFogDensity } from '../../game/systems/stormLight'
+import {
+  ambientFlashFactor,
+  flashTint,
+  moonFlashFactor,
+  stormFogDensity,
+} from '../../game/systems/stormLight'
 import {
   lerpBlend,
   targetBlend,

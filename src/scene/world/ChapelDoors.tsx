@@ -206,7 +206,11 @@ export function ChapelDoors() {
   const total = DOORS.ids.length * DOORS.slots
   return (
     <group name="chapel-doors">
-      <instancedMesh ref={frames} args={[undefined, undefined, DOORS.ids.length * 4]} raycast={() => null}>
+      <instancedMesh
+        ref={frames}
+        args={[undefined, undefined, DOORS.ids.length * 4]}
+        raycast={() => null}
+      >
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial color={FRAME_COLOR} roughness={0.8} metalness={0.4} />
       </instancedMesh>

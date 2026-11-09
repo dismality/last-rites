@@ -1194,6 +1194,354 @@
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794196577534
       }
+    ],
+    "10.1 Nights after a cleared night are skipped": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197553895
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197580357
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197940359
+      }
+    ],
+    "10.2 Melee kills pay nothing": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197553979
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197587340
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197941093
+      }
+    ],
+    "10.3 Zombies stuck flipping between two points": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554038
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197587418
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197941640
+      }
+    ],
+    "10.4 New Game keeps the last run's combat state": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554123
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197942452
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198167764
+      }
+    ],
+    "10.5 Retry Night leaves the player where they died": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554186
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197942952
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198168289
+      }
+    ],
+    "10.6 Materials never respawn": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554240
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197943500
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198169065
+      }
+    ],
+    "10.7 Zombies look like bright orange cartoons up close": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554298
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197944290
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198169608
+      }
+    ],
+    "10.8 Objective tracker during the final rite": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554352
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197944693
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198170416
+      }
+    ],
+    "10.9 Boss name card covers the boss health bar": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554416
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198170960
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198469804
+      }
+    ],
+    "10.10 Interactable rune glows in the ending shot": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554470
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198171766
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198470589
+      }
+    ],
+    "10.11 Ending sequence runs too long": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554534
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198172287
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198471145
+      }
+    ],
+    "10.12 Endless Survival shows story content": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554609
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198173064
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198471961
+      }
+    ],
+    "10.13 Check barricade strength against the design bible": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554656
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198173604
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198472494
+      }
+    ],
+    "10.14 Per-item pixel-art icons and the shared item name label": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554711
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198473032
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198894089
+      }
+    ],
+    "10.15 First workbench open freezes about 0.7 s": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554766
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198473791
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198894178
+      }
+    ],
+    "10.16 Log the playtest fixes": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794197554826
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198898403
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198987008
+      }
+    ],
+    "10. Playtest fixes (from the real-browser run of spec 08; task 9 stays open until all of these are played in a real browser)": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794198987074
+      }
+    ],
+    "11.1 Browser harness": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794199036478
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794199040701
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794199458078
+      }
+    ],
+    "11.2 Verify playtest items 1 to 15 in Chrome": [
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794199458621
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794199465928
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794200866389
+      },
+      {
+        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794200870580
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212363791
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212364216
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212390809
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212395724
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212414617
+      },
+      {
+        "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794212423862
+      }
     ]
   }
 }

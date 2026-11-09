@@ -103,7 +103,10 @@ export function OssuaryDoor() {
       {!open && (
         <>
           <RigidBody type="fixed" colliders={false}>
-            <CuboidCollider args={[width / 2, height / 2, thickness / 2]} position={[0, height / 2, z]} />
+            <CuboidCollider
+              args={[width / 2, height / 2, thickness / 2]}
+              position={[0, height / 2, z]}
+            />
           </RigidBody>
           <group position={[0, 0, z]}>
             <Interactable
@@ -122,12 +125,21 @@ export function OssuaryDoor() {
       )}
       {barsMounted && (
         <group ref={liftRef}>
-          <mesh position={[0, height / 2, z]} material={PART_MATERIALS.slate} castShadow receiveShadow>
+          <mesh
+            position={[0, height / 2, z]}
+            material={PART_MATERIALS.slate}
+            castShadow
+            receiveShadow
+          >
             <boxGeometry args={[width, height, thickness]} />
           </mesh>
           {/* Cross-bars so the door reads as ironwork rather than a wall. */}
           {[0.35, 0.95, 1.55].map((y) => (
-            <mesh key={y} position={[0, y, z - thickness / 2 - 0.03]} material={PART_MATERIALS.trim}>
+            <mesh
+              key={y}
+              position={[0, y, z - thickness / 2 - 0.03]}
+              material={PART_MATERIALS.trim}
+            >
               <boxGeometry args={[width, 0.08, 0.06]} />
             </mesh>
           ))}

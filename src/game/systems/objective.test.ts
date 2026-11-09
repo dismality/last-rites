@@ -3,6 +3,7 @@ import fc from 'fast-check'
 import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
 import { OBJECTIVE_MAX_LINE } from '../../data/objectiveRules'
 import { FIXED_SPAWNS } from '../../data/zones'
+import { buildCompassMarkers } from './compass'
 import {
   composeSecondLine,
   formatClock,
@@ -49,10 +50,14 @@ const referenceRule = (i: ObjectiveInput): number => {
   const night = i.phase === 'night'
   const day = i.phase === 'day'
   const p = i.progress
+  const rite = night && i.nightNumber === 5
+  // Rite rules (3, then 2) outrank the wave line (1); the rule ids stay as in the design bible.
+  if (rite && i.rite.running && i.rite.craneAlive) return 3
+  if (rite && (i.rite.available || i.rite.running)) return 2
   const conds: boolean[] = [
     night && i.waves.running,
-    night && i.nightNumber === 5 && i.rite.available,
-    night && i.nightNumber === 5 && i.rite.running && i.rite.craneAlive,
+    false,
+    false,
     i.phase === 'dusk',
     day && !p.page1Read,
     day && !p.cryptKey,
@@ -198,7 +203,9 @@ describe('objective', () => {
         ossuaryKey: true,
         relics: 5,
       }
-      expect(selectObjective({ ...base, progress: done }).main).toBe('Hold out until the fifth night')
+      expect(selectObjective({ ...base, progress: done }).main).toBe(
+        'Hold out until the fifth night',
+      )
     })
 
     it('rite rules point at the altar and carry a second line', () => {
@@ -219,11 +226,114 @@ describe('objective', () => {
       expect(r3.second.length).toBeGreaterThan(0)
     })
 
+    describe('final rite (playtest fix 10.8)', () => {
+      const night5 = {
+        ...base,
+        phase: 'night' as const,
+        nightNumber: 5,
+        waves: { running: true, index: 1, total: 5, zombiesLeft: 4 },
+        progress: { ...base.progress, relics: 4 },
+      }
+
+      it('rite started and Crane alive: Put Father Crane to rest, never the wave line', () => {
+        const o = selectObjective({
+          ...night5,
+          rite: { available: false, running: true, craneAlive: true },
+        })
+        expect(o.main).toBe('Put Father Crane to rest')
+        expect(o.position).toEqual(CHAPEL_ALTAR)
+      })
+
+      it('rite started and Crane not risen or already dead: Finish the rite with relic count', () => {
+        const o = selectObjective({
+          ...night5,
+          rite: { available: false, running: true, craneAlive: false },
+        })
+        expect(o.main).toBe('Finish the rite at the altar (4/5)')
+        expect(o.position).toEqual(CHAPEL_ALTAR)
+      })
+
+      it('normal night 5 before the rite still shows the wave line', () => {
+        const o = selectObjective({
+          ...night5,
+          rite: { available: false, running: false, craneAlive: false },
+        })
+        expect(o.main).toBe('Survive: Wave 1 of 5')
+        expect(o.position).toBeUndefined()
+      })
+
+      it('the compass shows the objective marker at night during the rite', () => {
+        const o = selectObjective({
+          ...night5,
+          rite: { available: false, running: true, craneAlive: true },
+        })
+        const markers = buildCompassMarkers({
+          player: { x: 0, z: 0 },
+          heading: 0,
+          objective: o.position,
+          phase: 'night',
+          bellBuilt: false,
+        })
+        expect(markers.some((m) => m.id === 'objective')).toBe(true)
+      })
+    })
+
     it('formats clocks and never goes negative', () => {
       expect(formatClock(30)).toBe('0:30')
       expect(formatClock(192)).toBe('3:12')
       expect(formatClock(-5)).toBe('0:00')
       expect(formatClock(Number.NaN)).toBe('0:00')
+    })
+  })
+})
+
+describe('selectObjective in Endless', () => {
+  it('never picks story rules (2, 3, 5-10) and shows the night number', () => {
+    fc.assert(
+      fc.property(inputArb, (i) => {
+        const o = selectObjective({ ...i, story: false })
+        expect([1, 4, 11]).toContain(o.rule)
+        expect(o.main).not.toMatch(/Elias|rite|Crane|Crypt|relic/i)
+        if (o.rule === 1 || o.rule === 11) {
+          expect(o.second.startsWith('Night ')).toBe(true)
+        }
+      }),
+      RUNS,
+    )
+  })
+
+  it('reads as plain survival across the phases', () => {
+    const base = {
+      phase: 'day',
+      nightNumber: 7,
+      secondsLeft: 72,
+      waves: { running: false, index: 1, total: 4, zombiesLeft: 0 },
+      rite: { available: false, running: false, craneAlive: false },
+      progress: {
+        page1Read: false,
+        cryptKey: false,
+        whistle: false,
+        stairRevealed: false,
+        ossuaryKey: false,
+        relics: 0,
+      },
+      relicSites: [],
+      playerPos: [0, 0, 0],
+      story: false,
+    } as const satisfies ObjectiveInput
+    expect(selectObjective(base)).toMatchObject({
+      main: 'Prepare for the night',
+      second: 'Night 7 \u00b7 Dusk in 1:12',
+    })
+    expect(selectObjective({ ...base, phase: 'dusk' }).main).toBe('Prepare for the night')
+    const night = selectObjective({
+      ...base,
+      phase: 'night',
+      waves: { running: true, index: 2, total: 4, zombiesLeft: 5 },
+    })
+    expect(night).toMatchObject({
+      main: 'Survive: Wave 2 of 4',
+      second: 'Night 7 \u00b7 Zombies left: 5',
     })
   })
 })

@@ -30,10 +30,7 @@ export function Slab({
         </mesh>
       )}
       {solid && (
-        <CuboidCollider
-          args={[size[0] / 2, size[1] / 2, size[2] / 2]}
-          position={[...position]}
-        />
+        <CuboidCollider args={[size[0] / 2, size[1] / 2, size[2] / 2]} position={[...position]} />
       )}
     </>
   )

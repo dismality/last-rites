@@ -16,7 +16,8 @@ export function statsPanelModel(
   mode: ModeId,
   endlessBest: number,
 ): StatsPanelModel {
-  const extra = { score, relics, ...(MODES[mode].story ? {} : { endlessBest }) }
+  const story = MODES[mode].story
+  const extra = { score, relics, story, ...(story ? {} : { endlessBest }) }
   return { rows: statRows(stats, extra), closeAutofocus: true }
 }
 

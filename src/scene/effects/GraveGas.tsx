@@ -22,7 +22,11 @@ export function GraveGas() {
     live.current = tickGas(live.current, dt)
     live.current.forEach((p, i) => {
       // Swell as it drifts, so the cloud reads as dust rather than a solid.
-      _m.compose(_p.set(p.x, p.y, p.z), camera.quaternion, _s.setScalar(0.5 + (0.9 * p.age) / GAS_LIFE_S))
+      _m.compose(
+        _p.set(p.x, p.y, p.z),
+        camera.quaternion,
+        _s.setScalar(0.5 + (0.9 * p.age) / GAS_LIFE_S),
+      )
       im.setMatrixAt(i, _m)
     })
     im.count = live.current.length
@@ -32,7 +36,13 @@ export function GraveGas() {
   return (
     <instancedMesh ref={mesh} args={[undefined, undefined, GAS_POOL]} frustumCulled={false}>
       <planeGeometry args={[1, 1]} />
-      <meshBasicMaterial color="#7d8a6c" transparent opacity={0.4} depthWrite={false} side={THREE.DoubleSide} />
+      <meshBasicMaterial
+        color="#7d8a6c"
+        transparent
+        opacity={0.4}
+        depthWrite={false}
+        side={THREE.DoubleSide}
+      />
     </instancedMesh>
   )
 }

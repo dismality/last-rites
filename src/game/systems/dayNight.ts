@@ -52,9 +52,14 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
   const dayLengthS = input.dayLengthS ?? DAY_DURATION_S
   const lastNight = input.lastNight ?? LAST_NIGHT
 
+  // wavesCleared is left over from the previous night until nightStarted resets it. It must
+  // never end a night on the tick that night begins, nor survive into the next day.
+  let enteredNight = false
+
   const enter = (next: Phase) => {
     phase = next
     phaseTime = 0
+    if (next === 'night') enteredNight = true
     events.push({ type: 'phaseChanged', phase })
     if (next === 'night') events.push({ type: 'nightStarted', nightNumber })
     if (next === 'dawn') events.push({ type: 'dawnStarted', nightNumber })
@@ -64,7 +69,7 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
   for (;;) {
     if (phase === 'night') {
       phaseTime += remaining
-      if (input.wavesCleared) enter('dawn')
+      if (input.wavesCleared && !enteredNight) enter('dawn')
       break
     }
     // A pending pick freezes dawn: no time passes and no event fires.
@@ -90,7 +95,8 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
       phaseTime,
       nightNumber,
       fogDensity: fogForNight(nightNumber),
-      wavesCleared: input.wavesCleared,
+      // Only a night in progress (or its dawn) can be "cleared"; day and dusk start fresh.
+      wavesCleared: (phase === 'night' && !enteredNight) || phase === 'dawn' ? input.wavesCleared : false,
     },
     events,
   }

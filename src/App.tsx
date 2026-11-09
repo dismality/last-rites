@@ -26,6 +26,8 @@ import { ExamineOverlay } from './ui/examine/ExamineOverlay'
 import { Journal } from './ui/journal/Journal'
 import { TombstoneOverlay } from './ui/tombstone/TombstoneOverlay'
 import { Satchel } from './ui/satchel/Satchel'
+import { HotbarWheel } from './ui/satchel/HotbarWheel'
+import { ItemNameLabel } from './ui/hud/ItemNameLabel'
 import { GameLoop } from './scene/GameLoop'
 import { PostEffects } from './scene/effects/PostEffects'
 import { DustBurst } from './scene/effects/DustBurst'
@@ -62,6 +64,7 @@ import { Workbench } from './scene/world/Workbench'
 import { Merchant } from './scene/world/Merchant'
 import { CoinPiles } from './scene/world/CoinPiles'
 import { Weather } from './scene/world/Weather'
+import { ShaderPrecompile } from './scene/perf/ShaderPrecompile'
 import { MusicDriver } from './scene/audio/MusicDriver'
 
 /** The 3D game: one Canvas, physics, fixed-step loop, then every system that reads the stores. */
@@ -118,6 +121,7 @@ function GameScreen() {
         {/* After the controller so the ending path wins the camera. */}
         <EndingCamera />
         <PostEffects />
+        <ShaderPrecompile />
       </Canvas>
     </div>
   )
@@ -153,6 +157,9 @@ export default function App() {
       <TombstoneOverlay />
       <Journal />
       <Satchel />
+      <HotbarWheel />
+      {/* Last, so the item name shows above every overlay that lists items. */}
+      <ItemNameLabel />
     </>
   )
 }

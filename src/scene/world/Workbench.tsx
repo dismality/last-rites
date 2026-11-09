@@ -19,6 +19,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { Instances, Instance, Html } from '@react-three/drei'
 import * as THREE from 'three'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
+import { useCinematic } from '../../game/state/menuState'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { emit } from '../../game/events'
@@ -31,6 +32,8 @@ import { Interactable } from './Interactable'
 import { requestLock } from '../player/input'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { BENCH_Z } from '../../data/cemeteryLayout'
+import { rampIntensity } from '../../game/systems/lightRamp'
+import { BenchOpenProbe } from '../perf/BenchOpenProbe'
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -42,7 +45,6 @@ import { BENCH_Z } from '../../data/cemeteryLayout'
  */
 const BENCH_CAM_POSITION = new THREE.Vector3(0, 1.8, BENCH_Z + 1.1)
 const BENCH_CAM_TARGET = new THREE.Vector3(0, 0.85, BENCH_Z)
-
 
 /**
  * Bench surface grid origin. Materials are laid out in a 4-column grid from
@@ -63,11 +65,11 @@ const MATERIAL_ORDER: MaterialId[] = [
 
 /** Colours that represent each material visually. */
 const MATERIAL_COLOR: Record<MaterialId, string> = {
-  'bone': '#e8dcc8',
+  bone: '#e8dcc8',
   'iron-nail': '#8a8a8a',
   'candle-wax': '#f5e6a0',
   'holy-water': '#a0d4f0',
-  'cloth': '#c4b090',
+  cloth: '#c4b090',
   'lamp-oil': '#b8860b',
   'grave-salt': '#ddd8cc',
   'wood-plank': '#8a6a45',
@@ -78,11 +80,11 @@ const MATERIAL_COLOR: Record<MaterialId, string> = {
 
 /** Geometry scale per material type — gives each pile a distinct silhouette. */
 const MATERIAL_SCALE: Record<MaterialId, [number, number, number]> = {
-  'bone': [0.04, 0.12, 0.04],
+  bone: [0.04, 0.12, 0.04],
   'iron-nail': [0.02, 0.06, 0.02],
   'candle-wax': [0.06, 0.08, 0.06],
-  'holy-water': [0.07, 0.10, 0.07],
-  'cloth': [0.10, 0.03, 0.10],
+  'holy-water': [0.07, 0.1, 0.07],
+  cloth: [0.1, 0.03, 0.1],
   'lamp-oil': [0.07, 0.09, 0.07],
   'grave-salt': [0.08, 0.04, 0.08],
   'wood-plank': [0.12, 0.02, 0.04],
@@ -116,20 +118,16 @@ function pilePositions(centre: THREE.Vector3, count: number): THREE.Vector3[] {
     [0.04, -0.05],
     [-0.04, -0.05],
   ]
-  return offsets.slice(0, count).map(([dx, dz]) =>
-    new THREE.Vector3(centre.x + dx, centre.y, centre.z + dz),
-  )
+  return offsets
+    .slice(0, count)
+    .map(([dx, dz]) => new THREE.Vector3(centre.x + dx, centre.y, centre.z + dz))
 }
 
 /** Column/row grid layout for up to 7 materials (4 columns). */
 function benchPosition(index: number): THREE.Vector3 {
   const col = index % 4
   const row = Math.floor(index / 4)
-  return new THREE.Vector3(
-    BENCH_ORIGIN.x + col * 0.30,
-    BENCH_ORIGIN.y,
-    BENCH_ORIGIN.z + row * 0.30,
-  )
+  return new THREE.Vector3(BENCH_ORIGIN.x + col * 0.3, BENCH_ORIGIN.y, BENCH_ORIGIN.z + row * 0.3)
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +207,34 @@ function CameraRig({ open }: { open: boolean }) {
   return null
 }
 
+const BENCH_LIGHT_INTENSITY = 8
+const BENCH_LIGHT_RATE = 12
+
+/** Bench point light, permanently mounted; the open/close animation ramps its intensity. */
+function BenchLight({ open }: { open: boolean }) {
+  const ref = useRef<THREE.PointLight>(null)
+  useFrame((_, delta) => {
+    const light = ref.current
+    if (!light) return
+    light.intensity = rampIntensity(
+      light.intensity,
+      open ? BENCH_LIGHT_INTENSITY : 0,
+      Math.min(delta, 0.1),
+      BENCH_LIGHT_RATE,
+    )
+  })
+  return (
+    <pointLight
+      ref={ref}
+      position={[0, 1.5, BENCH_Z]}
+      intensity={0}
+      distance={3}
+      color="#e8913a"
+      castShadow={false}
+    />
+  )
+}
+
 // Phase counter: incremented once per MaterialPile mount so each pile starts
 // at a different point in its animation sine wave. Module-level so it is never
 // called during component render (satisfies react-hooks/purity rule).
@@ -234,7 +260,13 @@ interface MaterialPileProps {
  * - Craftable piles pulse with ember emissive intensity so bloom catches it.
  * - Highlighted piles (recipe hover) pulse more strongly and add a rune label.
  */
-function MaterialPile({ materialId, qty, position, craftable = false, highlighted = false }: MaterialPileProps) {
+function MaterialPile({
+  materialId,
+  qty,
+  position,
+  craftable = false,
+  highlighted = false,
+}: MaterialPileProps) {
   const count = pileCount(qty)
   const positions = useMemo(() => pilePositions(position, count), [position, count])
   const scale = MATERIAL_SCALE[materialId]
@@ -245,17 +277,21 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
   // Phase offset: use a module-level counter so each pile starts at a
   // different point in the sine wave without calling Math.random() during render.
   const timeRef = useRef(pilePhaseCounter++ * PILE_PHASE_STEP)
+  // Craftable glow and rune are interactable cues: off during the intro and endings.
+  const cinematic = useCinematic()
+  const glowCraftable = craftable && !cinematic
+  const glowHighlighted = highlighted && !cinematic
 
   useFrame((_, delta) => {
     if (!matRef.current) return
     timeRef.current += delta
 
     let intensity = 0.15 // base
-    if (craftable) {
+    if (glowCraftable) {
       // Slow ember pulse: 0.35 → 0.65 at ~0.6 Hz
       intensity = 0.35 + Math.sin(timeRef.current * 3.8) * 0.15
     }
-    if (highlighted) {
+    if (glowHighlighted) {
       // Faster, stronger pulse when the recipe-book hovers over this item.
       intensity = 0.6 + Math.sin(timeRef.current * 6.0) * 0.25
     }
@@ -264,7 +300,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
   })
 
   // Ember colour when glowing; otherwise the pile's own natural colour.
-  const emissiveColor = (craftable || highlighted) ? '#e8913a' : color
+  const emissiveColor = glowCraftable || glowHighlighted ? '#e8913a' : color
 
   return (
     <group>
@@ -281,7 +317,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
         {positions.map((pos, i) => (
           <Instance
             key={i}
-            position={[pos.x, pos.y + (scale[1] * 0.5), pos.z]}
+            position={[pos.x, pos.y + scale[1] * 0.5, pos.z]}
             scale={scale}
             // Slight rotation variation for organic look
             rotation={[0, (i * Math.PI) / 3, 0]}
@@ -301,7 +337,7 @@ function MaterialPile({ materialId, qty, position, craftable = false, highlighte
             fontFamily: 'serif',
             fontSize: '10px',
             textShadow: '0 0 6px #e8913a',
-            opacity: highlighted ? 1 : 0.75,
+            opacity: glowHighlighted ? 1 : 0.75,
             transition: 'opacity 150ms ease-out',
           }}
         >
@@ -479,13 +515,11 @@ export function Workbench() {
         totals.set(id, (totals.get(id) ?? 0) + stack.qty)
       }
     }
-    return MATERIAL_ORDER
-      .filter((id) => (totals.get(id) ?? 0) > 0)
-      .map((id, index) => ({
-        id,
-        qty: totals.get(id)!,
-        position: benchPosition(index),
-      }))
+    return MATERIAL_ORDER.filter((id) => (totals.get(id) ?? 0) > 0).map((id, index) => ({
+      id,
+      qty: totals.get(id)!,
+      position: benchPosition(index),
+    }))
   }, [inventory.slots])
 
   // ----- Derive which materials are in ANY craftable unlocked recipe -----
@@ -511,6 +545,7 @@ export function Workbench() {
       {/* Camera rig runs every frame regardless of open state so the return
           lerp is smooth. */}
       <CameraRig open={workbenchOpen} />
+      {import.meta.env.DEV && <BenchOpenProbe open={workbenchOpen} />}
 
       {/* Bench geometry — always visible in the scene. */}
       <group name="workbench" position={[0, 0, 0]}>
@@ -541,15 +576,8 @@ export function Workbench() {
           ))}
 
         {/* Point light on the bench surface to warm up the material colours. */}
-        {workbenchOpen && (
-          <pointLight
-            position={[0, 1.5, BENCH_Z]}
-            intensity={8}
-            distance={3}
-            color="#e8913a"
-            castShadow={false}
-          />
-        )}
+        {/* Always mounted: adding/removing a light recompiles every shader (0.7 s freeze). */}
+        <BenchLight open={workbenchOpen} />
       </group>
     </>
   )

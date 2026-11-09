@@ -35,7 +35,7 @@ import { ELITE } from '../../data/elites'
 import type { DoorId } from '../types'
 import type { Vec2 } from './combat'
 import type { StaggerEnemy } from './melee'
-import { DEFAULT_GRAPH, nextTarget, type NavGraph, type SegmentBlocked } from './navigation'
+import { DEFAULT_GRAPH, steer, type NavGraph, type RouteState, type SegmentBlocked } from './navigation'
 
 export type AIState =
   | 'rise'
@@ -80,6 +80,8 @@ export interface AIEnemy extends StaggerEnemy {
   hitDealt: boolean
   /** Heading in radians, atan2(dx, dz); the scene turns the model with it. */
   yaw: number
+  /** Waypoint route being followed round walls; absent or null when the way is clear. */
+  route?: RouteState | null
 }
 
 export interface AIContext {
@@ -202,7 +204,9 @@ export function uidAngle(uid: string): number {
 
 /** Seek + separation + wall avoidance; returns the moved enemy. */
 function moveToward(e: AIEnemy, goal: Vec2, speed: number, dt: number, ctx: AIContext): AIEnemy {
-  const target = nextTarget(ctx.graph ?? DEFAULT_GRAPH, e.pos, goal, ctx.blocked)
+  const nav = steer(ctx.graph ?? DEFAULT_GRAPH, e.pos, goal, ctx.blocked, e.route, dt)
+  const target = nav.target
+  e = e.route === nav.route || (e.route == null && nav.route === null) ? e : { ...e, route: nav.route }
   const seek = norm({ x: target.x - e.pos.x, z: target.z - e.pos.z })
   if (seek.x === 0 && seek.z === 0) return e
 

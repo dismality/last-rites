@@ -7,10 +7,13 @@ import { usePlayerStore } from '../../game/state/playerStore'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { withinTradeRange, type Stock } from '../../game/systems/merchant'
-import type { MerchantRowId } from '../../game/types'
+import type { ItemId, MerchantRowId } from '../../game/types'
 
 export interface MerchantRowView {
   id: MerchantRowId
+  item: ItemId
+  /** Items per purchase (6 for a box of cartridges). */
+  count: number
   /** "Bandage" or "Revolver Cartridges ×6". */
   name: string
   price: number
@@ -34,6 +37,8 @@ export function merchantMenuView(stock: Stock | null, coins: number): MerchantMe
     const name = def.count > 1 ? `${base} ×${def.count}` : base
     return {
       id: s.id,
+      item: def.item,
+      count: def.count,
       name,
       price: def.price,
       left: s.qty,

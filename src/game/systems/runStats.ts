@@ -137,20 +137,24 @@ const KILL_LABELS: Readonly<Record<EnemyId, string>> = {
 /** Every row of Req 3.5; an empty run shows 0 (and 0:00, 0%). */
 export function statRows(
   s: RunStats,
-  extra: { score: number; relics: number; endlessBest?: number },
+  extra: { score: number; relics: number; endlessBest?: number; story?: boolean },
 ): SummaryRow[] {
+  // Endless has no Father Crane and no relics, so those rows would only mislead.
+  const story = extra.story !== false
+  const combo = Number.isFinite(s.bestCombo) ? Math.max(1, s.bestCombo) : 1
   const rows: SummaryRow[] = [
     { label: 'Score', value: String(extra.score) },
-    ...ENEMY_IDS.map((id) => ({
+    ...ENEMY_IDS.filter((id) => story || id !== 'father-crane').map((id) => ({
       label: `${KILL_LABELS[id]} banished`,
       value: String(s.kills[id]),
     })),
     { label: 'Accuracy', value: formatAccuracy(accuracyPercent(s)) },
     { label: 'Melee hits', value: String(s.meleeHits) },
-    { label: 'Best combo', value: `×${s.bestCombo.toFixed(2)}` },
+    // The multiplier floors at x1.00; an empty run has no combo, not a x0 one.
+    { label: 'Best combo', value: `×${combo.toFixed(2)}` },
     { label: 'Nights survived', value: String(s.nightsSurvived) },
     { label: 'Time survived', value: formatTime(s.timeS) },
-    { label: 'Relics', value: String(extra.relics) },
+    ...(story ? [{ label: 'Relics', value: String(extra.relics) }] : []),
     { label: 'Grave Coins earned', value: String(s.coinsEarned) },
   ]
   if (extra.endlessBest !== undefined) {

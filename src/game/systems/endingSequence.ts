@@ -28,6 +28,28 @@ export function fadeAlpha(def: EndingDef, t: number): number {
   return Math.max(fadeIn, fadeOut)
 }
 
+/**
+ * Longest single step the clock accepts. This was 0.1 s, which made a slow frame rate stretch the
+ * sequence (a 36 s ending took over 70 s at ~5 fps). It now only guards against a huge jump after
+ * the tab was hidden, so the sequence follows real time.
+ */
+export const MAX_SEQUENCE_STEP_S = 1
+
+/**
+ * One tick of the sequence clock. A pause holds the time (so the end is delayed, never lost) and
+ * the sequence is done when the time reaches the duration, with no dependency on Skip.
+ */
+export function advanceSequence(
+  def: EndingDef,
+  time: number,
+  dt: number,
+  paused = false,
+): { time: number; done: boolean } {
+  const step = paused || !Number.isFinite(dt) ? 0 : Math.min(Math.max(dt, 0), MAX_SEQUENCE_STEP_S)
+  const next = Math.min(time + step, def.duration)
+  return { time: next, done: next >= def.duration }
+}
+
 export function isSequenceDone(def: EndingDef, t: number): boolean {
   return t >= def.duration
 }

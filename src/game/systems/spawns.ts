@@ -28,7 +28,11 @@ export function respawnForDay(
 ): SpawnWorld {
   const materials: Record<string, ItemStack[]> = {}
   // Graves hold nothing on the surface: their loot is rolled when the player digs (dig.ts).
-  for (const p of points) materials[p.id] = p.lootTable === 'grave-dig' ? [] : rollLoot(LOOT_TABLE_MAP[p.lootTable], rng)
+  // Loot already on a dug grave is kept, so a new day never wipes what the player left behind.
+  for (const p of points) {
+    materials[p.id] =
+      p.lootTable === 'grave-dig' ? (world.materials[p.id] ?? []) : rollLoot(LOOT_TABLE_MAP[p.lootTable], rng)
+  }
   return { ...world, materials }
 }
 

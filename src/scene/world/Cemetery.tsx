@@ -81,7 +81,9 @@ const SPAWN_AVOID: Vec3[] = [
 ]
 const TREES = generateTrees(SPAWN_AVOID)
 const treesOf = (kind: TreeKind) =>
-  TREES.flatMap((t, i) => (t.kind === kind ? [unit(t.position, t.rotationY, 0.9 + (i % 4) * 0.1)] : []))
+  TREES.flatMap((t, i) =>
+    t.kind === kind ? [unit(t.position, t.rotationY, 0.9 + (i % 4) * 0.1)] : [],
+  )
 const PINE_PLACEMENTS = treesOf('pine-crooked')
 const PLAIN_PINE_PLACEMENTS = treesOf('pine')
 const TRUNK_PLACEMENTS = treesOf('trunk')
@@ -122,10 +124,7 @@ function Block({
           <boxGeometry args={[...size]} />
         </mesh>
       )}
-      <CuboidCollider
-        args={[size[0] / 2, size[1] / 2, size[2] / 2]}
-        position={[...position]}
-      />
+      <CuboidCollider args={[size[0] / 2, size[1] / 2, size[2] / 2]} position={[...position]} />
     </>
   )
 }
@@ -185,7 +184,9 @@ function Fences() {
             <CuboidCollider
               key={i}
               args={s.axis === 'x' ? [half, FENCE.height / 2, t] : [t, FENCE.height / 2, half]}
-              position={s.axis === 'x' ? [mid, FENCE.height / 2, s.fixed] : [s.fixed, FENCE.height / 2, mid]}
+              position={
+                s.axis === 'x' ? [mid, FENCE.height / 2, s.fixed] : [s.fixed, FENCE.height / 2, mid]
+              }
             />
           )
         })}
@@ -304,10 +305,29 @@ function Corridor({ spec }: { spec: CorridorSpec }) {
       <InstancedModel model="brick-wall" placements={walls} centerXZ />
       <RigidBody type="fixed" colliders={false}>
         <Block position={[0, -0.2, midZ]} size={[outerW, 0.4, length]} material="darkStone" />
-        <Block position={[-wallX, height / 2, midZ]} size={[t, height, length]} material="stone" visible={false} />
-        <Block position={[wallX, height / 2, midZ]} size={[t, height, length]} material="stone" visible={false} />
-        <Block position={[0, height / 2, endZ]} size={[outerW, height, t]} material="stone" visible={false} />
-        <Block position={[0, height + t / 2, midZ]} size={[outerW, t, length]} material="darkStone" />
+        <Block
+          position={[-wallX, height / 2, midZ]}
+          size={[t, height, length]}
+          material="stone"
+          visible={false}
+        />
+        <Block
+          position={[wallX, height / 2, midZ]}
+          size={[t, height, length]}
+          material="stone"
+          visible={false}
+        />
+        <Block
+          position={[0, height / 2, endZ]}
+          size={[outerW, height, t]}
+          material="stone"
+          visible={false}
+        />
+        <Block
+          position={[0, height + t / 2, midZ]}
+          size={[outerW, t, length]}
+          material="darkStone"
+        />
       </RigidBody>
       <Gate spec={spec} />
       {spec.id === 'catacombs' && <OssuaryDoor />}

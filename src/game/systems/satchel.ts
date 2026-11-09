@@ -67,3 +67,13 @@ export function hotbarSlotOf(inv: Inventory, item: ItemId): number | null {
   const i = inv.hotbar.indexOf(item)
   return i === -1 ? null : i
 }
+
+/** Next filled hotbar slot from `from` in direction `dir` (+1 or -1), wrapping. Null when none other is filled. */
+export function cycleHotbarSlot(inv: Inventory, from: number | null, dir: 1 | -1): 0 | 1 | 2 | 3 | null {
+  const start = from ?? (dir === 1 ? -1 : 4)
+  for (let step = 1; step <= 4; step++) {
+    const slot = (((start + dir * step) % 4) + 4) % 4
+    if (slot !== from && hotbarItem(inv, slot)) return slot as 0 | 1 | 2 | 3
+  }
+  return null
+}

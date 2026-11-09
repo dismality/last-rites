@@ -59,3 +59,11 @@ export const useGuidanceStore = create<GuidanceStoreState>((set) => ({
   restore: (steps) => set({ ...fresh(), tutorialDone: parseTutorial(steps) }),
   reset: () => set(fresh()),
 }))
+
+// guidanceTick cannot import progressionStore (import cycle via introStore), so the store registers
+// a probe here, like menuState's dawn-pick probe. Defaults to story until it registers.
+let storyProbe: () => boolean = () => true
+export const setStoryProbe = (probe: () => boolean): void => {
+  storyProbe = probe
+}
+export const isStoryRun = (): boolean => storyProbe()

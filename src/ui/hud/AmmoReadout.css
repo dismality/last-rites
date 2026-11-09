@@ -1,8 +1,8 @@
-/* Bottom right, sitting above the hotbar (which is at bottom: 24px). */
+/* Bottom right, sitting above the hotbar (bottom: 24px, 96px tall, so 128px leaves an 8px gap). */
 .ammo-readout {
   position: absolute;
   right: 24px;
-  bottom: 104px;
+  bottom: 128px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;

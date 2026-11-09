@@ -74,7 +74,9 @@ export function ChapelBuilding() {
     rotationY: 0,
     scale: [1, 1, 1],
   }))
-  const cross: Placement[] = [{ position: [0, ridge + 2.55, belfryZ], rotationY: 0, scale: [0.6, 0.6, 0.6] }]
+  const cross: Placement[] = [
+    { position: [0, ridge + 2.55, belfryZ], rotationY: 0, scale: [0.6, 0.6, 0.6] },
+  ]
 
   return (
     <group position={[...CHAPEL_CENTER]} name="chapel-building">
@@ -89,8 +91,16 @@ export function ChapelBuilding() {
         />
         <Slab position={[0, h / 2, halfZ]} size={[halfX * 2, h, t]} material="stone" />
         {/* West wall split around the vestry opening, with a lintel over it. */}
-        <Slab position={[-halfX, h / 2, westALen / 2 - halfZ]} size={[t, h, westALen]} material="stone" />
-        <Slab position={[-halfX, h / 2, halfZ - westBLen / 2]} size={[t, h, westBLen]} material="stone" />
+        <Slab
+          position={[-halfX, h / 2, westALen / 2 - halfZ]}
+          size={[t, h, westALen]}
+          material="stone"
+        />
+        <Slab
+          position={[-halfX, h / 2, halfZ - westBLen / 2]}
+          size={[t, h, westBLen]}
+          material="stone"
+        />
         <Slab
           position={[-halfX, DOOR_HEIGHT + (h - DOOR_HEIGHT) / 2, vestryZ]}
           size={[t, h - DOOR_HEIGHT, vestryW]}
@@ -129,7 +139,11 @@ export function ChapelBuilding() {
       {([-1, 1] as const).map((side) => (
         <mesh
           key={side}
-          position={[-halfX - 0.05, DOOR_HEIGHT / 2, vestryZ + side * (vestryW / 2 + FRAME.post / 2)]}
+          position={[
+            -halfX - 0.05,
+            DOOR_HEIGHT / 2,
+            vestryZ + side * (vestryW / 2 + FRAME.post / 2),
+          ]}
           material={PART_MATERIALS.trim}
           castShadow
         >

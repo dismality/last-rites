@@ -15,7 +15,13 @@ export function DustBurst() {
   const mesh = useRef<THREE.InstancedMesh>(null)
   const live = useRef<DustParticle[]>([])
   const material = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: '#8f8574', transparent: true, opacity: 0.55, depthWrite: false }),
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#8f8574',
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+      }),
     [],
   )
 
