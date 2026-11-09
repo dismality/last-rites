@@ -2,9 +2,12 @@
 // Pure zustand, no React / three.js imports.
 
 import { create } from 'zustand'
+import { PLAYER_MAX_HEALTH } from '../../data/balance'
 import type { PlayerState, ItemId } from '../types'
 
 interface PlayerStoreState extends PlayerState {
+  /** Max HP; raised by dawn upgrades. Kept out of PlayerState so saves are unchanged. */
+  maxHealth: number
   setPosition: (pos: [number, number, number]) => void
   setYaw: (yaw: number) => void
   setPitch: (pitch: number) => void
@@ -18,7 +21,8 @@ export const usePlayerStore = create<PlayerStoreState>((set) => ({
   position: [0, 0, 0],
   yaw: 0,
   pitch: 0,
-  health: 100,
+  health: PLAYER_MAX_HEALTH,
+  maxHealth: PLAYER_MAX_HEALTH,
   stamina: 100,
   interactTarget: null,
   setPosition: (position) => set({ position }),

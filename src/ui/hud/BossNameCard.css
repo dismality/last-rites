@@ -1,0 +1,43 @@
+/* Never takes control: no pointer events, no focus, no pause. */
+.boss-name-card {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 0.75rem 2rem;
+  text-align: center;
+  color: var(--parchment);
+  background: rgb(20 17 15 / 0.75);
+  border-top: 1px solid var(--parchment-dark);
+  border-bottom: 1px solid var(--parchment-dark);
+  text-shadow: 0 1px 3px #000;
+  pointer-events: none;
+  animation: boss-name-card-fade 300ms ease-out;
+}
+
+.boss-name-card__name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: normal;
+  letter-spacing: 0.06em;
+}
+
+.boss-name-card__line {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+@keyframes boss-name-card-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boss-name-card {
+    animation: none;
+  }
+}

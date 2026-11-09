@@ -33,6 +33,8 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   sfxVolume: fc.double({ min: 0, max: 100, noNaN: true }),
   brightness: fc.double({ min: 0.8, max: 1.4, noNaN: true }),
   accessibleHUD: fc.boolean(),
+  tutorialPrompts: fc.boolean(),
+  damageNumbers: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -74,6 +76,66 @@ describe('settings persistence', () => {
     expect(s.sfxVolume).toBe(80)
     expect(s.scareIntensity).toBe('full')
     expect(s.headBob).toBe(true)
+  })
+
+  it('defaults tutorialPrompts to true and Skip to Space', () => {
+    expect(DEFAULT_SETTINGS.tutorialPrompts).toBe(true)
+    expect(DEFAULT_SETTINGS.bindings.Skip).toBe('Space')
+  })
+
+  it('round-trips tutorialPrompts false', () => {
+    const storage = memoryStorage()
+    saveSettings({ ...DEFAULT_SETTINGS, tutorialPrompts: false }, storage)
+    expect(loadSettings(storage).tutorialPrompts).toBe(false)
+  })
+
+  it('loads settings stored before this change with the new defaults', () => {
+    const { tutorialPrompts: _t, ...rest } = DEFAULT_SETTINGS
+    const { Skip: _s, ...oldBindings } = DEFAULT_SETTINGS.bindings
+    void _t
+    void _s
+    const storage = memoryStorage(JSON.stringify({ ...rest, fov: 90, bindings: oldBindings }))
+    const s = loadSettings(storage)
+    expect(s.tutorialPrompts).toBe(true)
+    expect(s.bindings.Skip).toBe('Space')
+    expect(s.fov).toBe(90)
+  })
+
+  it('defaults damageNumbers on and the combat bindings', () => {
+    expect(DEFAULT_SETTINGS.damageNumbers).toBe(true)
+    expect(DEFAULT_SETTINGS.bindings).toMatchObject({
+      Reload: 'KeyR',
+      Kick: 'KeyQ',
+      Dodge: 'KeyC',
+      HeavyAttack: 'KeyV',
+      Block: 'MouseRight',
+    })
+  })
+
+  it('round-trips damageNumbers false', () => {
+    const storage = memoryStorage()
+    saveSettings({ ...DEFAULT_SETTINGS, damageNumbers: false }, storage)
+    expect(loadSettings(storage).damageNumbers).toBe(false)
+  })
+
+  it('turns a missing or invalid damageNumbers into On', () => {
+    expect(loadSettings(memoryStorage(JSON.stringify({ fov: 80 }))).damageNumbers).toBe(true)
+    expect(loadSettings(memoryStorage(JSON.stringify({ damageNumbers: 'no' }))).damageNumbers).toBe(true)
+    expect(loadSettings(memoryStorage(JSON.stringify({ damageNumbers: 0 }))).damageNumbers).toBe(true)
+  })
+
+  it('gives old stored bindings the four combat keys', () => {
+    const old = {
+      MoveForward: 'KeyW',
+      Block: 'MouseRight',
+      Interact: 'KeyG',
+    }
+    const s = loadSettings(memoryStorage(JSON.stringify({ bindings: old })))
+    expect(s.bindings.Reload).toBe('KeyR')
+    expect(s.bindings.Kick).toBe('KeyQ')
+    expect(s.bindings.Dodge).toBe('KeyC')
+    expect(s.bindings.HeavyAttack).toBe('KeyV')
+    expect(s.bindings.Interact).toBe('KeyG')
   })
 
   it('returns defaults for corrupt JSON', () => {

@@ -2,7 +2,7 @@
 // The factory takes plain events so it is testable without a DOM.
 
 import { useSettingsStore } from '../../game/state'
-import { isMenuOpen } from '../../game/state/menuState'
+import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
 
 export interface InputSnapshot {
   /** -1 (back) .. 1 (forward) */
@@ -17,11 +17,21 @@ export interface InputSnapshot {
   /** Mouse travel accumulated since the last consuming sample (pixels). */
   lookDX: number
   lookDY: number
+  /** Firearm reload (R by default). */
+  reload: boolean
+  kick: boolean
+  dodge: boolean
+  /** Auto-charge heavy attack (V by default). */
+  heavy: boolean
 }
 
 const MOUSE_CODES = ['MouseLeft', 'MouseMiddle', 'MouseRight']
 
-export function createInput(getBindings: () => Record<string, string>) {
+export function createInput(
+  getBindings: () => Record<string, string>,
+  /** When true the sim is frozen (pause, journal...): held buttons are dropped. */
+  isFrozen: () => boolean = () => false,
+) {
   const held = new Set<string>()
   let lookDX = 0
   let lookDY = 0
@@ -32,7 +42,18 @@ export function createInput(getBindings: () => Record<string, string>) {
     return code !== undefined && held.has(code)
   }
 
-  const snapshot = (): InputSnapshot => ({
+  // Why: a button still held when pause opens would otherwise read as released-on-resume
+  // and fire a charged heavy attack the player never meant to release.
+  const snapshot = (): InputSnapshot => {
+    if (isFrozen() && held.size > 0) held.clear()
+    return build()
+  }
+
+  const build = (): InputSnapshot => ({
+    reload: isDown('Reload'),
+    kick: isDown('Kick'),
+    dodge: isDown('Dodge'),
+    heavy: isDown('HeavyAttack'),
     forward: (isDown('MoveForward') ? 1 : 0) - (isDown('MoveBackward') ? 1 : 0),
     strafe: (isDown('MoveRight') ? 1 : 0) - (isDown('MoveLeft') ? 1 : 0),
     sprint: isDown('Sprint'),
@@ -74,7 +95,7 @@ export function createInput(getBindings: () => Record<string, string>) {
   }
 }
 
-export const input = createInput(() => useSettingsStore.getState().bindings)
+export const input = createInput(() => useSettingsStore.getState().bindings, isSimFrozen)
 
 /**
  * Asks for pointer lock without ever throwing. The browser rejects the request (a promise in

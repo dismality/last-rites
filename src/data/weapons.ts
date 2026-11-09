@@ -1,12 +1,12 @@
 // Weapon / tool definitions — source of truth mirrored from docs/game-design.md §4.
 // Pure data: no logic, no side effects.
 
-import type { CraftedItemId } from '../game/types'
+import type { CraftedItemId, EffectId } from '../game/types'
 
 export interface WeaponDef {
   id: CraftedItemId
   name: string
-  kind: 'melee' | 'thrown' | 'placed' | 'consumable'
+  kind: 'melee' | 'heavy' | 'firearm' | 'thrown' | 'placed' | 'consumable'
   damage: number
   /** Attack / use interval in seconds. null for placed/consumable items. */
   cooldown: number | null
@@ -20,6 +20,8 @@ export interface WeaponDef {
   fuelRestore?: number
   /** Duration in seconds (placed items). */
   duration?: number
+  /** Timed effect applied on use (consumables only). */
+  effect?: EffectId
   /** Whether the item can also dig graves. */
   canDig?: boolean
 }
@@ -114,6 +116,56 @@ export const WEAPONS: WeaponDef[] = [
     cooldown: null,
     durability: 1,
     fuelRestore: 0.5,
+  },
+  {
+    id: 'revolver',
+    name: 'Service Revolver',
+    kind: 'firearm',
+    damage: 34,
+    cooldown: 0.45,
+    durability: null,
+  },
+  {
+    id: 'shotgun',
+    name: 'Double-Barrel Shotgun',
+    kind: 'firearm',
+    damage: 9, // per pellet
+    cooldown: 0.3,
+    durability: null,
+  },
+  {
+    id: 'wood-axe',
+    name: 'Wood Axe',
+    kind: 'heavy',
+    damage: 30,
+    cooldown: 0.85,
+    durability: 60,
+  },
+  {
+    id: 'silver-sabre',
+    name: 'Silver Sabre',
+    kind: 'heavy',
+    damage: 28,
+    cooldown: 0.55,
+    durability: null,
+  },
+  {
+    id: 'blessed-rounds',
+    name: 'Blessed Rounds',
+    kind: 'consumable',
+    damage: 0,
+    cooldown: null,
+    durability: 1,
+    effect: 'blessed-rounds',
+  },
+  {
+    id: 'kola-tonic',
+    name: 'Kola Tonic',
+    kind: 'consumable',
+    damage: 0,
+    cooldown: null,
+    durability: 1,
+    effect: 'adrenaline',
   },
 ]
 

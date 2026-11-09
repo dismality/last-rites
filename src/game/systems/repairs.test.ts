@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { canRepair, repair, isDoorBarred, isAltarActive, isBellActive } from './repairs'
+import { canRepair, repair, isBarricadeBuilt, isAltarActive, isBellActive } from './repairs'
 import { REPAIR_STAGES } from '../../data/repairs'
 import type { Inventory, ItemId, ItemStack } from '../types'
 import type { ChapelState } from './repairs'
@@ -201,23 +201,23 @@ describe('altarHealedToday', () => {
 // Unit tests — door barring selector
 // ---------------------------------------------------------------------------
 
-describe('isDoorBarred', () => {
-  it('false when stage 1 is not complete', () => {
-    expect(isDoorBarred(freshChapel())).toBe(false)
+describe('isBarricadeBuilt', () => {
+  it('false before stage 1: chapel is not safe and no frames exist', () => {
+    expect(isBarricadeBuilt(freshChapel())).toBe(false)
   })
 
-  it('true when stage 1 complete and final rite not active', () => {
+  it('true after stage 1', () => {
     const chapel = chapelAfterStages(1)
-    expect(isDoorBarred(chapel)).toBe(true)
+    expect(isBarricadeBuilt(chapel)).toBe(true)
   })
 
-  it('false when stage 1 complete but final rite is active', () => {
+  it('stays true when the final rite is active', () => {
     const chapel: ChapelState = {
       completedStages: ['barDoor'],
       altarHealedToday: false,
       finalRiteActive: true,
     }
-    expect(isDoorBarred(chapel)).toBe(false)
+    expect(isBarricadeBuilt(chapel)).toBe(true)
   })
 })
 

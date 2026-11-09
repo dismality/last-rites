@@ -16,13 +16,14 @@ export interface RepairStage {
 export const REPAIR_STAGES: RepairStage[] = [
   {
     stage: 1,
-    label: 'Bar the Door',
+    label: 'Bar the Doors',
     cost: [
       { item: 'iron-nail', qty: 4 },
       { item: 'bone', qty: 2 },
     ],
     effect: 'barDoor',
-    description: 'Zombies cannot enter the chapel. True safe zone.',
+    description:
+      'Fits barricade frames on both doors and nails 2 boards on each. Zombies cannot enter while both doors hold.',
   },
   {
     stage: 2,

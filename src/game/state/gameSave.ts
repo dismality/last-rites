@@ -2,12 +2,20 @@
 // Pure rules live in systems/saveGame.ts. No React / three.js.
 
 import { subscribeToType } from '../events'
+import { sanitizeCombat } from '../systems/combatSave'
 import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
+import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
 import type { RecipeId } from '../types'
 import { useChapelStore } from './chapelStore'
+import { captureCombatSave } from './combatPersistence'
+import type { DoorsSave } from './combatPersistence'
+import { useCombatStore } from './combatStore'
+import { useDoorStore } from './doorStore'
 import { useCraftingStore } from './craftingStore'
+import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
+import { useIntroStore } from './introStore'
 import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
 import { useUiWorldStore } from './uiWorldStore'
@@ -33,6 +41,11 @@ function pickWorld(): SaveState['world'] {
   return { phase, phaseTime, nightNumber, fogDensity, wavesCleared }
 }
 
+function pickDoors(): DoorsSave {
+  const { built, doors } = useDoorStore.getState()
+  return { built, front: [...doors.front], vestry: [...doors.vestry] }
+}
+
 export function captureSave(): SaveState {
   return {
     world: pickWorld(),
@@ -41,6 +54,10 @@ export function captureSave(): SaveState {
     mystery: useMysteryStore.getState().mystery,
     chapel: useChapelStore.getState().chapel,
     recipes: [...useCraftingStore.getState().unlockedRecipes],
+    // Zone last-shown times and the zone clock are deliberately not saved.
+    tutorial: useGuidanceStore.getState().tutorialDone,
+    introSeen: useIntroStore.getState().seen,
+    combat: captureCombatSave(pickDoors()),
   }
 }
 
@@ -65,6 +82,18 @@ export function loadGame(): boolean {
   useMysteryStore.setState({ mystery: save.mystery })
   useChapelStore.setState({ chapel: save.chapel })
   useCraftingStore.setState({ unlockedRecipes: save.recipes as RecipeId[] })
+  useGuidanceStore.getState().restore(serializeTutorial(save.tutorial ?? new Set()))
+  useIntroStore.getState().setSeen(save.introSeen ?? false)
+  const combat = sanitizeCombat(save.combat, { inventory: save.inventory, chapel: save.chapel })
+  const { built, front, vestry } = combat.doors
+  useDoorStore.setState({ built, doors: { front, vestry }, nail: null })
+  useCombatStore.setState({
+    firearms: combat.firearms,
+    durability: combat.durability,
+    upgrades: combat.upgrades,
+    takenPickups: combat.takenPickups,
+  })
+  useCombatStore.getState().resetLive()
   return true
 }
 

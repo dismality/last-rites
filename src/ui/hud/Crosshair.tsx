@@ -1,5 +1,6 @@
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
+import { HitMarker } from './HitMarker'
 
 /**
  * 4x4 px dot; becomes a hand icon when the player store reports an interact
@@ -24,6 +25,7 @@ export function Crosshair() {
       ) : (
         <span className="hud-crosshair__dot" />
       )}
+      <HitMarker />
     </div>
   )
 }

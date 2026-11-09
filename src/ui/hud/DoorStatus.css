@@ -1,0 +1,19 @@
+/* Hud.tsx (5.7) places it; it only sets its own look. */
+.door-status {
+  box-sizing: border-box;
+  margin: 0.5rem 0 0;
+  padding: 0.25rem 0.6rem;
+  list-style: none;
+  color: var(--parchment);
+  background: rgb(20 17 15 / 70%);
+  border-left: 2px solid var(--parchment-dark);
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px #000;
+}
+
+.door-status__rune {
+  margin-right: 0.4rem;
+  color: var(--ember);
+}

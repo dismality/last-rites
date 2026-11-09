@@ -75,11 +75,51 @@ describe('stepRite', () => {
   })
 })
 
+describe('stepRite cap', () => {
+  it('stops at the cap and does not complete', () => {
+    const r = stepRite(createMysteryState(), 60, true, 5, 44)
+    expect(r.mystery.riteProgress).toBe(44)
+    expect(r.completed).toBe(false)
+    expect(r.mystery.ending).toBeUndefined()
+  })
+
+  it('completes once the cap lifts to 45', () => {
+    const held = stepRite(createMysteryState(), 60, true, 5, 44).mystery
+    expect(stepRite(held, 1, true, 5, 45).completed).toBe(true)
+  })
+
+  // **Validates: Requirements 17.5, 17.18**
+  it('property 28: capped progress stays at most the cap, never drops, and finishes only uncapped', () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: 0, max: 45, noNaN: true }),
+        fc.array(fc.tuple(fc.double({ min: 0, max: 10, noNaN: true }), fc.boolean()), { maxLength: 20 }),
+        (start, steps) => {
+          let m = { ...createMysteryState(), riteProgress: Math.min(start, 44) }
+          for (const [dt, hold] of steps) {
+            const before = m.riteProgress
+            const r = stepRite(m, dt, hold, 5, 44)
+            expect(r.mystery.riteProgress).toBeLessThanOrEqual(44)
+            expect(r.mystery.riteProgress).toBeGreaterThanOrEqual(before)
+            expect(r.completed).toBe(false)
+            m = r.mystery
+          }
+        },
+      ),
+    )
+  })
+
+  it('never lowers progress already above the cap', () => {
+    const above = { ...createMysteryState(), riteProgress: 45 - 0.5 }
+    expect(stepRite(above, 1, true, 5, 44).mystery.riteProgress).toBe(44.5)
+  })
+})
+
 describe('run stats', () => {
   it('counts banished zombies and never lowers nights survived', () => {
     let s = recordBanished(recordBanished(createRunStats()))
     s = recordNightSurvived(recordNightSurvived(s, 3), 2)
-    expect(s).toEqual({ nightsSurvived: 3, zombiesBanished: 2 })
+    expect([s.nightsSurvived, s.zombiesBanished]).toEqual([3, 2])
   })
 
   it('credits night 5 for completed rites but not for Taken', () => {
@@ -137,6 +177,7 @@ describe('credits and rite assault', () => {
     const w = startRiteAssault()
     expect(w.phase).toBe('active')
     expect(w.night).toBe(5)
-    expect(w.pending).toHaveLength(12)
+    // 8 shamblers, 2 wailers, 2 lurkers, plus 2 bloaters and 1 brute added by spec 07.
+    expect(w.pending).toHaveLength(15)
   })
 })

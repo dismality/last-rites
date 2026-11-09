@@ -3,7 +3,7 @@
 
 import { LAST_NIGHT } from '../../data/balance'
 import type { EndingId, Phase, RelicId } from '../types'
-import { chooseEnding, isRiteComplete, tickRite, type MysteryState } from './mystery'
+import { chooseEnding, isRiteComplete, RITE_DURATION, tickRite, type MysteryState } from './mystery'
 
 /** Fewest relics that let the rite be attempted at all (Req 5.2). */
 export const RITE_MIN_RELICS = 3
@@ -66,9 +66,15 @@ export function stepRite(
   dt: number,
   holding: boolean,
   relicCount: number,
+  capS: number = RITE_DURATION,
 ): RiteStep {
   if (mystery.ending) return { mystery, completed: false }
-  const next = tickRite(mystery, dt, holding)
+  const ticked = tickRite(mystery, dt, holding)
+  // A lower cap (Father Crane alive) holds progress back, but never takes earned progress away.
+  const next =
+    ticked.riteProgress > capS
+      ? { ...ticked, riteProgress: Math.max(mystery.riteProgress, capS) }
+      : ticked
   if (!isRiteComplete(next)) return { mystery: next, completed: false }
   const ending: EndingId = chooseEnding(relicCount)
   return { mystery: { ...next, ending }, completed: true }

@@ -83,7 +83,15 @@ export function itemModelUrls(): string[] {
 /** Rigged zombie shared by all three enemy types (see docs/enemy-models.md). */
 export const ZOMBIE_MODEL_URL = '/assets/models/enemies/zombie.glb'
 
+/** Blockier rig for the Brute and Father Crane (see docs/enemy-models.md). */
+export const BRUTE_MODEL_URL = '/assets/models/enemies/zombie-brute.glb'
+
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {
-  return [...WORLD_MODEL_IDS.map(worldModelUrl), ...itemModelUrls(), ZOMBIE_MODEL_URL]
+  return [
+    ...WORLD_MODEL_IDS.map(worldModelUrl),
+    ...itemModelUrls(),
+    ZOMBIE_MODEL_URL,
+    BRUTE_MODEL_URL,
+  ]
 }

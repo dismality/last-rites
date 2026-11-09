@@ -14,7 +14,9 @@ import {
   useSettingsStore,
   useUiWorldStore,
 } from '../../game/state'
+import { useIntroStore } from '../../game/state/introStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
+import { emit } from '../../game/events'
 import { assignHotbar } from '../../game/systems/inventory'
 import { dropPosition, hotbarSlotOf } from '../../game/systems/satchel'
 import { playerPositionRef } from '../../scene/world/playerPositionRef'
@@ -44,12 +46,21 @@ export function Satchel() {
       const gs = useGameStore.getState()
       const bindings = useSettingsStore.getState().bindings
       const ui = useUiWorldStore.getState()
+      // The intro and the death screen hold their own buttons. Tab must keep moving focus
+      // there, so the key is left alone (found in the spec 06 playtest: Tab was swallowed
+      // in the pause menu and could not reach the Skip button or the Settings toggle).
       const blocked =
-        gs.paused || gs.examining || gs.journalOpen || ui.workbenchOpen || ui.chapelRepairOpen
+        gs.paused ||
+        gs.examining ||
+        gs.journalOpen ||
+        gs.taken ||
+        useIntroStore.getState().playing ||
+        ui.workbenchOpen ||
+        ui.chapelRepairOpen
 
       if (e.code === bindings.Satchel) {
-        e.preventDefault()
         if (blocked) return
+        e.preventDefault()
         playSatchelCreak(!gs.satchelOpen)
         gs.setSatchelOpen(!gs.satchelOpen)
         return
@@ -72,7 +83,10 @@ export function Satchel() {
         const stack = inv.inventory.slots[focusRef.current]
         if (!stack) return
         e.preventDefault()
-        inv.setInventory(assignHotbar(inv.inventory, slot, stack.item))
+        const next = assignHotbar(inv.inventory, slot, stack.item)
+        inv.setInventory(next)
+        // assignHotbar returns the same object when the request is refused.
+        if (next !== inv.inventory) emit({ type: 'hotbarBound', slot: slot as 0 | 1 | 2 | 3 })
       } else {
         inv.equipSlot(slot as 0 | 1 | 2 | 3)
       }

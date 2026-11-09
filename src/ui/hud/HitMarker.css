@@ -1,0 +1,24 @@
+.hit-marker {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  fill: none;
+  stroke: var(--parchment);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 1.5px var(--ink));
+}
+
+.hit-marker[data-kind='kill'] {
+  stroke: var(--ember);
+}
+
+.hit-marker__dot {
+  fill: var(--parchment);
+  stroke: none;
+}
+
+.hit-marker__ring {
+  stroke-width: 1.6;
+}

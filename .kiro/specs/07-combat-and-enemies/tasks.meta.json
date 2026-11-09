@@ -1,0 +1,1474 @@
+{
+  "pbtResults": {
+    "2.5 Recoil, aim and muzzle flash": {
+      "status": "passed",
+      "lastRunTimestamp": 1794159872343
+    },
+    "2.4 Firearm magazine and reload": {
+      "status": "passed",
+      "lastRunTimestamp": 1794159900457
+    },
+    "2.7 Heavy attack and durability": {
+      "status": "passed",
+      "lastRunTimestamp": 1794159911872
+    },
+    "2.3 Ballistics": {
+      "status": "passed",
+      "lastRunTimestamp": 1794159947464
+    },
+    "2.9 Hit markers and damage numbers": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160037763
+    },
+    "2.15 Elite rules and drops": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160054127
+    },
+    "2.10 Timed effects and consumables": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160078763
+    },
+    "2.11 Weapon upgrades": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160199217
+    },
+    "2.24 Captions queue": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160269158
+    },
+    "2.27 Ammunition readout text": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160274952
+    },
+    "2.21 Boss director: Censer Swing, The Toll and the Congregation": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160689869
+    },
+    "2.26 Combat save sanitising": {
+      "status": "passed",
+      "lastRunTimestamp": 1794160888666
+    },
+    "2.22 Boss director: death and a dead player": {
+      "status": "passed",
+      "lastRunTimestamp": 1794161004317
+    },
+    "2.14 Bloater burst": {
+      "status": "passed",
+      "lastRunTimestamp": 1794161030456
+    },
+    "7.2 Retry Night snapshot and reset": {
+      "status": "passed",
+      "lastRunTimestamp": 1794163765157
+    }
+  },
+  "executionHistory": {
+    "1.1 Types, settings and bindings": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159217054
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159319741
+      }
+    ],
+    "1.2 Items, ammunition, weapons, consumables, recipes and loot": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159326596
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159565633
+      }
+    ],
+    "1.3 Firearm, heavy melee, move, effect and upgrade data": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159326653
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159565743
+      }
+    ],
+    "1.4 Enemy, elite, wave, boss and barricade data": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159326798
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159565812
+      }
+    ],
+    "1.5 Feedback, caption and sound data": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159326858
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159566145
+      }
+    ],
+    "1.6 Layout, placements, doors, waypoints and weapon pickups": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159326938
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159566638
+      }
+    ],
+    "1.7 Bible equality and referential integrity tests": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159574316
+      },
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159682158
+      }
+    ],
+    "1. Combat data and data tests": [
+      {
+        "executionId": "43a65ecd-b9f7-46f5-ab9b-13cbea15c903",
+        "chatSessionId": "sess_de50a16d-e9ed-4d83-99a0-2948df5c23e7",
+        "timestamp": 1794159682206
+      }
+    ],
+    "2.1 Knockdown, stagger and melee rules": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159795874
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159809675
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159969852
+      }
+    ],
+    "2.2 Enemy AI: down, swell, noise and door targets": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159795931
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160332147
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160504037
+      }
+    ],
+    "2.3 Ballistics": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159795995
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159809745
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159970347
+      }
+    ],
+    "2.4 Firearm magazine and reload": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796042
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159809888
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159970898
+      }
+    ],
+    "2.5 Recoil, aim and muzzle flash": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796090
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159810336
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159971450
+      }
+    ],
+    "2.6 Gunfire noise": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796136
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160950793
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794161077880
+      }
+    ],
+    "2.7 Heavy attack and durability": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796185
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159811040
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159971950
+      }
+    ],
+    "2.8 Kick, dodge and stamina": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796230
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160513226
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160780322
+      }
+    ],
+    "2.9 Hit markers and damage numbers": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796277
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159981162
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160211070
+      }
+    ],
+    "2.10 Timed effects and consumables": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796326
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159981241
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160211158
+      }
+    ],
+    "2.11 Weapon upgrades": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796383
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159981531
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160211229
+      }
+    ],
+    "2.12 Ammunition crafting": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796432
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159982078
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160212028
+      }
+    ],
+    "2.13 Weapon pickup rule": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796502
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160513305
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160778623
+      }
+    ],
+    "2.14 Bloater burst": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796557
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160951332
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794161077365
+      }
+    ],
+    "2.15 Elite rules and drops": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796605
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159982549
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160212407
+      }
+    ],
+    "2.16 Wave additions, elite rolls and Door_Attacker assignment": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796656
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160513379
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160779759
+      }
+    ],
+    "2.17 Barricade boards and damage": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796703
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160217277
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160317232
+      }
+    ],
+    "2.18 Barricade nailing": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796749
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160513971
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160778535
+      }
+    ],
+    "2.19 Chapel doors, safe zone and targeting": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796797
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160951847
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794161079038
+      }
+    ],
+    "2.20 Boss director: rising, phases and speed": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796846
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160217388
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160317781
+      }
+    ],
+    "2.21 Boss director: Censer Swing, The Toll and the Congregation": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796890
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160514373
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160779213
+      }
+    ],
+    "2.22 Boss director: death and a dead player": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796939
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160952473
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794161078656
+      }
+    ],
+    "2.23 Final rite cap": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159796986
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160784960
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160946691
+      }
+    ],
+    "2.24 Captions queue": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797028
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160217480
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160316439
+      }
+    ],
+    "2.25 Rebinding rule": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797077
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160217946
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160319157
+      }
+    ],
+    "2.26 Combat save sanitising": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797119
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160785030
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160947209
+      }
+    ],
+    "2.27 Ammunition readout text": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797162
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160218547
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160318584
+      }
+    ],
+    "2.28 Barricade-built repair rule": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797233
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160332063
+      },
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794160504555
+      }
+    ],
+    "3.1 Stamina runtime": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797289
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162608898
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162747013
+      }
+    ],
+    "3.2 Combat store and persistence list": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797330
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162609440
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162747110
+      }
+    ],
+    "3.3 Door, boss, effect and feedback stores": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797377
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162609938
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162747447
+      }
+    ],
+    "3.4 Combat sound emitter": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797422
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162610428
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162747779
+      }
+    ],
+    "3.5 Night state clear": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797466
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162751270
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162942491
+      }
+    ],
+    "3.6 Combat actions: firearms": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797517
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162751803
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162942582
+      }
+    ],
+    "3.7 Combat actions: heavy attack, kick, dodge and consumables": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797576
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162948568
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163125567
+      }
+    ],
+    "3.8 Combat actions: pickups, upgrades and nailing": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797625
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163129413
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163302216
+      }
+    ],
+    "3.9 Combat tick: weapons and effects": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797673
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162752304
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162942698
+      }
+    ],
+    "3.10 Combat tick: nailing and feedback": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797721
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162948641
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163126048
+      }
+    ],
+    "3.11 Combat tick: boss world effects": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797770
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163129937
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163302726
+      }
+    ],
+    "3.12 Player damage, watchers and wiring": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797825
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162752752
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794162942956
+      }
+    ],
+    "4.1 Shot occlusion": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797874
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163307450
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163488195
+      }
+    ],
+    "4.2 Input actions and weapon runtime": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797920
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163307532
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163488298
+      }
+    ],
+    "4.3 Weapon controller": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159797966
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163660761
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163855924
+      }
+    ],
+    "4.4 Melee attack: heavy weapons, durability and block": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798037
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163863055
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164074980
+      }
+    ],
+    "4.5 Use controller": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798089
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164082685
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164222440
+      }
+    ],
+    "4.6 First-person controller: dash, speed, recoil and FOV": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798136
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164082760
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164223033
+      }
+    ],
+    "4.7 Weapon poses and meshes": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798187
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163307806
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163488376
+      }
+    ],
+    "4.8 Viewmodel wiring and muzzle flash": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798232
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164082820
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164223791
+      }
+    ],
+    "4.9 Chapel vestry opening": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798278
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163308615
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163488456
+      }
+    ],
+    "4.10 Chapel door frames, boards and plaques": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798327
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163863142
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164073138
+      }
+    ],
+    "4.11 Weapon pickups and props": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798381
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164082893
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164224589
+      }
+    ],
+    "4.12 Enemy director: targets, doors and door attacks": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798424
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163863212
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164073641
+      }
+    ],
+    "4.13 Enemy director: Bloater, Brute, elites and noise": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798473
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164420078
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164567477
+      }
+    ],
+    "4.14 Enemy models: looks, swell and knockdown": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798523
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163660845
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163855424
+      }
+    ],
+    "4.15 Elite marks and Crane props": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798573
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164420153
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164568024
+      }
+    ],
+    "4.16 Wave director: elites and door attackers": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798619
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163660989
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163854081
+      }
+    ],
+    "4.17 Final rite and salt circles": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798666
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164082983
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164224970
+      }
+    ],
+    "4.18 Damage numbers and grave gas": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798719
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164228933
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164413815
+      }
+    ],
+    "4.19 Mount new scene components": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798786
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164573042
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164659734
+      }
+    ],
+    "5.1 Ammo readout and effect icons": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798835
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163661047
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163854878
+      }
+    ],
+    "5.2 Hit marker, crosshair and charge meter": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798886
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164229488
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164413305
+      }
+    ],
+    "5.3 Door status and nail prompt": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798938
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164420298
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164568821
+      }
+    ],
+    "5.4 Boss bar and name card": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159798989
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163863277
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164074442
+      }
+    ],
+    "5.5 Upgrade list in the workbench": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799039
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163863503
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164075562
+      }
+    ],
+    "5.6 Settings: damage numbers and controls": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799099
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164229991
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164412506
+      }
+    ],
+    "5.7 Assemble the new HUD": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799148
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164573539
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164659192
+      }
+    ],
+    "6.1 Synth core and volumes": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799197
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163308937
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163488529
+      }
+    ],
+    "6.2 Audio manager integration": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799243
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164230555
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164414209
+      }
+    ],
+    "6.3 Subtitles queue": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799288
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163502096
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163647198
+      }
+    ],
+    "6.4 Register sounds and unlock audio": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799334
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164420369
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164569276
+      }
+    ],
+    "6.5 Spatial loops and arrival sounds in the enemy director": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799386
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164574063
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164660304
+      }
+    ],
+    "7.1 Save and load wiring": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799453
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163502595
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163647875
+      }
+    ],
+    "7.2 Retry Night snapshot and reset": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799502
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163661106
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163853529
+      }
+    ],
+    "7.3 Process and integration tests": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799558
+      },
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164664122
+      },
+      {
+        "executionId": "d7bc52d7-8102-4eb4-b9b4-a41d3d75d174",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794192206121
+      },
+      {
+        "executionId": "d7bc52d7-8102-4eb4-b9b4-a41d3d75d174",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794192466672
+      }
+    ],
+    "8. Checkpoint: playtest in a real browser": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794159799608
+      },
+      {
+        "executionId": "d7bc52d7-8102-4eb4-b9b4-a41d3d75d174",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794192748881
+      }
+    ],
+    "2. Pure systems with property tests": [
+      {
+        "executionId": "897456d7-afc0-4f7c-a568-6a7df5769fbf",
+        "chatSessionId": "sess_a796ecfd-1f29-4e48-8bd6-7b364092537a",
+        "timestamp": 1794161079095
+      }
+    ],
+    "3. Stores and glue": [
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794163302787
+      }
+    ],
+    "5. HUD and workbench UI": [
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164659270
+      }
+    ],
+    "4. Scene drivers and meshes": [
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164659783
+      }
+    ],
+    "6. Procedural audio and captions": [
+      {
+        "executionId": "8afb343f-eb55-475a-beb3-99fed071f396",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794164660354
+      }
+    ],
+    "7. Save, Retry Night and verification tests": [
+      {
+        "executionId": "d7bc52d7-8102-4eb4-b9b4-a41d3d75d174",
+        "chatSessionId": "sess_c0772336-6519-4bfd-bf97-f0313267f67b",
+        "timestamp": 1794192466747
+      }
+    ]
+  }
+}

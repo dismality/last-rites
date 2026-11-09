@@ -4,6 +4,7 @@ import { useFrame } from '@react-three/fiber'
 import { Vector3 } from 'three'
 import { CHAPEL_CENTER } from '../../data/cemeteryLayout'
 import {
+  useBossStore,
   useChapelStore,
   useEnemyStore,
   useGameStore,
@@ -15,6 +16,7 @@ import { isMenuOpen } from '../../game/state/menuState'
 import { readRiteStatus } from '../../game/state/riteStatus'
 import { startEnding } from '../../game/state/startEnding'
 import { isHoldingRite, RITE_ALTAR_RANGE, stepRite } from '../../game/systems/finalRite'
+import { riteCapS } from '../../game/systems/bossDirector'
 import { startRiteAssault } from '../../game/systems/waves'
 import { input } from '../player/input'
 import { playerPositionRef } from './playerPositionRef'
@@ -62,6 +64,8 @@ export function FinalRite() {
       Math.min(rawDelta, MAX_DT),
       true,
       status.relicCount,
+      // Progress stops at 44 of 45 s until Crane has fallen; his rise clock runs in combatTick.
+      riteCapS(useBossStore.getState().boss),
     )
     useMysteryStore.setState({ mystery: step.mystery })
     if (step.completed && step.mystery.ending) {

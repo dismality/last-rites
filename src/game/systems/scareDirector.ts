@@ -29,6 +29,8 @@ export const FIRST_SCARE_EVENT: ScareEventId = 'statue-turn'
 /** Lunge speeds in m/s per intensity (design: Full 6, Reduced/Off 4). */
 export const LUNGE_SPEED_FULL = 6
 export const LUNGE_SPEED_SOFT = 4
+/** Reduced scare intensity plays the stinger at this share of full volume. */
+const STINGER_VOLUME_REDUCED = 0.4
 
 export interface IntensityProfile {
   stingerVolume: number
@@ -103,7 +105,7 @@ export function intensityProfile(
       }
     case 'reduced':
       return {
-        stingerVolume: 0.4,
+        stingerVolume: STINGER_VOLUME_REDUCED,
         lungeSpeed: LUNGE_SPEED_SOFT,
         cameraShake: false,
         subtitle: 'if-enabled',

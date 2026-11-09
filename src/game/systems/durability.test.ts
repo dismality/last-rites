@@ -3,7 +3,7 @@
 
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { applyHit, createWeaponState, isCracked } from './durability'
+import { applyHit, createWeaponState, isCracked, spendSwing, maxDurability } from './durability'
 import type { WeaponState } from './durability'
 
 // ---------------------------------------------------------------------------
@@ -118,6 +118,61 @@ describe('isCracked', () => {
   it('returns true for sharpened-shovel under 20% (threshold = 10)', () => {
     expect(isCracked(sharpenedShovel(9))).toBe(true)
     expect(isCracked(sharpenedShovel(10))).toBe(false)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Spec 07: spendSwing and upgrade-aware maxima
+// ---------------------------------------------------------------------------
+
+describe('spendSwing', () => {
+  it('spends 1 for a hitting swing and none for a miss', () => {
+    expect(spendSwing(boneClub(10), 3).weaponState.durability).toBe(9)
+    expect(spendSwing(boneClub(10), 0).weaponState.durability).toBe(10)
+  })
+
+  it('never spends on the sabre', () => {
+    const sabre: WeaponState = { id: 'silver-sabre', durability: null }
+    expect(spendSwing(sabre, 5).weaponState.durability).toBeNull()
+  })
+
+  it('breaks the axe at 0', () => {
+    const r = spendSwing({ id: 'wood-axe', durability: 1 }, 2)
+    expect(r.broke).toBe(true)
+    expect(r.weaponState.durability).toBe(0)
+  })
+})
+
+describe('maxDurability', () => {
+  it('uses base values and honours Iron-Banded Haft', () => {
+    expect(maxDurability('wood-axe')).toBe(60)
+    expect(maxDurability('wood-axe', ['up-axe-haft'])).toBe(100)
+    expect(maxDurability('silver-sabre', ['up-axe-haft'])).toBeNull()
+    expect(createWeaponState('wood-axe', ['up-axe-haft']).durability).toBe(100)
+  })
+})
+
+// Feature: 07-combat-and-enemies, Property 17: Durability is spent once per swing that hits
+// **Validates: Requirements 8.10, 8.11**
+describe('property: durability is spent once per swing that hits', () => {
+  it('loses exactly 1 on a hit, none on a miss, never below 0, sabre none', () => {
+    fc.assert(
+      fc.property(
+        fc.integer({ min: 0, max: 100 }),
+        fc.integer({ min: 0, max: 30 }),
+        (durability, hits) => {
+          const axe: WeaponState = { id: 'wood-axe', durability }
+          const r = spendSwing(axe, hits)
+          const expected = hits > 0 ? Math.max(durability - 1, 0) : durability
+          expect(r.weaponState.durability).toBe(expected)
+          expect(r.broke).toBe(hits > 0 && durability === 1)
+          const sabre = spendSwing({ id: 'silver-sabre', durability: null }, hits)
+          expect(sabre.weaponState.durability).toBeNull()
+          expect(sabre.broke).toBe(false)
+        },
+      ),
+      { numRuns: 300 },
+    )
   })
 })
 

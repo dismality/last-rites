@@ -3,7 +3,8 @@
 
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { canCraft, craft, unlockRecipes, SATCHEL_SLOTS, MATERIAL_STACK_LIMIT } from './crafting'
+import { canCraft, craft, unlockRecipes, MATERIAL_STACK_LIMIT } from './crafting'
+import { SATCHEL_SLOTS } from '../../data/items'
 import { RECIPES, RECIPE_MAP } from '../../data/recipes'
 import type { Inventory, ItemId, ItemStack } from '../types'
 
@@ -51,9 +52,9 @@ describe('unlockRecipes', () => {
     expect(ids).toEqual(['r-sharpened-shovel'])
   })
 
-  it('returns r-holy-water-flask after night 2', () => {
+  it('returns r-holy-water-flask and r-blessed-rounds after night 2', () => {
     const ids = unlockRecipes({ type: 'dawnStarted', night: 2 })
-    expect(ids).toEqual(['r-holy-water-flask'])
+    expect(ids).toEqual(['r-holy-water-flask', 'r-blessed-rounds'])
   })
 
   it('returns r-lantern-trap after night 3', () => {
@@ -200,6 +201,21 @@ describe('craft — capacity check (Req 3.2)', () => {
 
     // Inventory must be unchanged
     expect(countItem(inv, 'cloth')).toBe(3)
+  })
+
+  it('a larger slot limit lets the same craft succeed (Deep Pockets)', () => {
+    const recipe = RECIPE_MAP['r-bandage']
+    const inv: Inventory = {
+      slots: [
+        { item: 'cloth', qty: 3 },
+        ...Array.from({ length: 11 }, () => ({ item: 'bone' as ItemId, qty: 1 })),
+      ],
+      keyItems: [],
+      relics: [],
+      hotbar: [null, null, null, null],
+    }
+    expect(craft(inv, recipe).ok).toBe(false)
+    expect(craft(inv, recipe, SATCHEL_SLOTS + 2).ok).toBe(true)
   })
 
   it('succeeds when exactly one slot is free', () => {
@@ -405,6 +421,64 @@ describe('property: successful craft produces exact item delta', () => {
         return true
       }),
       { numRuns: 500 },
+    )
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Ammunition crafting (spec 07, Req 4.8, 4.9, 2.7)
+// ---------------------------------------------------------------------------
+
+describe('ammunition crafting', () => {
+  const inputsFor = (id: 'r-revolver-cartridge' | 'r-shotgun-shell'): ItemStack[] =>
+    RECIPE_MAP[id].inputs.map((r) => ({ item: r.item, qty: r.qty }))
+
+  it('tops a revolver stack up to its limit of 36 and consumes inputs once', () => {
+    const inv = invWith([...inputsFor('r-revolver-cartridge'), { item: 'revolver-cartridge', qty: 34 }])
+    const result = craft(inv, RECIPE_MAP['r-revolver-cartridge'])
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(countItem(result.inv, 'revolver-cartridge')).toBe(36)
+    expect(countItem(result.inv, 'black-powder')).toBe(0)
+    expect(countItem(result.inv, 'lead-shot')).toBe(0)
+  })
+
+  it('refuses a craft that would add nothing and consumes no inputs', () => {
+    const inv = invWith([...inputsFor('r-shotgun-shell'), { item: 'shotgun-shell', qty: 20 }])
+    const result = craft(inv, RECIPE_MAP['r-shotgun-shell'])
+    expect(result.ok).toBe(false)
+    expect(countItem(inv, 'lead-shot')).toBe(2)
+  })
+
+  it('unlocks the ammo recipes when the matching weapon is picked up', () => {
+    expect(unlockRecipes({ type: 'weaponPickedUp', weapon: 'revolver' })).toEqual(['r-revolver-cartridge'])
+    expect(unlockRecipes({ type: 'weaponPickedUp', weapon: 'shotgun' })).toEqual(['r-shotgun-shell'])
+  })
+
+  // Property 10: Ammunition crafting never exceeds the stack limit
+  // **Validates: Requirements 4.8, 4.9**
+  it('property: stack is min(before + output, limit); nothing added means refusal', () => {
+    const cases = [
+      { recipe: 'r-revolver-cartridge', ammo: 'revolver-cartridge', limit: 36, out: 6 },
+      { recipe: 'r-shotgun-shell', ammo: 'shotgun-shell', limit: 20, out: 4 },
+    ] as const
+    fc.assert(
+      fc.property(fc.constantFrom(...cases), fc.integer({ min: 0, max: 36 }), (c, raw) => {
+        const before = Math.min(raw, c.limit)
+        const stacks = [...inputsFor(c.recipe)]
+        if (before > 0) stacks.push({ item: c.ammo, qty: before })
+        const inv = invWith(stacks)
+        const result = craft(inv, RECIPE_MAP[c.recipe])
+        const expected = Math.min(before + c.out, c.limit)
+        if (expected === before) return !result.ok
+        if (!result.ok) return false
+        return (
+          countItem(result.inv, c.ammo) === expected &&
+          result.inv.slots.every((s) => s.qty > 0 && s.qty <= c.limit) &&
+          RECIPE_MAP[c.recipe].inputs.every((r) => countItem(result.inv, r.item) === 0)
+        )
+      }),
+      { numRuns: 300 },
     )
   })
 })

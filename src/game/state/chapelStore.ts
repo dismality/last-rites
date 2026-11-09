@@ -2,8 +2,9 @@
 // Pure zustand, no React / three.js imports.
 
 import { create } from 'zustand'
-import { repair, isDoorBarred, isAltarActive, isBellActive } from '../systems/repairs'
+import { repair, isBarricadeBuilt, isAltarActive, isBellActive } from '../systems/repairs'
 import type { ChapelState, RepairResult } from '../systems/repairs'
+import { useDoorStore } from './doorStore'
 import { useInventoryStore } from './inventoryStore'
 
 export type { ChapelState }
@@ -30,7 +31,7 @@ export interface ChapelStoreState {
   // ── Convenience selectors (re-export from the pure system) ──────────────
 
   /** True when stage 1 complete and final rite is not active. */
-  isDoorBarred: () => boolean
+  isBarricadeBuilt: () => boolean
 
   /** True when stage 2 is complete. */
   isAltarActive: () => boolean
@@ -50,10 +51,14 @@ export const useChapelStore = create<ChapelStoreState>((set, get) => ({
 
   applyRepair: () => {
     const { inventory, setInventory } = useInventoryStore.getState()
-    const result = repair(inventory, get().chapel)
+    const before = get().chapel
+    const result = repair(inventory, before)
     if (result.ok) {
       setInventory(result.inv)
       set({ chapel: result.chapel })
+      // Stage 1 fits the barricade frames and the starting boards (Req 16.1).
+      if (!isBarricadeBuilt(before) && isBarricadeBuilt(result.chapel))
+        useDoorStore.getState().build()
     }
     return result
   },
@@ -73,7 +78,7 @@ export const useChapelStore = create<ChapelStoreState>((set, get) => ({
       chapel: { ...state.chapel, altarHealedToday: false },
     })),
 
-  isDoorBarred: () => isDoorBarred(get().chapel),
+  isBarricadeBuilt: () => isBarricadeBuilt(get().chapel),
 
   isAltarActive: () => isAltarActive(get().chapel),
 

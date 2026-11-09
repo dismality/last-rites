@@ -1,0 +1,83 @@
+.health-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--parchment);
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  text-shadow: 0 1px 2px #000;
+}
+
+.health-bar__frame {
+  position: relative;
+  box-sizing: border-box;
+  width: 260px;
+  height: 18px;
+  background: var(--ink);
+  border: 2px solid var(--ink-mid);
+  outline: 1px solid var(--parchment-dark);
+  overflow: hidden;
+}
+
+.health-bar__fill,
+.health-bar__chunk {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+}
+
+.health-bar__fill {
+  background: var(--blood);
+}
+
+/* Pale recent-damage chunk sits behind the fill. */
+.health-bar__chunk {
+  background: var(--parchment);
+  opacity: 0.85;
+}
+
+/* Hit: parchment-white flash (flashing lights on) or a thicker frame (off). */
+.health-bar__frame[data-fx='flash'] {
+  border-color: var(--parchment);
+  outline-color: var(--parchment);
+}
+
+.health-bar__frame[data-fx='thick'],
+.health-bar__frame[data-thick='true'] {
+  border-width: 5px;
+  outline-width: 2px;
+}
+
+.health-bar__frame[data-pulse='true'] {
+  animation: health-bar-pulse 1.2s ease-in-out infinite;
+}
+
+.health-bar__tag {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  padding: 0 0.4rem;
+  border: 1px solid var(--blood-bright);
+  color: var(--parchment);
+}
+
+.health-bar__tag[hidden] {
+  display: none;
+}
+
+@keyframes health-bar-pulse {
+  0%,
+  100% {
+    border-color: var(--ink-mid);
+  }
+  50% {
+    border-color: var(--blood-bright);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .health-bar__frame[data-pulse='true'] {
+    animation: none;
+    border-width: 5px;
+  }
+}

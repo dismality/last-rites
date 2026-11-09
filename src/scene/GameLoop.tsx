@@ -11,6 +11,10 @@ import {
   usePlayerStore,
   useWorldStore,
 } from '../game/state'
+import { tickCombat } from '../game/state/combatTick'
+import { tickGuidance } from '../game/state/guidanceTick'
+import { getSprintDrainMult, readStamina, writeRegenDelay } from '../game/state/staminaRuntime'
+import { isSimFrozen } from '../game/state/menuState'
 import { STEP, advanceAccumulator } from '../game/systems/fixedStep'
 import { runTick, type TickInput } from '../game/systems/gameTick'
 import type { GameEvent, StaminaState } from '../game/types'
@@ -27,19 +31,19 @@ interface GameLoopProps {
 }
 
 // peek, not sample: look deltas are consumed per render frame by the controller.
-const liveInput = (): TickInput => ({ sprinting: input.peek().sprint })
+const liveInput = (): TickInput => ({
+  sprinting: input.peek().sprint,
+  sprintDrainMult: getSprintDrainMult(),
+})
 
 function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput }) {
   usePauseTriggers()
   const accumulator = useRef(0)
-  // regenDelayTimer is sim-internal, so it lives here rather than in a store.
-  const staminaDelay = useRef(0)
 
   useFrame((_state, delta) => {
     // Paused: skip entirely and drop the backlog so resume doesn't fast-forward.
-    const { paused, examining, journalOpen, screen } = useGameStore.getState()
-    // The ending sequence plays over a frozen world.
-    if (paused || examining || journalOpen || screen === 'ending') {
+    // The ending sequence plays over a frozen world; the intro freezes it too.
+    if (isSimFrozen() || useGameStore.getState().screen === 'ending') {
       accumulator.current = 0
       return
     }
@@ -52,10 +56,7 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       const player = usePlayerStore.getState()
       const lantern = useLanternStore.getState()
       const world = useWorldStore.getState()
-      const stamina: StaminaState = {
-        stamina: player.stamina,
-        regenDelayTimer: staminaDelay.current,
-      }
+      const stamina: StaminaState = readStamina()
 
       const r = runTick(
         { player, stamina, lantern, world },
@@ -63,13 +64,20 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
         STEP
       )
 
-      staminaDelay.current = r.stamina.regenDelayTimer
+      writeRegenDelay(r.stamina.regenDelayTimer)
       usePlayerStore.getState().applyPlayerState({ stamina: r.player.stamina })
       useLanternStore.getState().applyLanternState(r.lantern)
       useWorldStore.getState().applyWorldState(r.world)
       pending.push(...r.events)
       // Same fixed step as everything else, so a dig takes DIG_DURATION_S of sim time.
       useDigStore.getState().step(STEP, input.peek().interact)
+      const snap = input.peek()
+      tickCombat(STEP, {
+        interactHeld: snap.interact,
+        moving: snap.forward !== 0 || snap.strafe !== 0,
+        playerPos: usePlayerStore.getState().position,
+      })
+      tickGuidance(STEP)
     }
 
     // Publish after all systems have run so subscribers see consistent state.

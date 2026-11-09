@@ -1,7 +1,7 @@
 // Recipe definitions — source of truth mirrored from docs/game-design.md §5.
 // Pure data: no logic, no side effects.
 
-import type { ItemId, RecipeId } from '../game/types'
+import type { FirearmId, ItemId, RecipeId } from '../game/types'
 
 export interface RecipeDef {
   id: RecipeId
@@ -16,7 +16,13 @@ export interface RecipeDef {
   unlock:
     | { type: 'start' }
     | { type: 'night'; night: 1 | 2 | 3 | 4 }
+    | { type: 'pickup'; weapon: FirearmId }
     | { type: 'journal'; page: number }
+  /**
+   * 'partial': when the stack limit leaves room for only some of the output, craft
+   * anyway and add what fits (ammo). Absent: the craft needs room for all of it.
+   */
+  outputCap?: 'partial'
   /** Crafting animation duration in seconds (default 1.5). */
   craftTime: number
 }
@@ -112,6 +118,40 @@ export const RECIPES: RecipeDef[] = [
     ],
     output: { item: 'salt-circle', qty: 1 },
     unlock: { type: 'journal', page: 3 },
+    craftTime: 1.5,
+  },
+  // --- Weapon pickup unlocks and ammunition (spec 07) ---
+  {
+    id: 'r-revolver-cartridge',
+    inputs: [
+      { item: 'black-powder', qty: 1 },
+      { item: 'lead-shot', qty: 1 },
+    ],
+    output: { item: 'revolver-cartridge', qty: 6 },
+    outputCap: 'partial',
+    unlock: { type: 'pickup', weapon: 'revolver' },
+    craftTime: 1.5,
+  },
+  {
+    id: 'r-shotgun-shell',
+    inputs: [
+      { item: 'black-powder', qty: 1 },
+      { item: 'lead-shot', qty: 2 },
+      { item: 'cloth', qty: 1 },
+    ],
+    output: { item: 'shotgun-shell', qty: 4 },
+    outputCap: 'partial',
+    unlock: { type: 'pickup', weapon: 'shotgun' },
+    craftTime: 1.5,
+  },
+  {
+    id: 'r-blessed-rounds',
+    inputs: [
+      { item: 'holy-water', qty: 1 },
+      { item: 'silver-filings', qty: 1 },
+    ],
+    output: { item: 'blessed-rounds', qty: 1 },
+    unlock: { type: 'night', night: 2 },
     craftTime: 1.5,
   },
 ]

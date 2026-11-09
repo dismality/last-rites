@@ -42,7 +42,13 @@ export function hasItems(inv: Inventory, reqs: readonly ItemStack[]): boolean {
   return true
 }
 
-export function addItem(inv: Inventory, id: ItemId, qty: number): AddResult {
+/** slotLimit defaults to the base satchel; Deep Pockets raises it. */
+export function addItem(
+  inv: Inventory,
+  id: ItemId,
+  qty: number,
+  slotLimit: number = SATCHEL_SLOTS,
+): AddResult {
   const def = ITEM_MAP[id]
   const amount = Math.max(0, Math.floor(qty))
   if (amount === 0) return result(inv, 0, 0, null, def.name)
@@ -71,7 +77,7 @@ export function addItem(inv: Inventory, id: ItemId, qty: number): AddResult {
   // Materials keep a single stack per item, so a full stack is refused rather
   // than spilling into a second slot. One-per-slot gear still opens new slots.
   const mayOpenSlots = def.stackLimit === 1 || !hadStack
-  while (remaining > 0 && mayOpenSlots && slots.length < SATCHEL_SLOTS) {
+  while (remaining > 0 && mayOpenSlots && slots.length < slotLimit) {
     const take = Math.min(def.stackLimit, remaining)
     slots.push({ item: id, qty: take })
     remaining -= take
@@ -109,7 +115,9 @@ export function removeItem(inv: Inventory, id: ItemId, qty: number): RemoveResul
 
   // A hotbar binding to an item we no longer hold would point at nothing.
   const gone = !kept.some((s) => s.item === id)
-  const hotbar = (gone ? inv.hotbar.map((h) => (h === id ? null : h)) : [...inv.hotbar]) as Inventory['hotbar']
+  const hotbar = (
+    gone ? inv.hotbar.map((h) => (h === id ? null : h)) : [...inv.hotbar]
+  ) as Inventory['hotbar']
   return { inv: { ...inv, slots: kept, hotbar }, removed: amount - remaining }
 }
 
@@ -121,7 +129,9 @@ export function removeItem(inv: Inventory, id: ItemId, qty: number): RemoveResul
 export function assignHotbar(inv: Inventory, index: number, item: ItemId | null): Inventory {
   if (!Number.isInteger(index) || index < 0 || index > 3) return inv
   if (item !== null && !inv.slots.some((s) => s.item === item)) return inv
-  const hotbar = inv.hotbar.map((h) => (item !== null && h === item ? null : h)) as Inventory['hotbar']
+  const hotbar = inv.hotbar.map((h) =>
+    item !== null && h === item ? null : h,
+  ) as Inventory['hotbar']
   hotbar[index] = item
   return { ...inv, hotbar }
 }
@@ -145,6 +155,10 @@ function result(
   name: string,
 ): AddResult {
   const message =
-    reason === 'stack-full' ? `Satchel full: ${name}` : reason === 'satchel-full' ? 'Satchel full' : null
+    reason === 'stack-full'
+      ? `Satchel full: ${name}`
+      : reason === 'satchel-full'
+        ? 'Satchel full'
+        : null
   return { inv, added, rejected, reason, message }
 }

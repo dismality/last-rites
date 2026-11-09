@@ -4,7 +4,11 @@
 // The functions below are called by the scene layer; they will be filled in
 // once the audio system task runs.
 
+import { Howler } from 'howler'
 import type { AudioCueId } from '../data/enemies'
+import type { SoundId } from '../data/sounds'
+import { playSound } from './synth'
+import type { SoundPosition } from './synth'
 
 // ---------------------------------------------------------------------------
 // Crafting sounds
@@ -47,7 +51,12 @@ export function playPageTurn(): void {
 }
 
 export function playMeleeHit(): void {
-  // stub. TODO(audio): dull thud, spatialised at the zombie's position.
+  playSound('melee-hit')
+}
+
+/** One-shot combat voice (shots, reloads, boards, bursts). Position is optional for flat sounds. */
+export function playCombatSound(id: SoundId, at?: SoundPosition, volume = 1): void {
+  playSound(id, at, volume)
 }
 
 /**
@@ -84,35 +93,70 @@ export interface SpatialSource {
   z: number
 }
 
-/**
- * Keep Howler's listener on the camera each frame.
- * TODO(audio): Howler.pos(x, y, z) and Howler.orientation(fx, fy, fz, 0, 1, 0).
- */
+/** Keep Howler's listener on the camera each frame. Yaw 0 faces -Z, as the three.js camera does. */
 export function setListener(position: readonly [number, number, number], yaw: number): void {
-  void position
-  void yaw
+  try {
+    Howler.pos(position[0], position[1], position[2])
+    Howler.orientation(-Math.sin(yaw), 0, -Math.cos(yaw), 0, 1, 0)
+  } catch {
+    // no AudioContext (unsupported or not unlocked): stay silent
+  }
+}
+
+/** Cues that have a synth voice. Cues without one (shambler, lurker, wailer) stay silent for now. */
+const CUE_SOUND: Readonly<Partial<Record<AudioCueId, SoundId>>> = {
+  'brute-step': 'brute-step',
+  'brute-grunt': 'brute-grunt',
+  'bloater-gurgle': 'bloater-hiss',
+  'crane-censer': 'censer-chain',
+}
+
+/** Seconds between repeats for cues that loop. Procedural voices are one-shots, so we re-trigger them. */
+const LOOP_INTERVAL_S: Readonly<Partial<Record<AudioCueId, number>>> = {
+  'brute-step': 0.9,
+  'bloater-gurgle': 2.5,
+  'crane-censer': 1.4,
+}
+
+/** Next due time (seconds) per enemy uid. A uid missing from the latest sync is dropped. */
+const loopDue = new Map<string, number>()
+let clock: () => number = () => performance.now() / 1000
+
+/** Test hook: replace the clock (seconds). Pass null to restore. */
+export function setLoopClockForTests(fn: (() => number) | null): void {
+  clock = fn ?? (() => performance.now() / 1000)
+}
+
+/** Test hook: forget all scheduled loops. */
+export function resetEnemyLoopsForTests(): void {
+  loopDue.clear()
 }
 
 /**
- * Start/stop/move one looping 3D Howl per source so each zombie type is
- * recognisable by ear before it is seen.
- * TODO(audio): per-uid Howl with loop: true, panningModel 'HRTF',
- * pannerAttr({ maxDistance: CUE_MAX_DISTANCE[cue], distanceModel: 'inverse' }),
- * and howl.pos(x, y, z, id) each call; stop and drop ids no longer present.
+ * Schedule repeating one-shots per enemy so each type is recognisable by ear.
+ * Call every frame with the enemies that should be heard; others stop.
  */
 export function syncEnemyLoops(sources: readonly SpatialSource[]): void {
-  void sources
+  const now = clock()
+  const live = new Set<string>()
+  for (const s of sources) {
+    const interval = LOOP_INTERVAL_S[s.cue]
+    const sound = CUE_SOUND[s.cue]
+    if (interval === undefined || sound === undefined) continue
+    live.add(s.uid)
+    const due = loopDue.get(s.uid)
+    if (due !== undefined && now < due) continue
+    playSound(sound, { x: s.x, y: s.y, z: s.z })
+    // After a long gap (tab hidden) don't replay the backlog.
+    loopDue.set(s.uid, due === undefined || now - due > interval ? now + interval : due + interval)
+  }
+  for (const uid of loopDue.keys()) if (!live.has(uid)) loopDue.delete(uid)
 }
 
-/**
- * One-shot positional cue, e.g. the lurker's sharp breath or a wailer scream.
- * TODO(audio): play a pooled 3D Howl at the position.
- */
+/** One-shot positional cue, e.g. the brute's grunt. Cues without a synth voice are silent. */
 export function playEnemyCue(cue: AudioCueId, x: number, y: number, z: number): void {
-  void cue
-  void x
-  void y
-  void z
+  const sound = CUE_SOUND[cue]
+  if (sound) playSound(sound, { x, y, z })
 }
 
 // ---------------------------------------------------------------------------

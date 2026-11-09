@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import * as fc from 'fast-check'
 import { addItem, assignHotbar, countItem, createInventory, hasItems, removeItem } from './inventory'
-import { ITEMS, MATERIAL_STACK_LIMIT, SATCHEL_SLOTS } from '../../data/items'
+import { ITEMS, ITEM_MAP, SATCHEL_SLOTS } from '../../data/items'
 import type { Inventory, ItemId } from '../types'
 
 const allIds = ITEMS.map((i) => i.id)
@@ -30,6 +30,15 @@ describe('addItem examples', () => {
     expect(r.reason).toBe('satchel-full')
     expect(r.message).toBe('Satchel full')
     expect(r.rejected).toBe(3)
+  })
+
+  it('a larger slot limit holds more stacks, and the default still holds 12', () => {
+    let inv = createInventory()
+    for (let i = 0; i < SATCHEL_SLOTS; i++) inv = addItem(inv, 'bandage', 1).inv
+    expect(addItem(inv, 'bone', 1).reason).toBe('satchel-full')
+    const r = addItem(inv, 'bone', 1, SATCHEL_SLOTS + 2)
+    expect(r.reason).toBeNull()
+    expect(r.inv.slots).toHaveLength(SATCHEL_SLOTS + 1)
   })
 
   it('puts keys, relics and pages outside the slots, even when full', () => {
@@ -85,8 +94,7 @@ describe('property: inventory invariants', () => {
         expect(inv.slots.length).toBeLessThanOrEqual(SATCHEL_SLOTS)
         for (const s of inv.slots) {
           expect(s.qty).toBeGreaterThan(0)
-          const isMaterial = s.item !== undefined && (MATERIAL_IDS as string[]).includes(s.item)
-          expect(s.qty).toBeLessThanOrEqual(isMaterial ? MATERIAL_STACK_LIMIT : 1)
+          expect(s.qty).toBeLessThanOrEqual(ITEM_MAP[s.item].stackLimit)
         }
         // Key items and relics never leak into slots.
         const slotIds = new Set<string>(inv.slots.map((s) => s.item))
@@ -134,4 +142,3 @@ describe('property: inventory invariants', () => {
   })
 })
 
-const MATERIAL_IDS = ITEMS.filter((i) => i.kind === 'material').map((i) => i.id)

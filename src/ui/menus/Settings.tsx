@@ -7,6 +7,7 @@ import { useId } from 'react'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { SETTINGS_RANGES } from '../../game/systems/settings'
 import type { Settings as SettingsValues } from '../../game/types'
+import { Controls } from './Controls'
 import { MenuDialog } from './MenuDialog'
 
 type BooleanSetting =
@@ -16,6 +17,8 @@ type BooleanSetting =
   | 'invertY'
   | 'subtitles'
   | 'accessibleHUD'
+  | 'tutorialPrompts'
+  | 'damageNumbers'
 type RangeSetting = keyof typeof SETTINGS_RANGES
 
 const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
@@ -25,6 +28,8 @@ const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
   { key: 'invertY', label: 'Invert Y' },
   { key: 'subtitles', label: 'Subtitles' },
   { key: 'accessibleHUD', label: 'Accessible HUD (numeric values)' },
+  { key: 'tutorialPrompts', label: 'Tutorial prompts' },
+  { key: 'damageNumbers', label: 'Damage numbers' },
 ]
 
 const SLIDERS: ReadonlyArray<{ key: RangeSetting; label: string; step: number }> = [
@@ -104,6 +109,7 @@ export function SettingsFields() {
       {SLIDERS.map((s) => (
         <SliderRow key={s.key} setting={s.key} label={s.label} step={s.step} />
       ))}
+      <Controls />
     </form>
   )
 }

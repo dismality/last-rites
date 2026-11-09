@@ -6,17 +6,13 @@ import { useFrame } from '@react-three/fiber'
 import { NIGHT_MAP, type NightNumber } from '../../data/waves'
 import { subscribeToType } from '../../game/events'
 import { LAST_NIGHT } from '../../data/balance'
-import {
-  useChapelStore,
-  useEnemyStore,
-  useGameStore,
-  usePlayerStore,
-  useWorldStore,
-} from '../../game/state'
+import { useChapelStore, useEnemyStore, usePlayerStore, useWorldStore } from '../../game/state'
 import { useEndingStore } from '../../game/state/endingStore'
+import { isSimFrozen } from '../../game/state/menuState'
 import { useWaveStore } from '../../game/state/waveStore'
 import { createEnemy } from '../../game/systems/enemyAI'
 import { createRng } from '../../game/rng'
+import { emitCombatSound } from '../../game/state/combatSounds'
 import { startNight, tickWaves } from '../../game/systems/waves'
 import { graveBurstRuntime } from '../effects/graveBurstRuntime'
 
@@ -42,8 +38,7 @@ export function WaveDirector() {
   )
 
   useFrame((_s, rawDelta) => {
-    const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen) return
+    if (isSimFrozen()) return
     const waves = useWaveStore.getState().waves
     if (waves.phase === 'idle' || waves.phase === 'done') return
 
@@ -57,11 +52,18 @@ export function WaveDirector() {
     useWaveStore.getState().setWaves(r.state)
 
     if (r.spawns.length > 0) {
-      useEnemyStore.getState().setEnemies([
-        ...enemies,
-        ...r.spawns.map((s) => createEnemy(`z-${uid.current++}`, s.type, { x: s.x, z: s.z })),
-      ])
+      useEnemyStore
+        .getState()
+        .setEnemies([
+          ...enemies,
+          ...r.spawns.map((s) => createEnemy(`z-${uid.current++}`, s.type, { x: s.x, z: s.z })),
+        ])
       r.spawns.forEach((s) => graveBurstRuntime.queue.push({ x: s.x, z: s.z }))
+      for (const s of r.spawns) {
+        const at = { x: s.x, y: 0, z: s.z }
+        if (s.elite) emitCombatSound('elite-arrival', at)
+        if (s.type === 'brute') emitCombatSound('brute-grunt', at)
+      }
     }
     if (r.events.some((e) => e.type === 'wavesCleared')) {
       // Night 5 does not end at dawn: it ends with the rite or the Taken ending.

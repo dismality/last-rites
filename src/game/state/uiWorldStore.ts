@@ -3,6 +3,7 @@
 // Pure zustand, no React / three.js imports.
 
 import { create } from 'zustand'
+import { usePlayerStore } from './playerStore'
 
 export interface UiWorldState {
   /** Whether the player is currently at the workbench (camera moved to bench view). */
@@ -45,7 +46,7 @@ export interface UiWorldState {
   closeChapelRepair: () => void
 
   /**
-   * Heal the player by `amount` HP, clamped to 100.
+   * Heal the player by `amount` HP, clamped to the player's max HP.
    * Called by the altar interact and by bandage use.
    */
   healPlayer: (amount: number) => void
@@ -61,8 +62,11 @@ export const useUiWorldStore = create<UiWorldState>((set) => ({
   registerHit: () => set({ lastDamageAt: Date.now() }),
   openChapelRepair: () => set({ chapelRepairOpen: true }),
   closeChapelRepair: () => set({ chapelRepairOpen: false }),
-  healPlayer: (amount) =>
-    set((state) => ({
-      playerHealth: Math.min(100, state.playerHealth + amount),
-    })),
+  healPlayer: (amount) => {
+    // Both copies of health are written so the HUD and the combat system never disagree.
+    const player = usePlayerStore.getState()
+    const next = Math.min(player.maxHealth, Math.max(0, player.health + amount))
+    player.setHealth(next)
+    set({ playerHealth: next })
+  },
 }))

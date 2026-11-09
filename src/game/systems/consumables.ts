@@ -1,4 +1,4 @@
-﻿// Consumables system — pure TypeScript, no React / three.js / Howler.
+// Consumables system — pure TypeScript, no React / three.js / Howler.
 //
 // Tracks the in-progress timed use of a consumable item (bandage, lantern-refill).
 // The scene layer (or GameLoop) drives the clock by calling tickUse each fixed step.
@@ -12,7 +12,8 @@
 //
 // Requirement 5.4.
 
-import type { CraftedItemId } from '../types'
+import { WEAPON_MAP } from '../../data/weapons'
+import type { CraftedItemId, EffectId } from '../types'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -22,7 +23,7 @@ import type { CraftedItemId } from '../types'
  * The consumable items that go through a timed-use flow.
  * Thrown / placed items (single-use) are resolved by the combat layer instead.
  */
-export type ConsumableId = 'bandage' | 'lantern-refill'
+export type ConsumableId = 'bandage' | 'lantern-refill' | 'blessed-rounds' | 'kola-tonic'
 
 /**
  * Snapshot of an in-progress consumable use.  Created by `startUse`; updated
@@ -50,6 +51,8 @@ export interface ConsumableEffect {
   healHp: number
   /** Lantern fuel to add as an absolute percentage points (refill: 50, bandage: 0). */
   addFuel: number
+  /** Timed effect to apply through effects.ts (Req 12.1, 12.2). */
+  effect?: EffectId
 }
 
 // ---------------------------------------------------------------------------
@@ -64,11 +67,16 @@ export interface ConsumableEffect {
 const CONSUMABLE_DURATION: Record<ConsumableId, number> = {
   bandage: 2,
   'lantern-refill': 1,
+  // Instant: they complete on the first tick (Req 12.1, 12.2).
+  'blessed-rounds': 0,
+  'kola-tonic': 0,
 }
 
 const CONSUMABLE_EFFECT: Record<ConsumableId, ConsumableEffect> = {
-  bandage: { healHp: 30, addFuel: 0 },
-  'lantern-refill': { healHp: 0, addFuel: 50 },
+  bandage: { healHp: WEAPON_MAP.bandage.heals ?? 0, addFuel: 0 },
+  'lantern-refill': { healHp: 0, addFuel: (WEAPON_MAP['lantern-refill'].fuelRestore ?? 0) * 100 },
+  'blessed-rounds': { healHp: 0, addFuel: 0, effect: 'blessed-rounds' },
+  'kola-tonic': { healHp: 0, addFuel: 0, effect: 'adrenaline' },
 }
 
 // ---------------------------------------------------------------------------
@@ -146,7 +154,7 @@ export function cancelUse(state: ConsumableUseState): null {
  * True if the given item ID is a trackable consumable in this system.
  */
 export function isConsumable(id: CraftedItemId): id is ConsumableId {
-  return id === 'bandage' || id === 'lantern-refill'
+  return id === 'bandage' || id === 'lantern-refill' || id === 'blessed-rounds' || id === 'kola-tonic'
 }
 
 /**

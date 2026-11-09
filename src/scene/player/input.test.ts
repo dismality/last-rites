@@ -31,6 +31,27 @@ describe('input', () => {
     expect(i.peek().lookDX).toBe(0)
   })
 
+  it('reads rebound reload, kick, dodge and heavy keys', () => {
+    const b = { ...bindings, Reload: 'KeyT', Kick: 'KeyG', Dodge: 'KeyX', HeavyAttack: 'KeyB' }
+    const i = createInput(() => b)
+    i.keyDown('KeyR')
+    expect(i.peek()).toMatchObject({ reload: false, kick: false, dodge: false, heavy: false })
+    for (const k of ['KeyT', 'KeyG', 'KeyX', 'KeyB']) i.keyDown(k)
+    expect(i.peek()).toMatchObject({ reload: true, kick: true, dodge: true, heavy: true })
+  })
+
+  it('releases held buttons while the sim is frozen so a charge does not auto-fire', () => {
+    let frozen = false
+    const i = createInput(() => ({ ...bindings, Attack: 'MouseLeft' }), () => frozen)
+    i.mouseDown(0)
+    i.keyDown('KeyV')
+    expect(i.peek().attack).toBe(true)
+    frozen = true
+    expect(i.peek().attack).toBe(false)
+    frozen = false
+    expect(i.peek().attack).toBe(false)
+  })
+
   it('releaseAll clears held keys', () => {
     const i = createInput(() => bindings)
     i.keyDown('ShiftLeft')

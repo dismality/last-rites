@@ -1,12 +1,13 @@
 // Canvas 2D drawing for the journal map: pencil-hatched cells, sketched landmark
 // icons and the quill marker. Stateless; the Map component owns animation timing.
 
-import { MAP_CELL_SIZE, MAP_EXTENT, type Landmark, type LandmarkKind } from '../../data/mapLandmarks'
+import { MAP_EXTENT, MAP_PX, type Landmark, type LandmarkKind } from '../../data/mapLandmarks'
 import { createRng } from '../../game/rng'
+import { clampToMap, worldToMap } from '../../game/systems/mapProject'
 import type { Cell } from '../../game/systems/mapReveal'
 
-export const CELL_PX = 28
-export const MARGIN_PX = 16
+const CELL_PX = MAP_PX.cellPx
+const MARGIN_PX = MAP_PX.marginPx
 export const MAP_COLS = MAP_EXTENT.maxCx - MAP_EXTENT.minCx + 1
 export const MAP_ROWS = MAP_EXTENT.maxCz - MAP_EXTENT.minCz + 1
 export const MAP_WIDTH = MAP_COLS * CELL_PX + MARGIN_PX * 2
@@ -18,10 +19,7 @@ const STROKES_PER_CELL = 7
 
 /** World metres to canvas pixels. */
 export function toPx(x: number, z: number): [number, number] {
-  return [
-    MARGIN_PX + (x / MAP_CELL_SIZE - MAP_EXTENT.minCx) * CELL_PX,
-    MARGIN_PX + (z / MAP_CELL_SIZE - MAP_EXTENT.minCz) * CELL_PX,
-  ]
+  return worldToMap(x, z)
 }
 
 export interface MapScene {
@@ -29,6 +27,8 @@ export interface MapScene {
   cells: ReadonlyArray<{ cell: Cell; progress: number }>
   landmarks: readonly Landmark[]
   player: { x: number; z: number; yaw: number }
+  /** Current objective; the marker is drawn only when it has a world position. */
+  objective?: { position?: readonly [number, number, number]; marker?: string; main: string } | null
   /** Fade cells in instead of drawing strokes (prefers-reduced-motion). */
   reducedMotion: boolean
 }
@@ -42,7 +42,40 @@ export function drawMap(ctx: CanvasRenderingContext2D, scene: MapScene): void {
     const [px, pz] = toPx(l.position[0], l.position[2])
     drawIcon(ctx, l.kind, px, pz)
   }
+  drawObjective(ctx, scene.objective)
   drawQuill(ctx, scene.player)
+}
+
+/** Diamond glyph plus a 16 px text label, clamped to the map edge so it is never lost. */
+function drawObjective(ctx: CanvasRenderingContext2D, o: MapScene['objective']): void {
+  if (!o?.position) return
+  const [x, y] = clampToMap(...toPx(o.position[0], o.position[2]))
+  const label = o.marker ?? o.main
+  ctx.save()
+  ctx.fillStyle = '#e8913a'
+  ctx.strokeStyle = '#14110f'
+  ctx.lineWidth = 1.6
+  ctx.beginPath()
+  ctx.moveTo(x, y - 9)
+  ctx.lineTo(x + 7, y)
+  ctx.lineTo(x, y + 9)
+  ctx.lineTo(x - 7, y)
+  ctx.closePath()
+  ctx.fill()
+  ctx.stroke()
+  ctx.font = '16px "IM Fell English", serif'
+  ctx.textBaseline = 'middle'
+  const w = ctx.measureText(label).width
+  // Flip the label left of the glyph near the right edge so it stays on the sheet.
+  const flip = x + 12 + w > MAP_WIDTH
+  ctx.textAlign = flip ? 'right' : 'left'
+  const tx = flip ? x - 12 : x + 12
+  ctx.lineWidth = 3
+  ctx.strokeStyle = 'rgba(216, 201, 163, 0.9)'
+  ctx.strokeText(label, tx, y)
+  ctx.fillStyle = GRAPHITE
+  ctx.fillText(label, tx, y)
+  ctx.restore()
 }
 
 /** A wobbly pencil outline plus diagonal hatching; the jitter is seeded per cell so it never shimmers. */
@@ -144,7 +177,7 @@ function drawIcon(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: number, 
 
 /** Quill: a feather-shaped pointer aimed along the player's heading. */
 function drawQuill(ctx: CanvasRenderingContext2D, p: { x: number; z: number; yaw: number }): void {
-  const [x, y] = toPx(p.x, p.z)
+  const [x, y] = clampToMap(...toPx(p.x, p.z))
   // Camera yaw 0 looks toward -Z (up the map); positive yaw turns left (counter-clockwise).
   const angle = -p.yaw
   ctx.save()

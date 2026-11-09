@@ -47,6 +47,9 @@ export const CHAPEL = {
   doorWidth: 1.4,
 } as const
 
+/** Altar spot, 4.5 m into the chapel (matches ALTAR_OFFSET in Chapel.tsx). */
+export const CHAPEL_ALTAR: Vec3 = [CHAPEL_CENTER[0], 0, CHAPEL_CENTER[2] + 4.5]
+
 // --- Corridors (Mausoleum Row, Catacombs) ----------------------------------
 
 export interface CorridorSpec {
@@ -408,3 +411,73 @@ export function picketPositions(seg: FenceSegment): Array<readonly [number, numb
   }
   return out
 }
+
+// --- Combat placements (spec 07, design bible §2 and §7 "Placements and tuning") ---
+
+/** A chapel door as combat sees it: where it is, which way is out, and where attackers stand. */
+export interface ChapelDoorSpec {
+  readonly id: 'front' | 'vestry'
+  /** Centre of the opening on the wall line (ground level). */
+  readonly point: Vec3
+  /** Unit vector pointing out of the chapel through the opening. */
+  readonly outward: Vec3
+  /** Where a zombie stands to attack the boards (x, 0, z). */
+  readonly standPoint: Vec3
+  /** Opening width in metres. */
+  readonly width: number
+}
+
+export const CHAPEL_DOORS: Readonly<Record<'front' | 'vestry', ChapelDoorSpec>> = {
+  front: {
+    id: 'front',
+    point: [CHAPEL_CENTER[0], 0, CHAPEL_CENTER[2] - CHAPEL.halfZ],
+    outward: [0, 0, -1],
+    standPoint: [10, 0, -2],
+    width: CHAPEL.doorWidth,
+  },
+  vestry: {
+    id: 'vestry',
+    point: [CHAPEL_CENTER[0] - CHAPEL.halfX, 0, 9.5],
+    outward: [-1, 0, 0],
+    standPoint: [6.5, 0, 9.5],
+    width: 1.4,
+  },
+}
+
+/**
+ * Chapel side-wall buttress and window centres along the chapel's local Z. Mirrors the
+ * constants in ChapelBuilding.tsx; the vestry opening is placed to clear both.
+ */
+export const CHAPEL_BUTTRESS_Z: readonly number[] = [-5.9, -3, 0, 3, 5.9]
+export const CHAPEL_WINDOW_Z: readonly number[] = [-1.5, 1.5]
+/** Half-width along Z of a buttress (pillar scaled 1.2) and of a window pane. */
+export const CHAPEL_BUTTRESS_HALF_W = 0.5
+export const CHAPEL_WINDOW_HALF_W = 0.275
+
+/** Gatekeeper's lodge at the mouth of Mausoleum Row. Footprint is kept clear of the avenue crypts. */
+export const LODGE = {
+  center: [-23.8, 0, -41.5] as Vec3,
+  halfX: 1.2,
+  halfZ: 1.2,
+  /** Pickup radius for the shotgun. */
+  pickupRadius: 0.9,
+} as const
+
+export const WOODPILE_POSITION: Vec3 = [-5, 0, 2]
+export const CHAPEL_CUPBOARD_POSITION: Vec3 = [7.9, 0.9, 7.6]
+export const CRANE_CRYPT_STEP: Vec3 = [-18.9, 0.35, -59.3]
+export const POWDER_TIN_HUT: Vec3 = [-1.8, 0.8, -1]
+export const POWDER_TIN_BELL_TOWER: Vec3 = [29, 0.4, -24]
+
+/** Where Father Crane appears: the catacomb stair if revealed, otherwise a floor break. */
+export const CRANE_SPAWN = {
+  stair: [10, 0, 10.3] as Vec3,
+  floorBreak: [11.7, 0, 9.6] as Vec3,
+} as const
+
+/** Where the Congregation rises from the chapel floor. */
+export const CONGREGATION_POINTS: readonly Vec3[] = [
+  [9, 0, 3],
+  [11, 0, 3],
+  [10, 0, 1.5],
+]

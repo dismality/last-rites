@@ -1,0 +1,36 @@
+.charge-meter {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + 64px);
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  color: var(--parchment);
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px #000;
+  pointer-events: none;
+}
+
+.charge-meter__bar {
+  width: 140px;
+  height: 10px;
+  background: rgb(20 17 15 / 0.75);
+  border: 1px solid var(--parchment-dark);
+}
+
+.charge-meter__fill {
+  height: 100%;
+  background: var(--parchment-dark);
+}
+
+.charge-meter__bar[data-full='true'] .charge-meter__fill {
+  background: var(--ember);
+}
+
+.charge-meter__tired {
+  border-bottom: 1px solid var(--blood);
+}

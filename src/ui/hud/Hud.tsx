@@ -1,6 +1,11 @@
 import { useGameStore } from '../../game/state/gameStore'
-import { LanternHealth } from './LanternHealth'
-import { FuelReservoir } from './FuelReservoir'
+import { useIntroStore } from '../../game/state/introStore'
+import { IntroOverlay } from './IntroOverlay'
+import { HealthBar } from './HealthBar'
+import { LanternGauge } from './LanternGauge'
+import { ObjectiveTracker } from './ObjectiveTracker'
+import { Compass } from './Compass'
+import { ZoneCard } from './ZoneCard'
 import { StaminaBar } from './StaminaBar'
 import { DamageFeedback } from './DamageFeedback'
 import { Crosshair } from './Crosshair'
@@ -11,21 +16,51 @@ import { DuskHint } from './DuskHint'
 import { WaveTally } from './WaveTally'
 import { RiteMeter } from './RiteMeter'
 import { DigBar } from './DigBar'
+import { AmmoReadout } from './AmmoReadout'
+import { EffectIcons } from './EffectIcons'
+import { ChargeMeter } from './ChargeMeter'
+import { DoorStatus } from './DoorStatus'
+import { BossBar } from './BossBar'
+import { BossNameCard } from './BossNameCard'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
 
 /** HTML overlay above the canvas; only shown on the game screen. */
 export function Hud() {
   const screen = useGameStore((s) => s.screen)
+  const introPlaying = useIntroStore((s) => s.playing)
   if (screen !== 'game') return null
+  // The cutscene shows only its own overlay plus captions and toasts.
+  if (introPlaying) {
+    return (
+      <div className="hud">
+        <IntroOverlay />
+        <Subtitles />
+        <Toast />
+      </div>
+    )
+  }
   return (
     <div className="hud">
       <DamageFeedback />
       <Crosshair />
       <InteractPrompt />
+      <ObjectiveTracker />
+      <Compass />
+      <ZoneCard />
+      {/* Below the compass, wave tally and rite meter so none of them overlap. */}
+      <div className="hud-top-stack">
+        <BossBar />
+        <DoorStatus />
+      </div>
+      <BossNameCard />
+      <ChargeMeter />
+      <EffectIcons />
+      <AmmoReadout />
+      {/* Health over lantern, bottom left; stamina is bottom centre and the hotbar bottom right. */}
       <div className="hud-corner">
-        <LanternHealth />
-        <FuelReservoir />
+        <HealthBar />
+        <LanternGauge />
       </div>
       <Hotbar />
       <StaminaBar />

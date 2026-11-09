@@ -449,3 +449,7 @@
     transition: none;
   }
 }
+
+.recipe-book__tabs { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.5rem; }
+.recipe-book__tabs .craft-btn[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--ember); }
+.craft-btn:disabled { opacity: 0.5; cursor: not-allowed; }

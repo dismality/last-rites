@@ -8,8 +8,7 @@
 //  - "Altar" near the apse end: E within 2.5 m, stage 2 active, not healed today
 //    -> heal 25 HP and mark altarHealedToday = true
 //
-// Door mesh: barred (dark plank colour) when stage 1 is complete and the
-// final rite is not active. Enemy AI can call isDoorBarred() from chapelStore.
+// Door frames and boards live in ChapelBuilding and the barricade scene code.
 //
 // Architecture note: this is a rendering/interaction component.
 // All game logic lives in chapelStore and the repairs system.
@@ -45,11 +44,6 @@ const DOOR_OFFSET = new THREE.Vector3(0, 0, -4.5)
  */
 const ALTAR_OFFSET = new THREE.Vector3(0, 0, 4.5)
 
-/** Colour when the door is open / unbarred. */
-const DOOR_COLOR_OPEN = '#3a2412'
-
-/** Colour when the door is barred (stage 1 complete). */
-const DOOR_COLOR_BARRED = '#5c3d1e'
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -80,31 +74,6 @@ function ChapelGeometry() {
   )
 }
 
-/**
- * The chapel door mesh.  Its colour changes when the door is barred.
- */
-function DoorMesh({ barred }: { barred: boolean }) {
-  const meshRef = useRef<THREE.Mesh>(null)
-
-  useFrame(() => {
-    if (!meshRef.current) return
-    const mat = meshRef.current.material as THREE.MeshStandardMaterial
-    const target = barred ? DOOR_COLOR_BARRED : DOOR_COLOR_OPEN
-    mat.color.lerp(new THREE.Color(target), 0.05)
-  })
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={[0, 1.25, -5.85]}
-      castShadow
-    >
-      <boxGeometry args={[1.4, 2.5, 0.15]} />
-      <meshStandardMaterial color={DOOR_COLOR_OPEN} roughness={0.85} metalness={0.1} />
-    </mesh>
-  )
-}
-
 // ---------------------------------------------------------------------------
 // Chapel (main export)
 // ---------------------------------------------------------------------------
@@ -114,7 +83,6 @@ function DoorMesh({ barred }: { barred: boolean }) {
  * rest of the scene can treat `[0,0,0]` as the hut/grounds start.
  */
 export function Chapel() {
-  const doorBarred = useChapelStore((s) => s.isDoorBarred())
   const altarActive = useChapelStore((s) => s.isAltarActive())
   const altarHealedToday = useChapelStore((s) => s.chapel.altarHealedToday)
   const setAltarHealedToday = useChapelStore((s) => s.setAltarHealedToday)
@@ -189,7 +157,6 @@ export function Chapel() {
   return (
     <group position={[CHAPEL_POS.x, CHAPEL_POS.y, CHAPEL_POS.z]} name="chapel">
       <ChapelGeometry />
-      <DoorMesh barred={doorBarred} />
     </group>
   )
 }

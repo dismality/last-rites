@@ -28,6 +28,8 @@ interface MysteryStoreState {
   discoverClue: (clueId: string) => boolean
   /** Records a journal page as collected. */
   collectPage: (page: PageNumber) => void
+  /** Records that Father Crane was put to rest (Req 17.15). */
+  recordCraneRested: () => void
   reset: () => void
 }
 
@@ -56,5 +58,6 @@ export const useMysteryStore = create<MysteryStoreState>((set, get) => ({
     return true
   },
   collectPage: (page) => set({ mystery: collectPage(get().mystery, page) }),
+  recordCraneRested: () => set({ mystery: { ...get().mystery, craneRested: true } }),
   reset: () => set({ mystery: createMysteryState() }),
 }))

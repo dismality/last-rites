@@ -125,9 +125,11 @@ export const resolveFlask = <T extends StaggerEnemy>(
   enemies: readonly T[],
   lanternFuel: number,
   stun: number,
+  /** Blessed Reach upgrade: metres added to the splash radius. */
+  radiusBonusM = 0,
 ): BlastResult<T> => {
   const w = WEAPON_MAP['holy-water-flask']
-  return resolveBlast(center, w.radius ?? 0, w.damage, enemies, { lanternFuel, source: 'holy-water-flask' }, stun)
+  return resolveBlast(center, (w.radius ?? 0) + Math.max(0, radiusBonusM), w.damage, enemies, { lanternFuel, source: 'holy-water-flask' }, stun)
 }
 
 export const resolveNailBomb = <T extends StaggerEnemy>(
@@ -238,13 +240,15 @@ export function keepOutOfSalt(p: Vec2, circles: readonly SaltCircle[]): Vec2 {
 }
 
 /** Applies the barrier to every zombie; returns the same array when nothing moved. */
-export function constrainToSalt<T extends { pos: Vec2 }>(
+export function constrainToSalt<T extends { pos: Vec2; type?: string }>(
   enemies: readonly T[],
   circles: readonly SaltCircle[],
 ): readonly T[] {
   if (circles.length === 0) return enemies
   let changed = false
   const next = enemies.map((e) => {
+    // Father Crane is only slowed inside a circle (bossSpeed), never stopped (Req 17.10).
+    if (e.type === 'father-crane') return e
     const pos = keepOutOfSalt(e.pos, circles)
     if (pos === e.pos) return e
     changed = true

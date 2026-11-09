@@ -13,6 +13,7 @@ import { useRef, useMemo, useState } from 'react'
 import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGameStore, useInventoryStore, usePlayerStore, useSettingsStore } from '../../game/state'
+import { useIntroStore } from '../../game/state/introStore'
 import { tickHeadBob, type BobState } from '../../game/systems/movement'
 import { hotbarItem } from '../../game/systems/satchel'
 import {
@@ -30,9 +31,24 @@ import {
 import type { ItemId } from '../../game/types'
 import { input } from './input'
 import { meleeRuntime } from './meleeRuntime'
-import { isCracked } from '../../game/systems/durability'
+import { isCracked, maxDurability } from '../../game/systems/durability'
 import type { WeaponState } from '../../game/systems/durability'
-import { WEAPON_MAP } from '../../data/weapons'
+import { FIREARMS } from '../../data/firearms'
+import { useCombatStore } from '../../game/state/combatStore'
+import { heavyStatsFor } from '../../game/systems/heavyAttack'
+import { muzzleOpacity, muzzleProfile } from '../../game/systems/muzzleFlash'
+import {
+  POSE_REST,
+  addPoses,
+  aimPose,
+  firingKickPose,
+  heavyChargePose,
+  reloadPose,
+  type WeaponPose,
+} from '../../game/systems/viewmodel'
+import { weaponRuntime } from './weaponRuntime'
+import { WeaponMesh } from './viewmodelWeapons'
+import { MUZZLE_TIP, isHeldWeaponId } from './viewmodelWeaponGeometry'
 
 // ---------------------------------------------------------------------------
 // Props
@@ -44,7 +60,15 @@ export interface ViewmodelProps {
    * Pass null when no weapon is equipped (should not happen in normal play —
    * the player always has the rusty-shovel).
    */
-  weaponState: WeaponState | null
+  weaponState?: WeaponState | null
+}
+
+/** Durability of the shown item from the combat store, or null when it does not wear out. */
+function durableState(item: ItemId | null): WeaponState | null {
+  if (item !== 'bone-club' && item !== 'sharpened-shovel' && item !== 'wood-axe') return null
+  const state = useCombatStore.getState()
+  const durability = state.durability[item]
+  return durability === undefined ? null : { id: item, durability }
 }
 
 // ---------------------------------------------------------------------------
@@ -62,8 +86,7 @@ function crackOpacity(weaponState: WeaponState): number {
   const { durability, id } = weaponState
   if (durability === null) return 0
 
-  const def = WEAPON_MAP[id]
-  const max = def.durability
+  const max = maxDurability(id, useCombatStore.getState().upgrades)
   if (max === null || max === 0) return 0
 
   const fraction = durability / max
@@ -139,7 +162,49 @@ function BoneClubMesh() {
   )
 }
 
-function ViewmodelMesh({ item }: { item: ItemId | null }) {
+/**
+ * Additive flash sprite at the barrel tip. Opacity is driven per frame by Viewmodel
+ * (muzzleOpacity), so it is always mounted and simply hidden between shots.
+ */
+function MuzzleQuad({
+  tip,
+  quadRef,
+}: {
+  tip: readonly [number, number, number]
+  quadRef: React.RefObject<THREE.Mesh | null>
+}) {
+  return (
+    <mesh ref={quadRef} position={[tip[0], tip[1], tip[2]]} visible={false}>
+      <circleGeometry args={[0.07, 12]} />
+      <meshBasicMaterial
+        color="#ffcf7a"
+        transparent
+        opacity={0}
+        blending={THREE.AdditiveBlending}
+        depthWrite={false}
+        toneMapped={false}
+      />
+    </mesh>
+  )
+}
+
+function ViewmodelMesh({
+  item,
+  muzzleRef,
+}: {
+  item: ItemId | null
+  muzzleRef: React.RefObject<THREE.Mesh | null>
+}) {
+  if (isHeldWeaponId(item)) {
+    return (
+      <group position={HELD_POSITION} rotation={HELD_ROTATION}>
+        <WeaponMesh id={item} />
+        {(item === 'revolver' || item === 'shotgun') && (
+          <MuzzleQuad tip={MUZZLE_TIP[item]} quadRef={muzzleRef} />
+        )}
+      </group>
+    )
+  }
   if (item === 'rusty-shovel') return <ShovelMesh sharpened={false} />
   if (item === 'sharpened-shovel') return <ShovelMesh sharpened />
   if (item === 'bone-club') return <BoneClubMesh />
@@ -203,6 +268,26 @@ function CrackOverlay({ opacity }: CrackOverlayProps) {
   )
 }
 
+/** Aim, firing kick, reload dip and heavy-charge pull-back for the item in hand (Req 5.7, 5.8). */
+function weaponPose(item: ItemId | null): WeaponPose {
+  const live = useCombatStore.getState().live
+  if (item === 'revolver' || item === 'shotgun') {
+    const newest = weaponRuntime.muzzleEvents[weaponRuntime.muzzleEvents.length - 1]
+    const recoverS = FIREARMS.find((f) => f.id === item)?.recoilRecoverS ?? 0
+    const kick = newest ? firingKickPose(newest.ageS, recoverS) : POSE_REST
+    const reload =
+      live.reload && live.reload.weapon === item && live.reload.totalS > 0
+        ? reloadPose(1 - live.reload.leftS / live.reload.totalS)
+        : POSE_REST
+    return addPoses(aimPose(weaponRuntime.aimBlend), kick, reload)
+  }
+  if ((item === 'wood-axe' || item === 'silver-sabre') && live.charge) {
+    const { chargeS } = heavyStatsFor(item, useCombatStore.getState().upgrades)
+    return heavyChargePose(chargeS > 0 ? live.charge.heldS / chargeS : 0)
+  }
+  return POSE_REST
+}
+
 function syncCamera(camera: THREE.PerspectiveCamera, fov: number, aspect: number): void {
   if (camera.fov === fov && camera.aspect === aspect) return
   camera.fov = fov
@@ -225,13 +310,16 @@ function syncCamera(camera: THREE.PerspectiveCamera, fov: number, aspect: number
  * the world. Mount it together with <PostEffects />; on its own nothing draws
  * the world. The viewmodel therefore skips bloom/vignette, which is fine for a held prop.
  */
-export function Viewmodel({ weaponState }: ViewmodelProps) {
+export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProps) {
+  // Durability comes from the combat store; the prop only overrides it (tests, previews).
+  const [storeState, setStoreState] = useState<WeaponState | null>(null)
+  const weaponState = weaponStateProp ?? storeState
   const opacity = useMemo(
     () => (weaponState ? crackOpacity(weaponState) : 0),
     [weaponState],
   )
-  const cracked = weaponState ? isCracked(weaponState) : false
-
+  const cracked = weaponState ? isCracked(weaponState, useCombatStore.getState().upgrades) : false
+  const muzzleRef = useRef<THREE.Mesh>(null)
   const size = useThree((s) => s.size)
 
   const scene = useMemo(() => new THREE.Scene(), [])
@@ -283,18 +371,41 @@ export function Viewmodel({ weaponState }: ViewmodelProps) {
       const lowered = swapEase(swap.current.progress)
       const b = viewmodelBob(bob.current)
       const sw = meleeRuntime.pose
+      const wp = weaponPose(swap.current.shown)
       g.position.set(
-        sway.current.x + b.x + sw.x,
-        sway.current.y + b.y + sw.y - lowered * SWAP_LOWER_DISTANCE,
-        sw.z,
+        sway.current.x + b.x + sw.x + wp.x,
+        sway.current.y + b.y + sw.y + wp.y - lowered * SWAP_LOWER_DISTANCE,
+        sw.z + wp.z,
       )
-      g.rotation.set(-lowered * SWAP_LOWER_TILT - sw.rotX, 0, sw.rotZ)
+      g.rotation.set(-lowered * SWAP_LOWER_TILT - sw.rotX - wp.rotX, 0, sw.rotZ + wp.rotZ)
     }
+
+    // Muzzle flash: age the queued shots, drop spent ones, light the newest as a quad.
+    const profile = muzzleProfile(settings.flashingLights)
+    const events = weaponRuntime.muzzleEvents
+    if (dt > 0) {
+      for (const e of events) e.ageS += dt
+      weaponRuntime.muzzleEvents = events.filter((e) => e.ageS < profile.durationS)
+    }
+    const newest = weaponRuntime.muzzleEvents[weaponRuntime.muzzleEvents.length - 1]
+    const quad = muzzleRef.current
+    if (quad) {
+      const a = newest && newest.kind === swap.current.shown ? muzzleOpacity(profile, newest.ageS) : 0
+      quad.visible = a > 0
+      ;(quad.material as THREE.MeshBasicMaterial).opacity = a
+    }
+
+    // Feed durability from the combat store (Req 5.3); state only changes when the value does.
+    const ds = durableState(swap.current.shown)
+    setStoreState((cur) =>
+      cur?.id === ds?.id && cur?.durability === ds?.durability ? cur : ds,
+    )
     // Nothing is drawn while the slot is empty or mid-swap-to-nothing.
     if (itemGroup.current) itemGroup.current.visible = swap.current.shown !== null
     setShownItem((cur) => (cur === swap.current?.shown ? cur : (swap.current?.shown ?? null)))
     // The ending camera is not the player's eyes, so no hands in shot.
-    if (gs.screen === 'ending') return
+    // Same for the intro cutscene: its camera is not the player's eyes either.
+    if (gs.screen === 'ending' || useIntroStore.getState().playing) return
 
     // The EffectComposer (priority 1) has already drawn the world to the screen.
     // Draw the viewmodel over it with a cleared depth buffer so it never clips into walls.
@@ -312,7 +423,7 @@ export function Viewmodel({ weaponState }: ViewmodelProps) {
       <directionalLight position={[0.5, 1, 1]} intensity={1.2} color="#e8913a" />
       <group ref={rig} name="viewmodel">
         <group ref={itemGroup}>
-          <ViewmodelMesh item={shownItem} />
+          <ViewmodelMesh item={shownItem} muzzleRef={muzzleRef} />
           {cracked && <CrackOverlay opacity={opacity} />}
         </group>
       </group>

@@ -2,6 +2,9 @@
 // No React / three.js: positions are ground-plane (x, z) vectors.
 
 import type { EnemyId } from '../../data/enemies'
+import type { DamageSource, HeavyMeleeId } from '../types'
+import { HEAVY_MAP } from '../../data/heavyMelee'
+import { KNOCKDOWN_DAMAGE_MULT } from '../../data/combatMoves'
 import {
   DARKNESS_DAMAGE_MULT,
   FLASK_WAILER_DAMAGE_MULT,
@@ -21,13 +24,17 @@ export interface CombatEnemy {
   type: EnemyId
   hp: number
   pos: Vec2
+  /** Seconds of knockdown left; absent or 0 = on its feet. */
+  knockdown?: number
 }
 
 export interface DamageContext {
   /** Lantern fuel as a percentage 0–100. */
   lanternFuel: number
   /** Weapon that dealt the damage; drives type-specific bonuses. */
-  source?: 'holy-water-flask' | 'melee' | 'nail-bomb' | 'lantern-trap'
+  source?: DamageSource
+  /** Heavy weapon that swung, so its per-type bonus (Sabre vs Wailer) applies. */
+  weapon?: HeavyMeleeId
 }
 
 export const DEFAULT_MELEE_ARC_DEG = MELEE_ARC_DEG
@@ -73,16 +80,18 @@ export function aoe(center: Vec2, radius: number, enemies: readonly CombatEnemy[
 }
 
 /** Multiplier applied to raw damage for this target and context. */
-export function damageMultiplier(type: EnemyId, ctx: DamageContext): number {
+export function damageMultiplier(type: EnemyId, ctx: DamageContext, enemy?: { knockdown?: number }): number {
   let mult = 1
   if (ctx.lanternFuel <= 0) mult *= DARKNESS_DAMAGE_MULT
   if (type === 'wailer' && ctx.source === 'holy-water-flask') mult *= FLASK_WAILER_DAMAGE_MULT
+  if (type === 'wailer' && ctx.weapon) mult *= 1 + HEAVY_MAP[ctx.weapon].wailerBonus
+  if ((enemy?.knockdown ?? 0) > 0) mult *= KNOCKDOWN_DAMAGE_MULT
   return mult
 }
 
 /** Returns the enemy after taking `dmg`. HP never rises and never drops below 0. */
 export function applyDamage<T extends CombatEnemy>(enemy: T, dmg: number, ctx: DamageContext): T {
   const raw = Number.isFinite(dmg) ? Math.max(0, dmg) : 0
-  const dealt = raw * damageMultiplier(enemy.type, ctx)
+  const dealt = raw * damageMultiplier(enemy.type, ctx, enemy)
   return { ...enemy, hp: Math.max(0, enemy.hp - dealt) }
 }

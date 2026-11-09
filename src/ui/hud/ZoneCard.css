@@ -1,0 +1,35 @@
+/* Zone name card: upper third, fades are driven by cardOpacity (no CSS transition). */
+.zone-card {
+  position: fixed;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: min(40rem, 90vw);
+  text-align: center;
+  pointer-events: none;
+}
+
+.zone-card__panel {
+  padding: 0.6rem 1.5rem;
+  background: rgba(20, 17, 15, 0.55);
+  border-top: 1px solid var(--parchment-dark);
+  border-bottom: 1px solid var(--parchment-dark);
+}
+
+.zone-card__name {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  color: var(--parchment);
+  text-shadow: 0 2px 6px var(--ink);
+}
+
+.zone-card__line {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--parchment-dark);
+  text-shadow: 0 1px 4px var(--ink);
+}

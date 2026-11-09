@@ -17,13 +17,21 @@ import {
   type WaveComposition,
   type WaveGrave,
 } from '../../data/waves'
+import { waveSize } from '../../data/waves'
+import { DEFAULT_MODE } from '../../data/modes'
 import type { Rng } from '../rng'
+import type { ModeId } from '../types'
+import { endlessNight } from './endless'
+import { canBeDoorAttacker, doorAttackerCount } from './barricade'
+import { rollElite } from './elites'
 
 export type WavePhase = 'idle' | 'active' | 'gap' | 'done'
 
 export interface WaveState {
   phase: WavePhase
-  night: NightNumber | null
+  night: number | null
+  /** The night's compositions, fixed when it starts (story table or Endless generator). */
+  plan: readonly WaveComposition[]
   /** 0-based index of the current (or next, during a gap) wave. */
   waveIndex: number
   /** Enemies of the current wave still waiting for a free slot or a far grave. */
@@ -32,6 +40,10 @@ export interface WaveState {
   gapTimer: number
   /** Total enemies spawned this night. */
   spawned: number
+  /** An elite already spawned this wave (at most one per wave). Reset at every wave start. */
+  eliteSpawned: boolean
+  /** Door_Attacker slots still unassigned this wave. Reset at every wave start. */
+  attackersLeft: number
 }
 
 export interface WaveSpawn {
@@ -39,12 +51,14 @@ export interface WaveSpawn {
   graveId: string
   x: number
   z: number
+  elite: boolean
+  doorAttacker: boolean
 }
 
 export type WaveEvent =
-  | { type: 'waveStarted'; night: NightNumber; wave: number; total: number; size: number }
-  | { type: 'waveCleared'; night: NightNumber; wave: number }
-  | { type: 'wavesCleared'; night: NightNumber }
+  | { type: 'waveStarted'; night: number; wave: number; total: number; size: number }
+  | { type: 'waveCleared'; night: number; wave: number }
+  | { type: 'wavesCleared'; night: number }
 
 export interface WaveContext {
   playerPos: { x: number; z: number }
@@ -52,6 +66,8 @@ export interface WaveContext {
   liveCount: number
   rng: Rng
   graves?: readonly WaveGrave[]
+  /** Separate stream for elite rolls so base seeds are unchanged; without it no elite is rolled. */
+  eliteRng?: Rng
 }
 
 export interface WaveTick {
@@ -61,7 +77,11 @@ export interface WaveTick {
 }
 
 export function createWaveState(): WaveState {
-  return { phase: 'idle', night: null, waveIndex: 0, pending: [], gapTimer: 0, spawned: 0 }
+  return { phase: 'idle', night: null, plan: [], waveIndex: 0, pending: [], gapTimer: 0,
+    spawned: 0,
+    eliteSpawned: false,
+    attackersLeft: 0,
+  }
 }
 
 /** Expands a composition into a spawn queue; wailers last so the screamer arrives behind its pack. */
@@ -69,26 +89,37 @@ export function expandWave(w: WaveComposition): EnemyId[] {
   const q: EnemyId[] = []
   for (let i = 0; i < w.lurker; i++) q.push('lurker')
   for (let i = 0; i < w.shambler; i++) q.push('shambler')
+  for (let i = 0; i < w.brute; i++) q.push('brute')
+  for (let i = 0; i < w.bloater; i++) q.push('bloater')
   for (let i = 0; i < w.wailer; i++) q.push('wailer')
   return q
 }
 
 /** Total enemies a night spawns across all its waves. */
-export function nightTotal(night: NightNumber): number {
-  return NIGHT_MAP[night].waves.reduce((n, w) => n + w.shambler + w.wailer + w.lurker, 0)
+export function nightTotal(night: number, mode: ModeId = DEFAULT_MODE): number {
+  return nightPlan(mode, night).reduce((n, w) => n + waveSize(w), 0)
+}
+
+/** Waves of a night: the story table (with spec 07 additions) or the Endless generator. Empty if none. */
+export function nightPlan(mode: ModeId, night: number): readonly WaveComposition[] {
+  if (mode === 'endless') return Number.isFinite(night) && night >= 1 ? endlessNight(night).waves : []
+  return NIGHT_MAP[night as NightNumber]?.waves ?? []
 }
 
 /** `nightStarted(n)`: begin wave 1 immediately. */
-export function startNight(night: number): WaveState {
-  const def = NIGHT_MAP[night as NightNumber]
-  if (!def) return createWaveState()
+export function startNight(night: number, mode: ModeId = DEFAULT_MODE): WaveState {
+  const plan = nightPlan(mode, night)
+  if (plan.length === 0) return createWaveState()
   return {
     phase: 'active',
-    night: def.night,
+    night,
+    plan,
     waveIndex: 0,
-    pending: expandWave(def.waves[0]),
+    pending: expandWave(plan[0]),
     gapTimer: 0,
     spawned: 0,
+    eliteSpawned: false,
+    attackersLeft: doorAttackerCount(waveSize(plan[0]), night),
   }
 }
 
@@ -97,15 +128,18 @@ export function startNight(night: number): WaveState {
  * wave (the night's strongest) rises so the rite is always held under attack (Req 5.3).
  */
 export function startRiteAssault(): WaveState {
-  const def = NIGHT_MAP[5]
-  const last = def.waves.length - 1
+  const plan = NIGHT_MAP[5].waves
+  const last = plan.length - 1
   return {
     phase: 'active',
-    night: def.night,
+    night: 5,
+    plan,
     waveIndex: last,
-    pending: expandWave(def.waves[last]),
+    pending: expandWave(plan[last]),
     gapTimer: 0,
     spawned: 0,
+    eliteSpawned: false,
+    attackersLeft: doorAttackerCount(waveSize(plan[last]), 5),
   }
 }
 
@@ -124,7 +158,8 @@ export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveT
   if (state.phase === 'idle' || state.phase === 'done' || state.night === null) {
     return { state, spawns, events }
   }
-  const def = NIGHT_MAP[state.night]
+  const def = { night: state.night, waves: state.plan }
+  if (def.waves.length === 0) return { state, spawns, events }
 
   if (state.phase === 'gap') {
     const gapTimer = state.gapTimer - dt
@@ -135,10 +170,17 @@ export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveT
       night: def.night,
       wave: state.waveIndex + 1,
       total: def.waves.length,
-      size: w.shambler + w.wailer + w.lurker,
+      size: waveSize(w),
     })
     return {
-      state: { ...state, phase: 'active', pending: expandWave(w), gapTimer: 0 },
+      state: {
+        ...state,
+        phase: 'active',
+        pending: expandWave(w),
+        gapTimer: 0,
+        eliteSpawned: false,
+        attackersLeft: doorAttackerCount(waveSize(w), def.night),
+      },
       spawns,
       events,
     }
@@ -151,17 +193,22 @@ export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveT
   // Walk the eligible graves from a random start so one burst uses different graves,
   // then jitter each spawn so a wave larger than the grave count still doesn't stack.
   const start = graves.length === 0 ? 0 : Math.floor(ctx.rng() * graves.length)
+  let eliteSpawned = state.eliteSpawned
+  let attackersLeft = state.attackersLeft
   for (let i = 0; i < count; i++) {
     const g = graves[(start + i) % graves.length]
-    spawns.push({
-      type: state.pending[i],
-      graveId: g.id,
-      x: g.x + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M,
-      z: g.z + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M,
-    })
+    const type = state.pending[i]
+    const x = g.x + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
+    const z = g.z + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
+    const elite = ctx.eliteRng ? rollElite(ctx.eliteRng, type, def.night, eliteSpawned) : false
+    if (elite) eliteSpawned = true
+    const doorAttacker = attackersLeft > 0 && canBeDoorAttacker(type)
+    if (doorAttacker) attackersLeft--
+    spawns.push({ type, graveId: g.id, x, z, elite, doorAttacker })
   }
   const pending = state.pending.slice(count)
   const spawned = state.spawned + count
+  const wave = { eliteSpawned, attackersLeft }
 
   // Cleared only when nothing is queued, nothing alive, and nothing just spawned.
   if (pending.length === 0 && count === 0 && ctx.liveCount === 0) {
@@ -169,13 +216,13 @@ export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveT
     const next = state.waveIndex + 1
     if (next >= def.waves.length) {
       events.push({ type: 'wavesCleared', night: def.night })
-      return { state: { ...state, phase: 'done', pending, spawned }, spawns, events }
+      return { state: { ...state, ...wave, phase: 'done', pending, spawned }, spawns, events }
     }
     return {
-      state: { ...state, phase: 'gap', waveIndex: next, pending, gapTimer: WAVE_GAP, spawned },
+      state: { ...state, ...wave, phase: 'gap', waveIndex: next, pending, gapTimer: WAVE_GAP, spawned },
       spawns,
       events,
     }
   }
-  return { state: { ...state, pending, spawned }, spawns, events }
+  return { state: { ...state, ...wave, pending, spawned }, spawns, events }
 }

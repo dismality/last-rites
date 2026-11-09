@@ -3,7 +3,16 @@
 // Pure data: no logic, no side effects.
 
 import type { KeyItemId, RelicId } from '../game/types'
-import type { Vec3 } from './cemeteryLayout'
+import {
+  AVENUE_CRYPT_SIZE,
+  CATACOMBS,
+  CHAPEL,
+  CHAPEL_CENTER,
+  MAUSOLEUM_ROW,
+  avenueFarZ,
+  type CorridorSpec,
+  type Vec3,
+} from './cemeteryLayout'
 import type { LootTableId } from './lootTables'
 
 export type ZoneId = 'grounds' | 'mausoleum-row' | 'chapel' | 'catacombs'
@@ -20,12 +29,63 @@ export const ZONES: readonly ZoneDef[] = [
   { id: 'catacombs', name: 'Catacombs' },
 ]
 
+/** Axis-aligned ground rectangle (x east, z south). */
+export interface ZoneRect {
+  minX: number
+  maxX: number
+  minZ: number
+  maxZ: number
+}
+
+const corridorRect = (c: CorridorSpec, halfX: number, farZ: number): ZoneRect => {
+  const nearZ = c.entranceZ
+  return {
+    minX: c.centerX - halfX,
+    maxX: c.centerX + halfX,
+    minZ: Math.min(nearZ, farZ),
+    maxZ: Math.max(nearZ, farZ),
+  }
+}
+
+const deepestCrypt = Math.max(...Object.values(AVENUE_CRYPT_SIZE).map((s) => s.depth))
+
+/**
+ * Zone rectangles derived from the layout so they track it. Checked in this order;
+ * `grounds` is the fallback for everything else, so zone lookup is total.
+ * Mausoleum Row is widened to the crypts lining the avenue (setback 0.8 m, see cemeteryLayout).
+ */
+export const ZONE_BOUNDS: readonly { zone: Exclude<ZoneId, 'grounds'>; rect: ZoneRect }[] = [
+  {
+    zone: 'chapel',
+    rect: {
+      minX: CHAPEL_CENTER[0] - (CHAPEL.halfX + CHAPEL.wallThickness),
+      maxX: CHAPEL_CENTER[0] + (CHAPEL.halfX + CHAPEL.wallThickness),
+      minZ: CHAPEL_CENTER[2] - (CHAPEL.halfZ + CHAPEL.wallThickness),
+      maxZ: CHAPEL_CENTER[2] + (CHAPEL.halfZ + CHAPEL.wallThickness),
+    },
+  },
+  {
+    zone: 'catacombs',
+    rect: corridorRect(
+      CATACOMBS,
+      CATACOMBS.width / 2 + CATACOMBS.wallThickness,
+      CATACOMBS.entranceZ + CATACOMBS.dir * CATACOMBS.length,
+    ),
+  },
+  {
+    zone: 'mausoleum-row',
+    rect: corridorRect(MAUSOLEUM_ROW, MAUSOLEUM_ROW.width / 2 + 0.8 + deepestCrypt, avenueFarZ()),
+  },
+]
+
 /** A material spawn point; refilled from its loot table every new day. */
 export interface SpawnPoint {
   id: string
   zone: ZoneId
   position: Vec3
   lootTable: LootTableId
+  /** Fills once per run and never refills on a new day (e.g. the powder tin). */
+  once?: boolean
 }
 
 export const SPAWN_POINTS: readonly SpawnPoint[] = [

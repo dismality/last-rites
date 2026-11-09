@@ -80,6 +80,16 @@ describe('applyDamage', () => {
     expect(applyDamage(enemyAt('s', 0, 0, 'shambler'), flask, ctx).hp).toBe(20)
   })
 
+  it('takes 25% more while knocked down', () => {
+    expect(applyDamage({ ...enemyAt('a', 0, 0), knockdown: 1 }, 20, lit).hp).toBe(35)
+  })
+
+  it('adds 50% for the Sabre against Wailers only', () => {
+    const ctx: DamageContext = { lanternFuel: 50, source: 'heavy', weapon: 'silver-sabre' }
+    expect(applyDamage(enemyAt('w', 0, 0, 'wailer'), 30, ctx).hp).toBe(5)
+    expect(applyDamage(enemyAt('s', 0, 0), 30, ctx).hp).toBe(30)
+  })
+
   it('does not mutate the input', () => {
     const e = enemyAt('a', 0, 0)
     applyDamage(e, 10, lit)
