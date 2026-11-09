@@ -14,9 +14,20 @@ import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
 import { useFeedbackStore } from './feedbackStore'
 import { useProjectileStore } from './projectileStore'
+import { useCoinStore } from './coinStore'
+import { musicRuntime } from './musicRuntime'
+import { useScoreStore } from './scoreStore'
+import { stormRuntime } from './stormRuntime'
+import { emptySilence } from '../systems/scareSilence'
 import { useWaveStore } from './waveStore'
 
 export function clearNightState(): void {
+  // Night score, loose coin piles, weather and music silence belong to the failed night too.
+  useScoreStore.getState().resetNight()
+  useCoinStore.getState().clear()
+  stormRuntime.reset()
+  musicRuntime.silence = emptySilence
+  musicRuntime.reset()
   useEffectStore.getState().clear()
   gasRuntime.queue.length = 0
   meleeRuntime.dustQueue.length = 0

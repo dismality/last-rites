@@ -50,7 +50,7 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 5.1, 14.3, 14.4_
 
-- [ ] 2. Pure systems with property tests
+- [x] 2. Pure systems with property tests
   - [x] 2.1 Dawn upgrades: offer, pick and modifiers
     - New `src/game/systems/dawnUpgrades.ts`: `rankOf`, `belowMax`, `offerUpgrades` (partial Fisher-Yates over the upgrades below max), `pickUpgrade`, `Modifiers`, `IDENTITY_MODIFIERS`, `modifiersFromRanks`, `upgradeCard` (built from before and after modifiers)
     - `dawnUpgrades.test.ts` with fast-check
@@ -68,7 +68,7 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 1.5, 7.7, 12.11_
 
-  - [~] 2.3 Mode multipliers and lantern drain
+  - [x] 2.3 Mode multipliers and lantern drain
     - New `modes.ts` system: `spawnMultipliers`, `endlessHpScale`, `lanternDrainMultiplier`; `lantern.ts`: `tickLantern(s, dt, phase, drainMult = 1)`
     - `modes.test.ts` with fast-check, updates to `lantern.test.ts`
     - **Property 20: Mode multipliers match the table**
@@ -111,7 +111,7 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.10_
 
-  - [~] 2.8 Merchant stock and purchases
+  - [x] 2.8 Merchant stock and purchases
     - New `merchant.ts` system: `dealStock`, `merchantPresent`, `withinTradeRange`, `tryBuy` (sold out, then coins, then space, on a copy), `canOpenMerchant`
     - `merchant.test.ts` with fast-check
     - **Property 15: Merchant presence and menu gates**
@@ -143,7 +143,7 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 9.1, 9.10, 9.11, 9.12_
 
-  - [-] 2.12 Music mixer
+  - [x] 2.12 Music mixer
     - New `musicMixer.ts`: `initMixer`, `stepMixer`, `currentWeights`; retargeting mid-fade starts from the current weights; master falls over 0.3 s while silent and rises over 2 s afterwards, and the fade keeps tracking the layer while silent
     - `musicMixer.test.ts` with fast-check
     - **Property 26: Crossfades are continuous and frozen by pause**
@@ -151,14 +151,14 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 9.2, 9.5, 9.7, 9.9_
 
-  - [~] 2.13 Scare silence schedule
+  - [x] 2.13 Scare silence schedule
     - New `scareSilence.ts`: `emptySilence`, `announce`, `fired`, `isSilent`, `majorScareActive`, `beatImminent`
     - `scareSilence.test.ts` with fast-check, including the mixer integration at every Scare intensity
     - **Property 27: Scare silence covers the window and tracks the layer** (the schedule half: on from announcement to 2 s after the later beat, a pending beat keeps it on)
     - Finish
     - _Requirements: 9.5, 9.6, 9.7, 13.5_
 
-  - [-] 2.14 Storm rolls and lightning schedule
+  - [x] 2.14 Storm rolls and lightning schedule
     - New `storm.ts`: `StormState`, `stormChance`, `rollStorm`, `startStorm`, `tickStorm` (strike gaps 20 to 45 s, thunder delays 1 to 4 s, a strike waits while a beat is pending and keeps its thunder delay)
     - `storm.test.ts` with fast-check
     - **Property 28: Storm rolls follow the table**
@@ -167,7 +167,7 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.6, 10.16, 10.17, 10.18, 13.6, 13.7, 13.8_
 
-  - [~] 2.15 Lightning envelope, storm end and modifiers
+  - [x] 2.15 Lightning envelope, storm end and modifiers
     - `storm.ts`: `lightningLevel` (fast and slow variants), `endStorm` (cancels strikes, keeps scheduled thunder), `stormModifiers`, `thunderShakes`
     - Additions to `storm.test.ts` with fast-check
     - **Property 31: Flash envelope and shake follow the settings**
@@ -175,277 +175,277 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Finish
     - _Requirements: 10.5, 10.7, 10.8, 10.10, 10.11, 10.12, 12.6, 12.7_
 
-  - [-] 2.16 Satchel slot limit
+  - [x] 2.16 Satchel slot limit
     - `inventory.ts`: `addItem(inv, id, qty, slotLimit = SATCHEL_SLOTS)`; `crafting.ts`: remove the duplicate `SATCHEL_SLOTS` and pass the limit through
     - Updates to `inventory.test.ts` and `crafting.test.ts`: a larger limit holds more stacks, the default still holds 12
     - Finish
     - _Requirements: 1.8, 5.9_
 
-  - [-] 2.17 Stamina regen, dig time and flask radius hooks
+  - [x] 2.17 Stamina regen, dig time and flask radius hooks
     - `stamina.ts`: `tickStamina(..., regenMult = 1)`; `dig.ts`: `DigInput.durationS?` and `digProgress(state, durationS?)`; `projectiles.ts`: `throwFlask` takes `radiusBonusM`
     - Updates to `stamina.test.ts`, `dig.test.ts`, `projectiles.test.ts`: defaults unchanged, a multiplier of 1.25 raises regen by 25%, a 0.7 dig time shortens the dig, +1 m widens the flask radius
     - Finish
     - _Requirements: 1.8_
 
-  - [~] 2.18 Progression save sanitising
+  - [x] 2.18 Progression save sanitising
     - New `progressionSave.ts`: `ProgressionSave`, `sanitizeProgression(raw, ctx)` field by field (mode, seed, ranks, pending pick, score, coins, contracts, stock, stats, storm), defaults for a missing object
     - `progressionSave.test.ts` with fast-check
     - **Property 33: Persistent state round trips and sanitises per field**
     - Finish
     - _Requirements: 1.11, 6.5, 11.1, 11.4, 11.5, 11.8, 11.9, 11.10, 11.11, 11.13_
 
-- [ ] 3. Stores and glue
-  - [-] 3.1 Sim clock, overlay store and toast duration
+- [x] 3. Stores and glue
+  - [x] 3.1 Sim clock, overlay store and toast duration
     - New `simClock.ts` (plain object advanced only by the progression tick), `overlayStore.ts` (`merchantOpen`, `achievementsOpen`, `modeSelectOpen`); `toastStore.ts`: `push(text, durationMs?)` and `ToastMessage.durationMs`; `Toast.tsx` honours it
     - Unit tests: clock advances only when stepped, overlay flags toggle, contract toasts last 3000 ms, the default stays 2000 ms
     - Finish
     - _Requirements: 6.6, 12.9_
 
-  - [~] 3.2 Progression store and persistence list
+  - [x] 3.2 Progression store and persistence list
     - New `progressionStore.ts` (`mode`, `seed`, `ranks`, `pendingPick`, `dawnSummary`, `score`, `bossScored`, `coins`, `contracts`, `stock`, `stats`, `storm`) and `progressionPersistence.ts` (`PROGRESSION_PERSISTED`, `captureProgressionSave`)
     - Unit tests: initial state is the defaults, capture then sanitise returns the same state, coins never go below 0, the persisted list names every store field that is saved
     - Finish
     - _Requirements: 11.1, 11.4, 11.13_
 
-  - [~] 3.3 Score and coin stores
+  - [x] 3.3 Score and coin stores
     - New `scoreStore.ts` (combo, last kill time, seen uids, night counters, `resetNight`) and `coinStore.ts` (piles, `clear`)
     - Unit tests: `resetNight` clears the combo and counters, `clear` empties piles, a restored store equals a fresh one
     - Finish
     - _Requirements: 2.3, 4.5, 11.6_
 
-  - [~] 3.4 Achievement store and Endless best
+  - [x] 3.4 Achievement store and Endless best
     - New `achievementStore.ts` (`unlocked`, `visible`, `queued`, `unlock`, `resetSession`; own storage key; a failed write keeps the session unlock) and `endlessBest.ts` (`readBest`, `settleEndless` once per run, `sessionBest` fallback)
     - Unit tests: a throwing `localStorage` does not crash and the unlock still shows, the best is stored only when higher, a hostile stored value reads as 0, `settleEndless` runs once per `runId`
     - Finish
     - _Requirements: 7.10, 7.11, 7.12, 8.2, 8.8, 8.9, 8.10, 11.2, 11.12_
 
-  - [~] 3.5 Derived stats
+  - [x] 3.5 Derived stats
     - New `derivedStats.ts`: `currentModifiers()` memoised by the `ranks` object, `syncDerivedStats()` writing `playerStore.maxHealth = 100 + bonus`; `playerStore` gains `setMaxHealth`
     - Unit tests: Iron Constitution raises max HP by 15 per rank, `healPlayer` caps at the new max, a sync after load restores max HP, the modifiers object is stable between calls
     - Finish
     - _Requirements: 1.7, 1.8, 1.11_
 
-  - [~] 3.6 Progression actions
+  - [x] 3.6 Progression actions
     - New `progressionActions.ts`: `startRun(mode)` (reset, seed from `Math.random()`, first two contracts, derived stats, score reset, achievements and Endless best kept), `pickUpgrade(id)` (ignored when nothing is pending, Iron Constitution heals 15, jumps dawn to its last 2 s), `buyFromMerchant(id)`, `openMerchant()` and `closeMerchant()`
     - Unit tests: a second pick for the same dawn changes nothing, a pick sets `phaseTime` to at least `DAWN_DURATION_S − 2`, `startRun` resets ranks and coins, a purchase updates coins, stock and satchel together
     - Finish
     - _Requirements: 1.6, 1.7, 1.11, 5.9, 5.10, 6.1, 8.8, 11.3_
 
-  - [~] 3.7 Progression events: kills, shots, digs and pickups
+  - [x] 3.7 Progression events: kills, shots, digs and pickups
     - New `progressionEvents.ts` `installProgressionWatchers()`, first half: `enemyKilled` runs `applyKill`, `recordKill`, `coinDrop` and `addPile` in that order (the pile at the zombie's position, or at the player's feet if it is gone), `meleeHit`, `firearmFired`, `boardNailed`, `digCompleted`, `itemCollected` and `bossDefeated` update stats and score; events are ignored when `screen !== 'game'` or the player is taken
     - Unit tests: one kill pays score, stats and a pile once, a repeated uid changes nothing, a Crane `enemyKilled` scores 0 while `bossDefeated` scores 1000 once, a kill whose zombie has gone drops the pile at the player's feet
     - Finish
     - _Requirements: 2.1, 2.5, 2.8, 3.1, 3.2, 3.9, 4.5_
 
-  - [~] 3.8 Progression events: contracts, achievements, dawn and storms
+  - [x] 3.8 Progression events: contracts, achievements, dawn and storms
     - `progressionEvents.ts`, second half: contracts advance from the same events and pay once with a 3 s toast and caption; `nightStarted` resets night counters and rolls the night storm; `nightCleared` banks the night score, runs `finishNight` and Close Shave facts; `dawnStarted` deals contracts, sets `dawnSummary` and `pendingPick` from the seeded offer (null when nothing is left); `phaseChanged` to day rolls the day storm and deals the stock; any phase change ends the storm; achievements evaluate after each handler and on mystery and inventory changes; the 07 pause, journal and satchel states block nothing here
     - Unit tests: two contracts at run start, a dawn with every upgrade maxed sets no pick, the same seed gives the same offers, stock and storm after a Retry, `c-unhurt` pays at 50 damage or less, an achievement unlocks once with one toast
     - Finish
     - _Requirements: 1.2, 1.4, 5.6, 6.1, 6.4, 6.6, 6.7, 8.2, 10.1, 10.2, 10.11_
 
-  - [~] 3.9 Progression tick and runtime objects
+  - [x] 3.9 Progression tick and runtime objects
     - New `progressionTick.ts` (`progressionTick(dt)`, `deriveTickInput()`), `musicRuntime.ts` and `stormRuntime.ts` (plain objects with `reset()`); the tick advances `simClock`, `recordTime` (not while a pick is open), `tickCombo`, `stepPiles` with the coin subtitle, `tickStorm` and its events (`thunderRolled`), the music layer, silence and mixer; it returns early when `gameStore.taken`
     - Unit tests: one 0.1 s step equals ten 0.01 s steps, a frozen sim changes nothing, collected piles bank once, `deriveTickInput` carries hold, day length and last night per mode
     - Finish
     - _Requirements: 2.3, 3.4, 4.6, 9.9, 10.12_
 
-  - [~] 3.10 Install order
+  - [x] 3.10 Install order
     - `main.tsx`: call `installProgressionWatchers()` before `installNewDaySave()` and `installRunStats()`
     - Unit test that reads the install order from `main.tsx` and fails if the progression watchers come after the new-day save
     - Finish
     - _Requirements: 5.6, 14.5_
 
-- [ ] 4. Dawn hold and Endless wave plan
-  - [~] 4.1 Game loop wiring
+- [x] 4. Dawn hold and Endless wave plan
+  - [x] 4.1 Game loop wiring
     - `gameTick.ts` and `GameLoop.tsx`: `TickInput` carries `holdDawn`, `dayLengthS` and `lastNight` from `deriveTickInput()`; the loop passes the lantern drain multiplier, the stamina regen multiplier and the dig duration from `currentModifiers()`, and calls `progressionTick(STEP)` after `tickCombat`
     - Unit tests: a held dawn does not end, Endless has a 120 s day and no last night, Long Wick and storm change lantern drain, Second Wind raises regen
     - Finish
     - _Requirements: 1.5, 1.8, 7.4, 7.7, 10.5_
 
-  - [~] 4.2 Wave director: plan, mode, elites and night cleared
+  - [x] 4.2 Wave director: plan, mode, elites and night cleared
     - `WaveDirector.tsx`: build waves from `nightPlan(mode, night)`, pass `spawnMultipliers` and the mode elite chance to `createEnemy` and `rollElite`, emit `nightCleared` in both branches, run the rite branch only in story modes, record nights survived with the Endless cap
     - Unit tests: Hard zombies have ×1.25 HP and ×1.4 damage, Endless night 6 has the generated plan, `nightCleared` fires once per cleared night
     - Finish
     - _Requirements: 2.4, 7.3, 7.5, 7.7, 7.8, 7.9_
 
-  - [~] 4.3 Stats move and banish removal
+  - [x] 4.3 Stats move and banish removal
     - `endingStore.ts`: keep the flags and drop the `stats` field; `EnemyDirector.tsx`: remove the `banish()` call (kills are counted by the watchers); callers of `finalizeStats` and `summaryRows` read `progressionStore.stats` through `statRows`
     - Unit tests: `zombiesBanished` equals the sum of kills after a run of kills, the ending summary still lists its earlier rows
     - Finish
     - _Requirements: 3.1, 3.5_
 
-- [ ] 5. Scene
-  - [~] 5.1 Melee hit event and flask radius
+- [x] 5. Scene
+  - [x] 5.1 Melee hit event and flask radius
     - `MeleeAttack.tsx`: emit `meleeHit { uid }` once per zombie struck by a melee or heavy swing (never for kicks); `ThrownItems.tsx`: read `flaskRadiusBonusM` for the splash and the flash visual
     - Unit tests: one event per zombie per swing, none for a kick, a Blessed Reach flask has a 1 m larger radius
     - Finish
     - _Requirements: 1.8, 3.1, 6.4_
 
-  - [~] 5.2 Scare stager silence wiring
+  - [x] 5.2 Scare stager silence wiring
     - `ScareStager.tsx`: `telegraph()` for a major scare calls `announce(eventId, simClock.now + max(0, beat.at − directorTime))`, `beat()` calls `fired`; a beat held by a menu keeps the silence on; the scare director is untouched
     - Unit tests: a door slam announces then fires, a lurker lunge announces inside 1.5 s of its beat, `scareDirector.test.ts` passes unchanged
     - Finish
     - _Requirements: 9.5, 9.6, 13.5, 13.9_
 
-  - [~] 5.3 Merchant, cart and compass marker
+  - [x] 5.3 Merchant, cart and compass marker
     - New `scene/world/Merchant.tsx` (cart and Silas from merged primitives, about 5 draw calls, mounted only while `merchantPresent`, an emissive lantern sphere and no light); `interaction.ts`: `'trade'` action ("Trade", rune ᛗ, prompt "E: Trade") opening the menu through `canOpenMerchant`; `compass.ts`: optional `merchant` position adds the ⚱ "Silas" marker; arrival and leaving captions
     - Unit tests: the prompt reads "E: Trade" within 2.5 m, the marker appears only while he is present, an open menu closes when he leaves
     - Finish
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.8, 5.11, 5.13, 14.1_
 
-  - [~] 5.4 Coin piles
+  - [x] 5.4 Coin piles
     - New `scene/world/CoinPiles.tsx`: one instanced mesh of small coin heaps read from `coinStore`, shrinking in the last 2 s, up to 32 piles
     - Finish
     - _Requirements: 4.5, 4.7, 4.8_
 
-  - [~] 5.5 Weather: rain and thunder
+  - [x] 5.5 Weather: rain and thunder
     - New `scene/world/Weather.tsx`: one instanced mesh of 600 streaks in the 36 × 20 × 36 m box following the camera, falling at 16 m/s with an 8° slant and frozen by `isSimFrozen()`; rain level fades over 3 s; on `thunderRolled` it plays thunder, adds the "[thunder]" caption and shakes when `thunderShakes` allows; new `src/audio/rain.ts` exposes `setRainLevel` (the noise graph arrives in task 7.2)
     - Unit tests: a storm adds exactly one draw call, rain does not move while frozen, thunder shake follows Camera shake and Scare intensity
     - Finish
     - _Requirements: 10.5, 10.9, 10.10, 10.11, 10.12, 10.15_
 
-  - [~] 5.6 Lightning and storm fog
+  - [x] 5.6 Lightning and storm fog
     - `SkyAndFog.tsx`: `stormRuntime.flashLevel` boosts the existing ambient light by 1.4 and the moon by 1.6 and lerps the sky and fog colour toward `#d6e4ff` by 0.5; fog density adds 0.01 while a storm is active without writing it to the world store; no new light
     - Unit tests: level 0 changes nothing, the slow variant never exceeds 30%, the saved fog value is unchanged
     - Finish
     - _Requirements: 10.5, 10.7, 10.8, 12.6_
 
-  - [~] 5.7 Music driver
+  - [x] 5.7 Music driver
     - New `scene/audio/MusicDriver.tsx` reading `musicRuntime` per frame and writing stem and master gains with a 0.04 s smoothing; stays silent while the context is not running and starts when it runs; new `src/audio/music.ts` exposes `createMusicGraph` and `setMusicLevels` (the oscillator graph arrives in task 7.1)
     - Unit tests with a fake context: no graph while suspended, the graph starts when the context runs, gain targets follow the runtime
     - Finish
     - _Requirements: 9.3, 9.4, 9.8, 9.9_
 
-  - [~] 5.8 Pause triggers and menu state
+  - [x] 5.8 Pause triggers and menu state
     - `usePauseTriggers.ts`: the picker and merchant do not own Esc; pointer-lock loss caused by a deliberate cursor release is ignored while an overlay is open, Esc always pauses; `menuState.ts`: `isMenuOpen()` includes the new overlays
     - Unit tests: Esc pauses with the merchant, picker or achievements open, `PauseMenu.resume` does not request pointer lock while an overlay is open
     - Finish
     - _Requirements: 1.5, 12.12_
 
-  - [~] 5.9 Mount the new scene components
+  - [x] 5.9 Mount the new scene components
     - `App.tsx`: mount `Merchant`, `CoinPiles`, `Weather` and `MusicDriver` inside the game scene in the right order relative to `SkyAndFog` and `EnemyDirector`
     - Unit test that `App` renders the new components in the scene tree
     - Finish
     - _Requirements: 10.15, 14.1_
 
-- [ ] 6. UI
-  - [~] 6.1 Menu dialog autofocus
+- [x] 6. UI
+  - [x] 6.1 Menu dialog autofocus
     - `MenuDialog.tsx`: `data-autofocus` support (the first match wins); `onEscape` stays optional so overlays can leave Esc to the pause trigger
     - Unit tests: focus moves to the marked control within 100 ms, falls back to the first control, returns to the previous control on close, Tab stays inside
     - Finish
     - _Requirements: 12.2, 12.3, 12.4_
 
-  - [~] 6.2 Mode select
+  - [x] 6.2 Mode select
     - New `ui/menus/ModeSelect.tsx`: native radios for Easy, Normal, Hard and Endless Survival, Normal checked and focused, each option's modifiers as text, Endless lists "120 s day, no relics or rite, no Retry Night", Begin and Back, Esc goes back; CSS with `:focus-visible`
     - Unit tests: Normal is checked by default, arrows move the choice, Begin passes the chosen mode, the option text matches `MODES`
     - Finish
     - _Requirements: 7.1, 7.14, 12.1_
 
-  - [~] 6.3 Dawn picker and dawn card
+  - [x] 6.3 Dawn picker and dawn card
     - New `ui/hud/DawnPicker.tsx` (modal, three card buttons with rune, name, "Rank r/m" and "old → new" lines; arrows and Tab move, Enter or Space picks; no `onEscape`; waits while a major scare is active); `DawnCard.tsx` becomes the dawn summary with night score parts and hosts the picker; shows alone when there is no offer
     - Unit tests: cards render from `upgradeCard`, a pick calls `pickUpgrade` once, the picker stays closed during a major scare and opens after, a saved pending pick shows the same three cards
     - Finish
     - _Requirements: 1.4, 1.5, 1.6, 1.10, 11.5, 12.1, 12.11_
 
-  - [~] 6.4 Merchant menu
+  - [x] 6.4 Merchant menu
     - New `ui/merchant/MerchantMenu.tsx`: "Silas Vane", coins, rows with item, price, "Left: n" and a Buy button, a `role="alert"` refusal line naming sold out, coins or space, Close; closes when he leaves, at dusk or beyond 2.5 m; no `onEscape`
     - Unit tests: a purchase updates the row and coins, a refusal shows its reason and changes nothing, the menu closes at 2.5 m and at dusk
     - Finish
     - _Requirements: 5.8, 5.9, 5.10, 5.11, 5.12, 5.13, 13.3, 13.4_
 
-  - [~] 6.5 Contracts tab
+  - [x] 6.5 Contracts tab
     - New `ui/journal/ContractsTab.tsx` and a "Contracts" tab in `Journal.tsx`: goal text, "n/goal", "◎ N" reward and a "Done ✓" tag; empty slots render nothing
     - Unit tests: two contracts render, one contract renders one entry, a done contract shows its tag
     - Finish
     - _Requirements: 6.3, 6.8, 12.5_
 
-  - [~] 6.6 Score, combo and coins panel
+  - [x] 6.6 Score, combo and coins panel
     - New `ui/hud/ScorePanel.tsx` at `top: 88px; right: 24px`: "Score 1,240", the combo "×1.75" with a text-labelled bar (hidden at ×1.0), "◎ 12 coins"; a 0.2 s pulse only with Flashing lights on; `pointer-events: none`; 1rem minimum
     - Unit tests: combo hidden at ×1.0, text changes without a pulse class when Flashing lights is off, the coin count updates within the same render
     - Finish
     - _Requirements: 2.6, 2.7, 4.8, 4.9, 12.5, 12.6_
 
-  - [~] 6.7 Achievement toasts
+  - [x] 6.7 Achievement toasts
     - New `ui/hud/AchievementToasts.tsx` under the score panel: up to 3 visible, "★" and the name, 4 s each with 0.5 s fades, queued in unlock order, no pulse; contract and achievement toasts still show with Subtitles off for at least 3 s
     - Unit tests: a batch of 5 shows 3 and queues 2, toasts show with Subtitles off
     - Finish
     - _Requirements: 8.2, 8.4, 8.5, 12.6, 12.9_
 
-  - [~] 6.8 Achievements menu
+  - [x] 6.8 Achievements menu
     - New `ui/menus/AchievementsMenu.tsx`: 12 entries, unlocked with name and goal, locked as dim outlines with the goal and a "Locked" tag; shows "Not now" while a major scare is active; keyboard only
     - Unit tests: 12 entries, locked entries carry the tag, the menu stays closed during a major scare
     - Finish
     - _Requirements: 8.6, 8.7, 12.1, 12.5, 12.10_
 
-  - [~] 6.9 Stats screen, ending and taken screens
+  - [x] 6.9 Stats screen, ending and taken screens
     - New `ui/menus/StatsPanel.tsx` (`dl` rows from `statRows`, the Endless best, Close returning to the title); `EndingScreen.tsx` shows it and its New Game opens the mode select; `TakenScreen.tsx` hides Retry in Endless and shows the stats there, and Quit from a story death shows none
     - Unit tests: rows show 0 for empty stats, time reads "m:ss" and accuracy "N%", Retry is not rendered in Endless, Close has focus
     - Finish
     - _Requirements: 3.5, 3.6, 3.7, 3.8, 7.7, 7.13, 12.1_
 
-  - [~] 6.10 Title and pause menu wiring
+  - [x] 6.10 Title and pause menu wiring
     - `TitleScreen.tsx`: New Game opens `ModeSelect` then `startRun(mode)` (Endless skips the intro); Achievements button; `PauseMenu.tsx`: Achievements button nested like Settings
     - Unit tests: New Game leads to the mode select, Continue is unchanged, Achievements opens from Title and Pause
     - Finish
     - _Requirements: 7.1, 8.6, 12.12_
 
-  - [~] 6.11 Assemble the new HUD
+  - [x] 6.11 Assemble the new HUD
     - `Hud.tsx`: render `ScorePanel`, `AchievementToasts`, `DawnPicker` and `MerchantMenu` without moving 06 and 07 elements
     - Structure test: no `font-size` under `1rem` in the new CSS
     - Finish
     - _Requirements: 2.6, 12.5, 12.8_
 
-  - [~] 6.12 Satchel grid and dig bar
+  - [x] 6.12 Satchel grid and dig bar
     - `Satchel.tsx` renders `currentModifiers().satchelSlots` cells; `DigBar.tsx` reads the live dig duration
     - Unit tests: Deep Pockets shows 14 cells, Gravedigger shortens the dig bar's duration by 30%
     - Finish
     - _Requirements: 1.8_
 
-- [ ] 7. Procedural music, rain and thunder
-  - [~] 7.1 Music graph
+- [x] 7. Procedural music, rain and thunder
+  - [x] 7.1 Music graph
     - `src/audio/music.ts`: the drone, unease, tension and danger stems from the design graph on the 07 music bus (no file loaded), a heartbeat scheduler with a 0.25 s look-ahead while the danger stem is above 0.05, stem peaks 0.55, 0.40, 0.35 and 0.60, built once and never torn down; `MusicDriver` starts it
     - Unit tests with a fake `AudioContext`: stems are created once, stem gains follow the levels, the heartbeat schedules two thuds 0.22 s apart
     - Finish
     - _Requirements: 9.3, 9.4, 9.8_
 
-  - [~] 7.2 Rain noise
+  - [x] 7.2 Rain noise
     - `src/audio/rain.ts`: a looped noise buffer through a band-pass (2.4 kHz, Q 0.5) and a high-pass (500 Hz) at gain 0.22 on the `sfx` bus, faded over 3 s and muted while frozen
     - Unit tests with a fake context: the level fades over 3 s, silent when the context is missing, master and SFX volume apply
     - Finish
     - _Requirements: 10.5, 10.11, 10.12, 10.13_
 
-  - [~] 7.3 Thunder and bus checks
+  - [x] 7.3 Thunder and bus checks
     - Wire `thunder-close` and `thunder-far` through `playSound` from `Weather.tsx` on the `sfx` bus; a thunder already sounding finishes its tail when the game pauses; a missing audio context still produces the caption and the shake decision
     - Unit tests: thunder uses the SFX volume, the caption appears with no audio context, the music master gain target is 0 while silent
     - Finish
     - _Requirements: 9.5, 10.9, 10.13, 12.8_
 
-- [ ] 8. Save, Retry Night and New Game
-  - [~] 8.1 Save and load wiring
+- [x] 8. Save, Retry Night and New Game
+  - [x] 8.1 Save and load wiring
     - `saveGame.ts`: `progression` optional on read and always written, `SAVE_VERSION` stays 1; `gameSave.ts`: `captureSave` fills it from `captureProgressionSave`, `loadGame` applies `sanitizeProgression` and `syncDerivedStats()`; `validInventory` allows up to `SATCHEL_SLOTS_MAX`
     - Unit tests: save then load restores ranks, coins, contracts, stock and a pending pick with the same offers; a pre-08 save loads with the defaults and its earlier fields; corrupt data hides Continue and leaves storage untouched
     - Finish
     - _Requirements: 11.1, 11.4, 11.5, 11.8, 11.9, 11.10, 11.11, 11.12_
 
-  - [~] 8.2 Retry Night snapshot and night clear
+  - [x] 8.2 Retry Night snapshot and night clear
     - `retryNight.ts`: the snapshot list gains `progression`, Retry returns early in Endless; `nightState.ts` `clearNightState()` also calls `scoreStore.resetNight()`, `coinStore.clear()`, `stormRuntime.reset()`, `scareSilence` clear and `musicRuntime.reset()`
     - `retryProgression.test.ts` with fast-check
     - **Property 34: Retry Night restores the snapshot and clears the night**
     - Finish
     - _Requirements: 11.6, 11.7, 11.14_
 
-  - [~] 8.3 New Game and run end
+  - [x] 8.3 New Game and run end
     - `resetRun.ts` resets progression, score, coins and storm while keeping achievements and the Endless best; `startEnding.ts` settles the Endless best on death through `settleEndless` and finalises stats once
     - Unit tests: New Game keeps unlocked achievements and the stored best, an Endless death stores a higher score only, `settleEndless` runs once per run
     - Finish
     - _Requirements: 3.5, 7.10, 7.13, 8.8, 11.3_
 
-  - [~] 8.4 Process and structure tests
+  - [x] 8.4 Process and structure tests
     - `tests/progressionRules.test.ts`: every new file in `src/game/systems/` has a `*.test.ts`, nothing under `src/game/` imports React, three.js or Howler, no numeric balance literal (other than 0, 1, 2 and indices) in the new systems, no new `.ogg`, `.mp3` or `.glb` file, `PROGRESSION_PERSISTED` and the Retry snapshot list cover the same fields
     - Finish
     - _Requirements: 14.1, 14.2, 14.3, 14.5_
 
-  - [~] 8.5 Integration flows
+  - [x] 8.5 Integration flows
     - `tests/progressionCheckpoint.test.ts`: a seeded night 1 to dawn flow (kills build combo and coins, night score, pick Iron Constitution, merchant buys, contracts pay), save, load and compare, a failed night and Retry Night compared with the dusk snapshot, and an Endless night 6 plan
     - Finish
     - _Requirements: 11.6, 11.7, 14.5_

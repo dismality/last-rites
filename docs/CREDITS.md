@@ -5,6 +5,7 @@ Every third-party asset used in Last Rites. Only CC0, CC-BY (with attribution be
 | File | Asset | Author | Source | License |
 |---|---|---|---|---|
 | `public/assets/models/items/*.glb` | 8 hero items (relics and keys) | David Wong, built with Claude Code using `tools/blender/hero_items.py` | Original, this repository | MIT (project license) |
+| `public/assets/icons/items/*.png` | 39 pixel-art item icons | David Wong, built with Claude Code | Original, this repository | MIT (project license) |
 | `public/assets/models/world/*.glb` | Graveyard Kit 5.0, 80 models recoloured and rescaled | Kenney (www.kenney.nl) | https://kenney.nl/assets/graveyard-kit | CC0 |
 | `public/assets/models/enemies/zombie.glb` | Animated zombie, recoloured and rescaled | Quaternius | https://poly.pizza/m/VlXjG0N8Eg | CC0 |
 | `public/assets/models/enemies/zombie-brute.glb` | Animated zombie, recoloured and rescaled | Quaternius | https://poly.pizza/m/JoBvxIUpZP | CC0 |

@@ -13,6 +13,7 @@ interface PlayerStoreState extends PlayerState {
   setPitch: (pitch: number) => void
   setHealth: (health: number) => void
   setStamina: (stamina: number) => void
+  setMaxHealth: (maxHealth: number) => void
   setInteractTarget: (target: ItemId | null) => void
   applyPlayerState: (state: Partial<PlayerState>) => void
 }
@@ -30,6 +31,7 @@ export const usePlayerStore = create<PlayerStoreState>((set) => ({
   setPitch: (pitch) => set({ pitch }),
   setHealth: (health) => set({ health }),
   setStamina: (stamina) => set({ stamina }),
+  setMaxHealth: (maxHealth) => set((s) => ({ maxHealth, health: Math.min(s.health, maxHealth) })),
   setInteractTarget: (interactTarget) => set({ interactTarget }),
   applyPlayerState: (s) => set(s),
 }))

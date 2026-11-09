@@ -24,6 +24,14 @@ describe('tickLantern', () => {
   })
 })
 
+describe('tickLantern drainMult', () => {
+  it('scales the drain and defaults to 1', () => {
+    expect(tickLantern(lit(100), 3, 'night', 2).fuel).toBeCloseTo(98)
+    expect(tickLantern(lit(100), 3, 'night', 0).fuel).toBe(100)
+    expect(tickLantern(lit(100), 3, 'night').fuel).toBeCloseTo(99)
+  })
+})
+
 describe('lanternRadius', () => {
   it('hits the documented points', () => {
     expect(lanternRadius(100)).toBe(8)

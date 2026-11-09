@@ -1,6 +1,7 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { createMysteryState } from './mystery'
+import { defaultProgressionSave } from './progressionSave'
 import {
   SAVE_KEY,
   SAVE_VERSION,
@@ -98,6 +99,7 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   recipes: fc.subarray(['r-bone-club', 'r-bandage']),
   tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7] as TutorialStepId[]).map((a) => new Set(a)),
   introSeen: fc.boolean(),
+  progression: fc.constant(defaultProgressionSave()),
   combat: fc.constant({
     firearms: { revolver: { magazine: 3 } },
     durability: { 'wood-axe': 10 },

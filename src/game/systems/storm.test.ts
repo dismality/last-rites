@@ -3,9 +3,13 @@ import { describe, expect, it } from 'vitest'
 import { STORM, STORM_CHANCE_NIGHT } from '../../data/storms'
 import { createRng } from '../rng'
 import {
+  endStorm,
+  lightningLevel,
   rollStorm,
   startStorm,
   stormChance,
+  stormModifiers,
+  thunderShakes,
   tickStorm,
   type StormEvent,
   type StormState,
@@ -161,3 +165,114 @@ describe('Property 30: Lightning never starts within 1.5 s before a beat', () =>
     expect(fired.state.thunder).toHaveLength(1)
   })
 })
+
+describe('Property 31: Flash envelope and shake follow the settings', () => {
+  // **Validates: Requirements 10.7, 10.8, 10.10, 12.6, 12.7**
+  it('fast envelope is 1 for 0.15 s then 0', () => {
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 10, noNaN: true }), (age) => {
+        expect(lightningLevel(age, false)).toBe(age < 0.15 ? 1 : 0)
+      }),
+    )
+  })
+
+  it('slow envelope peaks at 0.3, ends by 3 s and changes no faster than the ramp', () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: 0, max: 4, noNaN: true }),
+        fc.double({ min: 0, max: 0.1, noNaN: true }),
+        (age, d) => {
+          const a = lightningLevel(age, true)
+          const b = lightningLevel(age + d, true)
+          expect(a).toBeGreaterThanOrEqual(0)
+          expect(a).toBeLessThanOrEqual(0.3 + 1e-12)
+          expect(Math.abs(b - a)).toBeLessThanOrEqual(0.2 * d + 1e-9)
+          if (age >= 3) expect(a).toBe(0)
+        },
+      ),
+    )
+    expect(lightningLevel(1.5, true)).toBeCloseTo(0.3)
+    expect(lightningLevel(null, true)).toBe(0)
+  })
+
+  it('strike variant is slow iff flashing lights are off', () => {
+    fc.assert(
+      fc.property(seedArb, nightArb, fc.boolean(), (seed, night, flashing) => {
+        const s = startStorm(seed, night)
+        const r = tickStorm(s, s.strikeIn ?? 0, {
+          seed,
+          night,
+          beatPending: false,
+          flashingLights: flashing,
+        })
+        expect(r.events[0]).toEqual({ type: 'strike', slow: !flashing })
+      }),
+    )
+  })
+
+  it('thunder shakes iff camera shake is on and intensity is full', () => {
+    fc.assert(
+      fc.property(
+        fc.boolean(),
+        fc.constantFrom('full', 'reduced', 'off' as const),
+        (cameraShake, scareIntensity) => {
+          expect(thunderShakes({ cameraShake, scareIntensity })).toBe(
+            cameraShake && scareIntensity === 'full',
+          )
+        },
+      ),
+    )
+  })
+})
+
+describe('Property 32: Storm end and pause', () => {
+  // **Validates: Requirements 10.5, 10.11, 10.12**
+  const ctx = (seed: number, night: number) => ({
+    seed,
+    night,
+    beatPending: false,
+    flashingLights: true,
+  })
+
+  it('endStorm cancels strikes but every scheduled thunder still plays', () => {
+    fc.assert(
+      fc.property(seedArb, nightArb, (seed, night) => {
+        const s0 = startStorm(seed, night)
+        const struck = tickStorm(s0, s0.strikeIn ?? 0, ctx(seed, night)).state
+        const ended = endStorm(struck)
+        expect(ended.events).toEqual([{ type: 'stormEnded' }])
+        expect(ended.state.strikeIn).toBeNull()
+        expect(ended.state.thunder).toEqual(struck.thunder)
+        let state = ended.state
+        let strikes = 0
+        let thunders = 0
+        for (let i = 0; i < 100; i++) {
+          const r = tickStorm(state, 1, ctx(seed, night))
+          state = r.state
+          strikes += r.events.filter((e) => e.type === 'strike').length
+          thunders += r.events.filter((e) => e.type === 'thunder').length
+        }
+        expect(strikes).toBe(0)
+        expect(thunders).toBe(struck.thunder.length)
+      }),
+    )
+  })
+
+  it('modifiers apply exactly while a storm is active', () => {
+    expect(stormModifiers(true)).toEqual({ fogAdd: 0.01, lanternDrainMult: 1.2 })
+    expect(stormModifiers(false)).toEqual({ fogAdd: 0, lanternDrainMult: 1 })
+  })
+
+  it('with no steps (pause) nothing changes', () => {
+    fc.assert(
+      fc.property(seedArb, nightArb, (seed, night) => {
+        const s0 = startStorm(seed, night)
+        const s1 = tickStorm(s0, s0.strikeIn ?? 0, ctx(seed, night)).state
+        const r = tickStorm(s1, 0, ctx(seed, night))
+        expect(r.events).toEqual([])
+        expect(r.state).toEqual(s1)
+      }),
+    )
+  })
+})
+

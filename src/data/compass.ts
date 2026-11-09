@@ -9,7 +9,7 @@ export const COMPASS = {
   markerPadPx: 12,
 } as const
 
-export type CompassMarkerKind = 'objective' | 'chapel' | 'hut' | 'spawn'
+export type CompassMarkerKind = 'objective' | 'chapel' | 'hut' | 'spawn' | 'merchant'
 
 /** Every marker is a glyph plus text, never colour alone. */
 export const COMPASS_MARKERS: Readonly<Record<CompassMarkerKind, { glyph: string; label: string }>> = {
@@ -17,6 +17,7 @@ export const COMPASS_MARKERS: Readonly<Record<CompassMarkerKind, { glyph: string
   chapel: { glyph: '✝', label: 'Chapel' },
   hut: { glyph: '⌂', label: 'Hut' },
   spawn: { glyph: '☠', label: 'Graves' },
+  merchant: { glyph: '⚱', label: 'Silas' },
 }
 
 export const COMPASS_LETTERS = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' } as const

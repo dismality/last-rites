@@ -22,6 +22,10 @@ import { ChargeMeter } from './ChargeMeter'
 import { DoorStatus } from './DoorStatus'
 import { BossBar } from './BossBar'
 import { BossNameCard } from './BossNameCard'
+import { ScorePanel } from './ScorePanel'
+import { AchievementToasts } from './AchievementToasts'
+import { DawnCard } from './DawnCard'
+import { MerchantMenu } from '../merchant/MerchantMenu'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
 
@@ -70,6 +74,10 @@ export function Hud() {
       <Subtitles />
       <Toast />
       <DuskHint />
+      <ScorePanel />
+      <AchievementToasts />
+      <DawnCard />
+      <MerchantMenu />
     </div>
   )
 }

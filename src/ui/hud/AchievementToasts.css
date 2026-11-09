@@ -1,0 +1,28 @@
+/* Under the score panel (top: 88px). Opacity is driven by toastOpacity, so there is no motion
+   beyond a fade and nothing pulses; reduced motion needs no extra rule. */
+.achievement-toasts {
+  position: fixed;
+  top: 168px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  pointer-events: none;
+}
+
+.achievement-toast {
+  margin: 0;
+  padding: 0.4rem 0.9rem;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 1px solid var(--parchment-dark);
+  box-shadow: 0 2px 8px rgba(20, 17, 15, 0.6);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.achievement-toast__star {
+  margin-right: 0.5rem;
+  color: var(--blood);
+}

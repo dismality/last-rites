@@ -26,6 +26,41 @@ describe('runTick', () => {
     expect(runTick(base(), { sprinting: false }, 6).lantern.fuel).toBeCloseTo(99)
   })
 
+  it('does not end a held dawn', () => {
+    const s = base()
+    s.world = { ...s.world, phase: 'dawn', phaseTime: 100 }
+    const r = runTick(s, { sprinting: false, holdDawn: true }, 5)
+    expect(r.world.phase).toBe('dawn')
+    expect(r.world.phaseTime).toBe(100)
+    expect(r.events).toEqual([])
+  })
+
+  it('uses a 120 s day and no last night for Endless', () => {
+    const s = base()
+    s.world.phaseTime = 119.99
+    const r = runTick(s, { sprinting: false, dayLengthS: 120, lastNight: Infinity }, 0.02)
+    expect(r.world.phase).toBe('dusk')
+    const d = base()
+    d.world = { ...d.world, phase: 'dawn', phaseTime: 9.99, nightNumber: 5 }
+    const n = runTick(d, { sprinting: false, dayLengthS: 120, lastNight: Infinity }, 0.02)
+    expect(n.world.nightNumber).toBe(6)
+  })
+
+  it('scales lantern drain by the multiplier (Long Wick, storm)', () => {
+    const slow = runTick(base(), { sprinting: false, lanternDrainMult: 0.8 }, 6).lantern.fuel
+    const fast = runTick(base(), { sprinting: false, lanternDrainMult: 1.2 }, 6).lantern.fuel
+    expect(100 - slow).toBeCloseTo(0.8)
+    expect(100 - fast).toBeCloseTo(1.2)
+  })
+
+  it('raises stamina regeneration with regenMult (Second Wind)', () => {
+    const s = base()
+    s.stamina = { stamina: 50, regenDelayTimer: 0 }
+    const plain = runTick(s, { sprinting: false }, 1).stamina.stamina
+    const wind = runTick(s, { sprinting: false, regenMult: 1.25 }, 1).stamina.stamina
+    expect(wind - 50).toBeCloseTo((plain - 50) * 1.25)
+  })
+
   it('collects dayNight events', () => {
     const s = base()
     s.world.phaseTime = 359.99

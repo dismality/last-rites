@@ -45,7 +45,10 @@ import {
   triggerStatue,
   zoneForEvent,
 } from '../../game/systems/scareStaging'
+import { musicRuntime } from '../../game/state/musicRuntime'
+import { simClock } from '../../game/state/simClock'
 import { SCARE_ENEMY_PREFIX } from '../enemies/scareEnemy'
+import { announceMajor, fireMajor } from './silenceWiring'
 import { resetScareRuntime, scareRuntime } from './scareRuntime'
 import { resetStagedProps, stagedProps } from './stagedProps'
 
@@ -137,8 +140,13 @@ export function ScareStager() {
       return false
     })
     for (const cue of due) {
-      if (cue.phase === 'telegraph') telegraph(cue, random, picked.current)
-      else beat(cue, picked.current, lurkerCount.current)
+      if (cue.phase === 'telegraph') {
+        musicRuntime.silence = announceMajor(musicRuntime.silence, cue, queue.current, now, simClock.now)
+        telegraph(cue, random, picked.current)
+      } else {
+        musicRuntime.silence = fireMajor(musicRuntime.silence, cue, simClock.now)
+        beat(cue, picked.current, lurkerCount.current)
+      }
     }
 
     tickProps(dt, player.position, player.yaw)

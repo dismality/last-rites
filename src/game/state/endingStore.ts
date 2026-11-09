@@ -4,19 +4,13 @@
 import { create } from 'zustand'
 import { subscribeToType } from '../events'
 import type { EndingId } from '../types'
-import {
-  createRunStats,
-  finalizeStats,
-  recordBanished,
-  recordNightSurvived,
-  type RunStats,
-} from '../systems/runStats'
+import { finalizeStats, recordNightSurvived } from '../systems/runStats'
+import { updateRunStats } from './statsPort'
 
 /** sequence = camera path playing; summary = stats, credits and the exit buttons. */
 export type EndingStage = 'sequence' | 'summary'
 
 interface EndingStoreState {
-  stats: RunStats
   /** Bumped on every reset; the scene is keyed on it so the player body returns to spawn. */
   runId: number
   /** Night 5's waves are cleared. Held here, not in worldStore, so night 5 does not drift to dawn. */
@@ -25,7 +19,6 @@ interface EndingStoreState {
   riteStarted: boolean
   ending: EndingId | null
   stage: EndingStage
-  banish: () => void
   surviveNight: (night: number) => void
   setNightFiveCleared: (v: boolean) => void
   setRiteStarted: (v: boolean) => void
@@ -36,7 +29,6 @@ interface EndingStoreState {
 }
 
 const INITIAL = {
-  stats: createRunStats(),
   runId: 0,
   nightFiveCleared: false,
   riteStarted: false,
@@ -49,14 +41,18 @@ export function installRunStats(): () => void {
   return subscribeToType('dawnStarted', (e) => useEndingStore.getState().surviveNight(e.nightNumber))
 }
 
+/** Run stats live in progressionStore; the ending only transforms them. */
+const writeStats = updateRunStats
+
 export const useEndingStore = create<EndingStoreState>((set, get) => ({
   ...INITIAL,
-  banish: () => set({ stats: recordBanished(get().stats) }),
-  surviveNight: (night) => set({ stats: recordNightSurvived(get().stats, night) }),
+  surviveNight: (night) => writeStats((s) => recordNightSurvived(s, night)),
   setNightFiveCleared: (nightFiveCleared) => set({ nightFiveCleared }),
   setRiteStarted: (riteStarted) => set({ riteStarted }),
-  beginEnding: (ending) =>
-    set({ ending, stage: 'sequence', stats: finalizeStats(get().stats, ending) }),
+  beginEnding: (ending) => {
+    writeStats((s) => finalizeStats(s, ending))
+    set({ ending, stage: 'sequence' })
+  },
   showSummary: () => set({ stage: 'summary' }),
-  reset: () => set({ ...INITIAL, stats: createRunStats(), runId: get().runId + 1 }),
+  reset: () => set({ ...INITIAL, runId: get().runId + 1 }),
 }))

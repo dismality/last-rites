@@ -132,6 +132,28 @@
 .journal-relic__state { font-size: 1rem; font-weight: 700; }
 .journal-relic__desc { font-size: 1rem; }
 
+.journal-contracts__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.journal-contract {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--parchment-dark);
+  font-size: 1rem;
+}
+.journal-contract__text { flex: 1 1 14rem; font-family: var(--font-hand); line-height: 1.8; }
+.journal-contract__progress,
+.journal-contract__reward { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 1rem; }
+.journal-contract__done {
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  font-weight: 700;
+  border: 1px solid currentColor;
+  padding: 0 0.5rem;
+}
+.journal-contract--done .journal-contract__text { text-decoration: line-through; opacity: 0.75; }
+
 @media (prefers-reduced-motion: reduce) {
   .journal { animation: none; }
   .journal-clues__text { animation: none; }

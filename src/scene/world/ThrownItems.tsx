@@ -15,6 +15,8 @@ import {
   tickFuse,
   type Fuse,
 } from '../../game/systems/projectiles'
+import { currentModifiers } from '../../game/state/derivedStats'
+import { flaskSplashRadius } from './flaskRadius'
 import { meleeRuntime } from '../player/meleeRuntime'
 import { BlastFlash } from '../effects/BlastFlash'
 import type { ThrownItem } from '../../game/state/projectileStore'
@@ -45,9 +47,10 @@ function Thrown({ item, onBurst }: { item: ThrownItem; onBurst: (flash: Flash) =
     const centre = { x: t.x, z: t.z }
     const enemies = useEnemyStore.getState().enemies
     const fuel = useLanternStore.getState().fuel
+    const bonus = currentModifiers().flaskRadiusBonusM
     const result =
       item.kind === 'holy-water-flask'
-        ? resolveFlask(centre, enemies, fuel, FLASK_STUN_S)
+        ? resolveFlask(centre, enemies, fuel, FLASK_STUN_S, bonus)
         : resolveNailBomb(centre, enemies, fuel)
     if (result.hitUids.length > 0) {
       useEnemyStore.getState().setEnemies(result.enemies)
@@ -64,7 +67,7 @@ function Thrown({ item, onBurst }: { item: ThrownItem; onBurst: (flash: Flash) =
       x: t.x,
       y: Math.max(0.1, t.y),
       z: t.z,
-      radius: flask ? 2 : 3,
+      radius: flask ? flaskSplashRadius(bonus) : 3,
       color: flask ? '#cfe6d8' : '#e8913a',
     })
     useProjectileStore.getState().removeThrown(item.id)

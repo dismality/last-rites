@@ -22,6 +22,9 @@ export const ENDLESS = {
   waveBase: 2,
   waveCap: 6,
   shamblerBase: 4,
+  // Brutes start at night 3 and add one every 3 nights (floor((n - 3) / 3)).
+  bruteFromNight: 3,
+  bruteEveryNights: 3,
   hpScale: 1.08,
   hpScaleAfterNight: 5,
 } as const

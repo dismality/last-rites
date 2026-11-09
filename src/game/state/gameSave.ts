@@ -3,6 +3,7 @@
 
 import { subscribeToType } from '../events'
 import { sanitizeCombat } from '../systems/combatSave'
+import { sanitizeProgression } from '../systems/progressionSave'
 import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
 import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
@@ -13,6 +14,8 @@ import type { DoorsSave } from './combatPersistence'
 import { useCombatStore } from './combatStore'
 import { useDoorStore } from './doorStore'
 import { useCraftingStore } from './craftingStore'
+import { syncDerivedStats } from './derivedStats'
+import { captureProgressionSave, restoreProgressionSave } from './progressionPersistence'
 import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useIntroStore } from './introStore'
@@ -58,6 +61,7 @@ export function captureSave(): SaveState {
     tutorial: useGuidanceStore.getState().tutorialDone,
     introSeen: useIntroStore.getState().seen,
     combat: captureCombatSave(pickDoors()),
+    progression: captureProgressionSave(),
   }
 }
 
@@ -94,6 +98,13 @@ export function loadGame(): boolean {
     takenPickups: combat.takenPickups,
   })
   useCombatStore.getState().resetLive()
+  restoreProgressionSave(
+    sanitizeProgression(save.progression, {
+      inventory: save.inventory,
+      takenPickups: combat.takenPickups,
+    }),
+  )
+  syncDerivedStats()
   return true
 }
 

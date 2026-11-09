@@ -4,14 +4,26 @@
 import { ENDING_MAP } from '../../data/endings'
 import type { EndingId } from '../types'
 import { useEndingStore } from './endingStore'
+import { settleEndless } from './endlessBest'
 import { useGameStore } from './gameStore'
 import { useMysteryStore } from './mysteryStore'
 import { clearNightState } from './nightState'
+import { useProgressionStore } from './progressionStore'
 import { useWorldStore } from './worldStore'
+
+/**
+ * Endless has no ending screen: death ends the run, so the best is settled here. settleEndless
+ * keeps only the first call per run id, which makes a repeated death a no-op.
+ */
+export function settleEndlessDeath(): void {
+  const p = useProgressionStore.getState()
+  if (p.mode === 'endless') settleEndless(p.score)
+}
 
 export function startEnding(id: EndingId): void {
   useEndingStore.getState().beginEnding(id)
   clearNightState()
+  settleEndlessDeath()
   useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, ending: id } }))
   // The sky blend follows the phase, so dawn endings break into morning.
   if (ENDING_MAP[id].sky === 'dawn') {

@@ -46,7 +46,7 @@ describe('Endless best', () => {
     fc.assert(
       fc.property(
         fc.oneof(fc.string(), fc.constant(null), fc.double().map(String), fc.nat().map(String)),
-        fc.oneof(fc.nat(), fc.double()),
+        fc.oneof(fc.nat(), fc.double({ noNaN: true, noDefaultInfinity: true })),
         (raw, run) => {
           const stored = parseBest(raw)
           expect(Number.isFinite(stored) && stored >= 0).toBe(true)

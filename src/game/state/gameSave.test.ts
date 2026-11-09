@@ -7,6 +7,13 @@ import { useGuidanceStore } from './guidanceStore'
 import { useIntroStore } from './introStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMysteryStore } from './mysteryStore'
+import { PLAYER_MAX_HEALTH } from '../../data/balance'
+import { defaultProgressionSave } from '../systems/progressionSave'
+import { syncDerivedStats } from './derivedStats'
+import { usePlayerStore } from './playerStore'
+import { captureProgressionSave } from './progressionPersistence'
+import { useProgressionStore } from './progressionStore'
+import { useWorldStore } from './worldStore'
 
 function stubStorage(initial: Record<string, string> = {}) {
   const data = new Map<string, string>(Object.entries(initial))
@@ -155,3 +162,91 @@ describe('save and load: combat block', () => {
     expect(useCombatStore.getState().takenPickups).toEqual(['revolver'])
   })
 })
+
+describe('save and load: progression block', () => {
+  beforeEach(() => {
+    useProgressionStore.getState().reset()
+    syncDerivedStats()
+  })
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('restores ranks, coins, contracts, stock and a pending pick with the same offers', () => {
+    stubStorage()
+    const contracts = [
+      { id: 'c-dig-3', progress: 2, done: false },
+      { id: 'c-gather-8', progress: 0, done: false },
+    ]
+    useProgressionStore.getState().patch({
+      mode: 'hard',
+      seed: 4242,
+      ranks: { 'iron-constitution': 1, 'long-wick': 2 },
+      pendingPick: ['steady-hands', 'gravedigger', 'marksman'],
+      coins: 37,
+      contracts: contracts as never,
+    })
+    const before = captureProgressionSave()
+    expect(saveGame()).toBe(true)
+
+    useProgressionStore.getState().reset()
+    expect(loadGame()).toBe(true)
+
+    const s = useProgressionStore.getState()
+    expect(s.ranks).toEqual({ 'iron-constitution': 1, 'long-wick': 2 })
+    expect(s.coins).toBe(37)
+    expect(s.pendingPick).toEqual(['steady-hands', 'gravedigger', 'marksman'])
+    expect(s.seed).toBe(4242)
+    expect(s.contracts).toEqual(before.contracts)
+    expect(s.stock).toEqual(before.stock)
+    expect(captureProgressionSave()).toEqual(before)
+    // Derived stats follow the restored ranks.
+    expect(usePlayerStore.getState().maxHealth).toBe(PLAYER_MAX_HEALTH + 15)
+  })
+
+  it('loads a pre-08 save with the defaults and its earlier fields', () => {
+    const data = stubStorage()
+    useWorldStore.getState().applyWorldState({ ...pickWorldForTest(), nightNumber: 3 })
+    saveGame()
+    const file = JSON.parse(data.get(SAVE_KEY)!) as Record<string, unknown>
+    delete file.progression
+    data.set(SAVE_KEY, JSON.stringify(file))
+    useProgressionStore.getState().patch({ coins: 99, ranks: { 'deep-pockets': 1 } })
+
+    expect(canContinue()).toBe(true)
+    expect(loadGame()).toBe(true)
+    expect(captureProgressionSave()).toEqual(defaultProgressionSave())
+    expect(useWorldStore.getState().nightNumber).toBe(3)
+  })
+
+  it('hides Continue for corrupt data and leaves storage untouched', () => {
+    const data = stubStorage()
+    saveGame()
+    const file = JSON.parse(data.get(SAVE_KEY)!) as Record<string, unknown>
+    file.world = 'junk'
+    const text = JSON.stringify(file)
+    data.set(SAVE_KEY, text)
+    useProgressionStore.getState().patch({ coins: 5 })
+
+    expect(canContinue()).toBe(false)
+    expect(loadGame()).toBe(false)
+    expect(data.get(SAVE_KEY)).toBe(text)
+    expect(useProgressionStore.getState().coins).toBe(5)
+  })
+
+  it('accepts a satchel of up to the Deep Pockets maximum', () => {
+    stubStorage()
+    const slots = Array.from({ length: 14 }, () => ({ item: 'bone', qty: 1 }))
+    useInventoryStore.getState().setInventory({
+      slots,
+      keyItems: [],
+      relics: [],
+      hotbar: [null, null, null, null],
+    } as never)
+    saveGame()
+    expect(canContinue()).toBe(true)
+  })
+})
+
+function pickWorldForTest() {
+  const { phase, phaseTime, nightNumber, fogDensity, wavesCleared } = useWorldStore.getState()
+  return { phase, phaseTime, nightNumber, fogDensity, wavesCleared }
+}

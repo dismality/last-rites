@@ -1,0 +1,63 @@
+.dawn-picker__row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+}
+
+.dawn-picker__card {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.8rem 0.6rem;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--parchment-dark);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 200ms ease-out,
+    border-color 200ms ease-out;
+}
+
+.dawn-picker__card:hover {
+  border-color: var(--ember);
+}
+
+.menu .dawn-picker__card:focus-visible {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+  border-color: var(--ember);
+}
+
+.dawn-picker__rune {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dawn-picker__name {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  text-align: center;
+}
+
+.dawn-picker__rank {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.dawn-picker__lines {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  text-align: center;
+  line-height: 1.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dawn-picker__card {
+    transition: none;
+  }
+}

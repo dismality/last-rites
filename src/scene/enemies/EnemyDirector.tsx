@@ -31,7 +31,6 @@ import {
   insideChapel,
 } from '../../game/systems/chapelDoors'
 import { input } from '../player/input'
-import { useEndingStore } from '../../game/state/endingStore'
 import { isSimFrozen } from '../../game/state/menuState'
 import { hurtPlayer } from '../../game/state/retryNight'
 import { loopCue, tickEnemies, type AIEvent } from '../../game/systems/enemyAI'
@@ -181,7 +180,6 @@ function handleEvent(ev: AIEvent): void {
       break
     case 'enemyCollapsed':
       if (ev.elite) dropEliteLoot(ev.pos)
-      useEndingStore.getState().banish()
       break
   }
 }

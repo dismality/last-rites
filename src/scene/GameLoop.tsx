@@ -13,6 +13,10 @@ import {
 } from '../game/state'
 import { tickCombat } from '../game/state/combatTick'
 import { tickGuidance } from '../game/state/guidanceTick'
+import { currentModifiers } from '../game/state/derivedStats'
+import { deriveTickInput, progressionTick } from '../game/state/progressionTick'
+import { useProgressionStore } from '../game/state/progressionStore'
+import { lanternDrainMultiplier } from '../game/systems/modes'
 import { getSprintDrainMult, readStamina, writeRegenDelay } from '../game/state/staminaRuntime'
 import { isSimFrozen } from '../game/state/menuState'
 import { STEP, advanceAccumulator } from '../game/systems/fixedStep'
@@ -35,6 +39,18 @@ const liveInput = (): TickInput => ({
   sprinting: input.peek().sprint,
   sprintDrainMult: getSprintDrainMult(),
 })
+
+/** Adds the progression-derived inputs: dawn hold, day length, drain and regen multipliers. */
+function withProgression(base: TickInput): TickInput {
+  const mods = currentModifiers()
+  const p = useProgressionStore.getState()
+  return {
+    ...base,
+    ...deriveTickInput(),
+    regenMult: mods.staminaRegenMult,
+    lanternDrainMult: lanternDrainMultiplier(p.mode, p.ranks['long-wick'] ?? 0, p.storm.active),
+  }
+}
 
 function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput }) {
   usePauseTriggers()
@@ -60,7 +76,7 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
 
       const r = runTick(
         { player, stamina, lantern, world },
-        sampleInput(),
+        withProgression(sampleInput()),
         STEP
       )
 
@@ -77,6 +93,7 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
         moving: snap.forward !== 0 || snap.strafe !== 0,
         playerPos: usePlayerStore.getState().position,
       })
+      progressionTick(STEP)
       tickGuidance(STEP)
     }
 

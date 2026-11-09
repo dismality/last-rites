@@ -151,6 +151,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193124769
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194030858
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194129070
       }
     ],
     "2.4 Endless wave generator, plan and best score": [
@@ -226,6 +236,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125030
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194030942
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194129239
       }
     ],
     "2.9 Side contracts": [
@@ -289,6 +309,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193773737
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193926334
       }
     ],
     "2.13 Scare silence schedule": [
@@ -296,6 +321,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125297
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194031073
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194130830
       }
     ],
     "2.14 Storm rolls and lightning schedule": [
@@ -308,6 +343,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193773796
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193926419
       }
     ],
     "2.15 Lightning envelope, storm end and modifiers": [
@@ -315,6 +355,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125399
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194031787
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194128965
       }
     ],
     "2.16 Satchel slot limit": [
@@ -327,6 +377,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193773852
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193927050
       }
     ],
     "2.17 Stamina regen, dig time and flask radius hooks": [
@@ -339,6 +394,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193773949
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193927856
       }
     ],
     "2.18 Progression save sanitising": [
@@ -346,6 +406,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125547
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194255859
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194474414
       }
     ],
     "3.1 Sim clock, overlay store and toast duration": [
@@ -358,6 +428,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193774379
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193928648
       }
     ],
     "3.2 Progression store and persistence list": [
@@ -365,6 +440,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125652
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194479124
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194564680
       }
     ],
     "3.3 Score and coin stores": [
@@ -372,6 +457,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125719
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194032364
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194130038
       }
     ],
     "3.4 Achievement store and Endless best": [
@@ -379,6 +474,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125768
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194136041
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194249544
       }
     ],
     "3.5 Derived stats": [
@@ -386,6 +491,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125816
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194570152
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194700882
       }
     ],
     "3.6 Progression actions": [
@@ -393,6 +508,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125860
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194726045
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194940752
       }
     ],
     "3.7 Progression events: kills, shots, digs and pickups": [
@@ -400,6 +525,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125907
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194726098
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194940819
       }
     ],
     "3.8 Progression events: contracts, achievements, dawn and storms": [
@@ -407,6 +542,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193125961
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195097556
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195473488
       }
     ],
     "3.9 Progression tick and runtime objects": [
@@ -414,6 +559,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126020
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194726257
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194940960
       }
     ],
     "3.10 Install order": [
@@ -421,6 +576,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126078
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195821688
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196019585
       }
     ],
     "4.1 Game loop wiring": [
@@ -428,6 +593,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126127
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195097607
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195473789
       }
     ],
     "4.2 Wave director: plan, mode, elites and night cleared": [
@@ -435,6 +610,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126176
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194726792
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194941314
       }
     ],
     "4.3 Stats move and banish removal": [
@@ -442,6 +627,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126234
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194570223
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194700937
       }
     ],
     "5.1 Melee hit event and flask radius": [
@@ -449,6 +644,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126303
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194727273
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194942113
       }
     ],
     "5.2 Scare stager silence wiring": [
@@ -456,6 +661,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126351
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195482297
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195671246
       }
     ],
     "5.3 Merchant, cart and compass marker": [
@@ -463,6 +678,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126395
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195097660
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195474589
       }
     ],
     "5.4 Coin piles": [
@@ -470,6 +695,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126448
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194255938
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194474918
       }
     ],
     "5.5 Weather: rain and thunder": [
@@ -477,6 +712,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126496
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195482388
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195672040
       }
     ],
     "5.6 Lightning and storm fog": [
@@ -484,6 +729,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126544
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195482444
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195672577
       }
     ],
     "5.7 Music driver": [
@@ -491,6 +746,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126595
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195482508
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195673080
       }
     ],
     "5.8 Pause triggers and menu state": [
@@ -498,6 +763,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126642
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194136121
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194250109
       }
     ],
     "5.9 Mount the new scene components": [
@@ -505,6 +780,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126690
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195821760
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196020103
       }
     ],
     "6.1 Menu dialog autofocus": [
@@ -512,6 +797,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126739
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794193934161
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194025803
       }
     ],
     "6.2 Mode select": [
@@ -519,6 +814,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126788
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194136197
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194250909
       }
     ],
     "6.3 Dawn picker and dawn card": [
@@ -526,6 +831,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126857
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195097713
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195475092
       }
     ],
     "6.4 Merchant menu": [
@@ -533,6 +848,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126903
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195482798
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195673661
       }
     ],
     "6.5 Contracts tab": [
@@ -540,6 +865,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193126954
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194570299
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194700993
       }
     ],
     "6.6 Score, combo and coins panel": [
@@ -547,6 +882,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127003
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194570398
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194701445
       }
     ],
     "6.7 Achievement toasts": [
@@ -554,6 +899,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127056
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194256227
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194475488
       }
     ],
     "6.8 Achievements menu": [
@@ -561,6 +916,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127119
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195677651
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195794471
       }
     ],
     "6.9 Stats screen, ending and taken screens": [
@@ -568,6 +933,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127165
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195097837
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195475871
       }
     ],
     "6.10 Title and pause menu wiring": [
@@ -575,6 +950,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127212
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195822153
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196020618
       }
     ],
     "6.11 Assemble the new HUD": [
@@ -582,6 +967,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127262
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196025556
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196289801
       }
     ],
     "6.12 Satchel grid and dig bar": [
@@ -589,6 +984,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127315
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194951304
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195089533
       }
     ],
     "7.1 Music graph": [
@@ -596,6 +1001,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127359
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195822692
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196021413
       }
     ],
     "7.2 Rain noise": [
@@ -603,6 +1018,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127412
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195823232
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196021731
       }
     ],
     "7.3 Thunder and bus checks": [
@@ -610,6 +1035,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127461
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196293504
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196413353
       }
     ],
     "8.1 Save and load wiring": [
@@ -617,6 +1052,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127509
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194951354
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195090089
       }
     ],
     "8.2 Retry Night snapshot and night clear": [
@@ -624,6 +1069,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127561
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195678199
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195794322
       }
     ],
     "8.3 New Game and run end": [
@@ -631,6 +1086,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127609
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195678697
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195794400
       }
     ],
     "8.4 Process and structure tests": [
@@ -638,6 +1103,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127658
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196417403
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196576945
       }
     ],
     "8.5 Integration flows": [
@@ -645,6 +1120,16 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127712
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196417764
+      },
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196577492
       }
     ],
     "9. Checkpoint: playtest in a real browser": [
@@ -659,6 +1144,55 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193589689
+      }
+    ],
+    "2. Pure systems with property tests": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794194474494
+      }
+    ],
+    "4. Dawn hold and Endless wave plan": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794195473847
+      }
+    ],
+    "3. Stores and glue": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196019652
+      }
+    ],
+    "5. Scene": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196020143
+      }
+    ],
+    "6. UI": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196289853
+      }
+    ],
+    "7. Procedural music, rain and thunder": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196413398
+      }
+    ],
+    "8. Save, Retry Night and New Game": [
+      {
+        "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794196577534
       }
     ]
   }

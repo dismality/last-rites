@@ -1,4 +1,4 @@
-# Kiro Development Log
+﻿# Kiro Development Log
 
 How Kiro was used to build Last Rites. Entries are added as work happens (see `.kiro/steering/kiro-log.md` for the format).
 
@@ -926,3 +926,235 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `storm.ts` (stormChance, rollStorm, startStorm, tickStorm) with seeded strike gaps and thunder delays, where a strike waits at 0 during a pending beat. `storm.test.ts` covers Properties 28 to 30 with fast-check.
 - **What Kiro caught or sped up:** Storm tests, lint and type-check are clean for these files. Full-repo build errors came from other files being edited by parallel tasks (crafting.ts, inventory.ts), not from storm.
+
+### 2026-11-09: 08-progression-and-atmosphere task 2.16: Satchel slot limit
+- **Kiro feature used:** spec task
+- **What happened:** addItem and craft take a slotLimit (default 12), and the duplicate SATCHEL_SLOTS in crafting.ts is gone. Tests cover a larger limit and the default. Also fixed a corrupted character in the runStats Best combo row (now the multiplication sign) and asserted it.
+- **What Kiro caught or sped up:** the garbled multiplication sign in statRows.
+### 2026-11-09: 08-progression-and-atmosphere task 2.12: Music mixer
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `musicMixer.ts` (initMixer, stepMixer, currentWeights): retargeting restarts from the audible weights, master falls over 0.3 s while silent and rises over 2 s after, and the fade keeps tracking the layer while silent. `musicMixer.test.ts` covers Properties 26 and 27 (mixer half) with fast-check.
+- **What Kiro caught or sped up:** Full test (1421 pass), lint and `tsc -b` are clean. The shell wedged on a stray `git add` during `npm run build`, so the build step was verified with `tsc -b` only.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.1: Menu dialog autofocus
+- **Kiro feature used:** spec task
+- **What happened:** `MenuDialog` now focuses the first `data-autofocus` control (else the first control, else the panel); `onEscape` stays optional. The focus and Tab-wrap rules moved into `menuFocus.ts` so they test in Node, with unit and fast-check tests in `menuFocus.test.ts`.
+- **What Kiro caught or sped up:** the project has no DOM test environment, so focus return on close (unchanged effect cleanup) is not covered by a test. Lint caught a `this` alias in the test fake.
+
+### 2026-11-09: 08-progression-and-atmosphere task 2.3: Mode multipliers and lantern drain
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `systems/modes.ts` (`spawnMultipliers`, `endlessHpScale`, `lanternDrainMultiplier`) and an optional `drainMult` on `tickLantern`. Property 20 in `modes.test.ts` checks the mode table, Endless 1.08 scaling after night 5, elite composition and the drain product; `lantern.test.ts` covers `drainMult`.
+- **What Kiro caught or sped up:** Full run: only failures are other parallel tasks' files (missing `scareSilence.test.ts`, unused vars lint in `scoreCoinStores.test.ts`); build is clean. The process-rule scan of numeric literals in systems accepted `modes.ts` because the numbers come from data.
+### 2026-11-09: 08-progression-and-atmosphere task 3.3: Score and coin stores
+- **Kiro feature used:** spec task
+- **What happened:** Added `scoreStore` (combo, last kill time, seen uids, night counters, `resetNight`) and `coinStore` (piles, `clear`) with unit tests for reset, clear and fresh-equals-reset.
+- **What Kiro caught or sped up:** lint flagged unused destructured names in the test helper; replaced with a JSON snapshot comparison.
+
+### 2026-11-09: 08-progression-and-atmosphere task 2.13: Scare silence schedule
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `systems/scareSilence.ts` (`emptySilence`, `announce`, `fired`, `isSilent`, `majorScareActive`, `beatImminent`). Property 27 in `scareSilence.test.ts` checks silence from announcement to 2 s after the later beat, pending beats holding it on, and the mixer ducking to 0 within 0.3 s then fading in toward the current layer, at every Scare intensity.
+- **What Kiro caught or sped up:** the schedule is intensity-independent, so the mixer integration reuses one schedule across all three intensities. Lint failures remain only in another parallel task's `scoreCoinStores.test.ts`.
+
+### 2026-11-09: 08-progression-and-atmosphere task 2.15: Lightning envelope, storm end and modifiers
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `lightningLevel` (fast 0.15 s flash, slow linear 0.3 ramp), `endStorm`, `stormModifiers` and `thunderShakes` to `storm.ts`. Properties 31 and 32 in `storm.test.ts` cover the envelopes, the slow-iff-flashing-off variant, shake settings, thunder surviving storm end and pause with no steps.
+- **What Kiro caught or sped up:** Full run passes (160 files, 1450 tests) and build is clean; the only lint errors are unused vars in another task's `scoreCoinStores.test.ts`.
+### 2026-11-09: 08-progression-and-atmosphere task 2.8: Merchant stock and purchases
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `merchant.ts` (dealStock, merchantPresent, withinTradeRange, tryBuy, canOpenMerchant). `tryBuy` checks sold out, coins, then space via `addItem` on a copy with a slot limit. `merchant.test.ts` covers Properties 15, 16 and 17 with fast-check.
+- **What Kiro caught or sped up:** Full test (1450 pass), lint and build are clean on the first run.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.2: Mode select
+- **Kiro feature used:** spec task
+- **What happened:** Added `ModeSelect.tsx` (native radios, Normal checked and autofocused, Begin/Back, Esc goes back) with a pure `modeSelect.ts` helper for option text and choice logic, plus unit tests and `:focus-visible` CSS.
+- **What Kiro caught or sped up:** Option text is derived from `MODES` and `ENDLESS`, so the screen can't drift from the data; a test checks every line.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.8: Pause triggers and menu state
+- **Kiro feature used:** spec task
+- **What happened:** Split usePauseTriggers into testable handlers: Esc always pauses over the picker, merchant and achievements; pointer-lock loss is ignored while an 08 overlay is open. menuState.isMenuOpen now counts the overlayStore flags, and PauseMenu resumes through resumeGame, which skips requestLock while an overlay is open.
+- **What Kiro caught or sped up:** progressionStore does not exist yet, so the dawn pick is a hook point (setDawnPickProbe) for it to register later.
+### 2026-11-09: 08-progression-and-atmosphere task 3.4: Achievement store and Endless best
+- **Kiro feature used:** spec task
+- **What happened:** Added `achievementStore.ts` (unlock, dismiss, resetSession, toast queue, "[achievement: NAME]" caption) and `endlessBest.ts` (readBest, settleEndless once per runId, session fallback). Unit tests cover a throwing `localStorage`, higher-only writes, hostile values reading as 0 and once-per-run settling.
+- **What Kiro caught or sped up:** Reused the pure `parseUnlocked`, `queueToasts`, `parseBest` and `updateBest` helpers, so the stores are thin. Full test (1467 pass), lint and build are clean.
+### 2026-11-09: 08-progression-and-atmosphere task 5.4: Coin piles
+- **Kiro feature used:** spec task
+- **What happened:** Added `CoinPiles.tsx` (one instanced mesh of merged low-poly coin heaps, up to 32, ember material, gentle bob frozen by `isSimFrozen()`) and a pure `coinPileLayout.ts` helper that applies `pileScale` so heaps shrink in their last 2 s. Not mounted yet (task 5.9).
+- **What Kiro caught or sped up:** The React compiler lint rule rejected `useMemo(fn, [])` with a named function, fixed with an inline arrow. Placement maths has unit and property tests.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.7: Achievement toasts
+- **Kiro feature used:** spec task
+- **What happened:** Added `AchievementToasts.tsx` (per-toast self-timing, "★" and name, fade only, no pulse) with `achievementToastTiming.ts` for duration, opacity, expiry and the 3-visible split. Not mounted yet (task 6.11). Unit and property tests cover 5 toasts as 3 shown and 2 queued, the fades, and a duration that ignores the Subtitles setting (at least 3 s).
+- **What Kiro caught or sped up:** The `react-hooks/refs` lint rule rejected a shared ref map of start times, so each toast became its own component holding its start in state.
+
+### 2026-11-09: 08-progression-and-atmosphere task 2.18: Progression save sanitising
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `progressionSave.ts` (`ProgressionSave`, `sanitizeProgression`, `defaultProgressionSave`, `DEFAULT_SEED`, a `NightSummary` shape for the dawn card) that reads each field on its own and reuses `parseStats` and the data tables. Property 33 covers the JSON round trip and one-bad-field-at-a-time replacement, with unit tests for defaults, ranks, pick and contract trimming and pre-08 saves.
+- **What Kiro caught or sped up:** The design does not define `NightSummary` or its sanitising rule, so it is defined here with all-or-nothing validation; task 3.2 may need to adopt it.
+### 2026-11-09: 08-progression-and-atmosphere task 3.2: Progression store and persistence list
+- **Kiro feature used:** spec task
+- **What happened:** Added `progressionStore.ts` (all twelve saved fields, coins floored at 0) and `progressionPersistence.ts` (`PROGRESSION_PERSISTED`, `captureProgressionSave`, `restoreProgressionSave`). The store registers a dawn pick probe with `menuState` that is true while `pendingPick` is non-null, and it reuses `NightSummary` from `progressionSave.ts`.
+- **What Kiro caught or sped up:** A test compares the persisted list with the keys of `defaultProgressionSave()`, so a field added to the save but not the list fails.
+
+### 2026-11-09: 08-progression-and-atmosphere task 3.5: Derived stats
+- **Kiro feature used:** spec task
+- **What happened:** Added `derivedStats.ts` (`currentModifiers` memoised by the ranks object, `syncDerivedStats` writing max HP) and `playerStore.setMaxHealth`, with unit tests for Iron Constitution, the heal cap, sync after load and modifier stability.
+- **What Kiro caught or sped up:** `healPlayer` already capped at `maxHealth`, so no change was needed there.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.6: Score, combo and coins panel
+- **Kiro feature used:** spec task
+- **What happened:** Added `ScorePanel.tsx`/`.css` plus a pure `scorePanelView.ts` (score, combo from `comboView`, coins, pulse class gated on Flashing lights) with unit tests. Not mounted in Hud yet (task 6.11).
+- **What Kiro caught or sped up:** Keyed spans restart the 0.2 s pulse without effect-driven state, and the combo bar drains via a CSS animation keyed on `lastKillAt`, so no per-frame re-render.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.5: Contracts tab
+- **Kiro feature used:** spec task
+- **What happened:** Added a Contracts tab to the journal (`ContractsTab.tsx`) backed by a pure view-model (`contractsView.ts`) with unit tests for two entries, one entry, empty slots and the Done tag.
+- **What Kiro caught or sped up:** No DOM test env, so the layout logic was extracted into a testable helper. Six other suites failed to load (a `dawnPickProbe` init error from parallel work), unrelated to this change.
+
+### 2026-11-09: 08-progression-and-atmosphere task 4.3: Stats move and banish removal
+- **Kiro feature used:** spec task
+- **What happened:** Removed `stats` and `banish()` from endingStore and the `banish()` call from EnemyDirector. The ending now reads and writes `progressionStore.stats` (summary screen, survive-night, finalize).
+- **What Kiro caught or sped up:** Importing progressionStore from endingStore created an import cycle through menuState (TDZ error in 6 test files). A small `statsPort.ts` that progressionStore registers into breaks the cycle.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.1: Melee hit event and flask radius
+- **Kiro feature used:** spec task
+- **What happened:** MeleeAttack now emits `meleeHit { uid }` once per zombie struck by a melee or heavy swing (kicks never). ThrownItems passes `flaskRadiusBonusM` to the splash and uses the same radius for the flash. Pure helpers `meleeHitEvents` and `flaskSplashRadius` are unit-tested.
+- **What Kiro caught or sped up:** No DOM test env, so the logic was extracted into helpers. Full test, lint and build pass.
+
+### 2026-11-09: 08-progression-and-atmosphere task 3.6: Progression actions
+- **Kiro feature used:** spec task
+- **What happened:** Added `progressionActions.ts` (`startRun`, `pickUpgrade`, `buyFromMerchant`, `openMerchant`, `closeMerchant`) with unit tests. Each action updates all affected stores together.
+- **What Kiro caught or sped up:** Reused the existing `tryBuy`, `dealContracts` and `deriveSeed`, so the purchase and offer rules stay in the pure systems and the actions are thin glue.
+
+### 2026-11-09: 08-progression-and-atmosphere task 3.7: Progression events (kills, shots, digs, pickups)
+- **Kiro feature used:** spec task
+- **What happened:** Added `installProgressionWatchers()` in `progressionEvents.ts`. `enemyKilled` runs the score, stats and coin-pile steps in order, using a per-night seeded coin stream. The melee, shot, board, dig, item and boss events update stats and score. Added unit tests.
+- **What Kiro caught or sped up:** A single shared coin stream per seed and night avoids a fresh rng repeating the same roll on every kill. Pile-cap overflow is banked into coins and counted as earned.
+
+### 2026-11-09: 08-progression-and-atmosphere task 4.2: Wave director mode, elites and nightCleared
+- **Kiro feature used:** spec task
+- **What happened:** WaveDirector now builds waves from nightPlan(mode, night), passes spawnMultipliers and the mode elite chance (new optional eliteChance in WaveContext), emits nightCleared once per night, routes to the rite only in story modes and records nights survived with an uncapped Endless limit. Decisions live in the pure waveDirection.ts with unit tests.
+- **What Kiro caught or sped up:** spawnMultipliers already includes the elite multipliers, which createEnemy also applies, so the director asks for the non-elite part to avoid doubling elite HP.
+
+### 2026-11-09: 08-progression-and-atmosphere task 3.9: Progression tick and runtime objects
+- **Kiro feature used:** spec task
+- **What happened:** Added `progressionTick(dt)`, `deriveTickInput()`, `musicRuntime` and `stormRuntime`. The tick advances the sim clock, run time (not during a dawn pick), combo decay, coin piles with the "[+N grave coins]" subtitle, storm and `thunderRolled`, and the music layer, silence and mixer. It returns early when taken or frozen.
+- **What Kiro caught or sped up:** Tests cover step-size equivalence, frozen sim, piles banking once, and per-mode hold, day length and last night.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.12: Satchel grid and dig bar
+- **Kiro feature used:** spec task
+- **What happened:** Satchel renders `currentModifiers().satchelSlots` cells (pure `satchelCells.ts`). `digDuration.ts` gives the live dig time (`DIG_DURATION_S × digTimeMult`), used by `digStore` (tickDig/digProgress) and `DigBar`.
+- **What Kiro caught or sped up:** The dig was ticked in `digStore`, not the bar, so the store had to use the modified duration too or the bar and the dig would disagree. Tests cover 14 cells with Deep Pockets and a 30% shorter dig with Gravedigger.
+
+### 2026-11-09: 08-progression-and-atmosphere task 8.1: Save and load wiring
+- **Kiro feature used:** spec task
+- **What happened:** `saveGame.ts` always writes a `progression` block (SAVE_VERSION stays 1) and reads it as optional; `validInventory` allows `SATCHEL_SLOTS_MAX`. `gameSave.ts` captures it and `loadGame` applies `sanitizeProgression` then `syncDerivedStats()`.
+- **What Kiro caught or sped up:** The progression import in `systems/saveGame.ts` is type-plus-pure-function only, so no cycle with the stores. Tests cover ranks, coins, contracts, stock and a pending pick restoring, a pre-08 save loading with defaults, and corrupt data leaving storage alone.
+
+### 2026-11-09: 08-progression-and-atmosphere task 4.1: Game loop wiring
+- **Kiro feature used:** spec task
+- **What happened:** TickInput now carries holdDawn, dayLengthS, lastNight, lanternDrainMult and regenMult; GameLoop fills them from deriveTickInput() and currentModifiers() and calls progressionTick(STEP) after tickCombat. Dig duration already reads currentModifiers() in digStore.
+- **What Kiro caught or sped up:** the pure systems already accepted the new parameters, so the wiring was a thin pass-through covered by four new gameTick tests.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.3: Dawn picker and dawn card
+- **Kiro feature used:** spec task
+- **What happened:** Added `DawnPicker.tsx` (MenuDialog, three card buttons, arrow-key movement, no onEscape, waits on `majorScareActive`) and pure view-models in `dawnView.ts`. `DawnCard.tsx` now shows the summary with night score parts and hosts the picker. It is not mounted yet; that is left to task 6.11.
+- **What Kiro caught or sped up:** `tsc -b` flagged `Array.at` in the new test (lib target), fixed by indexing. View-model tests cover cards from `upgradeCard`, one pick call, the scare wait, and a saved pending pick.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.3: Merchant, cart and compass marker
+- **Kiro feature used:** spec task
+- **What happened:** Added `Merchant.tsx` (cart and Silas from merged primitives, 5 draw calls, emissive lantern, no light), a `trade` interaction (rune ᛗ, "E: Trade") gated by `canOpenMerchant` in `merchantPresence.ts`, the ⚱ "Silas" compass marker, and arrival/leaving captions that also close an open menu. Not mounted yet (task 5.9).
+- **What Kiro caught or sped up:** the existing `canOpenMerchant`/`merchantPresent` rules and caption table made the glue thin; four unit tests cover prompt, range, marker and leave behaviour.
+### 2026-11-09: 08-progression-and-atmosphere task 3.8: Progression events: contracts, achievements, dawn and storms
+- **Kiro feature used:** spec task
+- **What happened:** Extended `progressionEvents.ts` so the same events advance contracts (paid once with a 3 s toast and caption), `nightStarted`/`phaseChanged` roll and end storms from the seed, `nightCleared` banks the night bonus and settles `c-unhurt` and Close Shave, `dawnStarted` deals contracts, the summary and the seeded offer, and achievements evaluate after each handler and on mystery, inventory and stats changes.
+- **What Kiro caught or sped up:** `installRunStats` runs after the watchers, so the dawn handler records the survived night itself (idempotent) for First Light. Unit tests cover the seeded replay after a Retry, a maxed dawn and single toasts. `npm run build` currently fails only on casing clashes in `src/ui/menus` from parallel tasks.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.9: Stats screen, ending and taken screens
+- **Kiro feature used:** spec task
+- **What happened:** Added `StatsPanel` (rows from `statRows`, Endless best, autofocused Close) with a pure view-model `statsPanelModel.ts`; the ending screen embeds it and New Game opens the mode select; the taken screen hides Retry in Endless and shows the stats there.
+- **What Kiro caught or sped up:** A first view-model file named `statsPanel.ts` clashed with `StatsPanel.tsx` on case-insensitive Windows and broke `tsc`; renamed to `statsPanelModel.ts`. The same casing clash exists between 6.2's `modeSelect.ts` and `ModeSelect.tsx` and still fails the build.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.2: Scare stager silence wiring
+- **Kiro feature used:** spec task
+- **What happened:** `ScareStager` now announces a major scare's beat on `musicRuntime.silence` at its telegraph (beat time = simClock.now + max(0, beat.at − directorTime)) and marks it fired at the beat. The pure helper `silenceWiring.ts` holds the logic; the scare director is untouched.
+- **What Kiro caught or sped up:** A menu-held beat stays in the queue, so it never fires and the silence stays on (overdue pending beats count as silent). Full `npm run test` passes; lint/tsc still report errors only in other parallel tasks' files (rain material immutability, `music.test.ts` `.at`).
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.6: Lightning and storm fog
+- **Kiro feature used:** spec task
+- **What happened:** Added pure helpers in stormLight.ts and applied flashLevel boosts, sky/fog tint and +0.01 storm fog in SkyAndFog.tsx without writing the world store.
+- **What Kiro caught or sped up:** progressionTick already wrote flashLevel from lightningLevel, so no change was needed there.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.5: Weather, rain and thunder
+- **Kiro feature used:** spec task
+- **What happened:** Added `Weather.tsx` (600 rain streaks as one instanced mesh, frozen with the sim, 3 s fade, thunder sound/caption/shake), pure helpers in `weatherRain.ts` with tests, and an `audio/rain.ts` level stub for task 7.2.
+- **What Kiro caught or sped up:** The React lint rule flagged writing a memoised material in `useFrame`; fixed by writing through the mesh's material.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.4: Merchant menu
+- **Kiro feature used:** spec task
+- **What happened:** Added `ui/merchant/MerchantMenu.tsx` (MenuDialog, Silas Vane, coins, rows with price, "Left: n" and Buy, a `role="alert"` refusal line, Close, no `onEscape`) with a Node-testable `merchantMenuModel.ts` that wraps `buyFromMerchant` and closes the menu at dusk, when he leaves or beyond 2.5 m. Not mounted in the Hud yet (task 6.11).
+- **What Kiro caught or sped up:** The React lint rule rejected resetting the refusal inside an effect; moved the reset to the closed render. Unit tests cover purchase, refusal and both close conditions.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.7: Music driver
+- **Kiro feature used:** spec task
+- **What happened:** Added `audio/music.ts` (`createMusicGraph` with 4 stem gains and a master on the music bus, `setMusicLevels` with 0.04 s smoothing, `stepMusic`) and `scene/audio/MusicDriver.tsx` reading `musicRuntime` per frame; silent until the context runs. Not mounted yet (task 5.9).
+- **What Kiro caught or sped up:** Music and master volume already reach the music bus via `volumes.ts`, so the driver reads no settings. A fake-context test caught my wrong gain-node ordering assumption.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.8: Achievements menu
+- **Kiro feature used:** spec task
+- **What happened:** Added `ui/menus/AchievementsMenu.tsx` (MenuDialog, Close button, Esc closes) with a pure `achievementsMenuModel.ts`; locked entries are dashed outlines with the goal and a "Locked" tag, and a major scare shows "Not now" instead. Not wired to the title/pause buttons yet (task 6.10).
+- **What Kiro caught or sped up:** The model is separate from the component name to avoid Windows casing clashes; unit and property tests cover 12 entries, the Locked tag and the closed-during-scare rule.
+
+### 2026-11-09: 08-progression-and-atmosphere task 8.2: Retry Night snapshot and night clear
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added a progression entry to the Retry snapshot (capture/restore plus syncDerivedStats), made Retry a no-op in Endless, and extended clearNightState to reset night score, coin piles, storm and music silence. Property 34 test in retryProgression.test.ts.
+- **What Kiro caught or sped up:** Reusing captureProgressionSave kept Save and Retry on one field list.
+
+### 2026-11-09: 08-progression-and-atmosphere task 8.3: New Game and run end
+- **Kiro feature used:** spec task
+- **What happened:** `resetRun` now resets progression, score, coins and storm while leaving achievements and the Endless best alone. `startEnding` and the death path in `hurtPlayer` settle the Endless best through `settleEndless` (once per run id). Added `runEnd.test.ts`.
+- **What Kiro caught or sped up:** Endless has no ending screen, so the death settle had to hook `hurtPlayer`, not `startEnding` alone.
+
+### 2026-11-09: 08-progression-and-atmosphere task 5.9: Mount the new scene components
+- **Kiro feature used:** spec task
+- **What happened:** `App.tsx` now mounts `Weather` right after `SkyAndFog`, and `MusicDriver`, `Merchant` and `CoinPiles` after `EnemyDirector`. Added `App.test.ts`, a source-level structural test of the mount order.
+- **What Kiro caught or sped up:** The project has no node types, so the test imports `App.tsx?raw` instead of using `node:fs`.
+
+### 2026-11-09: 08-progression-and-atmosphere task 3.10: Install order
+- **Kiro feature used:** spec task
+- **What happened:** `main.tsx` now calls `installProgressionWatchers()` before `installNewDaySave()` and `installRunStats()`. Added `tests/installOrder.test.ts`, which reads `main.tsx` as raw text and checks the call order.
+- **What Kiro caught or sped up:** The app tsconfig has no Node types, so the test uses Vite's raw glob instead of `node:fs`.
+
+### 2026-11-09: 08-progression-and-atmosphere task 6.10: Title and pause menu wiring
+- **Kiro feature used:** spec task
+- **What happened:** Title New Game now opens ModeSelect then starts the run via a shared runFlow helper (Endless skips the intro); Achievements buttons added to Title and Pause, driven by overlayStore flags.
+- **What Kiro caught or sped up:** Full suite passes except music.test.ts, which has a parse error from a parallel task (not touched here).
+
+### 2026-11-09: 08-progression-and-atmosphere task 7.1: Music graph
+- **Kiro feature used:** spec task
+- **What happened:** `src/audio/music.ts` now builds the drone, unease, tension and danger stems from oscillators, filters and LFOs on the 07 music bus, once, plus a heartbeat scheduler (0.25 s look-ahead, two thuds 0.22 s apart) that runs while the danger stem is above 0.05 and not while the sim is frozen. `MusicDriver` passes `isSimFrozen()`.
+- **What Kiro caught or sped up:** the older music test assumed exactly five gains were created, so it now checks that nothing is rebuilt on later steps instead.
+
+### 2026-11-09: 08-progression-and-atmosphere task 7.2: Rain noise
+- **Kiro feature used:** spec task
+- **What happened:** `src/audio/rain.ts` now builds a looped noise buffer through a 500 Hz high-pass and a 2.4 kHz band-pass (Q 0.5) into a 0.22 gain on the sfx bus, fading over 3 s and muting quickly while frozen (`setRainFrozen`, called from Weather). Values live in `RAIN_NOISE` in `storms.ts`.
+- **What Kiro caught or sped up:** the build's older TS lib has no `Array.at`, so the fake-context test uses an indexed helper instead.
+### 2026-11-09: 08-progression-and-atmosphere task 6.11: Assemble the new HUD
+- **Kiro feature used:** spec task
+- **What happened:** `Hud.tsx` now mounts `ScorePanel`, `AchievementToasts`, `DawnCard` (which hosts `DawnPicker`) and `MerchantMenu` after the 06 and 07 elements, leaving those untouched. `tests/hudProgressionStructure.test.ts` checks that no `font-size` is under 1rem in the four new CSS files and the `mode__` / `achievements__` rules in `menus.css`. No offenders were found.
+- **What Kiro caught or sped up:** Vitest replaces CSS with empty strings by default, so `?raw` CSS imports came back as `''` and the 07 font-size check had been passing without checking anything. `css: true` in `vitest.config.ts` fixes it, and the new test asserts that each file actually contains font sizes.
+
+### 2026-11-09: 08-progression-and-atmosphere task 7.3: Thunder and bus checks
+- **Kiro feature used:** spec task
+- **What happened:** `Weather.tsx` now calls a new `playThunder` in `weatherRain.ts`, which sends `thunder-close` / `thunder-far` through `emitCombatSound` (caption, then `playSound` on the sfx bus) and makes the shake decision separately, so a missing audio context still gives both. Thunder is a one-shot voice, so pausing never cuts its tail. `thunderBus.test.ts` checks the SFX volume reaches the bus, the caption and shake with no context, and a music master target of 0 while silent.
+- **What Kiro caught or sped up:** `tsc -b` caught that `MusicLayer` is numeric (0..3) after vitest had passed with string layers, so the test was fixed before finishing.
+
+### 2026-11-09: 08-progression-and-atmosphere task 8.4: Process and structure tests
+- **Kiro feature used:** spec task
+- **What happened:** Added `tests/progressionRules.test.ts`: every system has a test (spec 08 systems named), no React, three.js or Howler under `src/game/`, no unnamed balance literal beyond 0, 1, 2 and indices in the eleven new systems, no .ogg, .mp3 or .glb outside a recorded allowlist, and `PROGRESSION_PERSISTED`, the save defaults and the Retry snapshot name the same fields.
+- **What Kiro caught or sped up:** The literal scan found real offenders: Endless brute offset and step (3, 3) and the storm night seed stride (1000). They moved to `ENDLESS` and `STORM` in `src/data/`.
+
+### 2026-11-09: 08-progression-and-atmosphere task 8.5: Integration flows
+- **Kiro feature used:** spec task
+- **What happened:** Added tests/progressionCheckpoint.test.ts: a seeded night 1 to dawn flow (combo, coins, night score, Iron Constitution, merchant buys, contracts), save/load round trip, failed night plus Retry Night against the dusk snapshot, and an Endless night 6 plan.
+- **What Kiro caught or sped up:** Showed that dawn re-deals contracts, so paid contracts are checked through coins, not the contract list. No production bugs found.

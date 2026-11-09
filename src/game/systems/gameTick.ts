@@ -11,6 +11,16 @@ export interface TickInput {
   sprinting: boolean
   /** Scales sprint drain only; Adrenaline halves it. Defaults to 1. */
   sprintDrainMult?: number
+  /** Second Wind; scales stamina regeneration. Defaults to 1. */
+  regenMult?: number
+  /** Mode x Long Wick x storm (lanternDrainMultiplier). Defaults to 1. */
+  lanternDrainMult?: number
+  /** A dawn upgrade pick is pending; dawn freezes. */
+  holdDawn?: boolean
+  /** Day length in seconds (Endless is shorter). */
+  dayLengthS?: number
+  /** Highest night number; Endless passes Infinity. */
+  lastNight?: number
 }
 
 export interface TickSnapshot {
@@ -29,14 +39,19 @@ export function runTick(s: TickSnapshot, input: TickInput, dt: number): TickResu
 
   // Sprinting needs stamina left, otherwise the player is forced to walk.
   const sprinting = input.sprinting && s.stamina.stamina > 0
-  const stamina = tickStamina(s.stamina, dt, sprinting, input.sprintDrainMult ?? 1)
+  const stamina = tickStamina(s.stamina, dt, sprinting, input.sprintDrainMult ?? 1, input.regenMult ?? 1)
 
   // Player movement is applied by the Rapier controller (task 6); only mirror stamina here.
   const player: PlayerState = { ...s.player, stamina: stamina.stamina }
 
-  const lantern = tickLantern(s.lantern, dt, s.world.phase)
+  const lantern = tickLantern(s.lantern, dt, s.world.phase, input.lanternDrainMult ?? 1)
 
-  const night = tickDayNight(s.world, dt, { wavesCleared: s.world.wavesCleared })
+  const night = tickDayNight(s.world, dt, {
+    wavesCleared: s.world.wavesCleared,
+    holdDawn: input.holdDawn,
+    dayLengthS: input.dayLengthS,
+    lastNight: input.lastNight,
+  })
   events.push(...night.events)
 
   return { player, stamina, lantern, world: night.state, events }

@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { COMPASS, COMPASS_LETTERS } from '../../data/compass'
+import { MERCHANT_SPOT } from '../../data/merchant'
+import { isMerchantPresent } from '../../game/state/merchantPresence'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { usePlayerStore } from '../../game/state/playerStore'
@@ -75,6 +77,7 @@ export function Compass() {
         objective: useGuidanceStore.getState().objective?.position,
         phase: useWorldStore.getState().phase,
         bellBuilt: isBellActive(useChapelStore.getState().chapel),
+        merchant: isMerchantPresent() ? MERCHANT_SPOT.silas : undefined,
       })
       if (!layer) return
       const seen = new Set<string>()

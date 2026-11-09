@@ -1,13 +1,15 @@
 // Pure save/load logic for the persistent game save. No React / three.js.
 // Storage is injected so tests run in Node and failures can be simulated.
 
-import { SATCHEL_SLOTS as MAX_SATCHEL_SLOTS } from '../../data/items'
+import { SATCHEL_SLOTS_MAX as MAX_SATCHEL_SLOTS } from '../../data/items'
 import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { Inventory, Phase, PlayerState, WorldState } from '../types'
 import type { ChapelState } from './repairs'
 import type { MysteryGateId, MysteryState } from './mystery'
 import { sanitizeInventorySlots } from './combatSave'
 import type { CombatSave } from './combatSave'
+import type { ProgressionSave } from './progressionSave'
+import { defaultProgressionSave } from './progressionSave'
 import { parseTutorial, serializeTutorial } from './tutorial'
 
 export const SAVE_KEY = 'lastrites:save'
@@ -28,11 +30,15 @@ export interface SaveState {
   introSeen?: boolean
   /** Combat block (spec 07). Optional on input; on read it is the raw saved block, sanitised by the loader with sanitizeCombat. */
   combat?: CombatSave
+  /** Progression block (spec 08). Optional on input and on read; the loader sanitises the raw block. */
+  progression?: ProgressionSave
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
-export interface SaveFile extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat'> {
+export interface SaveFile
+  extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat' | 'progression'> {
   combat: CombatSave
+  progression: ProgressionSave
   version: typeof SAVE_VERSION
   tutorial: number[]
   introSeen: boolean
@@ -75,6 +81,7 @@ export function toSaveFile(state: SaveState): SaveFile {
       takenPickups: [],
       doors: { built: false, front: [], vestry: [] },
     },
+    progression: state.progression ?? defaultProgressionSave(),
   }
 }
 
@@ -178,6 +185,8 @@ export function fromSaveFile(
     tutorial: parseTutorial(raw.tutorial),
     introSeen: typeof raw.introSeen === 'boolean' ? raw.introSeen : hasPassedFirstDay(world),
     combat: raw.combat as CombatSave | undefined,
+    // Raw block; the loader runs sanitizeProgression so a bad field never fails the whole save.
+    progression: raw.progression as ProgressionSave | undefined,
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,

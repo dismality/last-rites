@@ -6,6 +6,10 @@ import { useGameStore } from './gameStore'
 import { loadGame } from './gameSave'
 import { useIntroStore } from './introStore'
 import { resetRun } from './resetRun'
+import { useOverlayStore } from './overlayStore'
+import { startRun } from './progressionActions'
+import { MODES } from '../../data/modes'
+import type { ModeId } from '../types'
 
 function start(): void {
   const game = useGameStore.getState()
@@ -21,6 +25,31 @@ export function newGame(): void {
   resetRun()
   useIntroStore.getState().begin()
   start()
+}
+
+/** New Game button: opens the mode select instead of starting at once. */
+export function openModeSelect(): void {
+  useOverlayStore.getState().setModeSelectOpen(true)
+}
+
+export function closeModeSelect(): void {
+  useOverlayStore.getState().setModeSelectOpen(false)
+}
+
+/** Mode chosen: startRun resets and seeds the run; story modes then play the intro, Endless skips it. */
+export function beginMode(mode: ModeId): void {
+  startRun(mode)
+  closeModeSelect()
+  if (MODES[mode].story) useIntroStore.getState().begin()
+  start()
+}
+
+export function openAchievements(): void {
+  useOverlayStore.getState().setAchievementsOpen(true)
+}
+
+export function closeAchievements(): void {
+  useOverlayStore.getState().setAchievementsOpen(false)
 }
 
 /** Resumes a save. Never begins the intro. Returns false if there was nothing to load. */
