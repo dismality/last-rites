@@ -1495,11 +1495,6 @@
       {
         "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
-        "timestamp": 1794199458621
-      },
-      {
-        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
-        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794199465928
       },
       {
@@ -1541,6 +1536,11 @@
         "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794212423862
+      },
+      {
+        "executionId": "780f0dfb-cc0b-4cf9-9f2a-cc549f3bc7ea",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794214565968
       }
     ]
   }
