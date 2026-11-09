@@ -21,6 +21,7 @@ import { useInventoryStore } from './inventoryStore'
 import { useIntroStore } from './introStore'
 import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
+import { queueTeleportToStore } from './playerTeleport'
 import { useUiWorldStore } from './uiWorldStore'
 import { useWorldStore } from './worldStore'
 
@@ -82,6 +83,7 @@ export function loadGame(): boolean {
   useWorldStore.getState().applyWorldState(save.world)
   usePlayerStore.getState().applyPlayerState(save.player) // includes health
   useUiWorldStore.setState({ playerHealth: save.player.health })
+  queueTeleportToStore() // the body must move too, or the controller overwrites the store
   useInventoryStore.getState().setInventory(save.inventory)
   useMysteryStore.setState({ mystery: save.mystery })
   useChapelStore.setState({ chapel: save.chapel })

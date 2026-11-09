@@ -1,6 +1,7 @@
 import { useDoorStore } from '../../game/state/doorStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
+import { useCinematic } from '../../game/state/menuState'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { nailPrompt } from '../../game/systems/barricade'
 import { ACTION_RUNE, promptText } from '../../game/systems/interaction'
@@ -15,7 +16,8 @@ export function InteractPrompt() {
   const built = useDoorStore((s) => s.built)
   const doors = useDoorStore((s) => s.doors)
   const inventory = useInventoryStore((s) => s.inventory)
-  if (!hover) return null
+  const cinematic = useCinematic()
+  if (!hover || cinematic) return null
 
   // A door that cannot take a board says why: full, or the first missing material (Req 16.4).
   let note: string | null = null

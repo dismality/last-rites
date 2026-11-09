@@ -26,6 +26,7 @@ import { isSimFrozen } from '../../game/state/menuState'
 import type { AIEnemy } from '../../game/systems/enemyAI'
 import '../assets/preloadModels'
 import { CraneProps } from './CraneProps'
+import { ZOMBIE_MATERIAL_PARAMS, adjustZombieColor, zombieColdFill } from './zombieMaterial'
 import { EliteMarks } from './EliteMarks'
 
 const FADE_S = 0.15
@@ -98,9 +99,24 @@ function tintedMaterial(cache: TintCache, type: EnemyId, src: THREE.Material): T
   const key = `${type}:${src.uuid}`
   let m = cache.get(key)
   if (!m) {
+    // Cloned so the shared GLTF material is never mutated (docs/enemy-models.md).
     m = src.clone()
-    const color = (m as THREE.MeshStandardMaterial).color
-    if (color) color.multiply(new THREE.Color(ENEMY_LOOKS[type].tint))
+    const std = m as THREE.MeshStandardMaterial
+    if (std.color) {
+      const base = std.color.getRGB({ r: 0, g: 0, b: 0 } as THREE.RGB, THREE.SRGBColorSpace)
+      const tint = new THREE.Color(ENEMY_LOOKS[type].tint).getRGB(
+        { r: 0, g: 0, b: 0 } as THREE.RGB,
+        THREE.SRGBColorSpace,
+      )
+      const [r, g, b] = adjustZombieColor([base.r, base.g, base.b], [tint.r, tint.g, tint.b])
+      std.color.setRGB(r, g, b, THREE.SRGBColorSpace)
+      std.roughness = ZOMBIE_MATERIAL_PARAMS.roughness
+      std.metalness = ZOMBIE_MATERIAL_PARAMS.metalness
+      std.envMapIntensity = ZOMBIE_MATERIAL_PARAMS.envMapIntensity
+      // Only a faint cold fill (no warm glow): the lantern stays the only warm light on the skin.
+      const [er, eg, eb] = zombieColdFill([r, g, b])
+      std.emissive?.setRGB(er, eg, eb, THREE.SRGBColorSpace)
+    }
     cache.set(key, m)
   }
   return m

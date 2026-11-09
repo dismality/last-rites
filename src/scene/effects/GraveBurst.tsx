@@ -27,7 +27,13 @@ export function GraveBurst() {
   const mesh = useRef<THREE.InstancedMesh>(null)
   const live = useRef<Clod[]>([])
   const material = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: '#3b2f25', transparent: true, opacity: 0.8, depthWrite: false }),
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#3b2f25',
+        transparent: true,
+        opacity: 0.8,
+        depthWrite: false,
+      }),
     [],
   )
 

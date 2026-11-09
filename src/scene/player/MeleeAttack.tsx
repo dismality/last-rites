@@ -39,6 +39,7 @@ import { hotbarItem } from '../../game/systems/satchel'
 import type { CraftedItemId, HeavyMeleeId } from '../../game/types'
 import { emit } from '../../game/events'
 import { meleeHitEvents } from './meleeEvents'
+import { killReports } from '../../game/systems/killReports'
 import { input } from './input'
 import { meleeRuntime } from './meleeRuntime'
 
@@ -196,9 +197,16 @@ export function MeleeAttack() {
       )
       if (result.hitUids.length === 0) return
       // Dead zombies stay in the list for the AI task to play the death; hp 0 excludes them from further hits.
+      const before = useEnemyStore.getState().enemies
       useEnemyStore.getState().setEnemies(result.enemies)
+      // Kills are reported once per zombie, with the swing's own source (Req 6.4: contracts count these two).
+      const swingSource = cur.heavy?.kind === 'heavy' ? 'heavy' : 'melee'
+      for (const ev of killReports(before, result.enemies, swingSource)) emit(ev)
       playMeleeHit()
-      for (const ev of meleeHitEvents(result.hitUids, cur.heavy?.kind === 'heavy' ? 'heavy' : 'melee')) {
+      for (const ev of meleeHitEvents(
+        result.hitUids,
+        cur.heavy?.kind === 'heavy' ? 'heavy' : 'melee',
+      )) {
         emit(ev)
       }
       for (const e of result.enemies) {

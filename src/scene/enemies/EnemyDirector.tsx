@@ -42,6 +42,7 @@ import {
 import { forwardFromYaw } from '../../game/systems/melee'
 import { createRng } from '../../game/rng'
 import { resolveBurst } from '../../game/systems/bloater'
+import { killReports } from '../../game/systems/killReports'
 import { placeEliteDrop, rollEliteDrop } from '../../game/systems/elites'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { gasRuntime } from '../effects/gasRuntime'
@@ -190,6 +191,7 @@ function burst(uid: string, pos: { x: number; z: number }): void {
   gasRuntime.queue.push({ x: pos.x, z: pos.z })
   const store = useEnemyStore.getState()
   const player = usePlayerStore.getState()
+  const before = store.enemies
   const res = resolveBurst(
     pos,
     uid,
@@ -200,18 +202,19 @@ function burst(uid: string, pos: { x: number; z: number }): void {
   )
   store.setEnemies(res.enemies)
   if (res.playerDamage > 0) hurtPlayer(res.playerDamage, false, 'burst')
-  for (const dead of res.killedUids) {
-    const e = res.enemies.find((x) => x.uid === dead)
-    if (!e) continue
-    emit({ type: 'enemyKilled', uid: e.uid, enemy: e.type, source: 'burst', headshot: false, elite: e.elite })
-  }
+  for (const ev of killReports(before, res.enemies, 'burst')) emit(ev)
 }
 
 /** One elite drop: into the satchel first, and what does not fit lies where it fell. */
 function dropEliteLoot(pos: { x: number; z: number }): void {
   const drop = rollEliteDrop(dropRng)
   const inv = useInventoryStore.getState()
-  const placed = placeEliteDrop(inv.inventory, drop, [pos.x, 0.2, pos.z], `elite-drop-${++dropCounter}`)
+  const placed = placeEliteDrop(
+    inv.inventory,
+    drop,
+    [pos.x, 0.2, pos.z],
+    `elite-drop-${++dropCounter}`,
+  )
   if (placed.added > 0) inv.setInventory(placed.inv)
   const ground = placed.ground
   if (ground) useSpawnStore.setState((s) => ({ drops: [...s.drops, ground] }))

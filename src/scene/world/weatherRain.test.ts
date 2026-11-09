@@ -30,7 +30,10 @@ describe('rain field', () => {
         const y0 = f.y[0]
         stepRain(f, dt, false)
         const fell = (y0 - f.y[0] + RAIN.boxM[1]) % RAIN.boxM[1]
-        expect(fell).toBeCloseTo(((RAIN.speedMps * Math.cos((8 * Math.PI) / 180) * dt) % RAIN.boxM[1]), 3)
+        expect(fell).toBeCloseTo(
+          (RAIN.speedMps * Math.cos((8 * Math.PI) / 180) * dt) % RAIN.boxM[1],
+          3,
+        )
         expect(f.x.every((v) => v >= 0 && v < RAIN.boxM[0])).toBe(true)
         expect(f.y.every((v) => v >= 0 && v < RAIN.boxM[1])).toBe(true)
       }),

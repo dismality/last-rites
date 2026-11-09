@@ -10,13 +10,20 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 
 export type HeldWeaponId = 'revolver' | 'shotgun' | 'wood-axe' | 'silver-sabre'
 
-export const HELD_WEAPON_IDS: readonly HeldWeaponId[] = ['revolver', 'shotgun', 'wood-axe', 'silver-sabre']
+export const HELD_WEAPON_IDS: readonly HeldWeaponId[] = [
+  'revolver',
+  'shotgun',
+  'wood-axe',
+  'silver-sabre',
+]
 
 export const isHeldWeaponId = (id: string | null): id is HeldWeaponId =>
   id !== null && (HELD_WEAPON_IDS as readonly string[]).includes(id)
 
 /** Barrel tip in the held group's space, where Viewmodel puts the muzzle quad (task 4.8). */
-export const MUZZLE_TIP: Readonly<Record<'revolver' | 'shotgun', readonly [number, number, number]>> = {
+export const MUZZLE_TIP: Readonly<
+  Record<'revolver' | 'shotgun', readonly [number, number, number]>
+> = {
   revolver: [0, 0.03, -0.25],
   shotgun: [0, 0.03, -0.46],
 }
@@ -24,7 +31,12 @@ export const MUZZLE_TIP: Readonly<Record<'revolver' | 'shotgun', readonly [numbe
 type Vec3 = [number, number, number]
 
 /** Bakes a transform into the primitive so many can be merged into one geometry. */
-function part(g: THREE.BufferGeometry, pos: Vec3, rot: Vec3 = [0, 0, 0], scale: Vec3 = [1, 1, 1]): THREE.BufferGeometry {
+function part(
+  g: THREE.BufferGeometry,
+  pos: Vec3,
+  rot: Vec3 = [0, 0, 0],
+  scale: Vec3 = [1, 1, 1],
+): THREE.BufferGeometry {
   g.applyMatrix4(
     new THREE.Matrix4().compose(
       new THREE.Vector3(...pos),
@@ -39,7 +51,8 @@ function part(g: THREE.BufferGeometry, pos: Vec3, rot: Vec3 = [0, 0, 0], scale: 
 const ALONG_Z: Vec3 = [Math.PI / 2, 0, 0]
 
 const box = (w: number, h: number, d: number) => new THREE.BoxGeometry(w, h, d)
-const cyl = (rt: number, rb: number, len: number, seg = 8) => new THREE.CylinderGeometry(rt, rb, len, seg)
+const cyl = (rt: number, rb: number, len: number, seg = 8) =>
+  new THREE.CylinderGeometry(rt, rb, len, seg)
 
 interface WeaponGeometry {
   metal: THREE.BufferGeometry
@@ -100,7 +113,12 @@ function buildSabre(): WeaponGeometry {
   return merge(
     [
       part(box(0.014, 0.034, 0.5), [0, 0, -0.33]), // blade
-      part(new THREE.ConeGeometry(0.02, 0.1, 4), [0, 0, -0.63], [-Math.PI / 2, Math.PI / 4, 0], [0.5, 1, 1]), // tip
+      part(
+        new THREE.ConeGeometry(0.02, 0.1, 4),
+        [0, 0, -0.63],
+        [-Math.PI / 2, Math.PI / 4, 0],
+        [0.5, 1, 1],
+      ), // tip
       part(new THREE.TorusGeometry(0.04, 0.005, 4, 10), [0, 0, -0.05], [0, 0, 0]), // basket hilt
       part(new THREE.SphereGeometry(0.018, 8, 6), [0, 0, 0.14]), // pommel
     ],
@@ -153,4 +171,3 @@ export function getWeaponMaterials(id: HeldWeaponId): WeaponMaterials {
   }
   return m
 }
-

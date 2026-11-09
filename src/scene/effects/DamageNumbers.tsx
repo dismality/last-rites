@@ -105,7 +105,12 @@ export function DamageNumbers() {
   })
 
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, POOL]} frustumCulled={false} renderOrder={20}>
+    <instancedMesh
+      ref={mesh}
+      args={[undefined, undefined, POOL]}
+      frustumCulled={false}
+      renderOrder={20}
+    >
       <planeGeometry ref={geo} args={[1, 1]} />
       <shaderMaterial
         ref={mat}

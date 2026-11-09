@@ -1158,3 +1158,75 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task
 - **What happened:** Added tests/progressionCheckpoint.test.ts: a seeded night 1 to dawn flow (combo, coins, night score, Iron Constitution, merchant buys, contracts), save/load round trip, failed night plus Retry Night against the dusk snapshot, and an Endless night 6 plan.
 - **What Kiro caught or sped up:** Showed that dawn re-deals contracts, so paid contracts are checked through coins, not the contract list. No production bugs found.
+### 2026-11-09: 08-progression-and-atmosphere task 10.1: Night 2 skipped to dawn
+- **Kiro feature used:** spec task
+- **What happened:** A stale `world.wavesCleared` sent night 2 straight to dawn. `tickDayNight` now ignores it on the tick night begins and returns it false in day and dusk; `WaveTally` is hidden by day (`tallyVisible`). `nightCycle.test.ts` plays night 1 clear, day, dusk, night 2 with the real `runTick`.
+- **What Kiro caught or sped up:** Real-browser verification was NOT DONE (no browser driver in this environment); checked by unit, structure and simulation tests only.
+### 2026-11-09: 08-progression-and-atmosphere task 10.2: Kills that never reported
+- **Kiro feature used:** spec task
+- **What happened:** Melee/heavy, holy water flask, nail bomb and lantern trap kills never emitted `enemyKilled`. New pure `systems/killReports.ts` routes every damage path (the burst moved onto it); revolver, shotgun and kick already reported. Tests include a melee kill paying score and one coin pile once.
+- **What Kiro caught or sped up:** A grep of `src/scene` and `src/game/state` was capped, so an unaudited kill path could remain. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.3: Zombies stalling between waypoints
+- **Kiro feature used:** spec task
+- **What happened:** Cause: the `hut` waypoint sat inside the hut walls (edges crossed walls) and `nextTarget` re-picked the nearest node each frame. Fix: per-zombie `RouteState` with hysteresis (`steer`/`planRoute` in `navigation.ts`), hut node moved to (0,5), new `hut-inside` and four corner nodes. `tests/zombieNavigation.test.ts` runs the real AI over the real graph and walls from every wave grave to the hut start, chapel and open grounds.
+- **What Kiro caught or sped up:** Simulation test now covers the stall. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.4: resetRun skipped stores
+- **Kiro feature used:** spec task
+- **What happened:** `resetRun` skipped the combat and door stores and others. It now uses a registry (`REPLACED_STORES`, `CUSTOM_RESETS`, `KEPT_STORES`) and module runtimes reset too.
+- **What Kiro caught or sped up:** A structure test fails if a store is unaccounted for. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.5: Teleport on Retry, Continue and New Game
+- **Kiro feature used:** spec task
+- **What happened:** Retry, Continue and New Game queue a one-shot teleport (`playerTeleport.ts`) consumed by `FirstPersonController`, which moves the rigid body and camera.
+- **What Kiro caught or sped up:** A parallel rewrite of `resetRun.ts` had dropped the New Game hook once; a test caught it. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.6: Respawn on day change
+- **Kiro feature used:** spec task
+- **What happened:** `respawnForDay` now runs on `phaseChanged` to day (`spawnRespawn.ts`, seeded by run seed and night) and keeps loot on dug graves.
+- **What Kiro caught or sped up:** Known gap: the spawn world is not part of the save file, so Continue restores day-1 stock until the next day change. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.7: Zombie skin colours
+- **Kiro feature used:** spec task
+- **What happened:** Pure `adjustZombieColor` caps saturation at 0.28 and value at 0.62 (min 0.1); materials are non-metal and rough, `envMapIntensity` 0.25, no emissive, applied to cloned materials. Caps apply to the colour factor only; textures and vertex colours are untouched.
+- **What Kiro caught or sped up:** Tune `ZOMBIE_MAX_*` if still too warm or dark. Real-browser verification NOT DONE (no browser driver; the look was not seen, tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.8: Objective order on night 5
+- **Kiro feature used:** spec task
+- **What happened:** Rite rules 3 then 2 now outrank the wave line on night 5. `craneAlive` now comes from the boss store (it was hard-coded false). The compass objective marker was missing only because the wave rule has no position.
+- **What Kiro caught or sped up:** The hard-coded `craneAlive` was found. Real-browser verification NOT DONE (no browser driver; unit, structure and simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.9: Boss name card position
+- **Kiro feature used:** spec task
+- **What happened:** The boss name card moved from `top:38%` to `top:70%`, with a CSS-band structure test (`tests/bossNameCardLayout.test.ts`).
+- **What Kiro caught or sped up:** Layout is checked from CSS text only. Real-browser verification NOT DONE (no browser driver; structure tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.10: Cues hidden during cinematics
+- **Kiro feature used:** spec task
+- **What happened:** One shared predicate `cinematicActive()`/`useCinematic()` in `menuState` gates Interactable runes, pulse and outline, the hand crosshair, `InteractPrompt` and the workbench craftable glow during the intro and endings.
+- **What Kiro caught or sped up:** The structure test covers four cue files only, so a new cue component would not be caught automatically. Real-browser verification NOT DONE (no browser driver; structure tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.11: Ending length and skipping
+- **Kiro feature used:** spec task
+- **What happened:** Cause found by reading: `EndingCamera` capped each frame at 0.1 s, so slow frame rates stretched the clock (not confirmed in a browser). New `advanceSequence` driver follows real time and holds on pause; durations are Rest 44 s, Uneasy Peace 45 s, Taken 42 s; Space and Enter now skip.
+- **What Kiro caught or sped up:** Esc still skips on the ending screen (as before), but the accessibility rule says Esc should pause. This deviates and needs a decision. Real-browser verification NOT DONE (no browser driver; unit and structure tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.12: Endless objectives and stats
+- **Kiro feature used:** spec task
+- **What happened:** Endless objectives added (Prepare for the night, Survive wave line, second line "Night N · ..."); stats rows hide Father Crane and Relics in Endless; Best combo floored at x1.00 in every mode. An import cycle was broken with a registered probe (`setStoryProbe` in `guidanceStore`).
+- **What Kiro caught or sped up:** The orchestrator found a U+FFFD corruption of the middle dot in `objective.ts` and `objective.test.ts` and replaced it with an escaped `\u00b7`. Real-browser verification NOT DONE (no browser driver; unit and structure tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.13: Barricade strength conclusion
+- **Kiro feature used:** spec task
+- **What happened:** Strength matches the design bible: Shambler 10 damage, 1.5 s cooldown, 0.4 s windup, board 60 HP, so one Shambler breaks a board in 7.9 s. Three Shamblers on 3 front boards take about 7.9 s, the vestry with 2 boards about 4.9 s; Brute double, rite double, Hardened Boards (75 HP) 10.9 s. The observed ~20 s includes walk-in and queueing.
+- **What Kiro caught or sped up:** Nothing in behaviour changed; `tests/barricadeStrength.test.ts` pins the times. Real-browser verification NOT DONE (no browser driver; the ~20 s was not re-timed, simulation tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.14: Item icons and name labels
+- **Kiro feature used:** spec task
+- **What happened:** `ITEM_ICON_URLS` (`Record<ItemId,string>`) in `data/assets.ts` and an `ItemIcon` component (64 or 128 px, pixelated) put icons in Hotbar, Satchel, RecipeBook, repair costs, merchant rows and journal relics; `itemGlyph.ts` deleted. Item names moved from lists to `aria-label` (no title). Shared `ItemNameLabel` (2 s hold, 0.6 s fade, replace restarts, hidden in cinematics) is driven by `itemNameStore` on hover, focus and hotbar number key, plus a new `HotbarWheel`. Hotbar slots are 80x96; ammo readout and effect icons moved. `itemNameStore` is registered in `resetRun`.
+- **What Kiro caught or sped up:** Placeholder list: NONE (all 38 item ids have icons; the five journal pages share `journal-page.png`; icon files unmodified). Unfound relics keep an old dashed svg; `UpgradeList` costs stay plain text. Real-browser verification NOT DONE (no browser driver; layout and look not seen, tests only).
+### 2026-11-09: 08-progression-and-atmosphere task 10.15: Workbench first-open hitch
+- **Kiro feature used:** spec task
+- **What happened:** Workbench light is permanently mounted at intensity 0 and ramped (`BenchLight`); `LanternTraps` uses a fixed pool of 3 lights; `MuzzleLight` is always mounted; `ShaderPrecompile` (`gl.compile` after 3 frames) added; a dev-only `BenchOpenProbe` logs the longest frame in the 2 s after the first open. `tests/lightsConstant.test.ts` forbids conditional lights.
+- **What Kiro caught or sped up:** THE FIRST-OPEN LONGEST FRAME WAS NOT MEASURED (no real browser). To measure: `npm run dev`, press E at the bench, read the `[perf] longest frame ...` console line. A fourth burning trap gets no light. Real-browser verification NOT DONE.
+### 2026-11-09: 08-progression-and-atmosphere task 10.16: Playtest fixes, verification status
+- **Kiro feature used:** spec task
+- **What happened:** Sub-agents could not drive a real browser (Chrome and Edge are installed, but there is no Playwright or puppeteer and no debug hooks), so task 9 remains open. At the end of the fixes `npm run test` passed 1734 tests, with lint and build clean.
+- **What Kiro caught or sped up:** Nothing in 10.1 to 10.15 has been confirmed in a real browser; all of it rests on unit, structure and simulation tests.
+### 2026-11-09: 08-progression-and-atmosphere task 11.1: Browser harness
+- **Kiro feature used:** spec task
+- **What happened:** Added `@playwright/test` 1.65.0 (exact, devDependency only, system Chrome via `channel: 'chrome'`, no browser download), `npm run e2e` (starts `vite` on port 5173) and a dev-only hook `window.__lastRites` (`src/debug/`), loaded from `main.tsx` by a dynamic import behind `import.meta.env.DEV`. The hook starts a run in any mode (skipping title and intro), sets the clock, skips to dusk or night, spawns zombies, gives items, teleports through `playerTeleport`, reads JSON snapshots of 12 stores, presses bound actions through the real input module, and reports the longest frame from a rolling rAF recorder. Pointer lock is bypassed in dev with `lockOverride` (`src/scene/player/pointerLockOverride.ts`), which `input.ts` and `HotbarWheel` consult; `startRun` turns it on and `lockless(false)` turns it off.
+- **What Kiro caught or sped up:** `tests/debugHookStripped.test.ts` runs a real in-memory production build and asserts no hook text is in it. It first failed because vitest's `NODE_ENV=test` makes Vite treat the build as dev, so the test now forces `NODE_ENV=production`. The same build also caught a wrong import in the hook. `npm run e2e`: 2 smoke specs pass in real Chrome (headless, SwiftShader WebGL). Task 9 not touched.
+### 2026-11-09: 08-progression-and-atmosphere task 11.2 (pass A, playtest items 1 to 6): real Chrome
+- **Kiro feature used:** spec task (Playwright in system Chrome, headless SwiftShader, no pointer lock)
+- **What happened:** `e2e/items-1-6.spec.ts` plays items 1 to 6; all 6 pass, and the 2 smoke specs still pass (8 of 8, 6.9 min). Measurements are in `e2e/logs/items-1-6.log`. Item 1: nights 1 to 3 in a row (2, 3 and 3 waves), each night still `night` 3 s in with 0 stale dawns, 3 dawn picks held dawn, day N+1 had no `.hud-tally` and `wavesCleared` false; phase order was dusk>night>dawn>day three times. Item 2: a real held Attack killed a 1 HP Shambler (score 10, combo 1, kills.shambler 1), a second kill gave 23 (combo 1.25); two piles were created, each banked once (2 coins). Item 3: all 4 night-1 Shamblers reached 1.1 to 1.3 m of a player standing at (0,0) (night clock about 87 s), longest stationary stretch while farther than 3 m was 3.65 s. Item 4: after New Game from the title `takenPickups`, `durability` and `firearms` are empty and the revolver and axe props are back in the three.js scene (3 meshes each). Item 5: the Rapier body and the camera went from (-12,10) back to the dusk spot (6,4) with yaw 1.0 after Retry Night; Continue moved them to the save spot (9,-6) both in place and from the title screen. Item 6: 4 ordinary spawn points emptied on day 1 all had stacks again on day 2, and a really dug grave's two loot stacks were unchanged.
+- **What Kiro caught or sped up:** No game bug found in items 1 to 6. Hook fixes along the way: `takePickup` read `.ok` instead of `.taken`, a missing `useLanternStore` import in `killAll` (the vite dev build does not type-check, `tsc -b` did not cover it until imports were complete), and `skipToDusk/skipToNight` no longer reset `wavesCleared`, because that masked the stale-flag bug of item 10.1. Added to the hook (dev only): `body()` (Rapier body and camera through `src/scene/player/bodyRuntime.ts`), `meshesUnder`, `killAll`, `pickAnyUpgrade`, `takePickup`, `collectMaterial`, `hurt`, `retryNight`, `saveGame`, `continueGame`, `setScreen`, `hold/release`, `keepAlive`, `seedForShamblerCoins`, `events()` and the `score`, `coins`, `dig`, `hover` snapshots. Not verified: item 1 kills waves through the damage rules (`killAll`), not swings, and item 4 takes pickups through `takeWeaponPickup` (what the Interactable calls), not by walking up and pressing E. Task 9 not touched.

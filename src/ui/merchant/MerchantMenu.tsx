@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { closeMerchant } from '../../game/state/progressionActions'
 import { useProgressionStore } from '../../game/state/progressionStore'
+import { showItemName } from '../../game/state/itemNameStore'
 import { MenuDialog } from '../menus/MenuDialog'
+import { ItemIcon } from '../satchel/ItemIcon'
 import { buyRow, closeMerchantIfOut, merchantMenuView } from './merchantMenuModel'
 import './MerchantMenu.css'
 
@@ -39,7 +41,18 @@ export function MerchantMenu() {
       <ul className="merchant__rows" aria-label="Wares">
         {view.rows.map((r) => (
           <li key={r.id} className="merchant__row">
-            <span className="merchant__name">{r.name}</span>
+            {/* Focusable so keyboard users get the name label too; the name is the aria-label. */}
+            <span
+              className="merchant__ware"
+              role="img"
+              tabIndex={0}
+              aria-label={r.name}
+              onMouseEnter={() => showItemName(r.item)}
+              onFocus={() => showItemName(r.item)}
+            >
+              <ItemIcon id={r.item} />
+              {r.count > 1 && <span className="merchant__count">×{r.count}</span>}
+            </span>
             <span className="merchant__price">{r.price} coins</span>
             <span className="merchant__left">{r.leftText}</span>
             <button

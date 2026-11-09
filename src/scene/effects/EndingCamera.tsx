@@ -6,13 +6,16 @@ import { CatmullRomCurve3, Vector3 } from 'three'
 import { ENDING_MAP, type EndingDef } from '../../data/endings'
 import { useEndingStore } from '../../game/state/endingStore'
 import { useGameStore, useSettingsStore } from '../../game/state'
-import { cameraProgress, isSequenceDone } from '../../game/systems/endingSequence'
+import { advanceSequence, cameraProgress } from '../../game/systems/endingSequence'
 import { endingCameraRuntime } from './endingCameraRuntime'
 
-const MAX_DT = 0.1
-
 function toCurve(points: EndingDef['camera']['position']): CatmullRomCurve3 {
-  return new CatmullRomCurve3(points.map((p) => new Vector3(p[0], p[1], p[2])), false, 'catmullrom', 0.5)
+  return new CatmullRomCurve3(
+    points.map((p) => new Vector3(p[0], p[1], p[2])),
+    false,
+    'catmullrom',
+    0.5,
+  )
 }
 
 export function EndingCamera() {
@@ -21,7 +24,8 @@ export function EndingCamera() {
   const def = screen === 'ending' && ending ? ENDING_MAP[ending] : null
 
   const curves = useMemo(
-    () => (def ? { position: toCurve(def.camera.position), target: toCurve(def.camera.target) } : null),
+    () =>
+      def ? { position: toCurve(def.camera.position), target: toCurve(def.camera.target) } : null,
     [def],
   )
   const pos = useRef(new Vector3())
@@ -42,8 +46,9 @@ export function EndingCamera() {
     const store = useEndingStore.getState()
     // After Skip (or the end) the camera holds its last pose behind the summary card.
     if (store.stage === 'sequence') {
-      rt.time += Math.min(rawDelta, MAX_DT)
-      if (isSequenceDone(def, rt.time)) store.showSummary()
+      const step = advanceSequence(def, rt.time, rawDelta, useGameStore.getState().paused)
+      rt.time = step.time
+      if (step.done) store.showSummary()
     } else {
       rt.time = def.duration
     }
@@ -54,7 +59,12 @@ export function EndingCamera() {
 
     // Shake only when the player allows it (reduced motion turns the setting off by default).
     const s = useSettingsStore.getState()
-    if (def.shake > 0 && s.cameraShake && s.scareIntensity === 'full' && store.stage === 'sequence') {
+    if (
+      def.shake > 0 &&
+      s.cameraShake &&
+      s.scareIntensity === 'full' &&
+      store.stage === 'sequence'
+    ) {
       pos.current.x += (Math.random() - 0.5) * 2 * def.shake
       pos.current.y += (Math.random() - 0.5) * 2 * def.shake
     }

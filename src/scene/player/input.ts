@@ -3,6 +3,7 @@
 
 import { useSettingsStore } from '../../game/state'
 import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
+import { isCanvasLocked } from './pointerLockOverride'
 
 export interface InputSnapshot {
   /** -1 (back) .. 1 (forward) */
@@ -116,22 +117,22 @@ export function requestLock(el: HTMLElement | null | undefined): void {
 export function installInput(canvas: HTMLElement): () => void {
   const onKeyDown = (e: KeyboardEvent) => {
     // Block Tab's focus change and similar while playing.
-    if (document.pointerLockElement === canvas && e.code === 'Tab') e.preventDefault()
+    if (isCanvasLocked(canvas) && e.code === 'Tab') e.preventDefault()
     input.keyDown(e.code)
   }
   const onKeyUp = (e: KeyboardEvent) => input.keyUp(e.code)
   const onMouseDown = (e: MouseEvent) => {
-    if (document.pointerLockElement === canvas) input.mouseDown(e.button)
+    if (isCanvasLocked(canvas)) input.mouseDown(e.button)
   }
   const onMouseUp = (e: MouseEvent) => input.mouseUp(e.button)
   const onMouseMove = (e: MouseEvent) => {
-    if (document.pointerLockElement === canvas) input.mouseMove(e.movementX, e.movementY)
+    if (isCanvasLocked(canvas)) input.mouseMove(e.movementX, e.movementY)
   }
   const onClick = () => {
-    if (document.pointerLockElement !== canvas) requestLock(canvas)
+    if (!isCanvasLocked(canvas)) requestLock(canvas)
   }
   const onLockChange = () => {
-    if (document.pointerLockElement !== canvas) input.releaseAll()
+    if (!isCanvasLocked(canvas)) input.releaseAll()
   }
 
   window.addEventListener('keydown', onKeyDown)

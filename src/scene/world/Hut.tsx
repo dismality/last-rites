@@ -78,7 +78,11 @@ export function Hut() {
         ([-1, 1] as const).map((sz) => (
           <mesh
             key={`${sx}${sz}`}
-            position={[TABLE.x + sx * (TABLE.w / 2 - 0.08), legY, TABLE.z + sz * (TABLE.d / 2 - 0.08)]}
+            position={[
+              TABLE.x + sx * (TABLE.w / 2 - 0.08),
+              legY,
+              TABLE.z + sz * (TABLE.d / 2 - 0.08),
+            ]}
             material={PART_MATERIALS.darkWood}
           >
             <boxGeometry args={[0.07, TABLE.top - 0.03, 0.07]} />

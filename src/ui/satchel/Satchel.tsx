@@ -20,9 +20,10 @@ import { useIntroStore } from '../../game/state/introStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { emit } from '../../game/events'
 import { assignHotbar } from '../../game/systems/inventory'
-import { dropPosition, hotbarSlotOf } from '../../game/systems/satchel'
+import { dropPosition, hotbarItem, hotbarSlotOf } from '../../game/systems/satchel'
 import { playerPositionRef } from '../../scene/world/playerPositionRef'
-import { itemGlyph } from './itemGlyph'
+import { showItemName } from '../../game/state/itemNameStore'
+import { ItemIcon } from './ItemIcon'
 import './satchel.css'
 
 const COLUMNS = 4
@@ -91,6 +92,8 @@ export function Satchel() {
         if (next !== inv.inventory) emit({ type: 'hotbarBound', slot: slot as 0 | 1 | 2 | 3 })
       } else {
         inv.equipSlot(slot as 0 | 1 | 2 | 3)
+        // Pointer-locked play has no hover, so the number key names the item. Empty slot: nothing.
+        showItemName(hotbarItem(useInventoryStore.getState().inventory, slot))
       }
     }
     window.addEventListener('keydown', onKey, true)
@@ -176,7 +179,11 @@ export function Satchel() {
                   type="button"
                   className={`satchel__cell${stack ? '' : ' satchel__cell--empty'}`}
                   tabIndex={i === focusIdx ? 0 : -1}
-                  onFocus={() => setFocusIdx(i)}
+                  onFocus={() => {
+                    setFocusIdx(i)
+                    showItemName(stack?.item)
+                  }}
+                  onMouseEnter={() => showItemName(stack?.item)}
                   onKeyDown={(e) => onCellKey(e, i)}
                   aria-label={
                     stack && def
@@ -186,10 +193,7 @@ export function Satchel() {
                 >
                   {stack && def && (
                     <>
-                      <span className="satchel__glyph" aria-hidden="true">
-                        {itemGlyph(def.kind)}
-                      </span>
-                      <span className="satchel__name">{def.name}</span>
+                      <ItemIcon id={stack.item} />
                       <span className="satchel__count">×{stack.qty}</span>
                       {bound >= 0 && (
                         <span className="satchel__badge" aria-hidden="true">

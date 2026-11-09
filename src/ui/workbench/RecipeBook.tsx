@@ -25,6 +25,7 @@ import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import { ITEM_MAP } from '../../data/items'
 import { UpgradeList } from './UpgradeList'
+import { NamedItemIcon } from '../satchel/NamedItemIcon'
 import type { RecipeDef } from '../../data/recipes'
 import type { ItemId, RecipeId } from '../../game/types'
 import './RecipeBook.css'
@@ -161,12 +162,10 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
         {craftable && (
           <span className="recipe-entry__rune" aria-hidden="true" title="Craftable">✦</span>
         )}
-        <span className="recipe-entry__output-name">
-          {itemName(recipe.output.item)}
-          {recipe.output.qty > 1 && (
-            <span className="recipe-entry__output-qty"> ×{recipe.output.qty}</span>
-          )}
-        </span>
+        <NamedItemIcon id={recipe.output.item} />
+        {recipe.output.qty > 1 && (
+          <span className="recipe-entry__output-qty">×{recipe.output.qty}</span>
+        )}
         {recipe.consumesTool && (
           <span className="recipe-entry__upgrade-tag" title="Upgrades an existing tool">
             ⟳ upgrade
@@ -187,8 +186,8 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
                 hasMissing ? 'recipe-entry__ingredient--missing' : '',
               ].join(' ')}
             >
-              <span className="ingredient-qty">{input.qty}</span>
-              <span className="ingredient-name">{itemName(input.item)}</span>
+              <NamedItemIcon id={input.item} />
+              <span className="ingredient-qty">×{input.qty}</span>
               {hasMissing && (
                 <span className="ingredient-missing-label" aria-label={`Missing ${lack}`}>
                   missing {lack}
@@ -210,8 +209,8 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
                 hasMissing ? 'recipe-entry__ingredient--missing' : '',
               ].join(' ')}
             >
-              <span className="ingredient-qty">1</span>
-              <span className="ingredient-name">{itemName(recipe.consumesTool)}</span>
+              <NamedItemIcon id={recipe.consumesTool} />
+              <span className="ingredient-qty">×1</span>
               {hasMissing && (
                 <span className="ingredient-missing-label" aria-label="Missing">
                   missing 1

@@ -64,7 +64,6 @@ function ChapelGeometry() {
 
       {/* Transept — crosses the nave near the altar end */}
 
-
       {/* Floor slab */}
       <mesh position={[0, 0.02, 0]} receiveShadow>
         <boxGeometry args={[4.8, 0.1, 11.8]} />
@@ -134,13 +133,20 @@ export function Chapel() {
         // Saved after the heal so the file holds the healed health and the used-today flag.
         saveGame()
         // Subtitle placeholder — a proper subtitle system will replace this.
-        console.info("[Chapel] \"The altar's warmth mends your wounds.\"")
+        console.info('[Chapel] "The altar\'s warmth mends your wounds."')
       }
     }
 
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [chapelRepairOpen, openChapelRepair, altarActive, altarHealedToday, healPlayer, setAltarHealedToday])
+  }, [
+    chapelRepairOpen,
+    openChapelRepair,
+    altarActive,
+    altarHealedToday,
+    healPlayer,
+    setAltarHealedToday,
+  ])
 
   // Reset interaction flags when the player moves away from the triggers.
   useFrame(() => {

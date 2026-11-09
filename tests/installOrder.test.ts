@@ -17,4 +17,9 @@ describe('main.tsx install order', () => {
     expect(callIndex('installNewDaySave')).toBeGreaterThan(progression)
     expect(callIndex('installRunStats')).toBeGreaterThan(progression)
   })
+
+  it('installs the daily respawn watcher after the progression watchers', () => {
+    const respawn = callIndex('installSpawnRespawn')
+    expect(respawn).toBeGreaterThan(callIndex('installProgressionWatchers'))
+  })
 })

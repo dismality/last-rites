@@ -34,6 +34,8 @@ export interface ObjectiveInput {
    */
   relicSites: readonly Vec3[]
   playerPos: Vec3
+  /** False for Endless: no story rules (5-10) and no rite rules (2-3). Absent means story. */
+  story?: boolean
 }
 
 export interface Objective {
@@ -51,6 +53,7 @@ const FINAL_NIGHT = 5
  * Second lines for rules 2 and 3. The data has no template for them and the design is
  * silent, so they state the one thing the player needs to know in that moment.
  */
+const ENDLESS_DAY_MAIN = 'Prepare for the night'
 const RITE_SECOND = 'Place the relics on the altar'
 const CRANE_SECOND = 'The rite cannot finish while he stands'
 
@@ -84,10 +87,15 @@ const matchRule = (i: ObjectiveInput): ObjectiveRuleId => {
   const night = i.phase === 'night'
   const day = i.phase === 'day'
   const p = i.progress
+  // Rite rules come before the wave line: wave state lingers during the final rite and
+  // the Crane fight, and "Survive: Wave 1 of 5" is wrong once the rite has begun.
+  const story = i.story !== false
+  const finalNight = story && night && i.nightNumber === FINAL_NIGHT
+  if (finalNight && i.rite.running && i.rite.craneAlive) return 3
+  if (finalNight && (i.rite.available || i.rite.running)) return 2
   if (night && i.waves.running) return 1
-  if (night && i.nightNumber === FINAL_NIGHT && i.rite.available) return 2
-  if (night && i.nightNumber === FINAL_NIGHT && i.rite.running && i.rite.craneAlive) return 3
   if (i.phase === 'dusk') return 4
+  if (!story) return 11
   if (day && !p.page1Read) return 5
   if (day && !p.cryptKey) return 6
   if (day && !p.whistle) return 7
@@ -121,6 +129,7 @@ const resolvePosition = (def: ObjectiveRuleDef, i: ObjectiveInput): Vec3 | undef
 }
 
 const mainLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
+  if (def.id === 11 && i.story === false) return ENDLESS_DAY_MAIN
   if (def.id === 1) {
     const total = Math.max(1, clampInt(i.waves.total, 1, Number.MAX_SAFE_INTEGER))
     const n = clampInt(i.waves.index, 1, total)
@@ -135,6 +144,13 @@ const mainLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
 }
 
 const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
+  if (i.story === false && (def.id === 1 || def.id === 11)) {
+    const tail =
+      def.id === 1
+        ? `Zombies left: ${Math.max(0, Math.floor(finite(i.waves.zombiesLeft)))}`
+        : `Dusk in ${formatClock(i.secondsLeft)}`
+    return `Night ${Math.max(1, Math.floor(finite(i.nightNumber)))} \u00b7 ${tail}`
+  }
   if (def.id === 2) return RITE_SECOND
   if (def.id === 3) return CRANE_SECOND
   const t = def.second ?? ''

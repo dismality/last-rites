@@ -87,26 +87,148 @@ export function nearestNode(graph: NavGraph, p: Vec2, blocked?: SegmentBlocked):
 
 /** Reaching a waypoint within this radius counts as arrived. */
 export const WAYPOINT_REACHED_M = 1.2
+/** A route is kept while the goal stays within this distance of where it was planned for. */
+export const ROUTE_GOAL_DRIFT_M = 4
+/** Moving at least this much closer to the current waypoint counts as progress. */
+export const ROUTE_PROGRESS_M = 0.25
+/** No progress for this long means the waypoint is not reachable from here; plan again without it. */
+export const ROUTE_STALL_S = 1.5
 
 /**
- * Where to steer next. With a clear line to the goal (or no blocker supplied) go straight;
- * otherwise follow the waypoint path, skipping nodes already reached.
+ * A walker's current route. Kept per zombie so it follows one waypoint at a time: the old stateless
+ * version re-picked the nearest visible node every frame, and inside a waypoint's radius it flipped
+ * between two targets forever.
  */
+export interface RouteState {
+  /** Where the route was planned to end. */
+  goal: Vec2
+  /** Waypoint ids still to visit, in order; `idx` is the one being walked to. */
+  ids: readonly string[]
+  idx: number
+  /** Closest approach to the current target so far, and seconds since it last improved. */
+  bestDist: number
+  stallS: number
+}
+
+export interface Route {
+  ids: string[]
+  /** Walking length from `from`, through the waypoints, to `goal`. */
+  length: number
+}
+
+function pathLength(graph: NavGraph, ids: readonly string[]): number {
+  let len = 0
+  for (let i = 1; i < ids.length; i++) len += dist(graph.nodes.get(ids[i - 1])!, graph.nodes.get(ids[i])!)
+  return len
+}
+
+/**
+ * Cheapest waypoint route from `from` to `goal`. Entry and exit nodes are chosen together by total
+ * length (walk to entry + graph path + walk from exit), so a route never starts by heading away
+ * from the goal just because the nearest node lies behind the walker.
+ */
+export function planRoute(
+  graph: NavGraph,
+  from: Vec2,
+  goal: Vec2,
+  blocked?: SegmentBlocked,
+  banned: readonly string[] = [],
+): Route | null {
+  const usable = [...graph.nodes].filter(([id]) => !banned.includes(id))
+  const seen = (p: Vec2) => {
+    const vis = usable.filter(([, pos]) => !blocked || !blocked(p, pos))
+    if (vis.length > 0) return vis
+    // Nothing in sight: fall back to the closest node so the walker still moves.
+    const near = usable.reduce<[string, Vec2] | null>(
+      (best, n) => (best === null || dist(p, n[1]) < dist(p, best[1]) ? n : best),
+      null,
+    )
+    return near ? [near] : []
+  }
+  const entries = seen(from)
+  const exits = seen(goal)
+  let best: Route | null = null
+  for (const [a, pa] of entries) {
+    for (const [b, pb] of exits) {
+      const ids = findPath(graph, a, b)
+      if (!ids) continue
+      const length = dist(from, pa) + pathLength(graph, ids) + dist(pb, goal)
+      if (!best || length < best.length) best = { ids, length }
+    }
+  }
+  return best
+}
+
+export interface Steer {
+  target: Vec2
+  /** Null when the way is clear and no route is needed. */
+  route: RouteState | null
+}
+
+/**
+ * Where to steer next. With a clear line to the goal go straight. Otherwise follow the stored route
+ * one waypoint at a time, advancing only on reaching the waypoint, and plan again only when the goal
+ * has moved on, the waypoint is no longer in sight, or the walker has stopped making progress.
+ */
+export function steer(
+  graph: NavGraph,
+  from: Vec2,
+  goal: Vec2,
+  blocked: SegmentBlocked | undefined,
+  route: RouteState | null | undefined,
+  dt: number,
+): Steer {
+  if (!blocked || !blocked(from, goal)) return { target: goal, route: null }
+
+  let r: RouteState | null = route ?? null
+  let banned: string[] = []
+  if (r) {
+    const node = r.idx < r.ids.length ? graph.nodes.get(r.ids[r.idx])! : null
+    if (dist(r.goal, goal) > ROUTE_GOAL_DRIFT_M) r = null
+    else if (node && blocked(from, node)) r = null
+    else if (r.stallS >= ROUTE_STALL_S) {
+      banned = node ? [r.ids[r.idx]] : []
+      r = null
+    }
+  }
+  if (!r) {
+    const plan = planRoute(graph, from, goal, blocked, banned)
+    if (!plan) return { target: goal, route: null }
+    r = { goal, ids: plan.ids, idx: 0, bestDist: Infinity, stallS: 0 }
+  }
+
+  // Advance on arrival, or once the next waypoint is already nearer than this one is to it
+  // (the corner has been cut). The index only moves forward, so it cannot flip back.
+  let idx = r.idx
+  let bestDist = r.bestDist
+  let stallS = r.stallS
+  for (;;) {
+    if (idx >= r.ids.length) break
+    const here = graph.nodes.get(r.ids[idx])!
+    const next = idx + 1 < r.ids.length ? graph.nodes.get(r.ids[idx + 1])! : null
+    const arrived = dist(from, here) <= WAYPOINT_REACHED_M
+    const cut = next !== null && dist(from, next) < dist(here, next) && !blocked(from, next)
+    if (!arrived && !cut) break
+    idx++
+    bestDist = Infinity
+    stallS = 0
+  }
+
+  const target = idx < r.ids.length ? graph.nodes.get(r.ids[idx])! : goal
+  const d = dist(from, target)
+  if (d < bestDist - ROUTE_PROGRESS_M) {
+    bestDist = d
+    stallS = 0
+  } else stallS += dt
+  return { target, route: { goal: r.goal, ids: r.ids, idx, bestDist, stallS } }
+}
+
+/** Stateless form of `steer`: plans from scratch, so it is only for one-off questions. */
 export function nextTarget(
   graph: NavGraph,
   from: Vec2,
   goal: Vec2,
   blocked?: SegmentBlocked,
 ): Vec2 {
-  if (!blocked || !blocked(from, goal)) return goal
-  const a = nearestNode(graph, from, blocked)
-  const b = nearestNode(graph, goal, blocked)
-  if (!a || !b) return goal
-  const path = findPath(graph, a, b)
-  if (!path) return goal
-  for (const id of path) {
-    const p = graph.nodes.get(id)!
-    if (dist(from, p) > WAYPOINT_REACHED_M) return p
-  }
-  return goal
+  return steer(graph, from, goal, blocked, null, 0).target
 }

@@ -10,7 +10,12 @@ function cues(id: ScareEventId, t: number): { tele: ScareCue; beat: ScareCue } {
   const profile = intensityProfile('full', true)
   return {
     tele: { eventId: id, phase: 'telegraph', at: t, intensityProfile: profile },
-    beat: { eventId: id, phase: 'beat', at: t + SCARE_EVENT_MAP[id].telegraph.lead, intensityProfile: profile },
+    beat: {
+      eventId: id,
+      phase: 'beat',
+      at: t + SCARE_EVENT_MAP[id].telegraph.lead,
+      intensityProfile: profile,
+    },
   }
 }
 

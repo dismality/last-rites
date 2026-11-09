@@ -128,7 +128,11 @@ function ShovelMesh({ sharpened }: { sharpened: boolean }) {
         <boxGeometry args={[0.11, 0.012, 0.13]} />
         <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
       </mesh>
-      <mesh position={[0, 0, -0.385]} rotation={[-Math.PI / 2, Math.PI / 4, 0]} scale={[1, 1, sharpened ? 1.4 : 0.6]}>
+      <mesh
+        position={[0, 0, -0.385]}
+        rotation={[-Math.PI / 2, Math.PI / 4, 0]}
+        scale={[1, 1, sharpened ? 1.4 : 0.6]}
+      >
         <coneGeometry args={[0.078, 0.07, 4]} />
         <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
       </mesh>
@@ -314,10 +318,7 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
   // Durability comes from the combat store; the prop only overrides it (tests, previews).
   const [storeState, setStoreState] = useState<WeaponState | null>(null)
   const weaponState = weaponStateProp ?? storeState
-  const opacity = useMemo(
-    () => (weaponState ? crackOpacity(weaponState) : 0),
-    [weaponState],
-  )
+  const opacity = useMemo(() => (weaponState ? crackOpacity(weaponState) : 0), [weaponState])
   const cracked = weaponState ? isCracked(weaponState, useCombatStore.getState().upgrades) : false
   const muzzleRef = useRef<THREE.Mesh>(null)
   const size = useThree((s) => s.size)
@@ -390,16 +391,15 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
     const newest = weaponRuntime.muzzleEvents[weaponRuntime.muzzleEvents.length - 1]
     const quad = muzzleRef.current
     if (quad) {
-      const a = newest && newest.kind === swap.current.shown ? muzzleOpacity(profile, newest.ageS) : 0
+      const a =
+        newest && newest.kind === swap.current.shown ? muzzleOpacity(profile, newest.ageS) : 0
       quad.visible = a > 0
       ;(quad.material as THREE.MeshBasicMaterial).opacity = a
     }
 
     // Feed durability from the combat store (Req 5.3); state only changes when the value does.
     const ds = durableState(swap.current.shown)
-    setStoreState((cur) =>
-      cur?.id === ds?.id && cur?.durability === ds?.durability ? cur : ds,
-    )
+    setStoreState((cur) => (cur?.id === ds?.id && cur?.durability === ds?.durability ? cur : ds))
     // Nothing is drawn while the slot is empty or mid-swap-to-nothing.
     if (itemGroup.current) itemGroup.current.visible = swap.current.shown !== null
     setShownItem((cur) => (cur === swap.current?.shown ? cur : (swap.current?.shown ?? null)))
@@ -428,6 +428,6 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
         </group>
       </group>
     </>,
-    scene
+    scene,
   )
 }

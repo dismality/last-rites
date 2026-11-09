@@ -15,6 +15,7 @@ import {
   useSettingsStore,
 } from '../../game/state'
 import type { PageNumber } from '../../game/types'
+import { NamedItemIcon } from '../satchel/NamedItemIcon'
 import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import './journal.css'
@@ -117,7 +118,8 @@ function RelicsTab() {
               key={r.id}
               className={`journal-relic ${found ? 'journal-relic--found' : 'journal-relic--missing'}`}
             >
-              <svg className="journal-relic__icon" viewBox="0 0 48 48" aria-hidden="true">
+              {found && <NamedItemIcon id={r.id} />}
+              {!found && <svg className="journal-relic__icon" viewBox="0 0 48 48" aria-hidden="true">
                 {/* Same outline either way; found relics are inked in. */}
                 <circle
                   cx="24"
@@ -136,7 +138,7 @@ function RelicsTab() {
                   strokeLinecap="round"
                   opacity={found ? 1 : 0.4}
                 />
-              </svg>
+              </svg>}
               <span className="journal-relic__name">{found ? r.name : 'Unknown relic'}</span>
               <span className="journal-relic__state">{found ? 'Found' : 'Not found'}</span>
               <span className="journal-relic__desc">

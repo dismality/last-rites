@@ -38,7 +38,13 @@ export function spawnGas(at: { x: number; z: number }, rand: () => number): GasP
 /** Advances puffs by dt, drops expired ones and caps the pool (oldest go first). */
 export function tickGas(puffs: readonly GasPuff[], dt: number): GasPuff[] {
   return puffs
-    .map((p) => ({ ...p, age: p.age + dt, x: p.x + p.vx * dt, z: p.z + p.vz * dt, y: p.y + 0.3 * dt }))
+    .map((p) => ({
+      ...p,
+      age: p.age + dt,
+      x: p.x + p.vx * dt,
+      z: p.z + p.vz * dt,
+      y: p.y + 0.3 * dt,
+    }))
     .filter((p) => p.age < GAS_LIFE_S)
     .slice(-GAS_POOL)
 }

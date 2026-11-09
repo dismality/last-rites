@@ -10,12 +10,7 @@ import { isSimFrozen } from '../../game/state/menuState'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { stormRuntime } from '../../game/state/stormRuntime'
 import { scareRuntime } from '../scares/scareRuntime'
-import {
-  createRainField,
-  stepRain,
-  playThunder,
-  stepRainLevel,
-} from './weatherRain'
+import { createRainField, stepRain, playThunder, stepRainLevel } from './weatherRain'
 
 const [BOX_X, BOX_Y, BOX_Z] = RAIN.boxM
 const SLANT_RAD = (RAIN.slantDeg * Math.PI) / 180

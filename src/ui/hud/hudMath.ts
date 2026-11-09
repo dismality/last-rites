@@ -11,6 +11,14 @@ export function formatValue(value: number): string {
   return String(Math.round(Math.min(100, Math.max(0, Number.isFinite(value) ? value : 0))))
 }
 
+/**
+ * The wave state keeps its last night's 'done' phase through the day and dusk, so the tally
+ * is only meaningful during the night itself and the dawn summary that follows.
+ */
+export function tallyVisible(worldPhase: 'day' | 'dusk' | 'night' | 'dawn'): boolean {
+  return worldPhase === 'night' || worldPhase === 'dawn'
+}
+
 /** Number of five-stroke groups needed to draw `count` tally marks. */
 export function tallyGroups(count: number): number {
   return Math.ceil(Math.max(0, count) / 5)

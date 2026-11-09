@@ -5,12 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { emit } from '../game/events'
 import { useDigStore } from '../game/state/digStore'
-import {
-  useGameStore,
-  useLanternStore,
-  usePlayerStore,
-  useWorldStore,
-} from '../game/state'
+import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '../game/state'
 import { tickCombat } from '../game/state/combatTick'
 import { tickGuidance } from '../game/state/guidanceTick'
 import { currentModifiers } from '../game/state/derivedStats'
@@ -74,11 +69,7 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       const world = useWorldStore.getState()
       const stamina: StaminaState = readStamina()
 
-      const r = runTick(
-        { player, stamina, lantern, world },
-        withProgression(sampleInput()),
-        STEP
-      )
+      const r = runTick({ player, stamina, lantern, world }, withProgression(sampleInput()), STEP)
 
       writeRegenDelay(r.stamina.regenDelayTimer)
       usePlayerStore.getState().applyPlayerState({ stamina: r.player.stamina })

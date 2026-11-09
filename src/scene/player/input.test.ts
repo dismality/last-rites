@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { createInput } from './input'
 
-const bindings = { MoveForward: 'KeyW', MoveBackward: 'KeyS', MoveLeft: 'KeyA', MoveRight: 'KeyD', Sprint: 'ShiftLeft' }
+const bindings = {
+  MoveForward: 'KeyW',
+  MoveBackward: 'KeyS',
+  MoveLeft: 'KeyA',
+  MoveRight: 'KeyD',
+  Sprint: 'ShiftLeft',
+}
 
 describe('input', () => {
   it('maps codes to actions and combines opposing keys', () => {
@@ -42,7 +48,10 @@ describe('input', () => {
 
   it('releases held buttons while the sim is frozen so a charge does not auto-fire', () => {
     let frozen = false
-    const i = createInput(() => ({ ...bindings, Attack: 'MouseLeft' }), () => frozen)
+    const i = createInput(
+      () => ({ ...bindings, Attack: 'MouseLeft' }),
+      () => frozen,
+    )
     i.mouseDown(0)
     i.keyDown('KeyV')
     expect(i.peek().attack).toBe(true)

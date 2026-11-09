@@ -37,7 +37,7 @@ export const OBJECTIVE_RULES: readonly ObjectiveRuleDef[] = [
     marker: 'Altar',
     place: { kind: 'altar' },
   },
-  // Spec 07 supplies `craneAlive`; until then this rule cannot match.
+  // Selector priority is 3, 2, 1 (rite before waves); ids keep the design-bible numbers.
   { id: 3, main: 'Put Father Crane to rest', marker: 'Father Crane', place: { kind: 'altar' } },
   { id: 4, main: 'Prepare for the night', second: 'Night falls in {clock}' },
   {

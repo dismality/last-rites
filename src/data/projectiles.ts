@@ -36,3 +36,6 @@ export const TRAP_TRIGGER_RADIUS_M = 1.5
 export const TRAP_BURN_RADIUS_M = 2
 /** Trap burn damage per second and duration come from WEAPON_MAP['lantern-trap']. */
 export const TRAP_LIGHT_INTENSITY = 6
+/** Fixed pool of trap lights, mounted for the whole game so the light count never changes.
+ * Burning traps beyond this many still burn; they just share no extra light. */
+export const TRAP_LIGHT_POOL = 3

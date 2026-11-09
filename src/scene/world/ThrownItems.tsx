@@ -8,6 +8,8 @@ import { playThrowSfx } from '../../audio/AudioManager'
 import { FLASK_MAX_FLIGHT_S, FLASK_STUN_S, NAIL_BOMB_FUSE_S } from '../../data/projectiles'
 import { useEnemyStore, useGameStore, useLanternStore, useProjectileStore } from '../../game/state'
 import { spawnDust } from '../../game/systems/melee'
+import { emit } from '../../game/events'
+import { killReports } from '../../game/systems/killReports'
 import {
   createFuse,
   resolveFlask,
@@ -54,9 +56,18 @@ function Thrown({ item, onBurst }: { item: ThrownItem; onBurst: (flash: Flash) =
         : resolveNailBomb(centre, enemies, fuel)
     if (result.hitUids.length > 0) {
       useEnemyStore.getState().setEnemies(result.enemies)
+      for (const ev of killReports(
+        enemies,
+        result.enemies,
+        item.kind === 'holy-water-flask' ? 'holy-water-flask' : 'nail-bomb',
+      )) {
+        emit(ev)
+      }
       for (const e of result.enemies) {
         if (result.hitUids.includes(e.uid)) {
-          meleeRuntime.dustQueue.push(...spawnDust({ x: e.pos.x, y: DUST_Y, z: e.pos.z }, Math.random))
+          meleeRuntime.dustQueue.push(
+            ...spawnDust({ x: e.pos.x, y: DUST_Y, z: e.pos.z }, Math.random),
+          )
         }
       }
     }

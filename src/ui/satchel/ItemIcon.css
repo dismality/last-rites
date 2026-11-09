@@ -1,0 +1,27 @@
+/* Pixel art: never smoothed. Sizes are exact CSS pixels. */
+.item-icon {
+  display: block;
+  flex: none;
+  image-rendering: pixelated;
+  user-select: none;
+}
+.item-icon--64 { width: 64px; height: 64px; }
+.item-icon--128 { width: 128px; height: 128px; }
+
+.named-item-icon { display: inline-flex; flex: none; }
+.named-item-icon:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+/* Icons are drawn for dark grounds; a dark tile keeps them readable on parchment lists. */
+.named-item-icon .item-icon { background: var(--ink-mid); }
+
+/* Art not made yet: a plain labelled box, no drawing. */
+.item-icon--missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px dashed var(--parchment-dark);
+  color: var(--parchment);
+  font-family: var(--font-heading);
+  font-size: 2rem;
+}
+.item-icon--128.item-icon--missing { font-size: 4rem; }

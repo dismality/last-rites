@@ -6,13 +6,7 @@ import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useRapier } from '@react-three/rapier'
 import { FIREARM_MAP } from '../../data/firearms'
-import {
-  cancelHeldReload,
-  dodge,
-  fireHeld,
-  kick,
-  reloadHeld,
-} from '../../game/state/combatActions'
+import { cancelHeldReload, dodge, fireHeld, kick, reloadHeld } from '../../game/state/combatActions'
 import { useInventoryStore, usePlayerStore } from '../../game/state'
 import { isSimFrozen } from '../../game/state/menuState'
 import { forwardFromYaw } from '../../game/systems/melee'
@@ -64,7 +58,11 @@ export function WeaponController() {
 
     const player = usePlayerStore.getState()
     const cp = Math.cos(player.pitch)
-    const eye: [number, number, number] = [player.position[0], player.position[1] + EYE_HEIGHT_M, player.position[2]]
+    const eye: [number, number, number] = [
+      player.position[0],
+      player.position[1] + EYE_HEIGHT_M,
+      player.position[2],
+    ]
     const dir: [number, number, number] = [
       -Math.sin(player.yaw) * cp,
       Math.sin(player.pitch),
@@ -91,7 +89,11 @@ export function WeaponController() {
       // The recoil still left from the last shot lifts the next one, so rapid fire climbs.
       const pitch = player.pitch + recoilOffsetRad(weaponRuntime.recoil)
       const cpa = Math.cos(pitch)
-      const aim = { x: -Math.sin(player.yaw) * cpa, y: Math.sin(pitch), z: -Math.cos(player.yaw) * cpa }
+      const aim = {
+        x: -Math.sin(player.yaw) * cpa,
+        y: Math.sin(pitch),
+        z: -Math.cos(player.yaw) * cpa,
+      }
       const res = fireHeld({
         origin: { x: eye[0], y: eye[1], z: eye[2] },
         aim,

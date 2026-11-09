@@ -10,6 +10,7 @@ import { useGameStore, useMapStore, usePlayerStore, useSettingsStore } from '../
 import { useCombatStore } from '../../game/state/combatStore'
 import { useEffectStore } from '../../game/state/effectStore'
 import { takePlayerPush } from '../../game/state/playerPush'
+import { takeTeleport } from '../../game/state/playerTeleport'
 import {
   applyLook,
   headBobOffset,
@@ -28,6 +29,7 @@ import {
   impactShakeAllowed,
   recoilOffsetRad,
 } from '../../game/systems/recoil'
+import { bodyRuntime } from './bodyRuntime'
 import { weaponRuntime } from './weaponRuntime'
 import { meleeRuntime } from './meleeRuntime'
 import { scareRuntime } from '../scares/scareRuntime'
@@ -79,6 +81,15 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     }
   }, [world])
 
+  useEffect(
+    () => () => {
+      bodyRuntime.body = null
+      bodyRuntime.camera = null
+      bodyRuntime.scene = null
+    },
+    [],
+  )
+
   useEffect(() => {
     const removeInput = installInput(canvas)
     // Re-locking the pointer is the way back into play after a pause.
@@ -97,9 +108,32 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     const rb = body.current
     const kcc = controller.current
     if (!rb || !kcc) return
+    bodyRuntime.body = rb
+    bodyRuntime.camera = camera
+    bodyRuntime.scene = state.scene
+    // Retry, Continue and New Game queue a move; apply it before anything reads the body, so
+    // the stale position is never copied back into the store. Runs even while a menu is open.
+    const tp = takeTeleport()
+    if (tp) {
+      const centre = { x: tp.position[0], y: tp.position[1] + CENTRE_Y, z: tp.position[2] }
+      rb.setTranslation(centre, true)
+      rb.setNextKinematicTranslation(centre)
+      fallSpeed.current = 0
+      bob.current = { phase: 0, amplitude: 0 }
+      playerPositionRef.current.set(tp.position[0], tp.position[1], tp.position[2])
+      camera.position.set(centre.x, centre.y + EYE_OFFSET, centre.z)
+      camera.rotation.order = 'YXZ'
+      camera.rotation.set(tp.pitch, tp.yaw, 0)
+    }
     // No movement or look while any menu holds the cursor. The workbench rig owns
     // the camera while opening, open and returning.
-    if (isMenuOpen() || workbenchCameraRuntime.active || endingCameraRuntime.active || introCameraRuntime.active) return
+    if (
+      isMenuOpen() ||
+      workbenchCameraRuntime.active ||
+      endingCameraRuntime.active ||
+      introCameraRuntime.active
+    )
+      return
 
     const dt = Math.min(rawDelta, MAX_FRAME_DT)
     const settings = useSettingsStore.getState()
@@ -112,7 +146,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
       snap.lookDX,
       snap.lookDY,
       settings.mouseSensitivity,
-      settings.invertY
+      settings.invertY,
     )
 
     // A grave hand holds the ankle: halve speed for its duration, then tick it down.
@@ -136,7 +170,11 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     const collider = rb.collider(0)
     const grounded = kcc.computedGrounded()
     fallSpeed.current = grounded ? 0 : fallSpeed.current + GRAVITY * dt
-    kcc.computeColliderMovement(collider, { x: vx * dt + (push?.x ?? 0), y: -fallSpeed.current * dt, z: vz * dt + (push?.z ?? 0) })
+    kcc.computeColliderMovement(collider, {
+      x: vx * dt + (push?.x ?? 0),
+      y: -fallSpeed.current * dt,
+      z: vz * dt + (push?.z ?? 0),
+    })
     const m = kcc.computedMovement()
     const t = rb.translation()
     const next = { x: t.x + m.x, y: t.y + m.y, z: t.z + m.z }

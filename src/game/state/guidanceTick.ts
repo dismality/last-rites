@@ -2,20 +2,28 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
+import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
 import type { TutorialAction } from '../../data/tutorialSteps'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { ZONE_CARD_SHOW_S } from '../../data/zoneCards'
 import { subscribeToType } from '../events'
+import { craneFighting } from '../systems/bossDirector'
 import { countRelics, riteAvailability } from '../systems/finalRite'
 import { cellAt, isExplored } from '../systems/mapReveal'
-import { selectObjective, type Objective, type ObjectiveInput, type Vec3 } from '../systems/objective'
+import {
+  selectObjective,
+  type Objective,
+  type ObjectiveInput,
+  type Vec3,
+} from '../systems/objective'
 import { markActionDone, isWalkComplete, tutorialPrompt, walkStep } from '../systems/tutorial'
 import { zoneAt } from '../systems/zoneAt'
 import { recordZoneCard, shouldShowZoneCard } from '../systems/zoneCardTrigger'
+import { useBossStore } from './bossStore'
 import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
-import { useGuidanceStore } from './guidanceStore'
+import { isStoryRun, useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMapStore } from './mapStore'
 import { useMysteryStore } from './mysteryStore'
@@ -56,7 +64,9 @@ export const readObjectiveInput = (): ObjectiveInput => {
     wavesCleared: useEndingStore.getState().nightFiveCleared,
     relicCount: relics,
   })
-  const phaseLength = world.phase === 'dusk' ? DUSK_DURATION_S : DAY_DURATION_S
+  const story = isStoryRun()
+  const phaseLength =
+    world.phase === 'dusk' ? DUSK_DURATION_S : story ? DAY_DURATION_S : ENDLESS.dayS
   const living = useEnemyStore
     .getState()
     .enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length
@@ -72,9 +82,9 @@ export const readObjectiveInput = (): ObjectiveInput => {
     },
     rite: {
       available: availability === 'ready' && useEndingStore.getState().nightFiveCleared,
-      running: mystery.riteProgress > 0,
-      // Spec 07 supplies Father Crane; until then he is never alive.
-      craneAlive: false,
+      running: mystery.riteProgress > 0 || useEndingStore.getState().riteStarted,
+      // Only while he is on the field; before he rises or after he falls the rite line shows.
+      craneAlive: craneFighting(useBossStore.getState().boss),
     },
     progress: {
       page1Read: mystery.pages.has(1),
@@ -86,6 +96,7 @@ export const readObjectiveInput = (): ObjectiveInput => {
     },
     relicSites: exploredRelicSites(),
     playerPos: player.position,
+    story,
   }
 }
 
@@ -127,7 +138,8 @@ const completeAction = (action: TutorialAction): void => {
 /** One fixed step. A non-finite player position skips the whole tick. */
 export const tickGuidance = (dt: number): void => {
   const [x, y, z] = usePlayerStore.getState().position
-  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z) || !Number.isFinite(dt)) return
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z) || !Number.isFinite(dt))
+    return
   const step = Math.max(0, dt)
 
   const s = useGuidanceStore.getState()

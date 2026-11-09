@@ -1,5 +1,6 @@
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
+import { useCinematic } from '../../game/state/menuState'
 import { HitMarker } from './HitMarker'
 
 /**
@@ -9,7 +10,8 @@ import { HitMarker } from './HitMarker'
 export function Crosshair() {
   const playerTarget = usePlayerStore((s) => s.interactTarget !== null)
   const hovering = useInteractionStore((s) => s.hover !== null)
-  const hasTarget = playerTarget || hovering
+  const cinematic = useCinematic()
+  const hasTarget = (playerTarget || hovering) && !cinematic
 
   return (
     <div className="hud-crosshair" aria-hidden="true" data-interactable={hasTarget}>

@@ -13,7 +13,8 @@
   top: 50%;
   right: 2rem;
   transform: translateY(-50%);
-  width: clamp(240px, 22vw, 320px);
+  /* Wide enough for three 64 px ingredient icons in a row. */
+  width: clamp(300px, 26vw, 420px);
   max-height: 80vh;
 
   display: flex;
@@ -254,8 +255,9 @@
   margin: 0;
   padding: 0 0 0 0.5rem;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 /* Smudged variant for locked entries */
@@ -269,8 +271,9 @@
 
 .recipe-entry__ingredient {
   display: flex;
-  align-items: baseline;
-  gap: 0.3rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
   font-family: var(--font-body);
   font-size: 0.72rem;
   color: var(--ink);
@@ -288,18 +291,12 @@
   font-family: var(--font-num);
   font-size: 0.72rem;
   color: var(--parchment-dark);
-  min-width: 0.9rem;
-  text-align: right;
+  text-align: center;
   flex-shrink: 0;
-}
-
-.ingredient-name {
-  flex: 1;
 }
 
 /* ── Missing state ───────────────────────────────────────────────────────── */
 
-.recipe-entry__ingredient--missing .ingredient-name,
 .recipe-entry__ingredient--missing .ingredient-qty {
   color: var(--blood);
   font-weight: 600;

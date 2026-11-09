@@ -34,14 +34,18 @@ describe('shot occlusion', () => {
 
   it('ignores a sensor around the shooter', () => {
     const w = worldWith((w) => {
-      w.createCollider(RAPIER.ColliderDesc.cuboid(10, 5, 10).setTranslation(0, 2, 0).setSensor(true))
+      w.createCollider(
+        RAPIER.ColliderDesc.cuboid(10, 5, 10).setTranslation(0, 2, 0).setSensor(true),
+      )
     })
     expect(makeWallDistance(w, RAPIER)(ORIGIN, FORWARD, 40)).toBe(Infinity)
   })
 
   it('ignores the kinematic player body', () => {
     const w = worldWith((w) => {
-      const body = w.createRigidBody(RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, 1, 0))
+      const body = w.createRigidBody(
+        RAPIER.RigidBodyDesc.kinematicPositionBased().setTranslation(0, 1, 0),
+      )
       w.createCollider(RAPIER.ColliderDesc.capsule(0.5, 0.4), body)
       w.createCollider(RAPIER.ColliderDesc.cuboid(0.5, 2, 3).setTranslation(8, 2, 0))
     })

@@ -78,7 +78,9 @@ export function ExamineScene({ itemId }: { itemId: ItemId }) {
       {/* Warm key light from upper left, faint cold fill so the far side never goes black. */}
       <ambientLight intensity={0.35} color="#9fb3c8" />
       <directionalLight position={[-2, 3, 3]} intensity={2.2} color="#f5b878" />
-      <Suspense fallback={null}>{model ? <ItemModel path={model} /> : <PlaceholderModel />}</Suspense>
+      <Suspense fallback={null}>
+        {model ? <ItemModel path={model} /> : <PlaceholderModel />}
+      </Suspense>
       <ClueWatcher itemId={itemId} />
       <OrbitControls
         enablePan={false}

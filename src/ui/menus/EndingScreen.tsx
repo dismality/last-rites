@@ -43,7 +43,7 @@ function Sequence() {
   // Escape skips; the button does the same for pointer users.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') showSummary()
+      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') showSummary()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

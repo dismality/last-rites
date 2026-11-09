@@ -46,7 +46,10 @@ function fakeCtx() {
 
 function setup() {
   const ctx = fakeCtx()
-  const engine = new SynthEngine(ctx as unknown as AudioContext, { connect() {} } as unknown as AudioNode)
+  const engine = new SynthEngine(
+    ctx as unknown as AudioContext,
+    { connect() {} } as unknown as AudioNode,
+  )
   setSynthForTests(engine)
   return { ctx, engine }
 }

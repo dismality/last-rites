@@ -11,7 +11,16 @@ export interface WaypointNode {
 
 export const WAYPOINT_NODES: readonly WaypointNode[] = [
   // Grounds hub
-  { id: 'hut', x: 0, z: 0 },
+  // The hut node stands just outside its door (+Z wall); the player starts inside, so any
+  // route to the start must come through here. A node inside the walls made every route
+  // that touched it start with a blocked leg.
+  { id: 'hut', x: 0, z: 5 },
+  { id: 'hut-inside', x: 0, z: 0 },
+  // Corners round the hut and the gap between hut and chapel, so legs never cross a wall.
+  { id: 'hut-sw', x: -6, z: 5.5 },
+  { id: 'hut-nw', x: -6, z: -6 },
+  { id: 'hut-ne', x: 6, z: -6 },
+  { id: 'hut-se', x: 6, z: 5.5 },
   { id: 'grounds-west', x: -20, z: -10 },
   { id: 'grounds-east', x: 25, z: 0 },
   { id: 'grounds-south', x: 10, z: 25 },
@@ -32,9 +41,17 @@ export const WAYPOINT_NODES: readonly WaypointNode[] = [
 ]
 
 export const WAYPOINT_EDGES: ReadonlyArray<readonly [string, string]> = [
-  ['hut', 'grounds-west'],
-  ['hut', 'grounds-east'],
-  ['hut', 'chapel-door'],
+  ['hut', 'hut-inside'],
+  ['hut', 'hut-sw'],
+  ['hut', 'hut-se'],
+  ['hut-sw', 'hut-nw'],
+  ['hut-sw', 'grounds-west'],
+  ['hut-nw', 'hut-ne'],
+  ['hut-nw', 'grounds-west'],
+  ['hut-ne', 'hut-se'],
+  ['hut-ne', 'chapel-door'],
+  ['hut-ne', 'grounds-east'],
+  ['hut-se', 'chapel-vestry'],
   ['grounds-east', 'chapel-door'],
   ['grounds-east', 'grounds-south'],
   ['chapel-vestry', 'hut'],

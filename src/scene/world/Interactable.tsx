@@ -10,6 +10,9 @@ import { useLanternStore } from '../../game/state/lanternStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { ACTION_RUNE, isWithinLantern, type InteractAction } from '../../game/systems/interaction'
+import { cinematicActive } from '../../game/state/menuState'
+import { endingCameraRuntime } from '../effects/endingCameraRuntime'
+import { introCameraRuntime } from '../effects/introCameraRuntime'
 import { interactableRegistry } from './interactableRegistry'
 
 const EMBER = '#e8913a'
@@ -36,6 +39,8 @@ function runeTexture(action: InteractAction): THREE.CanvasTexture {
       g.fillText(ACTION_RUNE[action], 32, 34)
     }
     tex = new THREE.CanvasTexture(c)
+    // Named so the browser specs can find rune sprites in the scene graph.
+    tex.name = `rune:${action}`
     runeTextures.set(action, tex)
   }
   return tex
@@ -97,14 +102,18 @@ export function Interactable({
     const dist = state.camera.position.distanceTo(world)
     const { fuel, on } = useLanternStore.getState()
     const lit = isWithinLantern(dist, fuel, on)
-    const isHover = useInteractionStore.getState().hover?.id === key
+    const hide = cinematicActive({
+      ending: endingCameraRuntime.active,
+      intro: introCameraRuntime.active,
+    })
+    const isHover = !hide && useInteractionStore.getState().hover?.id === key
     setHovered((h) => (h === isHover ? h : isHover))
     const animate = useSettingsStore.getState().flashingLights
     const t = state.clock.elapsedTime
     // Slow pulse; held steady when the flashing-lights setting is off.
     const pulse = animate ? 0.5 + 0.5 * Math.sin(t * 2.4) : 0.5
     // No glow volume: an additive box read as a glowing crate. The rune pulses instead.
-    if (rune.current) rune.current.opacity = isHover ? 1 : lit ? 0.25 + 0.3 * pulse : 0
+    if (rune.current) rune.current.opacity = isHover ? 1 : lit && !hide ? 0.25 + 0.3 * pulse : 0
   })
 
   return (
@@ -112,7 +121,7 @@ export function Interactable({
       {children}
       {/* Hover-only edge frame. raycast disabled so it never blocks the crosshair. */}
       {hovered && (
-        <lineSegments geometry={edges} position={[0, sy / 2, 0]} raycast={() => null}>
+        <lineSegments name="hover-outline" geometry={edges} position={[0, sy / 2, 0]} raycast={() => null}>
           <lineBasicMaterial
             color={OUTLINE}
             transparent

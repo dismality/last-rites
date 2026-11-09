@@ -38,7 +38,11 @@ function Statue({ index }: { index: number }) {
   })
 
   return (
-    <group ref={group} position={anchor.position as [number, number, number]} rotation={[0, anchor.awayYaw, 0]}>
+    <group
+      ref={group}
+      position={anchor.position as [number, number, number]}
+      rotation={[0, anchor.awayYaw, 0]}
+    >
       <mesh position={[0, 0.25, 0]}>
         <boxGeometry args={[0.8, 0.5, 0.8]} />
         <meshStandardMaterial color={STONE} roughness={0.95} />
@@ -72,7 +76,11 @@ function Door({ index }: { index: number }) {
   })
 
   return (
-    <group ref={hinge} position={anchor.position as [number, number, number]} rotation={[0, anchor.shutYaw, 0]}>
+    <group
+      ref={hinge}
+      position={anchor.position as [number, number, number]}
+      rotation={[0, anchor.shutYaw, 0]}
+    >
       <mesh position={[0.5, 1.05, 0]}>
         <boxGeometry args={[1, 2.1, 0.08]} />
         <meshStandardMaterial color={WOOD} roughness={0.9} />

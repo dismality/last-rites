@@ -74,6 +74,12 @@ export function resetCoinStream(): void {
   coinRng = null
 }
 
+/** New Game: forgets the coin stream and the previous run's night-clear score parts. */
+export function resetProgressionEventsRuntime(): void {
+  coinRng = null
+  clearedNight = null
+}
+
 /** Events only count while playing and alive; menus and pause do not block them here. */
 export function progressionAccepts(): boolean {
   const g = useGameStore.getState()

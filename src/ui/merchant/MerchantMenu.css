@@ -10,6 +10,8 @@
 .merchant__row {
   display: grid;
   grid-template-columns: 1fr auto auto auto;
+  /* 64 px icon rows. */
+  min-height: 72px;
   align-items: center;
   gap: 0.75rem;
   padding: 0.4rem 0.6rem;
@@ -19,6 +21,17 @@
   font-family: var(--font-body);
   font-size: 1rem;
 }
+
+.merchant__ware {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  /* Icons are drawn for dark grounds; a dark tile keeps them readable on parchment. */
+  justify-self: start;
+}
+.merchant__ware:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+.merchant__ware .item-icon { background: var(--ink-mid); }
+.merchant__count { font-family: var(--font-num); font-size: 1.25rem; }
 
 .merchant__price,
 .merchant__left,

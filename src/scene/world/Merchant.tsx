@@ -6,12 +6,23 @@ import { useEffect, useMemo, useState } from 'react'
 import * as THREE from 'three'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { MERCHANT_SPOT } from '../../data/merchant'
-import { isMerchantPresent, syncMerchantPresence, tryTrade } from '../../game/state/merchantPresence'
+import {
+  isMerchantPresent,
+  syncMerchantPresence,
+  tryTrade,
+} from '../../game/state/merchantPresence'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { Interactable } from './Interactable'
 
-type Part = [geo: THREE.BufferGeometry, x: number, y: number, z: number, rotZ?: number, rotX?: number]
+type Part = [
+  geo: THREE.BufferGeometry,
+  x: number,
+  y: number,
+  z: number,
+  rotZ?: number,
+  rotX?: number,
+]
 
 /** Bakes each part's transform in, then merges the lot into one geometry. */
 function merge(parts: Part[]): THREE.BufferGeometry {
@@ -59,7 +70,8 @@ const cloak = (): THREE.BufferGeometry =>
     [cyl(0.17, 0.3, 8), 0, 1.92, 0],
   ])
 
-const face = (): THREE.BufferGeometry => merge([[new THREE.SphereGeometry(0.14, 8, 6), 0, 1.6, 0.02]])
+const face = (): THREE.BufferGeometry =>
+  merge([[new THREE.SphereGeometry(0.14, 8, 6), 0, 1.6, 0.02]])
 
 const bulb = (): THREE.BufferGeometry =>
   merge([[new THREE.SphereGeometry(0.09, 8, 6), 0.55, 1.95, 1.15]])
