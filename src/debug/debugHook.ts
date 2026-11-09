@@ -37,6 +37,8 @@ import { useProgressionStore } from '../game/state/progressionStore'
 import { useInventoryStore } from '../game/state/inventoryStore'
 import { useCombatStore } from '../game/state/combatStore'
 import { useDoorStore } from '../game/state/doorStore'
+import { showItemName } from '../game/state/itemNameStore'
+import { useChapelStore } from '../game/state/chapelStore'
 import { useSpawnStore } from '../game/state/spawnStore'
 import { usePlayerStore } from '../game/state/playerStore'
 import { useEndingStore } from '../game/state/endingStore'
@@ -100,6 +102,7 @@ export type SnapshotName =
   | 'boss'
   | 'intro'
   | 'lantern'
+  | 'uiWorld'
 
 const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   game: () => useGameStore.getState(),
@@ -123,6 +126,7 @@ const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   boss: () => useBossStore.getState().boss,
   intro: () => useIntroStore.getState(),
   lantern: () => useLanternStore.getState(),
+  uiWorld: () => useUiWorldStore.getState(),
 }
 
 let keepAliveTimer: ReturnType<typeof setInterval> | null = null
@@ -302,6 +306,18 @@ const api = {
   pickAnyUpgrade(): boolean {
     const offer = useProgressionStore.getState().pendingPick
     return offer !== null && offer.length > 0 && pickUpgrade(offer[0])
+  },
+  /** Raises the shared item-name label exactly as hover and the hotbar do. */
+  showItemName(id: ItemId): void {
+    showItemName(id)
+  },
+  /** The real chapel repair action (spends the stage's cost from the satchel); stage 1 fits the barricades. */
+  repairChapel(): boolean {
+    return useChapelStore.getState().applyRepair().ok
+  },
+  /** Sets board health per door directly (a spec shortcut for extra boards; nailing itself is tested separately). */
+  setDoorBoards(front: readonly number[], vestry: readonly number[]): void {
+    useDoorStore.getState().setDoors({ front, vestry })
   },
   /** The real pickup action an Interactable calls. */
   takePickup(id: WeaponPickupId): boolean {
