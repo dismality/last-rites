@@ -2,6 +2,11 @@
 // Wires the pure rules in systems/ to the zustand stores. No React / three.js.
 
 import { PLAYER_MAX_HEALTH } from '../../data/balance'
+import { MODES } from '../../data/modes'
+import type { ProgressionSave } from '../systems/progressionSave'
+import { syncDerivedStats } from './derivedStats'
+import { captureProgressionSave, restoreProgressionSave } from './progressionPersistence'
+import { useProgressionStore } from './progressionStore'
 import { emit, subscribeToType } from '../events'
 import { loadSnapshot, pickData, saveSnapshot, type SnapshotData } from '../systems/duskSnapshot'
 import { isInvulnerable } from '../systems/dodge'
@@ -16,6 +21,7 @@ import { useCraftingStore } from './craftingStore'
 import { useDigStore } from './digStore'
 import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
+import { settleEndlessDeath } from './startEnding'
 import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useLanternStore } from './lanternStore'
@@ -57,12 +63,19 @@ export const riteProgress: Snapshotable = {
   },
 }
 
+/** Progression goes through its own capture/restore so Retry and Save share one field list. */
+export const progressionSnapshot: Snapshotable = {
+  getState: () => captureProgressionSave(),
+  setState: (partial) => restoreProgressionSave(partial as unknown as ProgressionSave),
+}
+
 /** Every store except settings. Transient crafting UI state is omitted. */
 export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: readonly string[] }> = {
   // Built from COMBAT_PERSISTED so a field the Save keeps cannot be forgotten here (Req 20.3).
   combat: { store: fieldsOf(useCombatStore, COMBAT_PERSISTED.combat) },
   doors: { store: fieldsOf(useDoorStore, COMBAT_PERSISTED.doors) },
   riteProgress: { store: riteProgress },
+  progression: { store: progressionSnapshot },
   inventory: { store: useInventoryStore as unknown as Snapshotable },
   crafting: { store: useCraftingStore as unknown as Snapshotable, omit: ['craftingProgress'] },
   chapel: { store: useChapelStore as unknown as Snapshotable },
@@ -103,12 +116,16 @@ export function installDuskSnapshot(): () => void {
 
 /** Back to the start of that dusk. Falls back to current inventory if no snapshot exists. */
 export function retryNight(): void {
+  // Endless has no second chance: death ends the run (Req 11.14).
+  if (!MODES[useProgressionStore.getState().mode].retryNight) return
   const snap = loadSnapshot(storage())
   if (snap) {
     for (const [name, { store }] of Object.entries(SNAPSHOT_STORES)) {
       const part = snap[name]
       if (part) store.setState(part as never)
     }
+    // Max HP derives from the restored ranks; the player store snapshot may hold another value.
+    syncDerivedStats()
     useCraftingStore.getState().clearHighlight()
     useCraftingStore.setState({ craftingProgress: null })
   } else {
@@ -170,6 +187,7 @@ export function hurtPlayer(dmg: number, blocking: boolean, source?: HurtSource):
   if (res.died) {
     // Nothing from the failed night may carry into the retry (Req 12.8, 20.2).
     clearNightState()
+    settleEndlessDeath()
     useGameStore.getState().setTaken(true)
   }
   return true

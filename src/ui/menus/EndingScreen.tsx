@@ -1,19 +1,21 @@
 import { useEffect, useId, useMemo, useState } from 'react'
 import creditsMarkdown from '../../../docs/CREDITS.md?raw'
-import { CLUES } from '../../data/clues'
 import { ENDING_MAP } from '../../data/endings'
 import { useEndingStore } from '../../game/state/endingStore'
+import { useCraftingStore } from '../../game/state/craftingStore'
+import { useIntroStore } from '../../game/state/introStore'
+import { useOverlayStore } from '../../game/state/overlayStore'
+import { startRun } from '../../game/state/progressionActions'
 import { useGameStore } from '../../game/state/gameStore'
-import { useInventoryStore } from '../../game/state/inventoryStore'
-import { useMysteryStore } from '../../game/state/mysteryStore'
 import { resetRun } from '../../game/state/resetRun'
-import { newGame } from '../../game/state/runFlow'
 import { parseCredits } from '../../game/systems/credits'
 import { activeLine, fadeAlpha } from '../../game/systems/endingSequence'
-import { countRelics } from '../../game/systems/finalRite'
-import { summaryRows } from '../../game/systems/runStats'
 import { endingCameraRuntime } from '../../scene/effects/endingCameraRuntime'
+import { MODES } from '../../data/modes'
+import type { ModeId } from '../../game/types'
 import { MenuDialog } from './MenuDialog'
+import { ModeSelect } from './ModeSelect'
+import { StatsPanel } from './StatsPanel'
 import './menus.css'
 
 /** Subtitled camera sequence: the closing lines are the narration, so they always show. */
@@ -64,15 +66,27 @@ function Sequence() {
 function Summary() {
   const titleId = useId()
   const ending = useEndingStore((s) => s.ending)
-  const stats = useEndingStore((s) => s.stats)
-  const inventoryRelics = useInventoryStore((s) => s.inventory.relics)
-  const mystery = useMysteryStore((s) => s.mystery)
+  const modeSelectOpen = useOverlayStore((s) => s.modeSelectOpen)
+  const setModeSelectOpen = useOverlayStore((s) => s.setModeSelectOpen)
   const setScreen = useGameStore((s) => s.setScreen)
   const credits = useMemo(() => parseCredits(creditsMarkdown), [])
 
   if (!ending) return null
   const def = ENDING_MAP[ending]
-  const rows = summaryRows(stats, countRelics(inventoryRelics, mystery.relics), mystery.clues.size, CLUES.length)
+
+  // startRun resets the run itself, so the starting recipes and the screen are set after it.
+  function beginMode(mode: ModeId) {
+    startRun(mode)
+    setModeSelectOpen(false)
+    useGameStore.getState().setPaused(false)
+    useCraftingStore.getState().applyUnlockEvent({ type: 'gameStart' })
+    if (MODES[mode].story) useIntroStore.getState().begin()
+    setScreen('game')
+  }
+
+  if (modeSelectOpen) {
+    return <ModeSelect onBegin={beginMode} onBack={() => setModeSelectOpen(false)} />
+  }
 
   function toTitle() {
     resetRun()
@@ -85,14 +99,7 @@ function Summary() {
         {def.title}
       </h2>
       <p className="ending__closing">{def.closingLine}</p>
-      <dl className="ending__stats">
-        {rows.map((r) => (
-          <div key={r.label} className="ending__stat">
-            <dt>{r.label}</dt>
-            <dd>{r.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <StatsPanel onClose={toTitle} />
       <section className="ending__credits" aria-label="Credits" tabIndex={0}>
         <h3 className="ending__credits-title">Credits</h3>
         {credits.map((c, i) =>
@@ -108,11 +115,8 @@ function Summary() {
         )}
       </section>
       <div className="menu__actions">
-        <button type="button" className="menu__button" onClick={newGame}>
+        <button type="button" className="menu__button" onClick={() => setModeSelectOpen(true)}>
           New Game
-        </button>
-        <button type="button" className="menu__button" onClick={toTitle}>
-          Title
         </button>
       </div>
     </MenuDialog>

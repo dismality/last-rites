@@ -68,6 +68,8 @@ export interface WaveContext {
   graves?: readonly WaveGrave[]
   /** Separate stream for elite rolls so base seeds are unchanged; without it no elite is rolled. */
   eliteRng?: Rng
+  /** Mode elite chance; defaults to Normal's. */
+  eliteChance?: number
 }
 
 export interface WaveTick {
@@ -200,7 +202,7 @@ export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveT
     const type = state.pending[i]
     const x = g.x + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
     const z = g.z + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
-    const elite = ctx.eliteRng ? rollElite(ctx.eliteRng, type, def.night, eliteSpawned) : false
+    const elite = ctx.eliteRng ? rollElite(ctx.eliteRng, type, def.night, eliteSpawned, ctx.eliteChance) : false
     if (elite) eliteSpawned = true
     const doorAttacker = attackersLeft > 0 && canBeDoorAttacker(type)
     if (doorAttacker) attackersLeft--

@@ -41,7 +41,7 @@ export function rollStorm(rng: Rng, chance: number): boolean {
 
 // Night is multiplied so each night's strike indices never collide with another night's stream.
 function strikeRng(seed: number, night: number, k: number): Rng {
-  return createRng(deriveSeed(seed, 'lightning', night * 1000 + k))
+  return createRng(deriveSeed(seed, 'lightning', night * STORM.nightSeedStride + k))
 }
 
 function drawGap(seed: number, night: number, k: number): number {
@@ -105,4 +105,38 @@ export function tickStorm(
     state: { active: s.active, strikeIn, strikeIndex, thunder: pending, flashAge, slow },
     events,
   }
+}
+
+/** Flash brightness 0..1 at `age` seconds after a strike; null age means no flash. Slow is a linear ramp, so it never jumps. */
+export function lightningLevel(age: number | null, slow: boolean): number {
+  if (age === null || age < 0) return 0
+  if (!slow) return age < LIGHTNING.flashS ? 1 : 0
+  const total = LIGHTNING.slowRiseS + LIGHTNING.slowFallS
+  if (age >= total) return 0
+  if (age <= LIGHTNING.slowRiseS) return (LIGHTNING.slowPeak * age) / LIGHTNING.slowRiseS
+  return (LIGHTNING.slowPeak * (total - age)) / LIGHTNING.slowFallS
+}
+
+/** Ends the storm: no more strikes, but thunder already scheduled still plays and a flash finishes. */
+export function endStorm(s: StormState): { state: StormState; events: StormEvent[] } {
+  if (!s.active) return { state: s, events: [] }
+  return {
+    state: { ...s, active: false, strikeIn: null },
+    events: [{ type: 'stormEnded' }],
+  }
+}
+
+/** Fog and lantern-drain modifiers; neutral when no storm is active. */
+export function stormModifiers(active: boolean): { fogAdd: number; lanternDrainMult: number } {
+  return active
+    ? { fogAdd: STORM.fogAdd, lanternDrainMult: STORM.lanternDrainMult }
+    : { fogAdd: 0, lanternDrainMult: 1 }
+}
+
+/** Thunder shakes the camera only with Camera shake on and Scare intensity at Full. */
+export function thunderShakes(settings: {
+  cameraShake: boolean
+  scareIntensity: 'full' | 'reduced' | 'off'
+}): boolean {
+  return settings.cameraShake && settings.scareIntensity === 'full'
 }

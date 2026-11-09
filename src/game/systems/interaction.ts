@@ -3,7 +3,7 @@
 import { INTERACT_RANGE_M } from '../../data/balance'
 import { lanternRadius } from './lantern'
 
-export type InteractAction = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail'
+export type InteractAction = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail' | 'trade'
 
 /** Verb shown in the prompt for each action. */
 export const ACTION_LABEL: Record<InteractAction, string> = {
@@ -13,6 +13,7 @@ export const ACTION_LABEL: Record<InteractAction, string> = {
   read: 'Read',
   examine: 'Examine',
   nail: 'Board up',
+  trade: 'Trade',
 }
 
 /**
@@ -26,6 +27,7 @@ export const ACTION_RUNE: Record<InteractAction, string> = {
   read: 'ᚱ',
   examine: 'ᛟ',
   nail: 'ᚾ',
+  trade: 'ᛗ',
 }
 
 /** "KeyE" -> "E", "ShiftLeft" -> "Shift", "Digit1" -> "1", "MouseLeft" -> "LMB". */

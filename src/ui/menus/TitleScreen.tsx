@@ -1,8 +1,18 @@
 import { useEffect, useId, useState } from 'react'
 import { bootAudioOnce } from '../../audio/audioBoot'
 import { canContinue } from '../../game/state/gameSave'
-import { continueGame, newGame } from '../../game/state/runFlow'
+import { useOverlayStore } from '../../game/state/overlayStore'
+import {
+  beginMode,
+  closeAchievements,
+  closeModeSelect,
+  continueGame,
+  openAchievements,
+  openModeSelect,
+} from '../../game/state/runFlow'
+import { AchievementsMenu } from './AchievementsMenu'
 import { MenuDialog } from './MenuDialog'
+import { ModeSelect } from './ModeSelect'
 import { Settings } from './Settings'
 
 type Panel = 'none' | 'settings' | 'credits'
@@ -13,6 +23,8 @@ export function TitleScreen() {
   const [panel, setPanel] = useState<Panel>('none')
   // Re-read each render: a missing or corrupt save hides Continue (Req 7.3).
   const saveExists = canContinue()
+  const modeSelectOpen = useOverlayStore((s) => s.modeSelectOpen)
+  const achievementsOpen = useOverlayStore((s) => s.achievementsOpen)
 
   // The first click (or key press, for keyboard-only players) is the gesture that unlocks audio.
   useEffect(() => {
@@ -29,6 +41,8 @@ export function TitleScreen() {
     }
   }, [])
 
+  if (modeSelectOpen) return <ModeSelect onBegin={beginMode} onBack={closeModeSelect} />
+  if (achievementsOpen) return <AchievementsMenu onClose={closeAchievements} />
   if (panel === 'settings') return <Settings onClose={() => setPanel('none')} />
   if (panel === 'credits') {
     return (
@@ -58,7 +72,7 @@ export function TitleScreen() {
         Hollowmere Cemetery, 1891
       </p>
       <div className="menu__actions">
-        <button type="button" className="menu__button" onClick={newGame}>
+        <button type="button" className="menu__button" onClick={openModeSelect}>
           New Game
         </button>
         {saveExists && (
@@ -68,6 +82,9 @@ export function TitleScreen() {
         )}
         <button type="button" className="menu__button" onClick={() => setPanel('settings')}>
           Settings
+        </button>
+        <button type="button" className="menu__button" onClick={openAchievements}>
+          Achievements
         </button>
         <button type="button" className="menu__button" onClick={() => setPanel('credits')}>
           Credits

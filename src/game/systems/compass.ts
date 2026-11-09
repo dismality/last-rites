@@ -85,6 +85,8 @@ export interface CompassContext {
   objective?: readonly [number, number, number]
   phase: Phase
   bellBuilt: boolean
+  /** Silas's spot; pass it only while he is at the gate. */
+  merchant?: readonly [number, number, number]
 }
 
 export const buildCompassMarkers = (c: CompassContext): CompassMarker[] => {
@@ -98,6 +100,10 @@ export const buildCompassMarkers = (c: CompassContext): CompassMarker[] => {
   }
   markers.push(makeMarker('chapel', 'chapel', rel({ x: CHAPEL_CENTER[0], z: CHAPEL_CENTER[2] })))
   markers.push(makeMarker('hut', 'hut', rel({ x: 0, z: 0 })))
+
+  if (c.merchant) {
+    markers.push(makeMarker('merchant', 'merchant', rel({ x: c.merchant[0], z: c.merchant[2] })))
+  }
 
   if ((c.phase === 'dusk' || c.phase === 'night') && c.bellBuilt) {
     // One skull per 15° bucket of absolute bearing keeps the strip readable.

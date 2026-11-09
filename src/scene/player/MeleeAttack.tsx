@@ -37,6 +37,8 @@ import {
 } from '../../game/systems/melee'
 import { hotbarItem } from '../../game/systems/satchel'
 import type { CraftedItemId, HeavyMeleeId } from '../../game/types'
+import { emit } from '../../game/events'
+import { meleeHitEvents } from './meleeEvents'
 import { input } from './input'
 import { meleeRuntime } from './meleeRuntime'
 
@@ -196,6 +198,9 @@ export function MeleeAttack() {
       // Dead zombies stay in the list for the AI task to play the death; hp 0 excludes them from further hits.
       useEnemyStore.getState().setEnemies(result.enemies)
       playMeleeHit()
+      for (const ev of meleeHitEvents(result.hitUids, cur.heavy?.kind === 'heavy' ? 'heavy' : 'melee')) {
+        emit(ev)
+      }
       for (const e of result.enemies) {
         if (result.hitUids.includes(e.uid)) {
           meleeRuntime.dustQueue.push(

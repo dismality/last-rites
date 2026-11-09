@@ -18,8 +18,16 @@ function drainSecondsPerPercent(phase: Phase): number {
     : LANTERN_DRAIN_S_PER_PERCENT_DAY
 }
 
-export function tickLantern(s: LanternState, dt: number, phase: Phase): LanternState {
-  const drain = s.on ? Math.max(0, dt) / drainSecondsPerPercent(phase) : 0
+/** drainMult comes from lanternDrainMultiplier (mode, Long Wick, storm); 1 keeps the base rate. */
+export function tickLantern(
+  s: LanternState,
+  dt: number,
+  phase: Phase,
+  drainMult = 1,
+): LanternState {
+  const drain = s.on
+    ? (Math.max(0, dt) * Math.max(0, drainMult)) / drainSecondsPerPercent(phase)
+    : 0
   const fuel = Math.min(LANTERN_MAX_FUEL, Math.max(0, s.fuel - drain))
   return { on: s.on, fuel, flicker: fuel < LANTERN_FLICKER_BELOW }
 }

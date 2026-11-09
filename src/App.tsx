@@ -59,6 +59,10 @@ import { SaltCircles } from './scene/world/SaltCircles'
 import { SkyAndFog } from './scene/world/SkyAndFog'
 import { ThrownItems } from './scene/world/ThrownItems'
 import { Workbench } from './scene/world/Workbench'
+import { Merchant } from './scene/world/Merchant'
+import { CoinPiles } from './scene/world/CoinPiles'
+import { Weather } from './scene/world/Weather'
+import { MusicDriver } from './scene/audio/MusicDriver'
 
 /** The 3D game: one Canvas, physics, fixed-step loop, then every system that reads the stores. */
 function GameScreen() {
@@ -67,6 +71,8 @@ function GameScreen() {
     <div style={{ position: 'fixed', inset: 0, background: 'var(--ink)' }}>
       <Canvas shadows camera={{ fov, near: 0.1, far: 200 }} dpr={[1, 1.5]}>
         <SkyAndFog />
+        {/* After SkyAndFog so rain and lightning adjust the lights and fog it set this frame. */}
+        <Weather />
         <GameLoop>
           <FirstPersonController />
           {/* After the controller so the intro path wins the camera while it plays. */}
@@ -83,6 +89,10 @@ function GameScreen() {
           <GraveMounds />
           <Workbench />
           <EnemyDirector />
+          {/* After EnemyDirector so music reads this frame's nearest zombie. */}
+          <MusicDriver />
+          <Merchant />
+          <CoinPiles />
           <WaveDirector />
           <FinalRite />
           <ScareZoneVolumes />

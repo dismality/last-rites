@@ -4,6 +4,7 @@
   behave identically on every menu (accessibility steering doc), so they live once.
 */
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react'
+import { pickInitialFocus, tabWrapTarget } from './menuFocus'
 import './menus.css'
 
 const FOCUSABLE =
@@ -26,8 +27,7 @@ export function MenuDialog({ titleId, onEscape, children, variant = 'overlay' }:
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
     const panel = panelRef.current
-    const first = panel?.querySelector<HTMLElement>(FOCUSABLE)
-    ;(first ?? panel)?.focus()
+    if (panel) pickInitialFocus(panel, FOCUSABLE).focus()
     return () => previous?.focus?.()
   }, [])
 
@@ -39,16 +39,10 @@ export function MenuDialog({ titleId, onEscape, children, variant = 'overlay' }:
     }
     if (e.key !== 'Tab') return
     const items = Array.from(panelRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? [])
-    if (items.length === 0) return
-    const first = items[0]
-    const last = items[items.length - 1]
-    const active = document.activeElement
-    if (e.shiftKey && (active === first || active === panelRef.current)) {
+    const target = tabWrapTarget(items, document.activeElement, panelRef.current, e.shiftKey)
+    if (target) {
       e.preventDefault()
-      last.focus()
-    } else if (!e.shiftKey && active === last) {
-      e.preventDefault()
-      first.focus()
+      target.focus()
     }
   }
 

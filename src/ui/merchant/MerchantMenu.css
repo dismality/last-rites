@@ -1,0 +1,42 @@
+.merchant__rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.merchant__row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--parchment-dark);
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+.merchant__price,
+.merchant__left,
+.merchant__coins {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+
+.merchant__buy[aria-disabled='true'] {
+  opacity: 0.45;
+}
+
+.menu .merchant__buy:focus-visible {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+}
+
+.merchant__refusal {
+  min-height: 1.6em;
+  color: var(--ember);
+}

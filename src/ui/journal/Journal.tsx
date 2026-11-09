@@ -15,6 +15,7 @@ import {
   useSettingsStore,
 } from '../../game/state'
 import type { PageNumber } from '../../game/types'
+import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import './journal.css'
 
@@ -22,6 +23,7 @@ const TABS = [
   { id: 'pages', label: 'Pages' },
   { id: 'clues', label: 'Clues' },
   { id: 'relics', label: 'Relics' },
+  { id: 'contracts', label: 'Contracts' },
   { id: 'map', label: 'Map' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
@@ -154,6 +156,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
     pages: null,
     clues: null,
     relics: null,
+    contracts: null,
     map: null,
   })
 
@@ -208,6 +211,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
           {tab === 'pages' && <PagesTab />}
           {tab === 'clues' && <CluesTab />}
           {tab === 'relics' && <RelicsTab />}
+          {tab === 'contracts' && <ContractsTab />}
           {tab === 'map' && <JournalMap />}
         </div>
         <button type="button" className="journal__close" onClick={onClose}>

@@ -295,3 +295,105 @@
   margin: 0.15rem 0;
   line-height: 1.4;
 }
+
+/* Mode select (Req 7.1, 7.14) */
+.mode__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.mode__legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.mode__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.mode__option:has(input:checked) {
+  border-color: var(--ink);
+  background: rgba(20, 17, 15, 0.1);
+}
+.mode__option:has(input:focus-visible) {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+}
+.mode__option input {
+  margin-top: 0.3rem;
+  accent-color: var(--blood);
+}
+.mode__label {
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}
+.mode__lines {
+  margin: 0.2rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+.menu input[type='radio']:focus-visible {
+  outline: 3px solid var(--ember);
+  outline-offset: 2px;
+}
+
+/* Achievements menu: locked entries are dim outlines but also carry a text tag. */
+.achievements__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.achievements__entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  align-items: baseline;
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+}
+.achievements__entry--unlocked {
+  border: 1px solid var(--ember);
+  background: rgba(216, 201, 163, 0.08);
+}
+.achievements__entry--locked {
+  border: 1px dashed var(--parchment-dark);
+  opacity: 0.7;
+}
+.achievements__name {
+  font-family: var(--font-heading);
+}
+.achievements__goal {
+  flex: 1;
+}
+.achievements__tag {
+  font-family: var(--font-heading);
+  border: 1px solid var(--parchment-dark);
+  padding: 0 0.4rem;
+}
+.achievements__notnow {
+  position: fixed;
+  left: 50%;
+  bottom: 20%;
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: var(--ink);
+  color: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  font-size: 1.1rem;
+}

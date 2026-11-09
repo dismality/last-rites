@@ -15,7 +15,7 @@ export function endlessNight(n: number): { night: number; waves: WaveComposition
     wailer: atLeast0(night / 2),
     lurker: atLeast0((night - 1) / 2),
     bloater: atLeast0((night - 2) / 2),
-    brute: atLeast0((night - 3) / 3),
+    brute: atLeast0((night - ENDLESS.bruteFromNight) / ENDLESS.bruteEveryNights),
   })
   return { night, waves: Array.from({ length: count }, wave) }
 }

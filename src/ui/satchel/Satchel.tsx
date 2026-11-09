@@ -6,7 +6,9 @@
 // Outside the overlay the same number keys equip the bound item.
 import { useEffect, useRef, useState } from 'react'
 import { playSatchelCreak } from '../../audio/AudioManager'
-import { ITEM_MAP, SATCHEL_SLOTS } from '../../data/items'
+import { ITEM_MAP } from '../../data/items'
+import { currentModifiers } from '../../game/state/derivedStats'
+import { clampCellIndex, satchelCellCount } from './satchelCells'
 import {
   useGameStore,
   useInventoryStore,
@@ -108,8 +110,10 @@ export function Satchel() {
 
   if (!open || screen !== 'game') return null
 
+  const cellCount = satchelCellCount(currentModifiers().satchelSlots)
+
   const moveFocus = (idx: number) => {
-    const next = Math.max(0, Math.min(SATCHEL_SLOTS - 1, idx))
+    const next = clampCellIndex(idx, cellCount)
     setFocusIdx(next)
     cells.current[next]?.focus()
   }
@@ -159,7 +163,7 @@ export function Satchel() {
       <div className="satchel__bag">
         <h2 className="satchel__title">Satchel</h2>
         <ul className="satchel__grid" role="grid" aria-label="Satchel pockets">
-          {Array.from({ length: SATCHEL_SLOTS }, (_, i) => {
+          {Array.from({ length: cellCount }, (_, i) => {
             const stack = slots[i]
             const def = stack ? ITEM_MAP[stack.item] : null
             const bound = stack ? hotbar.indexOf(stack.item) : -1

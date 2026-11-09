@@ -6,6 +6,8 @@ import { Color, FogExp2, SRGBColorSpace } from 'three'
 import type { AmbientLight, DirectionalLight, Scene } from 'three'
 import { MOON_COLOR, MOON_POSITION, SKY_LOOKS } from '../../data/skyPalette'
 import { useWorldStore } from '../../game/state'
+import { stormRuntime } from '../../game/state/stormRuntime'
+import { ambientFlashFactor, flashTint, moonFlashFactor, stormFogDensity } from '../../game/systems/stormLight'
 import {
   lerpBlend,
   targetBlend,
@@ -66,12 +68,19 @@ export function SkyAndFog() {
     const blend = lerpBlend(from.current, to.current, transitionProgress(elapsed.current))
     current.current = blend
 
-    applySky(scene, blend)
+    // Lightning and storm fog are applied on top of the blend each frame; the stored blend and the
+    // world store's fogDensity stay untouched, so nothing sticks when the storm ends.
+    const level = stormRuntime.flashLevel
+    applySky(scene, {
+      ...blend,
+      sky: flashTint(blend.sky, level),
+      fogDensity: stormFogDensity(blend.fogDensity, stormRuntime.storm.active),
+    })
     if (ambient.current) {
       ambient.current.color.setRGB(...blend.ambientColor, SRGBColorSpace)
-      ambient.current.intensity = blend.ambientIntensity
+      ambient.current.intensity = blend.ambientIntensity * ambientFlashFactor(level)
     }
-    if (moon.current) moon.current.intensity = blend.moonIntensity
+    if (moon.current) moon.current.intensity = blend.moonIntensity * moonFlashFactor(level)
   })
 
   const start = SKY_LOOKS[phase]

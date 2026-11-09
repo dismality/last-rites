@@ -16,6 +16,8 @@ import {
   type DigState,
 } from '../systems/dig'
 import { hotbarItem } from '../systems/satchel'
+import { liveDigDuration } from '../systems/digDuration'
+import { currentModifiers } from './derivedStats'
 import { useInteractionStore } from './interactionStore'
 import { useInventoryStore } from './inventoryStore'
 import { isMenuOpen } from './menuState'
@@ -77,7 +79,9 @@ export const useDigStore = create<DigStoreState>((set, get) => ({
     const hit = hitPending
     hitPending = false
 
+    const durationS = liveDigDuration(currentModifiers().digTimeMult)
     const r = tickDig(dig, dt, {
+      durationS,
       // A satchel or journal opened mid-dig counts as letting go.
       interactHeld: interactHeld && !isMenuOpen(),
       target: point ? { id: point.id, lootTable: point.lootTable } : null,
@@ -88,7 +92,7 @@ export const useDigStore = create<DigStoreState>((set, get) => ({
       phase: world.phase,
       rng,
     })
-    set({ dig: r.state, progress: digProgress(r.state), active: r.state.graveId !== null })
+    set({ dig: r.state, progress: digProgress(r.state, durationS), active: r.state.graveId !== null })
 
     for (const e of r.events) {
       if (e.type === 'digCompleted') {

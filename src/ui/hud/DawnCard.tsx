@@ -1,21 +1,42 @@
-export interface DawnCardProps {
-  zombiesBanished: number
-  itemsFound: number
-  recipeUnlocked: string | null
-  journalPageAvailable: boolean
-}
+import { useProgressionStore } from '../../game/state/progressionStore'
+import { useWorldStore } from '../../game/state/worldStore'
+import { dawnCardView } from './dawnView'
+import { DawnPicker } from './DawnPicker'
 
-/** Stub dawn summary card; later specs wire real data and show/hide logic. */
-export function DawnCard({ zombiesBanished, itemsFound, recipeUnlocked, journalPageAvailable }: DawnCardProps) {
+/**
+ * Dawn summary with the night score parts. Hosts the upgrade picker, which opens over it when
+ * an offer is pending; with no offer the card shows alone for the normal dawn.
+ */
+export function DawnCard() {
+  const phase = useWorldStore((s) => s.phase)
+  const summary = useProgressionStore((s) => s.dawnSummary)
+  if (phase !== 'dawn') return null
+
+  const view = summary ? dawnCardView(summary) : null
   return (
-    <section className="hud-dawn" aria-label="Dawn summary">
-      <h2 className="hud-dawn__title">Dawn</h2>
-      <ul className="hud-dawn__list">
-        <li>Zombies banished: {zombiesBanished}</li>
-        <li>Items found: {itemsFound}</li>
-        <li>New recipe: {recipeUnlocked ?? 'none'}</li>
-        <li>Journal page: {journalPageAvailable ? 'available' : 'none'}</li>
-      </ul>
-    </section>
+    <>
+      <section className="hud-dawn" aria-label="Dawn summary">
+        <h2 className="hud-dawn__title">Dawn</h2>
+        {view && (
+          <>
+            <ul className="hud-dawn__list">
+              {view.rows.map((r) => (
+                <li key={r.label}>
+                  {r.label}: {r.value}
+                </li>
+              ))}
+            </ul>
+            <ul className="hud-dawn__list" aria-label="Night score">
+              {view.scoreParts.map((r) => (
+                <li key={r.label}>
+                  {r.label}: {r.value}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+      <DawnPicker />
+    </>
   )
 }

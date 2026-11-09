@@ -18,6 +18,8 @@ export const STORM = {
   gapMaxS: 45,
   thunderMinS: 1,
   thunderMaxS: 4,
+  /** Spacing between nights in the lightning seed stream, so strike indices never collide. */
+  nightSeedStride: 1000,
   fogAdd: 0.01,
   lanternDrainMult: 1.2,
   /** Thunder that follows its flash within this time is "close" (shake, loud caption). */
@@ -37,6 +39,16 @@ export const LIGHTNING = {
   moonBoost: 1.6,
   skyLerp: 0.5,
   skyColor: '#d6e4ff',
+} as const
+
+/** Rain noise bed (Req 10.5): high-pass into band-pass, on the sfx bus. */
+export const RAIN_NOISE = {
+  highpassHz: 500,
+  bandpassHz: 2400,
+  bandpassQ: 0.5,
+  gain: 0.22,
+  /** Muting while the sim is frozen is quick; only the storm fade takes the full STORM.rainFadeS. */
+  freezeFadeS: 0.15,
 } as const
 
 export const RAIN = {

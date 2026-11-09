@@ -3,36 +3,51 @@
 // game/systems/waves.ts). Mount inside <GameLoop>, next to EnemyDirector.
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { NIGHT_MAP, type NightNumber } from '../../data/waves'
-import { subscribeToType } from '../../game/events'
-import { LAST_NIGHT } from '../../data/balance'
+import { subscribeToType, emit } from '../../game/events'
 import { useChapelStore, useEnemyStore, usePlayerStore, useWorldStore } from '../../game/state'
 import { useEndingStore } from '../../game/state/endingStore'
 import { isSimFrozen } from '../../game/state/menuState'
+import { useProgressionStore } from '../../game/state/progressionStore'
+import { updateRunStats } from '../../game/state/statsPort'
 import { useWaveStore } from '../../game/state/waveStore'
-import { createEnemy } from '../../game/systems/enemyAI'
 import { createRng } from '../../game/rng'
 import { emitCombatSound } from '../../game/state/combatSounds'
-import { startNight, tickWaves } from '../../game/systems/waves'
+import { tickWaves } from '../../game/systems/waves'
+import {
+  clearedRoute,
+  createWaveEnemy,
+  eliteChanceFor,
+  nightRngs,
+  planNight,
+  statsAfterClear,
+} from '../../game/systems/waveDirection'
 import { graveBurstRuntime } from '../effects/graveBurstRuntime'
 
 const MAX_DT = 0.1
 
 export function WaveDirector() {
   const rng = useRef(createRng(1849))
+  const eliteRng = useRef(createRng(1849))
+  // Night whose clear was already announced; the night-5 rite assault clears again.
+  const announced = useRef<number | null>(null)
   const uid = useRef(0)
 
   useEffect(
     () =>
       subscribeToType('nightStarted', (ev) => {
-        const def = NIGHT_MAP[ev.nightNumber as NightNumber]
+        const { mode, seed } = useProgressionStore.getState()
+        const plan = planNight(mode, ev.nightNumber)
+        const streams = nightRngs(seed, ev.nightNumber)
+        rng.current = streams.rng
+        eliteRng.current = streams.eliteRng
+        announced.current = null
         useWorldStore.getState().setWavesCleared(false)
         // A retried night 5 starts the rite flow afresh (progress itself is kept).
         useEndingStore.getState().setNightFiveCleared(false)
         useEndingStore.getState().setRiteStarted(false)
         useChapelStore.getState().setFinalRiteActive(false)
-        useWaveStore.getState().setTotalWaves(def?.waves.length ?? 0)
-        useWaveStore.getState().setWaves(startNight(ev.nightNumber))
+        useWaveStore.getState().setTotalWaves(plan.totalWaves)
+        useWaveStore.getState().setWaves(plan.state)
       }),
     [],
   )
@@ -42,12 +57,15 @@ export function WaveDirector() {
     const waves = useWaveStore.getState().waves
     if (waves.phase === 'idle' || waves.phase === 'done') return
 
+    const { mode } = useProgressionStore.getState()
     const enemies = useEnemyStore.getState().enemies
     const player = usePlayerStore.getState().position
     const r = tickWaves(waves, Math.min(rawDelta, MAX_DT), {
       playerPos: { x: player[0], z: player[2] },
       liveCount: enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length,
       rng: rng.current,
+      eliteRng: eliteRng.current,
+      eliteChance: eliteChanceFor(mode),
     })
     useWaveStore.getState().setWaves(r.state)
 
@@ -56,7 +74,7 @@ export function WaveDirector() {
         .getState()
         .setEnemies([
           ...enemies,
-          ...r.spawns.map((s) => createEnemy(`z-${uid.current++}`, s.type, { x: s.x, z: s.z })),
+          ...r.spawns.map((s) => createWaveEnemy(`z-${uid.current++}`, s, mode, waves.night ?? 1)),
         ])
       r.spawns.forEach((s) => graveBurstRuntime.queue.push({ x: s.x, z: s.z }))
       for (const s of r.spawns) {
@@ -66,8 +84,14 @@ export function WaveDirector() {
       }
     }
     if (r.events.some((e) => e.type === 'wavesCleared')) {
-      // Night 5 does not end at dawn: it ends with the rite or the Taken ending.
-      if (useWorldStore.getState().nightNumber >= LAST_NIGHT) {
+      const night = waves.night ?? useWorldStore.getState().nightNumber
+      if (announced.current !== night) {
+        announced.current = night
+        updateRunStats((s) => statsAfterClear(s, mode, night))
+        emit({ type: 'nightCleared', nightNumber: night })
+      }
+      // Story night 5 does not end at dawn: it ends with the rite or the Taken ending.
+      if (clearedRoute(mode, night) === 'rite') {
         useEndingStore.getState().setNightFiveCleared(true)
       } else {
         useWorldStore.getState().setWavesCleared(true)
