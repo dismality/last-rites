@@ -24,7 +24,7 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
     action: 'walk',
     template: '{MoveForward} {MoveLeft} {MoveBackward} {MoveRight} to move, mouse to look',
   },
-  { id: 2, action: 'pickup', template: '{Interact} to pick up the oil on the shelf' },
+  { id: 2, action: 'pickup', template: '{Interact} to pick up the oil on the table' },
   { id: 3, action: 'readPage', template: '{Interact} to read the page Elias left' },
   { id: 4, action: 'dig', template: 'Hold {Interact} on a grave mound to dig (shovel in hand)' },
   { id: 5, action: 'craft', template: '{Interact} at the workbench to craft' },
@@ -35,6 +35,9 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
   },
   { id: 7, action: 'openJournal', template: '{Journal} opens the journal and map' },
 ]
+
+/** The one item whose pickup finishes step 2 (spec 09, B4). */
+export const TUTORIAL_PICKUP_ITEM = 'lamp-oil' as const
 
 /** Distance in metres the player must walk to finish step 1. */
 export const TUTORIAL_WALK_TARGET_M = 3

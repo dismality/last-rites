@@ -5,7 +5,7 @@ import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
-import type { TutorialAction } from '../../data/tutorialSteps'
+import { TUTORIAL_PICKUP_ITEM, type TutorialAction } from '../../data/tutorialSteps'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { ZONE_CARD_SHOW_S } from '../../data/zoneCards'
 import { subscribeToType } from '../events'
@@ -176,7 +176,10 @@ export const tickGuidance = (dt: number): void => {
 /** Subscribes tutorial completion to game events and journal page 1. Returns the unsubscribe. */
 export const installGuidanceWatchers = (): (() => void) => {
   const offs = [
-    subscribeToType('itemCollected', () => completeAction('pickup')),
+    // Step 2 is "pick up the oil": any other pickup must not skip it (spec 09, B4 and F1).
+    subscribeToType('itemCollected', (e) => {
+      if (e.itemId === TUTORIAL_PICKUP_ITEM) completeAction('pickup')
+    }),
     subscribeToType('digCompleted', () => completeAction('dig')),
     subscribeToType('craftCompleted', () => completeAction('craft')),
     subscribeToType('hotbarBound', () => completeAction('bindHotbar')),

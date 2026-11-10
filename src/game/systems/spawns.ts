@@ -4,7 +4,7 @@ import { FIXED_SPAWNS, SPAWN_POINTS, type FixedSpawn, type SpawnPoint } from '..
 import { LOOT_TABLE_MAP } from '../../data/lootTables'
 import type { ItemStack, Phase } from '../types'
 import type { Rng } from '../rng'
-import { DAY1_HUT_MIN_CLOTH } from '../../data/balance'
+import { DAY1_HUT_MIN_CLOTH, DAY1_HUT_MIN_OIL } from '../../data/balance'
 import { ensureMinimum, rollLoot } from './loot'
 
 export interface SpawnWorld {
@@ -47,9 +47,14 @@ export const HUT_SHELF_ID = 'hut-shelf'
 export function dayOneSpawns(rng: Rng): SpawnWorld {
   const world = respawnForDay(createSpawnWorld(), rng)
   const shelf = world.materials[HUT_SHELF_ID] ?? []
+  // The oil comes first so the tutorial's "pick up the oil" (step 2) always has a target (B4).
+  const withOil = ensureMinimum(shelf, 'lamp-oil', DAY1_HUT_MIN_OIL)
   return {
     ...world,
-    materials: { ...world.materials, [HUT_SHELF_ID]: ensureMinimum(shelf, 'cloth', DAY1_HUT_MIN_CLOTH) },
+    materials: {
+      ...world.materials,
+      [HUT_SHELF_ID]: ensureMinimum(withOil, 'cloth', DAY1_HUT_MIN_CLOTH),
+    },
   }
 }
 

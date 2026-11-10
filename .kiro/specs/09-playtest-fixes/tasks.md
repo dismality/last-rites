@@ -43,7 +43,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 5.1-5.3, 12.1-12.4_
 
-- [ ] 6. B4: Hut oil pickup and tutorial step 2, with F1 (oil-only step)
+- [x] 6. B4: Hut oil pickup and tutorial step 2, with F1 (oil-only step)
   - Tutorial step 2 finishes only on picking up the oil, not on any pickup
   - Finish
   - _Requirements: 6.1-6.3, 12.5_
