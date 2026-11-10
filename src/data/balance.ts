@@ -50,6 +50,10 @@ export const LOW_HEALTH_THRESHOLD = 30
 
 /** sessionStorage key for the state saved at the start of each dusk (Retry Night). */
 export const DUSK_SNAPSHOT_KEY = 'lastrites:dusk'
+/** sessionStorage key for the state saved at the start of each day (Retry from morning). */
+export const MORNING_SNAPSHOT_KEY = 'lastrites:morning'
+/** A retried night or morning never starts with less lantern oil than this, in % (design bible §8). */
+export const RETRY_MIN_FUEL = 60
 
 /** Max distance (m) at which the crosshair can target an interactable. */
 export const INTERACT_RANGE_M = 2.5

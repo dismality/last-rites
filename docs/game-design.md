@@ -327,6 +327,9 @@ Zombies take 50% less damage while the player stands in darkness (lantern fuel 0
 | Night | Until all waves are cleared | Waves from open graves. Fog thickens each night. |
 | Dawn | 10 s | Summary card: zombies banished, items found, recipe unlocked, journal page available. From spec 08 the card also shows the night score and the upgrade choice, and dawn waits until an upgrade is picked. |
 
+### Retrying after death (09)
+In story modes the death screen offers **Retry Night** (back to the start of that dusk) and **Retry from morning** (back to the start of that day, shown when the day's start was recorded). Either way the player starts at full health with at least **60%** lantern oil; more oil is kept. Everything else is as it was at that dusk or morning. Endless Survival has neither.
+
 ### Waves
 | Night | Waves | Composition per wave | Added in spec 07 | Fog density |
 |---|---|---|---|---|

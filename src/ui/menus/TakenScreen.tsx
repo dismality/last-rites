@@ -1,6 +1,6 @@
 import { useEffect, useId } from 'react'
 import { useGameStore } from '../../game/state/gameStore'
-import { retryNight } from '../../game/state/retryNight'
+import { hasMorningSnapshot, retryFromMorning, retryNight } from '../../game/state/retryNight'
 import { requestLock } from '../../scene/player/input'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { MenuDialog } from './MenuDialog'
@@ -28,8 +28,16 @@ export function TakenScreen() {
 
   if (!taken || screen !== 'game') return null
 
+  // Read on each render; the screen renders when `taken` turns on, after the day's snapshot.
+  const morning = view.showRetry && hasMorningSnapshot()
+
   function retry() {
     retryNight()
+    requestLock(document.querySelector('canvas'))
+  }
+
+  function retryMorning() {
+    retryFromMorning()
     requestLock(document.querySelector('canvas'))
   }
 
@@ -54,6 +62,11 @@ export function TakenScreen() {
           {view.showRetry && (
             <button type="button" className="menu__button" onClick={retry}>
               Retry Night
+            </button>
+          )}
+          {morning && (
+            <button type="button" className="menu__button" onClick={retryMorning}>
+              Retry from morning
             </button>
           )}
           <button type="button" className="menu__button" onClick={quit}>

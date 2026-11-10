@@ -8,6 +8,8 @@ import { useIntroStore } from './introStore'
 import { resetRun } from './resetRun'
 import { useOverlayStore } from './overlayStore'
 import { startRun } from './progressionActions'
+import { clearMorningSnapshot, saveMorningSnapshot } from './retryNight'
+import { useWorldStore } from './worldStore'
 import { MODES } from '../../data/modes'
 import type { ModeId } from '../types'
 
@@ -17,6 +19,10 @@ function start(): void {
   // Starting recipes (bone club, bandage, candle, refill). Without this the recipe book
   // shows only locked entries.
   useCraftingStore.getState().applyUnlockEvent({ type: 'gameStart' })
+  // Day 1 has no phase change into day, so its morning is captured here. A run that resumes
+  // at dusk or night has no morning to go back to, and an older run's snapshot must not leak in.
+  if (useWorldStore.getState().phase === 'day') saveMorningSnapshot()
+  else clearMorningSnapshot()
   game.setScreen('game')
 }
 

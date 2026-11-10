@@ -28,6 +28,8 @@ Tests:
 ## B2: Retry loadout
 `retryNight()` clamps after restore: `fuel = max(fuel, RETRY_MIN_FUEL)` (60) and health = max HP. `RETRY_MIN_FUEL` goes in `balance.ts` and the bible. "Retry from morning" uses the day-start save (`installNewDaySave`) that already exists.
 
+Implemented as the pure `retryLoadout(fuel, maxHealth)` in `src/game/systems/retryLoadout.ts`, applied by one `restoreRetry(key, world)` in `retryNight.ts` on the snapshot and fallback paths. The morning snapshot (`lastrites:morning`, sessionStorage) is taken when a run starts in day (day 1 has no phase change into day) and on every later `phaseChanged → day`, installed after the progression watchers like the new-day save. A run resumed at dusk or night clears it, so the button only shows when a real morning exists. Kept from the dusk snapshot: everything else, weapons included; the playtest's "no weapons" was the state at that dusk, not something Retry removed.
+
 ## B3: Day drain
 To be decided in task 4 after reading `lantern.ts` and the bible. The default plan is half rate by day (12 s per 1%), because zero drain removes the day-time oil decision. The choice is recorded here when it is made.
 
