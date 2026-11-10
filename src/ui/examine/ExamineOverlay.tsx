@@ -1,6 +1,7 @@
 // HTML overlay for examine mode. Esc or E closes; the close button is focused on open.
 import { useEffect, useRef } from 'react'
 import { ITEM_MAP } from '../../data/items'
+import { journalPageForItem } from '../../data/journal'
 import { useExamineStore } from '../../game/state/examineStore'
 import { useGameStore } from '../../game/state/gameStore'
 import { ExamineScene } from '../../scene/examine/ExamineScene'
@@ -34,6 +35,8 @@ export function ExamineOverlay() {
   if (!item || screen !== 'game') return null
   const def = ITEM_MAP[item]
   const clue = def.clue
+  // A journal page is read here: the 3D page alone showed a blank slab (spec 09, B7).
+  const page = journalPageForItem(item)
 
   return (
     <div className="examine" role="dialog" aria-modal="true" aria-label={`Examine ${def.name}`}>
@@ -42,6 +45,12 @@ export function ExamineOverlay() {
       </div>
       <div className="examine__panel">
         <h2 className="examine__title">{def.name}</h2>
+        {page && (
+          <section className="examine__page" aria-label={`Journal page ${page.id}: ${page.title}`}>
+            <h3 className="examine__page-title">{page.title}</h3>
+            <p className="examine__page-text">{page.text}</p>
+          </section>
+        )}
         <p className="examine__hint">Drag to turn. Scroll to zoom. Esc or E to put it away.</p>
         <p className="examine__clue" role="status" aria-live="polite">
           {clue && clueRevealed ? clue.text : ''}

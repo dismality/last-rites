@@ -57,7 +57,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 7.2_
 
-- [ ] 9. B7: Readable examined journal page
+- [x] 9. B7: Readable examined journal page
   - Finish
   - _Requirements: 7.3_
 

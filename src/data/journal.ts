@@ -72,3 +72,9 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
 export const JOURNAL_PAGE_MAP: Readonly<Record<PageNumber, JournalPage>> = Object.fromEntries(
   JOURNAL_PAGES.map((p) => [p.id, p]),
 ) as Record<PageNumber, JournalPage>
+
+/** The page an item id stands for ("journal-page-3" -> page 3), or null for any other item. */
+export function journalPageForItem(itemId: string): JournalPage | null {
+  const m = /^journal-page-([1-5])$/.exec(itemId)
+  return m ? JOURNAL_PAGE_MAP[Number(m[1]) as PageNumber] : null
+}
