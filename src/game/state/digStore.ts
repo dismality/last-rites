@@ -16,6 +16,8 @@ import {
   type DigState,
 } from '../systems/dig'
 import { hotbarItem } from '../systems/satchel'
+import { ensureMinimum } from '../systems/loot'
+import { DAY1_FIRST_DIG_MIN_BONE } from '../../data/balance'
 import { liveDigDuration } from '../systems/digDuration'
 import { currentModifiers } from './derivedStats'
 import { useInteractionStore } from './interactionStore'
@@ -94,7 +96,13 @@ export const useDigStore = create<DigStoreState>((set, get) => ({
     })
     set({ dig: r.state, progress: digProgress(r.state, durationS), active: r.state.graveId !== null })
 
-    for (const e of r.events) {
+    // Day 1's first grave always gives enough bone for a Bone Club (spec 09, F1).
+    const firstDigOfRun = world.nightNumber === 1 && Object.keys(dig.dugOnDay).length === 0
+    for (const raw of r.events) {
+      const e =
+        raw.type === 'digCompleted' && firstDigOfRun
+          ? { ...raw, loot: ensureMinimum(raw.loot, 'bone', DAY1_FIRST_DIG_MIN_BONE) }
+          : raw
       if (e.type === 'digCompleted') {
         // Loot appears on the grave only now; before this the mound shows nothing.
         const spawn = useSpawnStore.getState()

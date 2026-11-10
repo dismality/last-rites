@@ -1,10 +1,12 @@
 // Objective selector (design bible §11, Req 3). Pure: no store or clock access. The
 // first matching rule wins; rule 11 is the fallback, so the result is total.
 
-import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
+import { BENCH_Z, CHAPEL_ALTAR } from '../../data/cemeteryLayout'
 import {
   OBJECTIVE_MAX_LINE,
   OBJECTIVE_RULES,
+  PREPARE_WEAPON_BEFORE_DUSK_S,
+  PREPARE_WEAPON_RULE,
   type ObjectiveRuleDef,
   type ObjectiveRuleId,
 } from '../../data/objectiveRules'
@@ -36,6 +38,8 @@ export interface ObjectiveInput {
   playerPos: Vec3
   /** False for Endless: no story rules (5-10) and no rite rules (2-3). Absent means story. */
   story?: boolean
+  /** The player owns no weapon except the Rusty Shovel (rule 12). Absent means false. */
+  needsWeapon?: boolean
 }
 
 export interface Objective {
@@ -45,6 +49,9 @@ export interface Objective {
   position?: Vec3
   marker?: string
 }
+
+/** The workbench centre in the hut (x 0, against the north wall). */
+const WORKBENCH_POS: Vec3 = [0, 0, BENCH_Z]
 
 const RELIC_TARGET = 5
 const FINAL_NIGHT = 5
@@ -96,6 +103,8 @@ const matchRule = (i: ObjectiveInput): ObjectiveRuleId => {
   if (night && i.waves.running) return 1
   if (i.phase === 'dusk') return 4
   if (!story) return 11
+  if (day && i.needsWeapon === true && finite(i.secondsLeft) < PREPARE_WEAPON_BEFORE_DUSK_S)
+    return PREPARE_WEAPON_RULE
   if (day && !p.page1Read) return 5
   if (day && !p.cryptKey) return 6
   if (day && !p.whistle) return 7
@@ -111,6 +120,8 @@ const resolvePosition = (def: ObjectiveRuleDef, i: ObjectiveInput): Vec3 | undef
   switch (place.kind) {
     case 'altar':
       return CHAPEL_ALTAR
+    case 'workbench':
+      return WORKBENCH_POS
     case 'fixed-spawn':
       return FIXED_SPAWNS.find((f) => f.id === place.id)?.position
     case 'nearest-relic': {
@@ -153,6 +164,11 @@ const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
   }
   if (def.id === 2) return RITE_SECOND
   if (def.id === 3) return CRANE_SECOND
+  // The prepare rule stands above the story objective, which moves down to the second line.
+  if (def.id === PREPARE_WEAPON_RULE) {
+    const story = ruleDef(matchRule({ ...i, needsWeapon: false }))
+    return mainLine(story, i)
+  }
   const t = def.second ?? ''
   return t
     .replace('{k}', String(Math.max(0, Math.floor(finite(i.waves.zombiesLeft)))))

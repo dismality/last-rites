@@ -6,7 +6,6 @@ import type { DamageSource, HeavyMeleeId } from '../types'
 import { HEAVY_MAP } from '../../data/heavyMelee'
 import { KNOCKDOWN_DAMAGE_MULT } from '../../data/combatMoves'
 import {
-  DARKNESS_DAMAGE_MULT,
   FLASK_WAILER_DAMAGE_MULT,
   MELEE_ARC_DEG,
   MELEE_RANGE_M,
@@ -81,8 +80,9 @@ export function aoe(center: Vec2, radius: number, enemies: readonly CombatEnemy[
 
 /** Multiplier applied to raw damage for this target and context. */
 export function damageMultiplier(type: EnemyId, ctx: DamageContext, enemy?: { knockdown?: number }): number {
+  // No darkness cut (spec 09, F4): running out of oil must not also make the player weaker.
+  // ctx.lanternFuel stays in the context for callers and for any future light rule.
   let mult = 1
-  if (ctx.lanternFuel <= 0) mult *= DARKNESS_DAMAGE_MULT
   if (type === 'wailer' && ctx.source === 'holy-water-flask') mult *= FLASK_WAILER_DAMAGE_MULT
   if (type === 'wailer' && ctx.weapon) mult *= 1 + HEAVY_MAP[ctx.weapon].wailerBonus
   if ((enemy?.knockdown ?? 0) > 0) mult *= KNOCKDOWN_DAMAGE_MULT

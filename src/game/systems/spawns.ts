@@ -4,7 +4,8 @@ import { FIXED_SPAWNS, SPAWN_POINTS, type FixedSpawn, type SpawnPoint } from '..
 import { LOOT_TABLE_MAP } from '../../data/lootTables'
 import type { ItemStack, Phase } from '../types'
 import type { Rng } from '../rng'
-import { rollLoot } from './loot'
+import { DAY1_HUT_MIN_CLOTH } from '../../data/balance'
+import { ensureMinimum, rollLoot } from './loot'
 
 export interface SpawnWorld {
   /** Material stacks currently lying at each spawn point id. */
@@ -34,6 +35,22 @@ export function respawnForDay(
       p.lootTable === 'grave-dig' ? (world.materials[p.id] ?? []) : rollLoot(LOOT_TABLE_MAP[p.lootTable], rng)
   }
   return { ...world, materials }
+}
+
+/** The hut shelf, where day 1's guaranteed cloth lies. */
+export const HUT_SHELF_ID = 'hut-shelf'
+
+/**
+ * Day 1's world: the normal roll, plus at least DAY1_HUT_MIN_CLOTH cloth on the hut shelf, so
+ * a Bone Club can be made before night 1 (spec 09, F1). Later days roll normally.
+ */
+export function dayOneSpawns(rng: Rng): SpawnWorld {
+  const world = respawnForDay(createSpawnWorld(), rng)
+  const shelf = world.materials[HUT_SHELF_ID] ?? []
+  return {
+    ...world,
+    materials: { ...world.materials, [HUT_SHELF_ID]: ensureMinimum(shelf, 'cloth', DAY1_HUT_MIN_CLOTH) },
+  }
 }
 
 /** Night-only spawns (the Child's Locket) are hidden at any other phase. */

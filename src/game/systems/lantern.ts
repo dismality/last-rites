@@ -1,7 +1,7 @@
 // Pure lantern fuel and light-radius logic.
 
 import {
-  LANTERN_DRAIN_S_PER_PERCENT_DAY,
+  LANTERN_DRAIN_PERCENT_PER_S_DAY,
   LANTERN_DRAIN_S_PER_PERCENT_NIGHT,
   LANTERN_EMBER_RADIUS_M,
   LANTERN_FLICKER_BELOW,
@@ -11,11 +11,14 @@ import {
 } from '../../data/balance'
 import type { LanternState, Phase } from '../types'
 
-/** Dusk counts as night: the light is already failing and the player should be hurrying back. */
-function drainSecondsPerPercent(phase: Phase): number {
+/**
+ * Percent of fuel burned per second. Dusk counts as night: the light is already failing and the
+ * player should be hurrying back. Day and dawn burn nothing.
+ */
+function drainPercentPerSecond(phase: Phase): number {
   return phase === 'night' || phase === 'dusk'
-    ? LANTERN_DRAIN_S_PER_PERCENT_NIGHT
-    : LANTERN_DRAIN_S_PER_PERCENT_DAY
+    ? 1 / LANTERN_DRAIN_S_PER_PERCENT_NIGHT
+    : LANTERN_DRAIN_PERCENT_PER_S_DAY
 }
 
 /** drainMult comes from lanternDrainMultiplier (mode, Long Wick, storm); 1 keeps the base rate. */
@@ -26,7 +29,7 @@ export function tickLantern(
   drainMult = 1,
 ): LanternState {
   const drain = s.on
-    ? (Math.max(0, dt) * Math.max(0, drainMult)) / drainSecondsPerPercent(phase)
+    ? Math.max(0, dt) * Math.max(0, drainMult) * drainPercentPerSecond(phase)
     : 0
   const fuel = Math.min(LANTERN_MAX_FUEL, Math.max(0, s.fuel - drain))
   return { on: s.on, fuel, flicker: fuel < LANTERN_FLICKER_BELOW }

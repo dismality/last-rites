@@ -1,7 +1,16 @@
 // Objective tracker rules (design bible §11). Order is priority: the selector returns
 // the first rule whose condition matches, and rule 11 is the fallback.
 
-export type ObjectiveRuleId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11
+export type ObjectiveRuleId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+
+/**
+ * Rule 12 (spec 09, F1) shows when it is day, the player owns no weapon but the shovel and dusk
+ * is closer than this. It sits above the story rules, whose line moves to the second line.
+ */
+export const PREPARE_WEAPON_BEFORE_DUSK_S = 120
+
+/** Id of the "Craft a weapon" rule, named so the selector holds no bare rule number. */
+export const PREPARE_WEAPON_RULE = 12 satisfies ObjectiveRuleId
 
 /** Where an objective points, resolved by the selector against world data. */
 export type PlaceRef =
@@ -11,6 +20,8 @@ export type PlaceRef =
   | { kind: 'altar' }
   /** Nearest uncollected relic site in an already explored map cell (never reveals unexplored sites). */
   | { kind: 'nearest-relic' }
+  /** The workbench in the keeper's hut. */
+  | { kind: 'workbench' }
 
 export interface ObjectiveRuleDef {
   readonly id: ObjectiveRuleId
@@ -88,6 +99,15 @@ export const OBJECTIVE_RULES: readonly ObjectiveRuleDef[] = [
     place: { kind: 'nearest-relic' },
   },
   { id: 11, main: 'Hold out until the fifth night', second: DAY_SECOND_LINE },
+  // Selector priority: after the dusk and wave rules, before rule 5. Its second line is the
+  // story objective it stands above.
+  {
+    id: PREPARE_WEAPON_RULE,
+    main: 'Craft a weapon at the workbench',
+    target: 1,
+    marker: 'Workbench',
+    place: { kind: 'workbench' },
+  },
 ]
 
 /** Both tracker lines are cut to this many characters. */

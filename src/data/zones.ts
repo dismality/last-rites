@@ -108,6 +108,9 @@ export const SPAWN_POINTS: readonly SpawnPoint[] = [
   { id: 'cat-wall-a', zone: 'catacombs', position: [24.5, 1, 45], lootTable: 'catacomb-walls' },
   { id: 'cat-wall-b', zone: 'catacombs', position: [25.5, 1, 50], lootTable: 'catacomb-walls' },
   { id: 'cat-wall-c', zone: 'catacombs', position: [24.5, 1, 55], lootTable: 'catacomb-walls' },
+  // Last, so adding it leaves every earlier point's seeded roll unchanged. On the way from the
+  // hut to the crypt key (spec 09, B3).
+  { id: 'grounds-path-oil', zone: 'grounds', position: [-6, 0, -8], lootTable: 'path-oil' },
 ]
 
 /** Key items, relics and journal pages spawn once only (Requirement 7.2). */

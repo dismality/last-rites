@@ -8,6 +8,7 @@ export type LootItemId = MaterialId | 'kola-tonic'
 
 export type LootTableId =
   | 'grave-dig'
+  | 'path-oil'
   | 'broken-coffin'
   | 'hut-supplies'
   | 'crypt-shelves'
@@ -91,6 +92,12 @@ export const LOOT_TABLES: readonly LootTable[] = [
     id: 'woodpile',
     rolls: 1,
     entries: [{ item: 'wood-plank', weight: 1, min: 2, max: 4 }],
+  },
+  // One bottle on the hut-to-crypt-key path each day (spec 09, B3; design bible §3).
+  {
+    id: 'path-oil',
+    rolls: 1,
+    entries: [{ item: 'lamp-oil', weight: 1, min: 1, max: 1 }],
   },
   {
     id: 'powder-tin',

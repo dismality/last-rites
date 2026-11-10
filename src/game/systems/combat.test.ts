@@ -69,8 +69,8 @@ describe('applyDamage', () => {
     expect(applyDamage(enemyAt('a', 0, 0), 15, lit).hp).toBe(45)
   })
 
-  it('halves damage while lantern fuel is 0', () => {
-    expect(applyDamage(enemyAt('a', 0, 0), 20, dark).hp).toBe(50)
+  it('deals full damage while lantern fuel is 0 (spec 09, F4)', () => {
+    expect(applyDamage(enemyAt('a', 0, 0), 20, dark).hp).toBe(40)
   })
 
   it('doubles flask damage against wailers only', () => {
@@ -114,7 +114,7 @@ describe('applyDamage', () => {
     )
   })
 
-  it('property: darkness never increases damage dealt', () => {
+  it('property: darkness does not change damage dealt (spec 09, F4)', () => {
     fc.assert(
       fc.property(
         fc.constantFrom<EnemyId>('shambler', 'lurker', 'wailer'),
@@ -123,7 +123,7 @@ describe('applyDamage', () => {
           const e = enemyAt('x', 0, 0, type)
           const litHp = applyDamage(e, dmg, { lanternFuel: 40 }).hp
           const darkHp = applyDamage(e, dmg, { lanternFuel: 0 }).hp
-          expect(darkHp).toBeGreaterThanOrEqual(litHp)
+          expect(darkHp).toBe(litHp)
         },
       ),
     )
