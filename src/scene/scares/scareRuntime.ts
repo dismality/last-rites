@@ -4,6 +4,8 @@
 export const scareRuntime = {
   /** Zones the player is currently inside (kept for debugging and future UI). */
   inside: new Set<string>(),
+  /** Every zone entered since the run started (debug and tests; never drained). */
+  entered: new Set<string>(),
   /** Zone entries since the stager last ticked; drained by the stager. */
   justEntered: [] as string[],
   /** Seconds since the last scare shake began; Infinity = idle. */
@@ -18,9 +20,11 @@ export const scareRuntime = {
 
 export function resetScareRuntime(): void {
   scareRuntime.inside.clear()
+  scareRuntime.entered.clear()
   scareRuntime.justEntered = []
   scareRuntime.shakeAge = Infinity
   scareRuntime.flickerLeft = 0
   scareRuntime.flickerStrobe = true
   scareRuntime.slowLeft = 0
 }
+

@@ -28,6 +28,7 @@ import { applyDamage } from '../game/systems/combat'
 import { coinDrop } from '../game/systems/coins'
 import { killReports } from '../game/systems/killReports'
 import { bodyRuntime } from '../scene/player/bodyRuntime'
+import { scareRuntime } from '../scene/scares/scareRuntime'
 import { useIntroStore } from '../game/state/introStore'
 import { useGameStore } from '../game/state/gameStore'
 import { useWorldStore } from '../game/state/worldStore'
@@ -276,6 +277,14 @@ const api = {
       yaw: camera.rotation.y,
     }
   },
+  /**
+   * Zones the sensors report the player inside now, and every zone entered since the run started.
+   * An entry means the intersection event fired, the same handler that queues the zone for the
+   * scare director (justEntered), so a test can check a scare could fire without the random roll.
+   */
+  scareZones(): { inside: string[]; entered: string[] } {
+    return { inside: [...scareRuntime.inside], entered: [...scareRuntime.entered] }
+  },
   /** Mesh count under the named scene group (-1 when no such group is mounted). */
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
@@ -455,3 +464,4 @@ export function installDebugHook(): void {
   frames ??= installFrameRecorder(FRAME_WINDOW_MS)
   window.__lastRites = api
 }
+

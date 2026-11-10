@@ -1,0 +1,239 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1. B1: Scare sensors no longer block the player": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297714739
+      },
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297725796
+      }
+    ],
+    "2. A1: Developer mode": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297714882
+      },
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794298829141
+      }
+    ],
+    "3. A2: Automated playthrough test": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715001
+      }
+    ],
+    "4. B2: Fair Retry Night and Retry from morning": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715102
+      }
+    ],
+    "5. B3: Day-1 oil": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715198
+      }
+    ],
+    "6. B4: Hut oil pickup and tutorial step 2": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715316
+      }
+    ],
+    "7. B5: Spawn yaw and intro card": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715423
+      }
+    ],
+    "8. B6: Compass inside the hut": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715590
+      }
+    ],
+    "9. B7: Readable examined journal page": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715702
+      }
+    ],
+    "10. B8: Lantern glare near walls": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715834
+      }
+    ],
+    "11. B9: Recipe book names and tooltip": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297715948
+      }
+    ],
+    "12. Gate: ask the user about B10 before going on": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716051
+      }
+    ],
+    "13. B10: Short Vigil demo mode": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716173
+      }
+    ],
+    "14. C1: README links and screenshot": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716279
+      }
+    ],
+    "15. C2: Dev log dates from git history": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716401
+      }
+    ],
+    "16. C3: Submission kit": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716499
+      }
+    ],
+    "17. B11: Movement hint clears": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716599
+      }
+    ],
+    "18. B12: Responsive HUD and 800x600 screenshot test": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716702
+      }
+    ],
+    "19. B13: Difficulty screen Begin visible": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716821
+      }
+    ],
+    "20. B14: Journal font size and plain-font setting": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297716937
+      }
+    ],
+    "21. B15: Shorter intro": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717057
+      }
+    ],
+    "22. B16: Quit confirmation and Continue on title": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717164
+      }
+    ],
+    "23. B17: Remove dead useWorkbench.ts": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717265
+      }
+    ],
+    "24.1 D1 main story path": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717365
+      }
+    ],
+    "24.2 D2 crafting and the workbench": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717470
+      }
+    ],
+    "24.3 D3 digging and materials": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717581
+      }
+    ],
+    "24.4 D4 chapel repairs": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717698
+      }
+    ],
+    "24.5 D5 night combat and balance": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297717819
+      }
+    ],
+    "24.6 D6 scares and comfort settings": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297718012
+      }
+    ],
+    "24.7 D7 endings and save/load": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297718115
+      }
+    ],
+    "24.8 D8 performance (SwiftShader numbers only; real GPU fps not verifiable here)": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297718222
+      }
+    ],
+    "24.9 D9 screens and settings": [
+      {
+        "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
+        "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
+        "timestamp": 1794297718347
+      }
+    ]
+  }
+}

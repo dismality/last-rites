@@ -65,7 +65,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
   const controller = useRef<KinematicCharacterController | null>(null)
   const bob = useRef<BobState>({ phase: 0, amplitude: 0 })
   const fallSpeed = useRef(0)
-  const { world } = useRapier()
+  const { world, rapier } = useRapier()
   const canvas = useThree((s) => s.gl.domElement)
   useInteractionRaycast()
 
@@ -170,11 +170,17 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     const collider = rb.collider(0)
     const grounded = kcc.computedGrounded()
     fallSpeed.current = grounded ? 0 : fallSpeed.current + GRAVITY * dt
-    kcc.computeColliderMovement(collider, {
-      x: vx * dt + (push?.x ?? 0),
-      y: -fallSpeed.current * dt,
-      z: vz * dt + (push?.z ?? 0),
-    })
+    // Scare zones are sensors: without this flag the controller treats them as walls, and every
+    // item inside a zone (crypt key, whistle, relics, pages) becomes unreachable.
+    kcc.computeColliderMovement(
+      collider,
+      {
+        x: vx * dt + (push?.x ?? 0),
+        y: -fallSpeed.current * dt,
+        z: vz * dt + (push?.z ?? 0),
+      },
+      rapier.QueryFilterFlags.EXCLUDE_SENSORS,
+    )
     const m = kcc.computedMovement()
     const t = rb.translation()
     const next = { x: t.x + m.x, y: t.y + m.y, z: t.z + m.z }
