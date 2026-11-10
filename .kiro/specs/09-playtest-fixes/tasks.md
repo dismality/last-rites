@@ -15,7 +15,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 1.1-1.5_
 
-- [ ] 1b. Lantern lights stay visible and use intensity 0 instead of toggling visible
+- [x] 1b. Lantern lights stay visible and use intensity 0 instead of toggling visible
   - `src/scene/player/Lantern.tsx`: the spot, fill and ember lights are never hidden; off and empty states set `intensity = 0`, so the scene's light count never changes and lit materials are not recompiled when the lantern toggles or runs dry
   - From the performance-review hook, item 1 (approved by the user)
   - Finish
