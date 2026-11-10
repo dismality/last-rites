@@ -162,10 +162,8 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
         {craftable && (
           <span className="recipe-entry__rune" aria-hidden="true" title="Craftable">✦</span>
         )}
-        <NamedItemIcon id={recipe.output.item} />
-        {recipe.output.qty > 1 && (
-          <span className="recipe-entry__output-qty">×{recipe.output.qty}</span>
-        )}
+        <NamedItemIcon id={recipe.output.item} announce={false} />
+        <h3 className="recipe-entry__name">{card.title}</h3>
         {recipe.consumesTool && (
           <span className="recipe-entry__upgrade-tag" title="Upgrades an existing tool">
             ⟳ upgrade
