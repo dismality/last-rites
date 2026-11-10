@@ -1,14 +1,21 @@
 // Dusk snapshot save/restore and player damage entry point.
 // Wires the pure rules in systems/ to the zustand stores. No React / three.js.
 
-import { PLAYER_MAX_HEALTH } from '../../data/balance'
+import { DUSK_SNAPSHOT_KEY, MORNING_SNAPSHOT_KEY } from '../../data/balance'
 import { MODES } from '../../data/modes'
 import type { ProgressionSave } from '../systems/progressionSave'
 import { syncDerivedStats } from './derivedStats'
 import { captureProgressionSave, restoreProgressionSave } from './progressionPersistence'
 import { useProgressionStore } from './progressionStore'
 import { emit, subscribeToType } from '../events'
-import { loadSnapshot, pickData, saveSnapshot, type SnapshotData } from '../systems/duskSnapshot'
+import {
+  clearSnapshot,
+  loadSnapshot,
+  pickData,
+  saveSnapshot,
+  type SnapshotData,
+} from '../systems/duskSnapshot'
+import { retryLoadout } from '../systems/retryLoadout'
 import { isInvulnerable } from '../systems/dodge'
 import { damagePlayer } from '../systems/playerHealth'
 import { useChapelStore } from './chapelStore'
@@ -100,13 +107,32 @@ function storage(): Storage | undefined {
   }
 }
 
-/** Call at the start of dusk. Returns false if storage failed (Retry then keeps current inventory). */
-export function saveDuskSnapshot(): boolean {
+function captureSnapshot(key: string): boolean {
   const data: SnapshotData = {}
   for (const [name, { store, omit }] of Object.entries(SNAPSHOT_STORES)) {
     data[name] = pickData(store.getState(), omit)
   }
-  return saveSnapshot(storage(), data)
+  return saveSnapshot(storage(), data, key)
+}
+
+/** Call at the start of dusk. Returns false if storage failed (Retry then keeps current inventory). */
+export function saveDuskSnapshot(): boolean {
+  return captureSnapshot(DUSK_SNAPSHOT_KEY)
+}
+
+/** Call at the start of a day. Returns false if storage failed. */
+export function saveMorningSnapshot(): boolean {
+  return captureSnapshot(MORNING_SNAPSHOT_KEY)
+}
+
+/** Drops the morning snapshot, so one from an earlier run or day can never be restored. */
+export function clearMorningSnapshot(): void {
+  clearSnapshot(storage(), MORNING_SNAPSHOT_KEY)
+}
+
+/** Drives the "Retry from morning" button. */
+export function hasMorningSnapshot(): boolean {
+  return loadSnapshot(storage(), MORNING_SNAPSHOT_KEY) !== null
 }
 
 /** Save a snapshot whenever dusk begins. Returns the unsubscribe function. */
@@ -116,27 +142,54 @@ export function installDuskSnapshot(): () => void {
   })
 }
 
+/**
+ * Save a snapshot whenever a day begins. Install after the progression watchers, so the
+ * snapshot holds the day's dealt stock and storm (the same rule as the new-day save).
+ */
+export function installMorningSnapshot(): () => void {
+  return subscribeToType('phaseChanged', (e) => {
+    if (e.phase === 'day') saveMorningSnapshot()
+  })
+}
+
 /** Back to the start of that dusk. Falls back to current inventory if no snapshot exists. */
 export function retryNight(): void {
+  // Always the start of dusk, whatever phaseTime the snapshot caught: the full 30 s (Req 20.5).
+  restoreRetry(DUSK_SNAPSHOT_KEY, { phase: 'dusk', phaseTime: 0, wavesCleared: false })
+}
+
+/** Back to the start of that day. Does nothing without a morning snapshot. */
+export function retryFromMorning(): void {
+  if (!hasMorningSnapshot()) return
+  restoreRetry(MORNING_SNAPSHOT_KEY, { phase: 'day', phaseTime: 0, wavesCleared: false })
+}
+
+function restoreRetry(
+  key: string,
+  world: { phase: 'day' | 'dusk'; phaseTime: number; wavesCleared: boolean },
+): void {
   // Endless has no second chance: death ends the run (Req 11.14).
   if (!MODES[useProgressionStore.getState().mode].retryNight) return
-  const snap = loadSnapshot(storage())
+  const snap = loadSnapshot(storage(), key)
   if (snap) {
     for (const [name, { store }] of Object.entries(SNAPSHOT_STORES)) {
       const part = snap[name]
       if (part) store.setState(part as never)
     }
-    // Max HP derives from the restored ranks; the player store snapshot may hold another value.
-    syncDerivedStats()
     useCraftingStore.getState().clearHighlight()
     useCraftingStore.setState({ craftingProgress: null })
   } else {
-    usePlayerStore.getState().setHealth(PLAYER_MAX_HEALTH)
-    useUiWorldStore.setState({ playerHealth: PLAYER_MAX_HEALTH })
     useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, riteProgress: 0 } }))
   }
-  // Always the start of dusk, whatever phaseTime the snapshot caught: the full 30 s (Req 20.5).
-  useWorldStore.getState().applyWorldState({ phase: 'dusk', phaseTime: 0, wavesCleared: false })
+  // Max HP derives from the restored ranks; the player store snapshot may hold another value.
+  syncDerivedStats()
+  // A fair start on every path (spec 09, B2): full health and at least RETRY_MIN_FUEL oil, so a
+  // low-oil dusk cannot turn into a death loop.
+  const loadout = retryLoadout(useLanternStore.getState().fuel, usePlayerStore.getState().maxHealth)
+  usePlayerStore.getState().setHealth(loadout.health)
+  useUiWorldStore.setState({ playerHealth: loadout.health })
+  useLanternStore.getState().setFuel(loadout.fuel)
+  useWorldStore.getState().applyWorldState(world)
   // Every path, snapshot or fallback, ends with an empty night (Req 20.2, 20.6).
   clearNightState()
   useProjectileStore.getState().reset()

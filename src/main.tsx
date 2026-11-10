@@ -8,7 +8,7 @@ import { installCombatWatchers } from './game/state/combatWatchers'
 import { installGuidanceWatchers } from './game/state/guidanceTick'
 import { installProgressionWatchers } from './game/state/progressionEvents'
 import { installSpawnRespawn } from './game/state/spawnRespawn'
-import { installDuskSnapshot } from './game/state/retryNight'
+import { installDuskSnapshot, installMorningSnapshot } from './game/state/retryNight'
 
 import { registerCombatSounds } from './audio/audioBoot'
 
@@ -19,6 +19,8 @@ installGuidanceWatchers()
 // Must run before the new-day save and run stats so their dawn/day handlers see progression state already updated.
 installProgressionWatchers()
 installNewDaySave()
+// After the progression watchers, like the new-day save, so the morning holds the dealt stock.
+installMorningSnapshot()
 installRunStats()
 installSpawnRespawn()
 

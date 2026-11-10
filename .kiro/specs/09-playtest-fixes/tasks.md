@@ -31,7 +31,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 3.1-3.3_
 
-- [ ] 4. B2: Fair Retry Night and Retry from morning
+- [x] 4. B2: Fair Retry Night and Retry from morning
   - Finish
   - _Requirements: 4.1-4.3_
 
