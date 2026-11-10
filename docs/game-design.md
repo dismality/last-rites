@@ -225,6 +225,7 @@ Crafting happens only at the **workbench** (keeper's hut). Crafting takes 1.5 s 
 | Stamina | 100; sprint drains 20/s, regenerates 15/s after 1 s |
 | Lantern fuel | 100%; no drain by day or at dawn **(09)**, 1% per 3 s at dusk and by night |
 | Lantern radius | 8 m at 100% fuel, scaling down to 2 m at 0% |
+| Wall glare **(09)** | With a surface under 2 m ahead the beam dims by (distance ÷ 2 m)², never below 10%, so a wall at 0.5 m stays readable |
 | Interact range | 2.5 m |
 
 Taking damage: brief red vignette (disabled when flashing lights is off) and a heartbeat below 30 HP. From spec 06 the **health bar** shows health (see §11) and the lantern flame shows **fuel only**; the flame no longer dips on a hit.

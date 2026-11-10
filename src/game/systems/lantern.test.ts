@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import * as fc from 'fast-check'
-import { lanternIntensity, lanternRadius, tickLantern } from './lantern'
+import { LANTERN_GLARE_FULL_M, LANTERN_GLARE_MIN_SCALE } from '../../data/balance'
+import { lanternIntensity, lanternRadius, tickLantern, wallGlareScale } from './lantern'
 import type { LanternState, Phase } from '../types'
 
 const lit = (fuel: number): LanternState => ({ on: true, fuel, flicker: false })
@@ -83,6 +84,35 @@ describe('lanternIntensity', () => {
         const i = lanternIntensity(f)
         return i > 0 && i <= 1
       })
+    )
+  })
+})
+
+describe('wallGlareScale (spec 09, B8)', () => {
+  it('is full brightness with nothing near, and dims a wall at 0.5 m to a sixteenth', () => {
+    expect(wallGlareScale(Infinity)).toBe(1)
+    expect(wallGlareScale(Number.NaN)).toBe(1)
+    expect(wallGlareScale(LANTERN_GLARE_FULL_M)).toBe(1)
+    expect(wallGlareScale(1)).toBeCloseTo(0.25)
+    // 0.5 m is 4x closer than 2 m, so 16x brighter under inverse square. 1/16 is under the
+    // floor, so the wall ends up 1.6x as bright as one at 2 m instead of 16x.
+    expect(wallGlareScale(0.5)).toBe(LANTERN_GLARE_MIN_SCALE)
+    expect(wallGlareScale(0.5) * 16).toBeCloseTo(1.6)
+    expect(wallGlareScale(0)).toBe(LANTERN_GLARE_MIN_SCALE)
+  })
+
+  it('property: stays in [min, 1], never darker when the wall is farther, and keeps lit area >= min', () => {
+    fc.assert(
+      fc.property(
+        fc.double({ min: -1, max: 10, noNaN: true }),
+        fc.double({ min: 0, max: 5, noNaN: true }),
+        (d, step) => {
+          const a = wallGlareScale(d)
+          expect(a).toBeGreaterThanOrEqual(LANTERN_GLARE_MIN_SCALE)
+          expect(a).toBeLessThanOrEqual(1)
+          expect(wallGlareScale(d + step)).toBeGreaterThanOrEqual(a)
+        },
+      ),
     )
   })
 })

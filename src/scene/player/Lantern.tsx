@@ -4,10 +4,12 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import type { Group, Object3D, PointLight, SpotLight } from 'three'
-import { LANTERN_RADIUS_MAX_M } from '../../data/balance'
+import { Vector3 } from 'three'
+import { useRapier } from '@react-three/rapier'
+import { LANTERN_GLARE_FULL_M, LANTERN_RADIUS_MAX_M } from '../../data/balance'
 import { useGameStore, useLanternStore, useSettingsStore } from '../../game/state'
 import { useIntroStore } from '../../game/state/introStore'
-import { lanternIntensity, lanternRadius } from '../../game/systems/lantern'
+import { lanternIntensity, lanternRadius, wallGlareScale } from '../../game/systems/lantern'
 import { scareRuntime } from '../scares/scareRuntime'
 
 const AMBER = '#e8913a'
@@ -18,6 +20,10 @@ const EMBER_INTENSITY = 1.2
 /** Flicker swings intensity between 50% and 100%. */
 const FLICKER_DEPTH = 0.5
 const EYE_FORWARD_OFFSET = 0.3
+/** How fast the wall-glare dim follows the probe (per second); ~0.1 s to settle. */
+const GLARE_EASE_PER_S = 10
+/** Module scratch for the look direction, so the frame loop allocates nothing. */
+const lookDir = new Vector3()
 
 export function Lantern() {
   const rig = useRef<Group>(null)
@@ -25,6 +31,12 @@ export function Lantern() {
   const target = useRef<Object3D>(null)
   const fill = useRef<PointLight>(null)
   const ember = useRef<PointLight>(null)
+  const { world, rapier } = useRapier()
+  // One ray, reused every frame: no allocation in useFrame.
+  const probe = useRef(new rapier.Ray({ x: 0, y: 0, z: 0 }, { x: 0, y: 0, z: -1 }))
+  // Scare-zone sensors are not walls, and the kinematic player body must not dim its own lantern.
+  const probeFlags = rapier.QueryFilterFlags.EXCLUDE_SENSORS | rapier.QueryFilterFlags.EXCLUDE_KINEMATIC
+  const glare = useRef(1)
 
   // Toggle on keydown only (ignore auto-repeat), and never while paused.
   useEffect(() => {
@@ -58,7 +70,18 @@ export function Lantern() {
       scareRuntime.flickerLeft = Math.max(0, scareRuntime.flickerLeft - delta)
       wave *= scareRuntime.flickerStrobe ? (Math.sin(Date.now() * 0.05) > 0 ? 1 : 0.25) : 0.5
     }
-    const k = level * wave
+    // Wall glare (spec 09, B8): one Rapier ray ahead finds the nearest surface. The dim eases in
+    // over a few frames so walking past a doorframe does not pop the light.
+    let wallM = Infinity
+    if (on && !empty) {
+      camera.getWorldDirection(lookDir)
+      probe.current.origin = camera.position
+      probe.current.dir = lookDir
+      const hit = world.castRay(probe.current, LANTERN_GLARE_FULL_M, true, probeFlags)
+      if (hit) wallM = hit.timeOfImpact
+    }
+    glare.current += (wallGlareScale(wallM) - glare.current) * Math.min(1, delta * GLARE_EASE_PER_S)
+    const k = level * wave * glare.current
 
     // The three lights are never hidden: three.js builds its light state from visible lights, so
     // toggling `visible` changes the light count and recompiles every lit material (a hitch when
