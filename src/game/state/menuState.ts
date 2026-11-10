@@ -1,6 +1,7 @@
 // One answer to "is a menu or overlay holding the cursor?". Input, the controller and the
 // interaction raycast all ask it, so a new overlay only needs adding here.
 // Pure zustand reads: no React / three.js imports.
+import { getDevCheats } from './devCheats'
 import { useGameStore } from './gameStore'
 import { useIntroStore } from './introStore'
 import { useOverlayStore } from './overlayStore'
@@ -50,10 +51,19 @@ export function useCinematic(): boolean {
   return cinematicOf(screen, playing)
 }
 
-/** An 08 overlay (merchant, achievements, mode select, dawn pick) has freed the cursor on purpose. */
+/**
+ * An overlay has freed the cursor on purpose: an 08 overlay (merchant, achievements, mode select,
+ * dawn pick) or the Dev_Panel (its flag is always false outside dev mode).
+ */
 export function isOverlayOpen(): boolean {
   const o = useOverlayStore.getState()
-  return o.merchantOpen || o.achievementsOpen || o.modeSelectOpen || isDawnPickPending()
+  return (
+    o.merchantOpen ||
+    o.achievementsOpen ||
+    o.modeSelectOpen ||
+    isDawnPickPending() ||
+    getDevCheats().panelOpen
+  )
 }
 
 export function isMenuOpen(): boolean {

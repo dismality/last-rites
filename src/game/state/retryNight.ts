@@ -14,6 +14,7 @@ import { damagePlayer } from '../systems/playerHealth'
 import { useChapelStore } from './chapelStore'
 import { COMBAT_PERSISTED } from './combatPersistence'
 import { useCombatStore } from './combatStore'
+import { getDevCheats } from './devCheats'
 import { useDoorStore } from './doorStore'
 import { useMysteryStore } from './mysteryStore'
 import { useProjectileStore } from './projectileStore'
@@ -167,6 +168,8 @@ export type HurtSource = 'zombie' | 'brute' | 'burst' | 'toll' | 'swing' | 'scar
 export function hurtPlayer(dmg: number, blocking: boolean, source?: HurtSource): boolean {
   if (useGameStore.getState().taken) return false
   if (isInvulnerable(useCombatStore.getState().live.dodge)) return false
+  // Dev panel god mode; the flag is false unless src/dev/ sets it.
+  if (getDevCheats().god) return false
   const player = usePlayerStore.getState()
   // A raised melee guard turns aside blows, not gas or the Toll's shockwave (Req 5.3).
   const guards =

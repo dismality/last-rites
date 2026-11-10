@@ -9,6 +9,7 @@ import type { KinematicCharacterController } from '@dimforge/rapier3d-compat'
 import { useGameStore, useMapStore, usePlayerStore, useSettingsStore } from '../../game/state'
 import { useCombatStore } from '../../game/state/combatStore'
 import { useEffectStore } from '../../game/state/effectStore'
+import { getDevCheats } from '../../game/state/devCheats'
 import { takePlayerPush } from '../../game/state/playerPush'
 import { takeTeleport } from '../../game/state/playerTeleport'
 import {
@@ -172,16 +173,17 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     fallSpeed.current = grounded ? 0 : fallSpeed.current + GRAVITY * dt
     // Scare zones are sensors: without this flag the controller treats them as walls, and every
     // item inside a zone (crypt key, whistle, relics, pages) becomes unreachable.
-    kcc.computeColliderMovement(
-      collider,
-      {
-        x: vx * dt + (push?.x ?? 0),
-        y: -fallSpeed.current * dt,
-        z: vz * dt + (push?.z ?? 0),
-      },
-      rapier.QueryFilterFlags.EXCLUDE_SENSORS,
-    )
-    const m = kcc.computedMovement()
+    const desired = {
+      x: vx * dt + (push?.x ?? 0),
+      y: -fallSpeed.current * dt,
+      z: vz * dt + (push?.z ?? 0),
+    }
+    // Dev noclip (false unless src/dev/ sets it): glide through walls, no gravity.
+    const noclip = getDevCheats().noclip
+    if (!noclip) {
+      kcc.computeColliderMovement(collider, desired, rapier.QueryFilterFlags.EXCLUDE_SENSORS)
+    }
+    const m = noclip ? { x: desired.x, y: 0, z: desired.z } : kcc.computedMovement()
     const t = rb.translation()
     const next = { x: t.x + m.x, y: t.y + m.y, z: t.z + m.z }
     rb.setNextKinematicTranslation(next)

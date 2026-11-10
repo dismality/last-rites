@@ -30,6 +30,7 @@ import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
 import { createEnemy } from '../../game/systems/enemyAI'
 import {
   createScareDirectorState,
+  intensityProfile,
   tickScares,
   type ScareCue,
   type ScareDirectorState,
@@ -72,6 +73,8 @@ interface Pending {
   side: -1 | 1
   doorIndex?: number
 }
+
+const NO_FORCED: readonly ScareEventId[] = []
 
 export function ScareStager() {
   const director = useRef<ScareDirectorState | null>(null)
@@ -129,6 +132,18 @@ export function ScareStager() {
     digDone.current = false
     director.current = result.state
     queue.current.push(...result.cues)
+    // Dev panel "trigger scare": same telegraph then beat as a rolled scare, minus the roll.
+    // Guarded so the normal frame (nothing forced) allocates no array.
+    const forced = scareRuntime.forced.length > 0 ? scareRuntime.forced.splice(0) : NO_FORCED
+    for (const eventId of forced) {
+      const profile = intensityProfile(settings.scareIntensity, settings.cameraShake)
+      const at = result.state.time
+      const lead = SCARE_EVENT_MAP[eventId].telegraph.lead
+      queue.current.push(
+        { eventId, phase: 'telegraph', at, intensityProfile: profile },
+        { eventId, phase: 'beat', at: at + lead, intensityProfile: profile },
+      )
+    }
 
     // Telegraphs play at once; a beat waits while a menu is open so it never fires over one.
     const now = result.state.time

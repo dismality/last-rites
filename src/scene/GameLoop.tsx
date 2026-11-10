@@ -9,6 +9,7 @@ import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '..
 import { tickCombat } from '../game/state/combatTick'
 import { tickGuidance } from '../game/state/guidanceTick'
 import { currentModifiers } from '../game/state/derivedStats'
+import { devTimeScaleTicks } from '../game/state/devCheats'
 import { deriveTickInput, progressionTick } from '../game/state/progressionTick'
 import { useProgressionStore } from '../game/state/progressionStore'
 import { lanternDrainMultiplier } from '../game/systems/modes'
@@ -63,7 +64,10 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
     accumulator.current = step.accumulator
 
     const pending: GameEvent[] = []
-    for (let i = 0; i < step.ticks; i++) {
+    // Dev time scale repeats whole ticks (1 outside the dev panel), so the sim runs faster
+    // without a bigger step.
+    const ticks = step.ticks * devTimeScaleTicks()
+    for (let i = 0; i < ticks; i++) {
       const player = usePlayerStore.getState()
       const lantern = useLanternStore.getState()
       const world = useWorldStore.getState()
