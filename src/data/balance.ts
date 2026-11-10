@@ -26,6 +26,13 @@ export const LANTERN_RADIUS_MIN_M = 2
 export const LANTERN_RADIUS_MAX_M = 8
 /** Ember glow at empty so the player always keeps a silhouette (horror-design: never fully black). */
 export const LANTERN_EMBER_RADIUS_M = 1.5
+/**
+ * Wall glare (spec 09, B8): with a surface closer than this ahead, the beam is dimmed by
+ * (distance / this)², which cancels the inverse-square brightening, so a wall at 0.5 m stays readable.
+ */
+export const LANTERN_GLARE_FULL_M = 2
+/** The beam never dims below this share of its brightness, so close walls are still lit. */
+export const LANTERN_GLARE_MIN_SCALE = 0.1
 
 // --- Stamina (design bible §6) ---
 export const STAMINA_MAX = 100

@@ -5,6 +5,8 @@ import {
   LANTERN_DRAIN_S_PER_PERCENT_NIGHT,
   LANTERN_EMBER_RADIUS_M,
   LANTERN_FLICKER_BELOW,
+  LANTERN_GLARE_FULL_M,
+  LANTERN_GLARE_MIN_SCALE,
   LANTERN_MAX_FUEL,
   LANTERN_RADIUS_MAX_M,
   LANTERN_RADIUS_MIN_M,
@@ -48,4 +50,15 @@ export function lanternRadius(fuel: number): number {
     LANTERN_RADIUS_MIN_M +
     ((LANTERN_RADIUS_MAX_M - LANTERN_RADIUS_MIN_M) * f) / LANTERN_MAX_FUEL
   )
+}
+
+/**
+ * Brightness share for the beam with the nearest surface ahead `distM` away (spec 09, B8).
+ * 1 at LANTERN_GLARE_FULL_M or beyond (or nothing hit), falling with the square of the
+ * distance, never below LANTERN_GLARE_MIN_SCALE. NaN counts as nothing hit.
+ */
+export function wallGlareScale(distM: number): number {
+  if (!(distM < LANTERN_GLARE_FULL_M)) return 1
+  const r = Math.max(0, distM) / LANTERN_GLARE_FULL_M
+  return Math.max(LANTERN_GLARE_MIN_SCALE, r * r)
 }

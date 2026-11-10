@@ -61,7 +61,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 7.3_
 
-- [ ] 10. B8: Lantern glare near walls
+- [x] 10. B8: Lantern glare near walls
   - Finish
   - _Requirements: 7.4_
 
