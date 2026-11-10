@@ -1,7 +1,15 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { forwardFromYaw } from './melee'
-import { bearingDeg, buildCompassMarkers, compassTicks, headingDeg, relativeAngle } from './compass'
+import { COMPASS_DOOR_LABEL } from '../../data/compass'
+import {
+  bearingDeg,
+  buildCompassMarkers,
+  compassTicks,
+  headingDeg,
+  objectiveAim,
+  relativeAngle,
+} from './compass'
 
 const RUNS = { numRuns: 100 }
 const yawArb = fc.double({ min: -20, max: 20, noNaN: true })
@@ -30,13 +38,42 @@ describe('compass conventions', () => {
 
   it('shows whole metres on the objective marker', () => {
     const m = buildCompassMarkers({
-      player: { x: 0, z: 0 },
+      player: { x: 0, z: 10 },
       heading: 0,
-      objective: [0, 0, -33.6],
+      objective: [0, 0, 43.6],
       phase: 'day',
       bellBuilt: false,
     })
     expect(m.find((k) => k.id === 'objective')?.label).toBe('34 m')
+  })
+
+  it('inside the hut, points an outside objective at the door, not through the wall (B6)', () => {
+    // Page 1 read, the crypt key is next: the playtest's case. The key is behind the back wall.
+    const m = buildCompassMarkers({
+      player: { x: 0, z: 0 },
+      heading: 0,
+      objective: [-12, 0, -18],
+      phase: 'day',
+      bellBuilt: false,
+    }).find((k) => k.id === 'objective')!
+    expect(m.via).toBe('hut-door')
+    // The door is due south of the hut centre: bearing 180, so behind a north-facing player.
+    expect(Math.abs(m.rel)).toBeCloseTo(180, 6)
+    expect(m.label).toBe(`${COMPASS_DOOR_LABEL} \u00b7 22 m`)
+    expect(m.distanceM).toBe(22)
+  })
+
+  it('points straight at the objective when both are inside, or both outside, the hut', () => {
+    const inHut = buildCompassMarkers({
+      player: { x: 0, z: 0 },
+      heading: 0,
+      objective: [2.6, 0.8, -1.3],
+      phase: 'day',
+      bellBuilt: false,
+    }).find((k) => k.id === 'objective')!
+    expect(inHut.via).toBeUndefined()
+    const outside = objectiveAim({ x: 5, z: 10 }, { x: -12, z: -18 })
+    expect(outside).toEqual({ x: -12, z: -18 })
   })
 })
 
@@ -99,7 +136,10 @@ describe('compass properties', () => {
           expect(obj !== undefined).toBe(objective !== undefined)
           if (obj && objective) {
             const d = Math.round(Math.hypot(objective[0] - player.x, objective[2] - player.z))
-            expect(obj.label).toBe(`${d} m`)
+            const target = { x: objective[0], z: objective[2] }
+            const viaDoor = objectiveAim(player, target) !== target
+            expect(obj.label).toBe(viaDoor ? `${COMPASS_DOOR_LABEL} \u00b7 ${d} m` : `${d} m`)
+            expect(obj.distanceM).toBe(d)
           }
           const hasSpawn = ms.some((m) => m.id.startsWith('spawn-'))
           if (!((phase === 'dusk' || phase === 'night') && bellBuilt)) expect(hasSpawn).toBe(false)

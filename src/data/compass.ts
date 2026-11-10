@@ -21,3 +21,6 @@ export const COMPASS_MARKERS: Readonly<Record<CompassMarkerKind, { glyph: string
 }
 
 export const COMPASS_LETTERS = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' } as const
+
+/** Prefix on the objective label while it points at the hut door (spec 09, B6). */
+export const COMPASS_DOOR_LABEL = 'Door'
