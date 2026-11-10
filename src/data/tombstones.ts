@@ -110,6 +110,8 @@ export interface ClueSpot {
 export const CLUE_SPOTS: readonly ClueSpot[] = [
   { clueId: 'clue-hut-boots', position: [-2.2, 0, 1.6], prop: 'marks', label: "Elias's boots" },
   { clueId: 'clue-empty-graves', position: [12.5, 0, -20.5], prop: 'marks', label: 'Turned earth' },
+  // Just east of the west-hill scare zone (x < -26), looking out toward the locket's grave.
+  { clueId: 'clue-west-hill-glint', position: [-24.5, 0, 9], prop: 'marks', label: 'View of the west hill' },
   { clueId: 'clue-ledger-week', position: [7.6, 0, -4], prop: 'parchment', label: 'Burial notice' },
   { clueId: 'clue-row-statues', position: [-18.9, 0, -30], prop: 'marks', label: 'Statue plinth' },
   { clueId: 'clue-elias-body', position: [-18.9, 0, -59], prop: 'coat', label: 'Keeper\u2019s coat' },

@@ -43,6 +43,13 @@ export const CLUES: readonly ClueDef[] = [
     text: 'Thirty-one burials entered in one week, all in the same careful hand. No causes of death.',
     requires: 'parish-ledger',
   },
+  // Points at the night-only Child's Locket (spec 09, F11): nothing else told the player.
+  {
+    id: 'clue-west-hill-glint',
+    zone: 'grounds',
+    source: 'environment',
+    text: 'Something small glints on the west hill\u2026 but only after dark.',
+  },
   // Wrong graves: stones whose date the parish ledger lists as a 1849 burial (Requirement 3.2).
   {
     id: 'clue-wrong-grave-marsh',

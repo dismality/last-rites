@@ -48,7 +48,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 6.1-6.3, 12.5_
 
-- [ ] 7. B5: Spawn yaw and intro card, with F11
+- [x] 7. B5: Spawn yaw and intro card, with F11
   - F11: intro card "on the table"; a clue that the Child's Locket only shows on the west hill after dark
   - Finish
   - _Requirements: 7.1, 12.6_

@@ -3,6 +3,7 @@
 
 import { create } from 'zustand'
 import { PLAYER_MAX_HEALTH } from '../../data/balance'
+import { SPAWN_YAW } from '../../data/spawn'
 import type { PlayerState, ItemId } from '../types'
 
 interface PlayerStoreState extends PlayerState {
@@ -20,7 +21,8 @@ interface PlayerStoreState extends PlayerState {
 
 export const usePlayerStore = create<PlayerStoreState>((set) => ({
   position: [0, 0, 0],
-  yaw: 0,
+  // A new run faces page 1 on the side table (spec 09, B5).
+  yaw: SPAWN_YAW,
   pitch: 0,
   health: PLAYER_MAX_HEALTH,
   maxHealth: PLAYER_MAX_HEALTH,
