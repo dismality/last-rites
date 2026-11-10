@@ -36,9 +36,16 @@ inclusion: always
 │   │   ├── satchel/        # inventory overlay
 │   │   ├── journal/        # lore pages, clues, map
 │   │   └── theme/          # fonts, CSS tokens, shared ornaments
-│   └── audio/              # AudioManager wrapping Howler
+│   ├── audio/              # AudioManager wrapping Howler
+│   └── dev/                # developer mode: Dev_Panel, cheats, debug views (playtest only)
 └── tests/                  # cross-system integration tests
 ```
+
+## Developer mode (`src/dev/`)
+- Playtest tools only. Enabled by `?dev=1` in the URL or `import.meta.env.DEV`; the backquote key toggles the Dev_Panel. It is never in the Settings menu.
+- `main.tsx` loads `src/dev/installDev.tsx` with a dynamic import behind that check, so the code is its own chunk and a production page without `?dev=1` never fetches it. `installDev` checks the flag again.
+- All dev code lives in `src/dev/`. The game reads cheats only through `src/game/state/devCheats.ts` (defaults off). The only hooks outside `src/dev/` are noclip (`FirstPersonController`), god mode (`hurtPlayer`), the time scale (`GameLoop`), the forced-scare queue (`scareRuntime` / `ScareStager`) and the open panel counting as an overlay (`isOverlayOpen` in `menuState`, so input stops and releasing the cursor does not pause).
+- Dev code goes through the real stores and actions, and never holds game rules. Tests for it sit next to it in `src/dev/`.
 
 ## Conventions
 - Tests sit next to their file: `CraftingSystem.ts` → `CraftingSystem.test.ts`.

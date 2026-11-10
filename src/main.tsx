@@ -24,6 +24,9 @@ installSpawnRespawn()
 
 // Dev only: a dynamic import behind the DEV constant, so production builds drop the hook entirely.
 if (import.meta.env.DEV) void import('./debug/debugHook').then((m) => m.installDebugHook())
+// Developer mode: its own chunk, fetched only with ?dev=1 (or in a DEV build). See src/dev/.
+if (import.meta.env.DEV || new URLSearchParams(location.search).get('dev') === '1')
+  void import('./dev/installDev').then((m) => m.installDev())
 const root = document.getElementById('root')
 if (!root) throw new Error('Root element not found')
 
