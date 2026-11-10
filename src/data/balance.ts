@@ -62,6 +62,8 @@ export const RETRY_MIN_FUEL = 60
 export const DAY1_FIRST_DIG_MIN_BONE = 3
 /** The hut shelf holds at least this much cloth on day 1. */
 export const DAY1_HUT_MIN_CLOTH = 1
+/** The hut shelf holds at least this much lamp oil on day 1, for tutorial step 2 (B4). */
+export const DAY1_HUT_MIN_OIL = 1
 
 /** Max distance (m) at which the crosshair can target an interactable. */
 export const INTERACT_RANGE_M = 2.5

@@ -431,7 +431,7 @@ One prompt at a time, in this order. Each one finishes as soon as the player doe
 | Step | Prompt | Done when |
 |---|---|---|
 | 1 | "W A S D to move, mouse to look" | Walked 3 m |
-| 2 | "E to pick up the oil on the shelf" | Any pickup |
+| 2 | "E to pick up the oil on the table" **(09)** | Lamp oil picked up (other pickups, page 1 included, no longer count) **(09)** |
 | 3 | "E to read the page Elias left" | Journal page 1 read |
 | 4 | "Hold E on a grave mound to dig (shovel in hand)" | First dig finished |
 | 5 | "E at the workbench to craft" | First craft finished |
