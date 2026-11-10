@@ -28,6 +28,7 @@ function ScareZoneVolume({ zone }: { zone: ScareZone }) {
         onIntersectionEnter={() => {
           if (scareRuntime.inside.has(zone.id)) return
           scareRuntime.inside.add(zone.id)
+          scareRuntime.entered.add(zone.id)
           scareRuntime.justEntered.push(zone.id)
         }}
         onIntersectionExit={() => scareRuntime.inside.delete(zone.id)}
@@ -49,3 +50,4 @@ export function ScareZoneVolumes() {
     </>
   )
 }
+
