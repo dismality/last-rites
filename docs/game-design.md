@@ -105,7 +105,7 @@ Each stack takes one satchel slot. Stack limits are higher than materials.
 |---|---|---|
 | `crane-rosary` | Crane's Rosary | Crane crypt sarcophagus (Mausoleum Row) |
 | `sextons-bell-clapper` | Sexton's Bell Clapper | Under the collapsed bell tower (Grounds) |
-| `childs-locket` | Child's Locket | Smallest grave, west hill (Grounds), only appears at night |
+| `childs-locket` | Child's Locket | Smallest grave, west hill (Grounds), only appears at night. **(09)** A day clue at (−24.5, 0, 9) says so: "Something small glints on the west hill… but only after dark." |
 | `burial-shroud` | Burial Shroud | Ossuary (Catacombs) |
 | `reliquary-heart` | Reliquary Heart | Deepest chamber (Catacombs, Iron Ossuary Key) |
 
@@ -472,7 +472,7 @@ Plays once on New Game: about 35 s in-engine, five camera shots, with text cards
 | 2 | Over the gate toward the hut | "The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks." |
 | 3 | Past the chapel | "They need someone to tend the dead." |
 | 4 | Down onto an open grave, soil thrown outward | "The graves here are opening. From the inside." |
-| 5 | Into the hut, ending at the player's view of the bench | "Elias left a page on the shelf." |
+| 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "Elias left a page on the table." **(09)** |
 
 It ends with the first objective appearing in the tracker.
 

@@ -3,6 +3,7 @@
 // World axes: +X east, +Z south. The hut sits at the origin with its door in the +Z wall.
 
 import { CHAPEL_CENTER, type Vec3 } from './cemeteryLayout'
+import { SPAWN_YAW } from './spawn'
 
 export interface IntroShot {
   readonly id: 1 | 2 | 3 | 4 | 5
@@ -14,6 +15,11 @@ export interface IntroShot {
   /** Shot 4 only: soil thrown outward from this grave `at` seconds into the shot. */
   readonly burst?: { readonly x: number; readonly z: number; readonly at: number }
 }
+
+/** How far ahead of the eye the end pose looks (only the direction matters). */
+const END_LOOK_M = 3
+/** Where the intro's last frame looks: along SPAWN_YAW, level, toward the side table. */
+const END_TARGET: Vec3 = [-Math.sin(SPAWN_YAW) * END_LOOK_M, 1.65, -Math.cos(SPAWN_YAW) * END_LOOK_M]
 
 /** Dip to ink at every shot boundary; 0.5 s also keeps flashing-lights-off players comfortable. */
 export const INTRO_FADE_S = 0.5
@@ -120,23 +126,24 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
         [0, 1.65, 1.8],
         [0, 1.65, 0],
       ],
+      // Through the door looking ahead, then a turn to the side table with page 1 (B5).
       target: [
         [0, 1.6, -3],
         [0, 1.6, -3],
         [0, 1.65, -3],
-        [0, 1.65, -3],
+        END_TARGET,
       ],
     },
-    card: { text: 'Elias left a page on the shelf.', at: 0.8, hold: 5 },
+    card: { text: 'Elias left a page on the table.', at: 0.8, hold: 5 },
   },
 ]
 
 /**
  * Final camera pose. It MUST equal the player's spawn eye so the handover is seamless.
  * FirstPersonController: spawn feet [0, 0.05, 0] + eye 1.6 m above the feet = y 1.65;
- * yaw 0 and pitch 0 look along -Z, at the bench. Change both places together.
+ * the look follows SPAWN_YAW at pitch 0, toward page 1 on the side table (spec 09, B5).
  */
 export const INTRO_END_POSE: { readonly position: Vec3; readonly target: Vec3 } = {
   position: [0, 1.65, 0],
-  target: [0, 1.65, -3],
+  target: END_TARGET,
 }
