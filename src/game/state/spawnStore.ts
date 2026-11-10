@@ -8,7 +8,7 @@ import { dropStack, pickupDrop, type Vec3, type WorldDrop } from '../systems/sat
 import { ITEM_MAP } from '../../data/items'
 import type { ItemId } from '../types'
 import { FIXED_SPAWNS } from '../../data/zones'
-import { collectFixedSpawn, createSpawnWorld, respawnForDay, type SpawnWorld } from '../systems/spawns'
+import { collectFixedSpawn, dayOneSpawns, type SpawnWorld } from '../systems/spawns'
 import { emit } from '../events'
 import { useExamineStore } from './examineStore'
 import { useInventoryStore } from './inventoryStore'
@@ -32,7 +32,7 @@ interface SpawnStoreState {
 let dropCounter = 0
 
 export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
-  world: respawnForDay(createSpawnWorld(), createRng(1891)),
+  world: dayOneSpawns(createRng(1891)),
   setWorld: (world) => set({ world }),
   drops: [],
   dropFromSatchel: (item, at) => {

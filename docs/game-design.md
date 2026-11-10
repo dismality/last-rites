@@ -74,12 +74,12 @@ Door condition is shown in the world (a small board-count plaque over each door)
 ### Materials (stack limit 10 each)
 | ID | Name | Found |
 |---|---|---|
-| `bone` | Bone | Disturbed graves, catacomb walls |
+| `bone` | Bone | Disturbed graves, catacomb walls. **(09)** The first grave dug on day 1 always yields at least 3 |
 | `iron-nail` | Iron Nails | Broken coffins, fences |
 | `candle-wax` | Candle Wax | Crypt shelves, chapel |
 | `holy-water` | Holy Water | Chapel font (refills daily: 2), rare in crypts |
-| `cloth` | Cloth | Shrouds, the hut |
-| `lamp-oil` | Lamp Oil | Hut, mausoleum lamps |
+| `cloth` | Cloth | Shrouds, the hut. **(09)** The hut shelf always holds at least 1 on day 1 |
+| `lamp-oil` | Lamp Oil | Hut, mausoleum lamps, one bottle a day on the path from the hut to the oak path at (−6, 0, −8) **(09)** |
 | `grave-salt` | Grave Salt | Catacombs, Crane crypt |
 | `wood-plank` | Wood Planks | Woodpile by the hut, broken coffins, fences, fallen oaks **(07)** |
 | `black-powder` | Black Powder | Powder tin in the hut (1 at the start), bell tower store, crypt shelves (rare) **(07)** |
@@ -223,7 +223,7 @@ Crafting happens only at the **workbench** (keeper's hut). Crafting takes 1.5 s 
 | Health | 100 (regenerates only via bandage or the altar) |
 | Walk / sprint speed | 3.0 / 5.5 m/s |
 | Stamina | 100; sprint drains 20/s, regenerates 15/s after 1 s |
-| Lantern fuel | 100%; drains 1% per 6 s by day, 1% per 3 s by night |
+| Lantern fuel | 100%; no drain by day or at dawn **(09)**, 1% per 3 s at dusk and by night |
 | Lantern radius | 8 m at 100% fuel, scaling down to 2 m at 0% |
 | Interact range | 2.5 m |
 
@@ -314,7 +314,7 @@ Treat him as a tragic figure who did a terrible thing, never as a joke. The rite
 | Extra captions | "[the axe handle splinters]", "[something worse rises]" (elite), "[heavy footsteps]" (brute), "[a gunshot]", "[a shotgun blast]", "[reloading]", "[a wet hiss]" (bloater), "[dead shuffle rising from the floor]" (congregation) |
 | Audio | At most 16 voices; loops every 0.9 s (Brute step), 2.5 s (Bloater gurgle), 1.4 s (Crane's chains) |
 
-Zombies take 50% less damage while the player stands in darkness (lantern fuel 0) and flinch away from tallow candles for 1 s.
+Zombies flinch away from tallow candles for 1 s. **(09)** Darkness (lantern fuel 0) no longer cuts the damage zombies take: running dry already makes them harder to see and scares more likely.
 
 ---
 
@@ -422,6 +422,8 @@ Always visible at the top left: one main goal with a progress count, plus a smal
 | 11 | Otherwise | Hold out until the fifth night |
 
 By day the second line shows "Dusk in 3:12". A tutorial prompt, when one is showing, takes the second line's place.
+
+**Rule 12 (09):** "Craft a weapon at the workbench (0/1)" outranks rules 5–11 when it is day in a story mode, the player owns no weapon but the Rusty Shovel, and dusk is under 2:00 away. The story objective it stands above moves to the second line, and the compass points at the workbench.
 
 ### Tutorial (first day only)
 One prompt at a time, in this order. Each one finishes as soon as the player does the action, and skips itself if the action was already done. Keys come from the current bindings. A **Tutorial prompts** setting (default On) turns them off.

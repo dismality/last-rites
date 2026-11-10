@@ -337,3 +337,36 @@ describe('selectObjective in Endless', () => {
     })
   })
 })
+
+describe('rule 12: craft a weapon before dusk (spec 09, F1)', () => {
+  it('property: shows exactly when it is a story day, no weapon is owned and dusk is under 2:00', () => {
+    fc.assert(
+      fc.property(inputArb, fc.boolean(), (i, needsWeapon) => {
+        const o = selectObjective({ ...i, needsWeapon })
+        const story = selectObjective({ ...i, needsWeapon: false })
+        const expected =
+          needsWeapon && i.phase === 'day' && story.rule >= 5 && i.secondsLeft < 120
+        expect(o.rule === 12).toBe(expected)
+        if (o.rule === 12) {
+          expect(o.main).toBe('Craft a weapon at the workbench (0/1)')
+          // The story objective it stands above moves to the second line.
+          expect(o.second).toBe(story.main)
+          expect(o.position).toBeDefined()
+          expect(o.marker).toBe('Workbench')
+        } else {
+          expect(o).toEqual(story)
+        }
+      }),
+      RUNS,
+    )
+  })
+
+  it('never shows in Endless', () => {
+    fc.assert(
+      fc.property(dayArb, (i) => {
+        expect(selectObjective({ ...i, story: false, needsWeapon: true, secondsLeft: 30 }).rule).not.toBe(12)
+      }),
+      RUNS,
+    )
+  })
+})

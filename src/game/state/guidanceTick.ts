@@ -2,6 +2,7 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
+import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
 import type { TutorialAction } from '../../data/tutorialSteps'
@@ -86,6 +87,10 @@ export const readObjectiveInput = (): ObjectiveInput => {
       // Only while he is on the field; before he rises or after he falls the rite line shows.
       craneAlive: craneFighting(useBossStore.getState().boss),
     },
+    // Rule 12 (spec 09, F1): only the starting shovel counts as "no weapon yet".
+    needsWeapon: !inv.slots.some(
+      (s) => ITEM_MAP[s.item]?.kind === 'weapon' && s.item !== 'rusty-shovel',
+    ),
     progress: {
       page1Read: mystery.pages.has(1),
       cryptKey: inv.keyItems.includes('rusted-crypt-key'),

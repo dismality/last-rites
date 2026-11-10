@@ -26,3 +26,13 @@ export function rollLoot(table: LootTable, rng: Rng): ItemStack[] {
   }
   return result
 }
+
+/**
+ * Tops a roll up so it holds at least `min` of `item` (spec 09, F1: day-1 guarantees). Adds one
+ * stack for the shortfall; never removes or shrinks a rolled stack.
+ */
+export function ensureMinimum(stacks: readonly ItemStack[], item: ItemStack['item'], min: number): ItemStack[] {
+  const have = stacks.reduce((n, s) => (s.item === item ? n + s.qty : n), 0)
+  const short = Math.floor(min) - have
+  return short > 0 ? [...stacks, { item, qty: short }] : [...stacks]
+}

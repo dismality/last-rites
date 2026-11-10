@@ -35,7 +35,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 4.1-4.3_
 
-- [ ] 5. B3: Day-1 oil, with F1 (day-1 setup) and F4 (darkness)
+- [x] 5. B3: Day-1 oil, with F1 (day-1 setup) and F4 (darkness)
   - Lantern day drain 0 (user decision); night rate unchanged; `balance.ts`, `lantern.ts` and design bible §6 together
   - An oil pickup on the day-1 objective path
   - F1: on day 1 the first dig gives at least 3 bone and the hut holds at least 1 cloth; a "Craft a weapon at the workbench (0/1)" objective when it's day, only the shovel is owned and dusk is under 2:00

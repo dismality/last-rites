@@ -22,8 +22,8 @@ describe('HEALTH_BAR', () => {
 })
 
 describe('OBJECTIVE_RULES', () => {
-  it('has 11 rules in ascending id order with §11 main lines', () => {
-    expect(OBJECTIVE_RULES.map((r) => r.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11])
+  it('has 12 rules in ascending id order with §11 main lines', () => {
+    expect(OBJECTIVE_RULES.map((r) => r.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
     expect(OBJECTIVE_RULES.map((r) => r.main)).toEqual([
       'Survive: Wave {n} of {m}',
       'Finish the rite at the altar',
@@ -36,6 +36,7 @@ describe('OBJECTIVE_RULES', () => {
       'Find the Iron Ossuary Key in the Crane crypt',
       'Gather the relics of the rite',
       'Hold out until the fifth night',
+      'Craft a weapon at the workbench',
     ])
   })
 

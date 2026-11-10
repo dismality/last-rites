@@ -8,6 +8,13 @@ const base = (): TickSnapshot => ({
   world: { phase: 'day', phaseTime: 0, nightNumber: 1, fogDensity: 0.02, wavesCleared: false },
 })
 
+/** Night with waves still running, so the tick stays at night. */
+const night = (): TickSnapshot => {
+  const s = base()
+  s.world = { ...s.world, phase: 'night' }
+  return s
+}
+
 describe('runTick', () => {
   it('drains stamina while sprinting and mirrors it to the player', () => {
     const r = runTick(base(), { sprinting: true }, 0.5)
@@ -22,8 +29,9 @@ describe('runTick', () => {
     expect(r.stamina.stamina).toBeGreaterThan(0)
   })
 
-  it('drains lantern fuel', () => {
-    expect(runTick(base(), { sprinting: false }, 6).lantern.fuel).toBeCloseTo(99)
+  it('drains lantern fuel at night (1% per 3 s) and not by day (spec 09, B3)', () => {
+    expect(runTick(night(), { sprinting: false }, 6).lantern.fuel).toBeCloseTo(98)
+    expect(runTick(base(), { sprinting: false }, 6).lantern.fuel).toBe(100)
   })
 
   it('does not end a held dawn', () => {
@@ -47,10 +55,10 @@ describe('runTick', () => {
   })
 
   it('scales lantern drain by the multiplier (Long Wick, storm)', () => {
-    const slow = runTick(base(), { sprinting: false, lanternDrainMult: 0.8 }, 6).lantern.fuel
-    const fast = runTick(base(), { sprinting: false, lanternDrainMult: 1.2 }, 6).lantern.fuel
-    expect(100 - slow).toBeCloseTo(0.8)
-    expect(100 - fast).toBeCloseTo(1.2)
+    const slow = runTick(night(), { sprinting: false, lanternDrainMult: 0.8 }, 6).lantern.fuel
+    const fast = runTick(night(), { sprinting: false, lanternDrainMult: 1.2 }, 6).lantern.fuel
+    expect(100 - slow).toBeCloseTo(1.6)
+    expect(100 - fast).toBeCloseTo(2.4)
   })
 
   it('raises stamina regeneration with regenMult (Second Wind)', () => {

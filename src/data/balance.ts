@@ -14,8 +14,12 @@ export const NIGHT_FOG_DENSITY: readonly number[] = [0.02, 0.03, 0.04, 0.05, 0.0
 
 // --- Lantern (design bible §6) ---
 export const LANTERN_MAX_FUEL = 100
-/** Seconds to burn 1% fuel. */
-export const LANTERN_DRAIN_S_PER_PERCENT_DAY = 6
+/**
+ * Daylight burns no oil (spec 09, B3 and F4): a 6-minute day used to cost ~60% before night 1.
+ * Kept as a rate, so 0 needs no division.
+ */
+export const LANTERN_DRAIN_PERCENT_PER_S_DAY = 0
+/** Seconds to burn 1% fuel at dusk and night. */
 export const LANTERN_DRAIN_S_PER_PERCENT_NIGHT = 3
 export const LANTERN_FLICKER_BELOW = 20
 export const LANTERN_RADIUS_MIN_M = 2
@@ -34,8 +38,6 @@ export const STAMINA_REGEN_DELAY_S = 1
 export const MELEE_RANGE_M = 1.8
 /** Full width of the melee swing cone in degrees. */
 export const MELEE_ARC_DEG = 70
-/** Damage multiplier on zombies while the player's lantern fuel is 0. */
-export const DARKNESS_DAMAGE_MULT = 0.5
 /** Damage multiplier a holy water flask deals to Wailers. */
 export const FLASK_WAILER_DAMAGE_MULT = 2
 
@@ -54,6 +56,12 @@ export const DUSK_SNAPSHOT_KEY = 'lastrites:dusk'
 export const MORNING_SNAPSHOT_KEY = 'lastrites:morning'
 /** A retried night or morning never starts with less lantern oil than this, in % (design bible §8). */
 export const RETRY_MIN_FUEL = 60
+
+// --- Day 1 setup (spec 09, F1; design bible §3) ---
+/** The first grave dug on day 1 yields at least this much bone, enough for a Bone Club. */
+export const DAY1_FIRST_DIG_MIN_BONE = 3
+/** The hut shelf holds at least this much cloth on day 1. */
+export const DAY1_HUT_MIN_CLOTH = 1
 
 /** Max distance (m) at which the crosshair can target an interactable. */
 export const INTERACT_RANGE_M = 2.5

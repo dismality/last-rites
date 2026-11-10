@@ -6,8 +6,13 @@ import type { LanternState, Phase } from '../types'
 const lit = (fuel: number): LanternState => ({ on: true, fuel, flicker: false })
 
 describe('tickLantern', () => {
-  it('drains 1% per 6 s by day', () => {
-    expect(tickLantern(lit(100), 6, 'day').fuel).toBeCloseTo(99)
+  it('burns no oil by day or at dawn (spec 09, B3)', () => {
+    expect(tickLantern(lit(100), 360, 'day').fuel).toBe(100)
+    expect(tickLantern(lit(100), 360, 'day', 2).fuel).toBe(100)
+    expect(tickLantern(lit(100), 10, 'dawn').fuel).toBe(100)
+  })
+  it('drains at the night rate at dusk', () => {
+    expect(tickLantern(lit(100), 3, 'dusk').fuel).toBeCloseTo(99)
   })
   it('drains 1% per 3 s by night', () => {
     expect(tickLantern(lit(100), 3, 'night').fuel).toBeCloseTo(99)

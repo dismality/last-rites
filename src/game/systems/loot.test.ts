@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
 import { LOOT_TABLES, LOOT_TABLE_MAP } from '../../data/lootTables'
 import { createRng } from '../rng'
-import { rollLoot } from './loot'
+import { ensureMinimum, rollLoot } from './loot'
 
 describe('rollLoot', () => {
   it('is deterministic for a given seed', () => {
@@ -27,6 +27,23 @@ describe('rollLoot', () => {
           expect(matching.length).toBeGreaterThan(0)
           expect(matching.some((e) => stack.qty >= e.min && stack.qty <= e.max)).toBe(true)
         }
+      }),
+    )
+  })
+})
+
+describe('ensureMinimum', () => {
+  it('property: the result holds at least the minimum and keeps every rolled stack', () => {
+    fc.assert(
+      fc.property(fc.integer(), fc.integer({ min: 0, max: 5 }), (seed, min) => {
+        const rolled = rollLoot(LOOT_TABLE_MAP['grave-dig'], createRng(seed))
+        const out = ensureMinimum(rolled, 'bone', min)
+        const bone = out.filter((s) => s.item === 'bone').reduce((n, s) => n + s.qty, 0)
+        expect(bone).toBeGreaterThanOrEqual(min)
+        expect(out.slice(0, rolled.length)).toEqual(rolled)
+        // Only the shortfall is added, never more.
+        const before = rolled.filter((s) => s.item === 'bone').reduce((n, s) => n + s.qty, 0)
+        expect(bone).toBe(Math.max(before, min))
       }),
     )
   })

@@ -1,10 +1,14 @@
 import { describe, expect, it } from 'vitest'
+import fc from 'fast-check'
+import { DAY1_HUT_MIN_CLOTH } from '../../data/balance'
 import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
 import { createRng } from '../rng'
 import {
   availableFixedSpawns,
   collectFixedSpawn,
   createSpawnWorld,
+  dayOneSpawns,
+  HUT_SHELF_ID,
   respawnForDay,
   takeMaterial,
 } from './spawns'
@@ -63,5 +67,22 @@ describe("Child's Locket", () => {
     const w = createSpawnWorld()
     expect(collectFixedSpawn(w, 'fx-locket', 'day')).toBe(w)
     expect(collectFixedSpawn(w, 'fx-locket', 'night').collectedFixed).toContain('fx-locket')
+  })
+})
+
+describe('dayOneSpawns (spec 09, F1)', () => {
+  it('property: the hut shelf always holds cloth on day 1, whatever the seed', () => {
+    fc.assert(
+      fc.property(fc.integer(), (seed) => {
+        const shelf = dayOneSpawns(createRng(seed)).materials[HUT_SHELF_ID]
+        const cloth = shelf.filter((s) => s.item === 'cloth').reduce((n, s) => n + s.qty, 0)
+        expect(cloth).toBeGreaterThanOrEqual(DAY1_HUT_MIN_CLOTH)
+      }),
+    )
+  })
+
+  it('places the day-1 path oil, which always holds lamp oil', () => {
+    const oil = dayOneSpawns(createRng(1891)).materials['grounds-path-oil']
+    expect(oil).toEqual([{ item: 'lamp-oil', qty: 1 }])
   })
 })
