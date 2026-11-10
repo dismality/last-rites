@@ -53,7 +53,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 7.1, 12.6_
 
-- [ ] 8. B6: Compass inside the hut
+- [x] 8. B6: Compass inside the hut
   - Finish
   - _Requirements: 7.2_
 

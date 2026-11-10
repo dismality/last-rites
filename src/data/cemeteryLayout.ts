@@ -32,6 +32,16 @@ export const HUT = {
   roofRise: 1.3,
 } as const
 
+/**
+ * A point 1 m outside the hut door (the door is centred in the +Z wall). The compass aims here
+ * while only one of the player and the objective is inside the hut (spec 09, B6).
+ */
+export const HUT_DOOR_OUTSIDE: Vec3 = [0, 0, HUT.halfZ + 1]
+
+/** Inside the hut's walls (ground plane). */
+export const isInsideHut = (x: number, z: number): boolean =>
+  Math.abs(x) < HUT.halfX && Math.abs(z) < HUT.halfZ
+
 /** Z of the workbench centre: against the hut's north wall, straight ahead of the spawn. */
 export const BENCH_Z = -2.2
 

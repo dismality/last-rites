@@ -2,8 +2,8 @@
 // Yaw convention: yaw 0 looks down -Z (north), positive yaw turns left, so forward is
 // (-sin yaw, -cos yaw) (movement.ts, forwardFromYaw). Compass degrees run clockwise
 // from north (N = -Z, E = +X), hence heading = -yaw. mapDraw's quill rotates by -yaw too.
-import { COMPASS, COMPASS_LETTERS, COMPASS_MARKERS } from '../../data/compass'
-import { CHAPEL_CENTER } from '../../data/cemeteryLayout'
+import { COMPASS, COMPASS_DOOR_LABEL, COMPASS_LETTERS, COMPASS_MARKERS } from '../../data/compass'
+import { CHAPEL_CENTER, HUT_DOOR_OUTSIDE, isInsideHut } from '../../data/cemeteryLayout'
 import { WAVE_GRAVES } from '../../data/waves'
 import type { Phase } from '../types'
 import { eligibleGraves } from './waves'
@@ -30,6 +30,8 @@ export interface CompassMarker {
   x: number
   pinned: 'left' | 'right' | null
   distanceM?: number
+  /** Set when the objective marker aims at the hut door instead of the objective itself. */
+  via?: 'hut-door'
 }
 
 const RAD_TO_DEG = 180 / Math.PI
@@ -89,6 +91,15 @@ export interface CompassContext {
   merchant?: readonly [number, number, number]
 }
 
+/**
+ * Where the objective marker points. Straight at the objective, except when the hut wall stands
+ * between them (one inside, one outside): then at the door, so it never points through a wall.
+ */
+export const objectiveAim = (player: CompassVec2, target: CompassVec2): CompassVec2 =>
+  isInsideHut(player.x, player.z) !== isInsideHut(target.x, target.z)
+    ? { x: HUT_DOOR_OUTSIDE[0], z: HUT_DOOR_OUTSIDE[2] }
+    : target
+
 export const buildCompassMarkers = (c: CompassContext): CompassMarker[] => {
   const rel = (to: CompassVec2): number => relativeAngle(bearingDeg(c.player, to), c.heading)
   const markers: CompassMarker[] = []
@@ -96,7 +107,12 @@ export const buildCompassMarkers = (c: CompassContext): CompassMarker[] => {
   if (c.objective) {
     const target = { x: c.objective[0], z: c.objective[2] }
     const dist = Math.round(Math.hypot(target.x - c.player.x, target.z - c.player.z))
-    markers.push(makeMarker('objective', 'objective', rel(target), `${dist} m`, dist))
+    const aim = objectiveAim(c.player, target)
+    const viaDoor = aim !== target
+    const label = viaDoor ? `${COMPASS_DOOR_LABEL} \u00b7 ${dist} m` : `${dist} m`
+    const marker = makeMarker('objective', 'objective', rel(aim), label, dist)
+    if (viaDoor) marker.via = 'hut-door'
+    markers.push(marker)
   }
   markers.push(makeMarker('chapel', 'chapel', rel({ x: CHAPEL_CENTER[0], z: CHAPEL_CENTER[2] })))
   markers.push(makeMarker('hut', 'hut', rel({ x: 0, z: 0 })))

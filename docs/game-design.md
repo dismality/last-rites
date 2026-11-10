@@ -448,7 +448,7 @@ A strip at the top centre spanning 180° of heading, with N / E / S / W letters 
 | Keeper's hut | ⌂ | Always |
 | Wave spawn direction | ☠ | Dusk and night, only once bell repair stage 3 is built |
 
-A marker behind the player sits at the strip's nearer edge with an arrow. Each marker is a glyph and text, never colour alone.
+A marker behind the player sits at the strip's nearer edge with an arrow. **(09)** While only one of the player and the objective is inside the hut, the objective marker points 1 m outside the hut door instead of through the wall, labelled "Door · 22 m" with the real distance to the objective. Each marker is a glyph and text, never colour alone.
 
 ### Map
 The journal map shows the player as an arrow at their position, pointing their way, plus the objective marker.
