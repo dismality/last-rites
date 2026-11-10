@@ -38,6 +38,27 @@
   font-size: 1.5rem;
 }
 .examine__hint { margin: 0 0 0.5rem; }
+/* A journal page's own text (spec 09, B7). Scrolls inside the panel on short windows. */
+.examine__page {
+  max-height: 40vh;
+  overflow-y: auto;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-top: 1px solid var(--parchment-dark);
+  border-bottom: 1px solid var(--parchment-dark);
+}
+.examine__page-title {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+}
+.examine__page-text {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.15rem;
+  line-height: 1.8;
+}
 /* Fixed height so the panel does not jump when the clue appears. */
 .examine__clue {
   min-height: 3em;
