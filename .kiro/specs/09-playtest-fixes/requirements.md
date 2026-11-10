@@ -76,9 +76,8 @@ This spec turns the playtest of https://last-rites.vercel.app on 2026-11-10, and
 4. (B8) Walls SHALL stay readable with the lantern at 0.5 m.
 5. (B9) Recipe cards SHALL name the recipe and each ingredient with its count; the tooltip SHALL sit by the hovered item and go away when the workbench closes.
 
-### Requirement 8 (B10): Short Vigil demo mode
-**Gate:** this changes game balance. Work stops and the user is asked before it starts.
-1. THE difficulty screen SHALL offer Short Vigil: 2-minute days, 3 nights, 100% starting oil and a basic weapon.
+### Requirement 8 (B10): moved to spec 10
+Short Vigil becomes E11 in spec `10-curse-stages` (3 stages, 2-minute days), because stages replace nights. D5 and D7 move there too.
 
 ### Requirement 9 (C1 to C3): Submission tidy-up
 1. (C1) README links SHALL point at the deploy and the video, with a screenshot at the top. The video link waits until it is uploaded.
@@ -97,3 +96,14 @@ This spec turns the playtest of https://last-rites.vercel.app on 2026-11-10, and
 ### Requirement 11 (D1 to D9): Browser test passes
 1. Each pass SHALL run through Playwright and Dev_Mode, and SHALL add an automated test where it can.
 2. Each pass SHALL report what it could not verify (feel, real GPU frame rates, the live Vercel build) instead of guessing.
+
+### Requirement 12 (F1, F4, F5, F6, F11): Flow fixes folded into spec 09
+Source: Part F of `docs/kiro-prompts.md`, decisions by the user on 2026-11-10.
+1. (B3) THE lantern SHALL not drain by day (rate 0); the night rate is unchanged.
+2. (F1) On day 1 only, THE first dig SHALL give at least 3 bone, and THE hut SHALL hold at least 1 cloth, so the Bone Club can be made before dusk.
+3. (F1) WHEN it is day, the player owns no weapon but the shovel and dusk is under 2:00 away, THE Objective_Tracker SHALL show "Craft a weapon at the workbench (0/1)" above the story objective.
+4. (F4) Zombies SHALL take normal damage while the lantern is empty (the 50% darkness cut is removed).
+5. (F1) Tutorial step 2 SHALL finish only when the oil is picked up.
+6. (F11) THE intro card SHALL say the page is "on the table", and a clue SHALL tell the player the Child's Locket shows on the west hill only after dark.
+7. (F6) An elite SHALL drop revolver ammo only once the revolver is owned and shotgun shells only once the shotgun is owned; otherwise it drops materials.
+8. (F5, B16) THE game SHALL autosave at every dawn and at the start of each dusk, and a Retry SHALL keep every clue and journal page already found.

@@ -5,7 +5,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
 
 - **Finish:** run `npm run lint`, `npm run build` and `npm test -- --run` (plus the task's Playwright spec when it has one), fix any failures, append a `docs/kiro-log.md` entry with the real date, and commit with a clear message. Do not push.
 
-**Gate:** stop and ask the user before task 13 (B10, Short Vigil), because it changes game balance.
+**Order (user decision, 2026-11-10):** tasks 5 to 11b (B3 to B9 and F6) next, then task 12: draft E0 and stop for approval. Part E (E1 to E5, plus E7, G1 and G2) goes in spec `10-curse-stages`; E6, E8 to E11 and the other G items are stretch goals. Source: `docs/kiro-prompts.md`.
 
 ## Tasks
 
@@ -35,17 +35,23 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 4.1-4.3_
 
-- [ ] 5. B3: Day-1 oil
+- [ ] 5. B3: Day-1 oil, with F1 (day-1 setup) and F4 (darkness)
+  - Lantern day drain 0 (user decision); night rate unchanged; `balance.ts`, `lantern.ts` and design bible §6 together
+  - An oil pickup on the day-1 objective path
+  - F1: on day 1 the first dig gives at least 3 bone and the hut holds at least 1 cloth; a "Craft a weapon at the workbench (0/1)" objective when it's day, only the shovel is owned and dusk is under 2:00
+  - F4: remove the 50% damage cut on zombies while the lantern is empty (`DARKNESS_DAMAGE_MULT`, user approved); the match of last resort stays out of scope
   - Finish
-  - _Requirements: 5.1-5.3_
+  - _Requirements: 5.1-5.3, 12.1-12.4_
 
-- [ ] 6. B4: Hut oil pickup and tutorial step 2
+- [ ] 6. B4: Hut oil pickup and tutorial step 2, with F1 (oil-only step)
+  - Tutorial step 2 finishes only on picking up the oil, not on any pickup
   - Finish
-  - _Requirements: 6.1-6.3_
+  - _Requirements: 6.1-6.3, 12.5_
 
-- [ ] 7. B5: Spawn yaw and intro card
+- [ ] 7. B5: Spawn yaw and intro card, with F11
+  - F11: intro card "on the table"; a clue that the Child's Locket only shows on the west hill after dark
   - Finish
-  - _Requirements: 7.1_
+  - _Requirements: 7.1, 12.6_
 
 - [ ] 8. B6: Compass inside the hut
   - Finish
@@ -63,11 +69,14 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 7.5_
 
-- [ ] 12. Gate: ask the user about B10 before going on
-
-- [ ] 13. B10: Short Vigil demo mode
+- [ ] 11b. F6: Elite ammo drops only for owned guns (user approved)
+  - Roll revolver ammo only once the revolver is owned and shells only once the shotgun is owned; otherwise drop materials; property test
   - Finish
-  - _Requirements: 8.1_
+  - _Requirements: 12.7_
+
+- [ ] 12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval
+
+- 13. Moved to spec 10 (stages replace them): B10 Short Vigil (now E11), D5 night balance, D7 endings and save/load
 
 - [ ] 14. C1: README links and screenshot
   - Finish
@@ -101,7 +110,8 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 10.5_
 
-- [ ] 22. B16: Quit confirmation and Continue on title
+- [ ] 22. B16: Quit confirmation and Continue on title, with F5
+  - F5: autosave at every dawn and at the start of each dusk, separate from the altar save; on Retry, clues and journal pages found after the retry point stay found
   - Finish
   - _Requirements: 10.6_
 
@@ -114,9 +124,9 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - [ ] 24.2 D2 crafting and the workbench
   - [ ] 24.3 D3 digging and materials
   - [ ] 24.4 D4 chapel repairs
-  - [ ] 24.5 D5 night combat and balance
+  - 24.5 D5: moved to spec 10
   - [ ] 24.6 D6 scares and comfort settings
-  - [ ] 24.7 D7 endings and save/load
+  - 24.7 D7: moved to spec 10
   - [ ] 24.8 D8 performance (SwiftShader numbers only; real GPU fps not verifiable here)
     - Also measure these performance-review items; fix one only if D8 shows a real cost:
       - `LanternTraps.tsx` 44-55: the always-mounted pool of trap point lights (cost even at intensity 0)
