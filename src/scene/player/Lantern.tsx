@@ -60,20 +60,23 @@ export function Lantern() {
     }
     const k = level * wave
 
+    // The three lights are never hidden: three.js builds its light state from visible lights, so
+    // toggling `visible` changes the light count and recompiles every lit material (a hitch when
+    // the lantern is switched or runs dry). Off and empty are intensity 0 instead.
+    const beam = on && !empty
     if (spot.current) {
-      spot.current.visible = on && !empty
-      spot.current.intensity = SPOT_PEAK * k
+      spot.current.intensity = beam ? SPOT_PEAK * k : 0
+      // A dark beam needs no shadow redraw; this skips the pass without touching the light count.
+      spot.current.shadow.autoUpdate = beam
       spot.current.distance = lanternRadius(fuel) * 2
     }
     if (fill.current) {
-      fill.current.visible = on && !empty
-      fill.current.intensity = FILL_PEAK * k
+      fill.current.intensity = beam ? FILL_PEAK * k : 0
       fill.current.distance = lanternRadius(fuel)
     }
     if (ember.current) {
-      // At empty the beam is swapped for a dim non-shadowing glow so the world is never fully black.
-      ember.current.visible = on && empty
-      ember.current.intensity = EMBER_INTENSITY * wave
+      // At empty the beam gives way to a dim non-shadowing glow so the world is never fully black.
+      ember.current.intensity = on && empty ? EMBER_INTENSITY * wave : 0
       ember.current.distance = lanternRadius(0)
     }
   })
