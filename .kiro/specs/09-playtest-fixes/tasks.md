@@ -65,11 +65,11 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 7.4_
 
-- [-] 11. B9: Recipe book names and tooltip
+- [x] 11. B9: Recipe book names and tooltip
   - Finish
   - _Requirements: 7.5_
 
-- [~] 11b. F6: Elite ammo drops only for owned guns (user approved)
+- [-] 11b. F6: Elite ammo drops only for owned guns (user approved)
   - Roll revolver ammo only once the revolver is owned and shells only once the shotgun is owned; otherwise drop materials; property test
   - Finish
   - _Requirements: 12.7_

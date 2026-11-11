@@ -7,6 +7,7 @@ export type SoundId =
   | 'dry-click'
   | 'reload'
   | 'weapon-break'
+  | 'weapon-crack'
   | 'board-break'
   | 'board-nail'
   | 'bloater-hiss'
@@ -114,6 +115,15 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.003,
     decayS: 0.35,
     layers: [noise('bandpass', 1800, 500, 2, 0.8), tone('triangle', 220, 90, 0.3)],
+  },
+  // A short dry crack: the warning that comes before 'weapon-break'.
+  'weapon-crack': {
+    id: 'weapon-crack',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.002,
+    decayS: 0.12,
+    layers: [noise('highpass', 2600, 1200, 1.5, 0.6), tone('triangle', 320, 160, 0.2)],
   },
   'board-break': {
     id: 'board-break',

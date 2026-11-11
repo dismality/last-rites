@@ -4,7 +4,15 @@ import { ELITE, ELITE_DROPS } from '../../data/elites'
 import type { EnemyId } from '../../data/enemies'
 import { createRng } from '../rng'
 import type { Inventory, ItemId } from '../types'
-import { canBeElite, eliteStats, placeEliteDrop, rollElite, rollEliteDrop } from './elites'
+import {
+  canBeElite,
+  eliteDropTable,
+  eliteStats,
+  ownedGuns,
+  placeEliteDrop,
+  rollElite,
+  rollEliteDrop,
+} from './elites'
 import { addItem, countItem, createInventory } from './inventory'
 
 const ELIGIBLE: EnemyId[] = ['shambler', 'bloater', 'brute']
@@ -129,5 +137,41 @@ describe('Feature: 07-combat-and-enemies, Property 24: Elite drops follow the ta
 
   it('eligible list matches the data', () => {
     for (const t of ELIGIBLE) expect(canBeElite(t, ELITE.fromNight, false)).toBe(true)
+  })
+})
+
+describe('elite drops follow gun ownership (spec 09 F6)', () => {
+  const AMMO: Record<string, 'revolver' | 'shotgun'> = {
+    'revolver-cartridge': 'revolver',
+    'shotgun-shell': 'shotgun',
+  }
+
+  it('never drops ammo for an unowned gun; owned guns keep their rows', () => {
+    fc.assert(
+      fc.property(fc.boolean(), fc.boolean(), fc.integer(), (revolver, shotgun, seed) => {
+        const owned = { revolver, shotgun }
+        const rng = createRng(seed)
+        for (let i = 0; i < 30; i++) {
+          const d = rollEliteDrop(rng, owned)
+          expect(d.qty).toBeGreaterThan(0)
+          expect(d.weight).toBeGreaterThan(0)
+          const gun = AMMO[d.item]
+          if (gun) expect(owned[gun]).toBe(true)
+        }
+        const table = eliteDropTable(owned)
+        expect(table.length).toBe(ELITE_DROPS.length)
+        expect(table.reduce((s, d) => s + d.weight, 0)).toBe(100)
+        expect(table.some((d) => d.item === 'revolver-cartridge')).toBe(revolver)
+        expect(table.some((d) => d.item === 'shotgun-shell')).toBe(shotgun)
+      }),
+    )
+  })
+
+  it('treats a gun in the satchel or tracked by the combat store as owned', () => {
+    const none = createInventory()
+    expect(ownedGuns(none, {})).toEqual({ revolver: false, shotgun: false })
+    expect(ownedGuns(none, { shotgun: { magazine: 2 } })).toEqual({ revolver: false, shotgun: true })
+    const withRevolver = addItem(none, 'revolver', 1).inv
+    expect(ownedGuns(withRevolver, {})).toEqual({ revolver: true, shotgun: false })
   })
 })

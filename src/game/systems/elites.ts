@@ -3,11 +3,11 @@
 // Which spawns may become elites, their stat multipliers, and the one drop an
 // elite leaves behind. Numbers live in src/data/elites.ts.
 
-import { ELITE, ELITE_DROPS, type EliteDrop } from '../../data/elites'
+import { ELITE, ELITE_AMMO_SUBSTITUTES, ELITE_DROPS, type EliteDrop } from '../../data/elites'
 import type { EnemyId } from '../../data/enemies'
 import type { Rng } from '../rng'
 import type { Inventory } from '../types'
-import { addItem } from './inventory'
+import { addItem, countItem } from './inventory'
 import type { Vec3, WorldDrop } from './satchel'
 
 /** Night ≥ fromNight, an eligible type, and no elite in this wave yet. */
@@ -46,15 +46,43 @@ export function eliteStats(base: EliteBase): EliteBase {
   }
 }
 
-/** Weighted pick from ELITE_DROPS; always returns one of the table entries. */
-export function rollEliteDrop(rng: Rng): EliteDrop {
-  const total = ELITE_DROPS.reduce((sum, d) => sum + d.weight, 0)
+export interface OwnedGuns {
+  revolver: boolean
+  shotgun: boolean
+}
+
+/** Owned = the gun is in the satchel, or the combat store already tracks its magazine. */
+export function ownedGuns(
+  inv: Inventory,
+  firearms: Partial<Record<'revolver' | 'shotgun', unknown>>,
+): OwnedGuns {
+  return {
+    revolver: countItem(inv, 'revolver') > 0 || firearms.revolver !== undefined,
+    shotgun: countItem(inv, 'shotgun') > 0 || firearms.shotgun !== undefined,
+  }
+}
+
+/** The drop table as it applies now: ammo rows for guns the player lacks become materials. */
+export function eliteDropTable(owned: OwnedGuns): readonly EliteDrop[] {
+  return ELITE_DROPS.map((d) => {
+    const needs =
+      d.item === 'revolver-cartridge' ? owned.revolver : d.item === 'shotgun-shell' ? owned.shotgun : true
+    if (needs) return d
+    const sub = ELITE_AMMO_SUBSTITUTES[d.item as keyof typeof ELITE_AMMO_SUBSTITUTES]
+    return { item: sub.item, qty: sub.qty, weight: d.weight }
+  })
+}
+
+/** Weighted pick from the drop table; both guns count as owned unless told otherwise. */
+export function rollEliteDrop(rng: Rng, owned: OwnedGuns = { revolver: true, shotgun: true }): EliteDrop {
+  const table = eliteDropTable(owned)
+  const total = table.reduce((sum, d) => sum + d.weight, 0)
   let pick = rng() * total
-  for (const d of ELITE_DROPS) {
+  for (const d of table) {
     pick -= d.weight
     if (pick < 0) return d
   }
-  return ELITE_DROPS[ELITE_DROPS.length - 1]
+  return table[table.length - 1]
 }
 
 export interface EliteDropPlacement {

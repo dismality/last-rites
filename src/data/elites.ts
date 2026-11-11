@@ -31,3 +31,14 @@ export const ELITE_DROPS: readonly EliteDrop[] = [
   { item: 'kola-tonic', qty: 1, weight: 15 },
   { item: 'black-powder', qty: 2, weight: 10 },
 ]
+
+/**
+ * What an ammo row turns into while its gun is not owned (docs/game-design.md §7 Elites).
+ * The weight stays; the two materials are the ingredients of that ammo's recipe.
+ */
+export const ELITE_AMMO_SUBSTITUTES: Readonly<
+  Record<'revolver-cartridge' | 'shotgun-shell', { item: ItemId; qty: number }>
+> = {
+  'revolver-cartridge': { item: 'lead-shot', qty: 2 },
+  'shotgun-shell': { item: 'black-powder', qty: 1 },
+}

@@ -43,7 +43,8 @@ import { forwardFromYaw } from '../../game/systems/melee'
 import { createRng } from '../../game/rng'
 import { resolveBurst } from '../../game/systems/bloater'
 import { killReports } from '../../game/systems/killReports'
-import { placeEliteDrop, rollEliteDrop } from '../../game/systems/elites'
+import { ownedGuns, placeEliteDrop, rollEliteDrop } from '../../game/systems/elites'
+import { useCombatStore } from '../../game/state/combatStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { gasRuntime } from '../effects/gasRuntime'
 import { EnemyModels } from './EnemyModels'
@@ -207,8 +208,8 @@ function burst(uid: string, pos: { x: number; z: number }): void {
 
 /** One elite drop: into the satchel first, and what does not fit lies where it fell. */
 function dropEliteLoot(pos: { x: number; z: number }): void {
-  const drop = rollEliteDrop(dropRng)
   const inv = useInventoryStore.getState()
+  const drop = rollEliteDrop(dropRng, ownedGuns(inv.inventory, useCombatStore.getState().firearms))
   const placed = placeEliteDrop(
     inv.inventory,
     drop,
