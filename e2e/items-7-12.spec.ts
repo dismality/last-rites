@@ -574,8 +574,10 @@ test('item 11: Taken ending reaches the summary unskipped (real night-5 check, 0
 
 test('item 11: Space and Enter skip the ending sequence', async ({ page }) => {
   test.setTimeout(300_000)
-  const errors = await boot(page)
+  let errors = await boot(page)
   for (const [key, id] of [['Space', 'rest'], ['Enter', 'taken']] as const) {
+    // Second pass needs a fresh page: the first ending leaves the screen on 'ending'.
+    if (key === 'Enter') errors = await boot(page)
     await page.evaluate((e) => window.__lastRites!.startEnding(e), id)
     await until(page, () => (window.__lastRites!.snapshot('game') as { screen: string }).screen === 'ending', null, 30_000)
     await page.waitForTimeout(3000)

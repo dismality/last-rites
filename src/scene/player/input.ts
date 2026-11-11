@@ -3,7 +3,9 @@
 
 import { useSettingsStore } from '../../game/state'
 import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
+import { createSpikeFilter } from '../../game/systems/lookFilter'
 import { isCanvasLocked } from './pointerLockOverride'
+import { requestPointerLockUnadjusted } from './pointerLockRequest'
 
 export interface InputSnapshot {
   /** -1 (back) .. 1 (forward) */
@@ -36,6 +38,7 @@ export function createInput(
   const held = new Set<string>()
   let lookDX = 0
   let lookDY = 0
+  const spikes = createSpikeFilter()
 
   // Resolved at sample time so rebinding takes effect immediately.
   const isDown = (action: string): boolean => {
@@ -77,8 +80,15 @@ export function createInput(
       if (c) held.delete(c)
     },
     mouseMove: (dx: number, dy: number) => {
-      lookDX += dx
-      lookDY += dy
+      const d = spikes.push(dx, dy)
+      lookDX += d.dx
+      lookDY += d.dy
+    },
+    /** Throw away collected look movement (view owned by a menu/camera, pointer lock regained). */
+    discardLook: () => {
+      lookDX = 0
+      lookDY = 0
+      spikes.reset()
     },
     /** Drop held keys, e.g. on blur/pause, so nothing sticks. */
     releaseAll: () => {
@@ -91,6 +101,7 @@ export function createInput(
       const s = snapshot()
       lookDX = 0
       lookDY = 0
+      spikes.endFrame()
       return s
     },
   }
@@ -105,12 +116,7 @@ export const input = createInput(() => useSettingsStore.getState().bindings, isS
  */
 export function requestLock(el: HTMLElement | null | undefined): void {
   if (!el || isMenuOpen()) return
-  try {
-    const result = el.requestPointerLock() as Promise<void> | undefined
-    result?.catch?.(() => {})
-  } catch {
-    /* not allowed right now; the next click tries again */
-  }
+  requestPointerLockUnadjusted(el)
 }
 
 /** Attach DOM listeners; mouse look only counts while the pointer is locked. */
@@ -132,7 +138,9 @@ export function installInput(canvas: HTMLElement): () => void {
     if (!isCanvasLocked(canvas)) requestLock(canvas)
   }
   const onLockChange = () => {
+    // Lock lost: nothing sticks. Lock regained: movement from before it is stale.
     if (!isCanvasLocked(canvas)) input.releaseAll()
+    input.discardLook()
   }
 
   window.addEventListener('keydown', onKeyDown)

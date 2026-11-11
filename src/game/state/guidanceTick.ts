@@ -5,8 +5,8 @@ import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
-import { TUTORIAL_PICKUP_ITEM, type TutorialAction } from '../../data/tutorialSteps'
-import { FIXED_SPAWNS } from '../../data/zones'
+import { DIG_STEP_ID, TUTORIAL_PICKUP_ITEM, type TutorialAction } from '../../data/tutorialSteps'
+import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
 import { ZONE_CARD_SHOW_S } from '../../data/zoneCards'
 import { subscribeToType } from '../events'
 import { craneFighting } from '../systems/bossDirector'
@@ -18,7 +18,14 @@ import {
   type ObjectiveInput,
   type Vec3,
 } from '../systems/objective'
-import { markActionDone, isWalkComplete, tutorialPrompt, walkStep } from '../systems/tutorial'
+import { withDigTutorialMarker } from '../systems/digGuidance'
+import {
+  currentTutorialStep,
+  markActionDone,
+  isWalkComplete,
+  tutorialPrompt,
+  walkStep,
+} from '../systems/tutorial'
 import { zoneAt } from '../systems/zoneAt'
 import { recordZoneCard, shouldShowZoneCard } from '../systems/zoneCardTrigger'
 import { useBossStore } from './bossStore'
@@ -114,9 +121,24 @@ const sameObjective = (a: Objective | null, b: Objective): boolean =>
   a.position?.[0] === b.position?.[0] &&
   a.position?.[2] === b.position?.[2]
 
+/** True while the dig tutorial prompt is the one on screen. */
+const digTutorialActive = (): boolean => {
+  const s = useSettingsStore.getState()
+  const world = useWorldStore.getState()
+  if (!s.tutorialPrompts || world.phase !== 'day' || world.nightNumber !== 1) return false
+  return currentTutorialStep(useGuidanceStore.getState().tutorialDone) === DIG_STEP_ID
+}
+
 /** Recomputes the objective now; writes only on change so subscribers stay quiet. */
 export const refreshGuidance = (): void => {
-  const next = selectObjective(readObjectiveInput())
+  const input = readObjectiveInput()
+  const next = withDigTutorialMarker(
+    selectObjective(input),
+    digTutorialActive(),
+    input.playerPos,
+    // Read from data (not digStore) to keep guidance free of the progression import cycle.
+    SPAWN_POINTS.filter((p) => p.lootTable === 'grave-dig').map((p) => p.position),
+  )
   const store = useGuidanceStore.getState()
   if (!sameObjective(store.objective, next)) store.setObjective(next)
 }

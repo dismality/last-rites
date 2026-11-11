@@ -36,10 +36,7 @@ import { meleeRuntime } from './meleeRuntime'
 import { scareRuntime } from '../scares/scareRuntime'
 import { slowFactor } from '../../game/systems/scareStaging'
 import { playerPositionRef } from '../world/playerPositionRef'
-import { endingCameraRuntime } from '../effects/endingCameraRuntime'
-import { introCameraRuntime } from '../effects/introCameraRuntime'
-import { workbenchCameraRuntime } from '../world/workbenchCameraRuntime'
-import { isMenuOpen } from '../../game/state/menuState'
+import { discardLookWhileOwned, isViewOwned } from './viewOwnership'
 import { input, installInput } from './input'
 import { useInteractionRaycast } from './useInteractionRaycast'
 
@@ -87,6 +84,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
       bodyRuntime.body = null
       bodyRuntime.camera = null
       bodyRuntime.scene = null
+      bodyRuntime.world = null
     },
     [],
   )
@@ -112,6 +110,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     bodyRuntime.body = rb
     bodyRuntime.camera = camera
     bodyRuntime.scene = state.scene
+    bodyRuntime.world = world
     // Retry, Continue and New Game queue a move; apply it before anything reads the body, so
     // the stale position is never copied back into the store. Runs even while a menu is open.
     const tp = takeTeleport()
@@ -128,13 +127,8 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     }
     // No movement or look while any menu holds the cursor. The workbench rig owns
     // the camera while opening, open and returning.
-    if (
-      isMenuOpen() ||
-      workbenchCameraRuntime.active ||
-      endingCameraRuntime.active ||
-      introCameraRuntime.active
-    )
-      return
+    // Mouse travel collected meanwhile is discarded, so it can't release as one big turn.
+    if (discardLookWhileOwned(isViewOwned(), input)) return
 
     const dt = Math.min(rawDelta, MAX_FRAME_DT)
     const settings = useSettingsStore.getState()

@@ -7,7 +7,11 @@
 // started through `startRun`) makes input.ts and the hotbar wheel act as if the canvas were locked.
 
 import type * as THREE from 'three'
-import { DAY_DURATION_S, DUSK_DURATION_S } from '../data/balance'
+import { Box3, Raycaster, Vector2, Vector3 } from 'three'
+import { DAY_DURATION_S, DUSK_DURATION_S, INTERACT_RANGE_M } from '../data/balance'
+import { interactableRegistry } from '../scene/world/interactableRegistry'
+import { DRACO_PATH, worldModelUrl, type WorldModelId } from '../data/assets'
+import { colliderOwner } from './colliderOwners'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
 import { createRng, deriveSeed } from '../game/rng'
@@ -285,6 +289,78 @@ const api = {
   scareZones(): { inside: string[]; entered: string[] } {
     return { inside: [...scareRuntime.inside], entered: [...scareRuntime.entered] }
   },
+  /**
+   * Rapier colliders whose centre is within `radius` m of (x, z) on the ground plane, nearest
+   * first, so a block can be attributed. Cuboids report half-extents; the owner is matched
+   * against the layout data ('unknown' means a collider with no known source).
+   */
+  collidersNear(x: number, z: number, radius = 3): ColliderInfo[] {
+    const world = bodyRuntime.world
+    if (!world) return []
+    const out: ColliderInfo[] = []
+    world.colliders.forEach((c) => {
+      const t = c.translation()
+      const dist = Math.hypot(t.x - x, t.z - z)
+      const s = c.shape as unknown as { halfExtents?: { x: number; y: number; z: number }; radius?: number; halfHeight?: number }
+      // Big boxes (ground, fences, boundaries) reach the point from far away: use the box edge.
+      const reach = s.halfExtents ? Math.max(s.halfExtents.x, s.halfExtents.z) : (s.radius ?? 0)
+      if (dist - reach > radius) return
+      const r = c.rotation()
+      out.push({
+        handle: c.handle,
+        shape: ['ball', 'cuboid', 'capsule'][c.shapeType()] ?? String(c.shapeType()),
+        halfExtents: s.halfExtents ? [s.halfExtents.x, s.halfExtents.y, s.halfExtents.z] : null,
+        radius: s.radius ?? null,
+        translation: [t.x, t.y, t.z],
+        rotationY: 2 * Math.atan2(r.y, r.w),
+        sensor: c.isSensor(),
+        owner: c.parent() === bodyRuntime.body ? 'player' : colliderOwner(t.x, t.z),
+        distance: dist,
+      })
+    })
+    return out.sort((a, b) => a.distance - b.distance)
+  },
+  /**
+   * Bounds of a world model's vertices between two heights (model space, metres), measured from
+   * the real GLB through the same Draco decoder the game uses.
+   */
+  async measureModel(id: WorldModelId, yMin = -1e9, yMax = 1e9): Promise<ModelSlice> {
+    const { GLTFLoader } = await import('three/examples/jsm/loaders/GLTFLoader.js')
+    const { DRACOLoader } = await import('three/examples/jsm/loaders/DRACOLoader.js')
+    const draco = new DRACOLoader().setDecoderPath(DRACO_PATH)
+    const loader = new GLTFLoader().setDRACOLoader(draco)
+    const gltf = await loader.loadAsync(worldModelUrl(id))
+    gltf.scene.updateMatrixWorld(true)
+    const box = new Box3()
+    const v = new Vector3()
+    gltf.scene.traverse((o) => {
+      const m = o as THREE.Mesh
+      if (!m.isMesh) return
+      const pos = m.geometry.getAttribute('position')
+      for (let i = 0; i < pos.count; i++) {
+        v.fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld)
+        if (v.y >= yMin && v.y <= yMax) box.expandByPoint(v)
+      }
+    })
+    draco.dispose()
+    return {
+      min: [box.min.x, box.min.y, box.min.z],
+      max: [box.max.x, box.max.y, box.max.z],
+    }
+  },
+  /** World centre of an interactable's meshes (what the crosshair has to hit), or null when it is not mounted. */
+  interactableCentre(id: string): [number, number, number] | null {
+    const entry = interactableRegistry.get(id)
+    if (!entry) return null
+    const box = new Box3()
+    entry.object.updateWorldMatrix(true, true)
+    entry.object.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) box.expandByObject(o)
+    })
+    if (box.isEmpty()) return null
+    const c = box.getCenter(new Vector3())
+    return [c.x, c.y, c.z]
+  },
   /** Mesh count under the named scene group (-1 when no such group is mounted). */
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
@@ -418,6 +494,32 @@ const api = {
   releaseAll: (): void => input.releaseAll(),
   /** The input module itself, for anything not covered above. */
   input,
+  /**
+   * Cost of one useInteractionRaycast pass (array build plus recursive intersect) from the live
+   * camera, averaged over `n` runs, in ms. Null when no rig is mounted.
+   */
+  raycastCostMs(n = 200): { meanMs: number; objects: number; meshes: number } | null {
+    const cam = bodyRuntime.camera
+    if (!cam) return null
+    const rc = new Raycaster()
+    rc.far = INTERACT_RANGE_M
+    rc.setFromCamera(new Vector2(0, 0), cam)
+    let meshes = 0
+    for (const e of interactableRegistry.values())
+      e.object.traverse((o) => {
+        if ((o as THREE.Mesh).isMesh) meshes++
+      })
+    const t0 = performance.now()
+    for (let i = 0; i < n; i++) {
+      const objects = [...interactableRegistry.values()].map((e) => e.object)
+      rc.intersectObjects(objects, true)
+    }
+    return {
+      meanMs: (performance.now() - t0) / n,
+      objects: interactableRegistry.size,
+      meshes,
+    }
+  },
   /** Longest frame in the last `windowMs` (default the whole rolling window), in ms. */
   longestFrameMs(windowMs?: number): number {
     return frames?.longest(windowMs) ?? 0
@@ -434,6 +536,23 @@ declare global {
   interface Window {
     __lastRites?: LastRitesHook
   }
+}
+
+export interface ColliderInfo {
+  handle: number
+  shape: string
+  halfExtents: [number, number, number] | null
+  radius: number | null
+  translation: [number, number, number]
+  rotationY: number
+  sensor: boolean
+  owner: string
+  distance: number
+}
+
+export interface ModelSlice {
+  min: [number, number, number]
+  max: [number, number, number]
 }
 
 export interface LoggedEvent {

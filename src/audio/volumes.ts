@@ -3,6 +3,7 @@
 
 import { Howler } from 'howler'
 import { useSettingsStore } from '../game/state/settingsStore'
+import { isAudioEnabled } from './audioEnabled'
 import { getSynth } from './synth'
 
 export interface VolumeSettings {
@@ -15,15 +16,18 @@ const unit = (v: number): number => (Number.isFinite(v) ? Math.min(1, Math.max(0
 
 /** Push the settings onto Howler and the buses. Each step is isolated so one failure can't skip the rest. */
 export function applyVolumes(s: VolumeSettings): void {
+  const on = isAudioEnabled()
   try {
-    Howler.volume(unit(s.masterVolume))
+    // Muted: hard-mute Howler and zero the master, but keep the stored settings untouched.
+    Howler.mute(!on)
+    Howler.volume(on ? unit(s.masterVolume) : 0)
   } catch {
     // no audio device
   }
   try {
     const synth = getSynth()
-    synth?.setBusGain('sfx', unit(s.sfxVolume))
-    synth?.setBusGain('music', unit(s.musicVolume))
+    synth?.setBusGain('sfx', on ? unit(s.sfxVolume) : 0)
+    synth?.setBusGain('music', on ? unit(s.musicVolume) : 0)
   } catch {
     // buses not ready
   }

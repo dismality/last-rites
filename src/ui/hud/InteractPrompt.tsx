@@ -1,3 +1,6 @@
+import { DIG_ID_PREFIX, useDigStore } from '../../game/state/digStore'
+import { useWorldStore } from '../../game/state/worldStore'
+import { digPromptNote } from '../../game/systems/digGuidance'
 import { useDoorStore } from '../../game/state/doorStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -17,6 +20,10 @@ export function InteractPrompt() {
   const doors = useDoorStore((s) => s.doors)
   const inventory = useInventoryStore((s) => s.inventory)
   const cinematic = useCinematic()
+  const equippedSlot = useInventoryStore((s) => s.equippedSlot)
+  const bindings = useSettingsStore((s) => s.bindings)
+  const day = useWorldStore((s) => s.nightNumber)
+  const dugOnDay = useDigStore((s) => s.dig.dugOnDay)
   if (!hover || cinematic) return null
 
   // A door that cannot take a board says why: full, or the first missing material (Req 16.4).
@@ -29,12 +36,23 @@ export function InteractPrompt() {
     }
   }
 
+  let label = promptText(hover.action, key)
+  if (hover.action === 'dig' && hover.id.startsWith(DIG_ID_PREFIX)) {
+    label = `Hold ${label}`
+    note = digPromptNote({
+      inventory,
+      equippedSlot,
+      bindings,
+      dugToday: dugOnDay[hover.id.slice(DIG_ID_PREFIX.length)] === day,
+    })
+  }
+
   return (
     <p className="hud-prompt" role="status">
       <span className="hud-prompt__rune" aria-hidden="true">
         {ACTION_RUNE[hover.action]}
       </span>
-      {promptText(hover.action, key)}
+      {label}
       {note && <span className="hud-prompt__note">{` (${note})`}</span>}
     </p>
   )

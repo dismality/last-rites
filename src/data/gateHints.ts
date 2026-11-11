@@ -27,7 +27,7 @@ export const GATE_DEFS: Readonly<Record<MysteryGateId, GateDef>> = {
     name: 'Mausoleum Row gate',
     site: 'gate',
     hintMissingKey:
-      'The gate is locked. A rusted key bearing the Crane name might lie near the Marsh family grave.',
+      'The gate is locked. A rusted key bearing the Crane name lies on the ground at the foot of the Marsh family stone.',
     unlockText: 'The rusted lock gives way.',
     unlockSound: '[Iron grinds and the gate swings open]',
   },

@@ -4,9 +4,12 @@
 
 import type * as THREE from 'three'
 import type { RapierRigidBody } from '@react-three/rapier'
+import type { World } from '@dimforge/rapier3d-compat'
 
 export const bodyRuntime: {
   body: RapierRigidBody | null
   camera: THREE.Camera | null
   scene: THREE.Scene | null
-} = { body: null, camera: null, scene: null }
+  /** The Rapier world, so the debug hook can list the colliders near a point. */
+  world: World | null
+} = { body: null, camera: null, scene: null, world: null }

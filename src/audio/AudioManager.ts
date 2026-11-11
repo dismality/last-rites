@@ -7,6 +7,7 @@
 import { Howler } from 'howler'
 import type { AudioCueId } from '../data/enemies'
 import type { SoundId } from '../data/sounds'
+import { isAudioEnabled } from './audioEnabled'
 import { playSound } from './synth'
 import type { SoundPosition } from './synth'
 
@@ -95,6 +96,7 @@ export interface SpatialSource {
 
 /** Keep Howler's listener on the camera each frame. Yaw 0 faces -Z, as the three.js camera does. */
 export function setListener(position: readonly [number, number, number], yaw: number): void {
+  if (!isAudioEnabled()) return
   try {
     Howler.pos(position[0], position[1], position[2])
     Howler.orientation(-Math.sin(yaw), 0, -Math.cos(yaw), 0, 1, 0)
