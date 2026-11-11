@@ -3,6 +3,8 @@
 
   Layout: fixed panel on the right side of the screen, scrollable list of
   recipe entries. Unlocked recipes show full detail; locked recipes are smudged.
+  Each ingredient shows its name, have/need and a check or cross (never colour alone).
+  Undiscovered recipes read "???" until one of each ingredient was held.
 
   Visual language (Req 2.1–2.4):
   - Craftable entry:  ember-coloured heading + rune icon (✦) + ember glow pulse.
@@ -18,6 +20,9 @@
 */
 
 import { useCallback, useEffect, useId, useState } from 'react'
+import { createPortal } from 'react-dom'
+import { ItemIcon } from '../satchel/ItemIcon'
+import { displayTitle, isDiscovered, recipeCard, recipeItems, tooltipTarget } from './recipeView'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
@@ -99,47 +104,57 @@ interface UnlockedEntryProps {
   isCrafting: boolean
   /** Craft progress 0–1 (only meaningful when isCrafting is true). */
   craftProgress: number
+  discovered: boolean
+  collected: readonly ItemId[]
+  pinned: boolean
   onCraft: (recipeId: RecipeId) => void
+  onPin: (recipeId: RecipeId) => void
+  onTip: (recipeId: RecipeId | null, rect?: DOMRect) => void
 }
 
 /**
  * A visible, unlocked recipe row.
- * - Craftable: ember glow pulse + rune icon (✦).
- * - Hover: calls setHighlight / clearHighlight on the crafting store.
- * - Missing items shown in blood red with "missing" label.
- * - "Craft" button fires `startCrafting` and shows a progress bar.
+ * - Names the recipe and each ingredient with have/need counts and a ✓ / ✗ mark.
+ * - Undiscovered recipes read "???" with a silhouette until one of each ingredient was held.
+ * - Hover or focus: highlights the bench piles, selects the recipe for the ghost preview and
+ *   shows the tooltip beside the row.
+ * - Keyboard: Enter crafts, P pins.
  */
-function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, craftProgress, onCraft }: UnlockedEntryProps) {
+function UnlockedEntry({
+  recipe, craftable, missing, highlighted, isCrafting, craftProgress,
+  discovered, collected, pinned, onCraft, onPin, onTip,
+}: UnlockedEntryProps) {
   const setHighlight = useCraftingStore((s) => s.setHighlight)
   const clearHighlight = useCraftingStore((s) => s.clearHighlight)
+  const selectRecipe = useCraftingStore((s) => s.selectRecipe)
+  const pinId = useId()
 
-  const handleMouseEnter = useCallback(() => {
-    // Build inline so the array reference is stable within the callback.
-    const ids: ItemId[] = [
-      ...recipe.inputs.map((i) => i.item),
-      ...(recipe.consumesTool ? [recipe.consumesTool] : []),
-    ]
-    setHighlight(ids)
-  }, [recipe.inputs, recipe.consumesTool, setHighlight])
+  const enter = useCallback((el: HTMLElement) => {
+    setHighlight(recipeItems(recipe))
+    selectRecipe(recipe.id)
+    onTip(recipe.id, el.getBoundingClientRect())
+  }, [recipe, setHighlight, selectRecipe, onTip])
 
-  const handleMouseLeave = useCallback(() => {
+  const leave = useCallback(() => {
     clearHighlight()
-  }, [clearHighlight])
+    selectRecipe(null)
+    onTip(null)
+  }, [clearHighlight, selectRecipe, onTip])
 
-  const handleFocus = handleMouseEnter
-  const handleBlur = handleMouseLeave
+  const card = recipeCard(recipe, missing)
+  const title = displayTitle(recipe, collected, card)
+  const seen = new Set(collected)
 
-  // Build a map of missing items for quick lookup.
-  const missingMap = new Map(missing.map((m) => [m.item, m.qty]))
-
-  const ariaLabel = [
-    craftable ? 'Craftable.' : 'Cannot craft — missing ingredients.',
-    `Output: ${itemName(recipe.output.item)}`,
-    recipe.output.qty > 1 ? `(×${recipe.output.qty})` : '',
-    'Requires:',
-    recipe.inputs.map((i) => `${i.qty} ${itemName(i.item)}`).join(', '),
-    recipe.consumesTool ? `and ${itemName(recipe.consumesTool)}` : '',
-  ].filter(Boolean).join(' ')
+  const ariaLabel = !discovered
+    ? 'Unknown recipe. Collect one of each ingredient to learn it.'
+    : [
+        craftable ? 'Craftable.' : 'Cannot craft.',
+        `Makes ${card.title}.`,
+        card.ingredients.map((i) => `${i.label}, ${i.note}`).join('; '),
+        pinned ? 'Pinned.' : '',
+        craftable ? 'Enter to craft.' : '',
+        'P to pin.',
+      ].filter(Boolean).join(' ')
 
   return (
     <li
@@ -147,78 +162,84 @@ function UnlockedEntry({ recipe, craftable, missing, highlighted, isCrafting, cr
         'recipe-entry',
         craftable ? 'recipe-entry--craftable' : '',
         highlighted ? 'recipe-entry--hover-active' : '',
+        discovered ? '' : 'recipe-entry--unknown',
       ].join(' ')}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onMouseEnter={(e) => enter(e.currentTarget)}
+      onMouseLeave={leave}
+      onFocus={(e) => { if (e.target === e.currentTarget) enter(e.currentTarget) }}
+      onBlur={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) leave() }}
+      onKeyDown={(e) => {
+        if (e.target !== e.currentTarget) return
+        if (e.code === 'KeyP') {
+          e.preventDefault()
+          onPin(recipe.id)
+        } else if ((e.code === 'Enter' || e.code === 'NumpadEnter') && craftable && discovered && !isCrafting) {
+          e.preventDefault()
+          onCraft(recipe.id)
+        }
+      }}
       tabIndex={0}
       aria-label={ariaLabel}
-      // aria-live so screen readers announce missing-ingredient changes
-      aria-live="polite"
     >
       {/* Output row */}
       <div className="recipe-entry__output">
-        {craftable && (
+        {craftable && discovered && (
           <span className="recipe-entry__rune" aria-hidden="true" title="Craftable">✦</span>
         )}
-        <NamedItemIcon id={recipe.output.item} announce={false} />
-        <h3 className="recipe-entry__name">{card.title}</h3>
-        {recipe.consumesTool && (
+        {discovered ? (
+          <NamedItemIcon id={recipe.output.item} announce={false} />
+        ) : (
+          <span className="recipe-entry__silhouette" aria-hidden="true">
+            <ItemIcon id={recipe.output.item} size={64} />
+          </span>
+        )}
+        <h3 className="recipe-entry__name">{title}</h3>
+        {discovered && recipe.consumesTool && (
           <span className="recipe-entry__upgrade-tag" title="Upgrades an existing tool">
             ⟳ upgrade
           </span>
         )}
+        {discovered && (
+          <button
+            type="button"
+            className="pin-btn"
+            id={pinId}
+            aria-pressed={pinned}
+            aria-label={`${pinned ? 'Unpin' : 'Pin'} ${card.title}`}
+            onClick={(e) => { e.stopPropagation(); onPin(recipe.id) }}
+          >
+            {pinned ? '◆ Pinned' : '◇ Pin'}
+          </button>
+        )}
       </div>
 
-      {/* Ingredients list */}
+      {/* Ingredients list: name, have/need, and a mark so colour is never the only cue. */}
       <ul className="recipe-entry__ingredients" aria-label="Required ingredients">
-        {recipe.inputs.map((input) => {
-          const lack = missingMap.get(input.item) ?? 0
-          const hasMissing = lack > 0
+        {card.ingredients.map((row) => {
+          const known = discovered || seen.has(row.item)
           return (
             <li
-              key={input.item}
+              key={row.item}
               className={[
                 'recipe-entry__ingredient',
-                hasMissing ? 'recipe-entry__ingredient--missing' : '',
+                row.tool ? 'recipe-entry__ingredient--tool' : '',
+                known && row.lack > 0 ? 'recipe-entry__ingredient--missing' : '',
               ].join(' ')}
             >
-              <NamedItemIcon id={input.item} />
-              <span className="ingredient-qty">×{input.qty}</span>
-              {hasMissing && (
-                <span className="ingredient-missing-label" aria-label={`Missing ${lack}`}>
-                  missing {lack}
-                </span>
+              {known ? <NamedItemIcon id={row.item} announce={false} /> : <span className="recipe-entry__silhouette" aria-hidden="true"><ItemIcon id={row.item} size={64} /></span>}
+              {known ? (
+                <>
+                  <span className="ingredient-name">{row.label}</span>
+                  <span className="ingredient-mark" aria-hidden="true">{row.mark}</span>
+                  {row.lack > 0 && <span className="ingredient-missing-label">{row.note}</span>}
+                </>
+              ) : (
+                <span className="ingredient-name">???</span>
               )}
             </li>
           )
         })}
-        {/* consumesTool row */}
-        {recipe.consumesTool && (() => {
-          const lack = missingMap.get(recipe.consumesTool) ?? 0
-          const hasMissing = lack > 0
-          return (
-            <li
-              key={recipe.consumesTool}
-              className={[
-                'recipe-entry__ingredient',
-                'recipe-entry__ingredient--tool',
-                hasMissing ? 'recipe-entry__ingredient--missing' : '',
-              ].join(' ')}
-            >
-              <NamedItemIcon id={recipe.consumesTool} />
-              <span className="ingredient-qty">×1</span>
-              {hasMissing && (
-                <span className="ingredient-missing-label" aria-label="Missing">
-                  missing 1
-                </span>
-              )}
-            </li>
-          )
-        })()}
       </ul>
-
       {/* Craft button + progress bar (Req 3.1) */}
       {craftable && (
         <div className="recipe-entry__craft-row">
@@ -276,14 +297,28 @@ export function RecipeBook() {
   const craftingProgress = useCraftingStore((s) => s.craftingProgress)
   const startCrafting = useCraftingStore((s) => s.startCrafting)
   const inventory = useInventoryStore((s) => s.inventory)
+  const collected = useCraftingStore((s) => s.collectedItems)
+  const pinnedRecipe = useCraftingStore((s) => s.pinnedRecipe)
+  const togglePin = useCraftingStore((s) => s.togglePin)
+  const selectRecipe = useCraftingStore((s) => s.selectRecipe)
+  const [tip, setTip] = useState<{ id: RecipeId; top: number; right: number } | null>(null)
+  const onTip = useCallback((id: RecipeId | null, rect?: DOMRect) => {
+    setTip(id && rect ? { id, top: rect.top, right: window.innerWidth - rect.left + 8 } : null)
+  }, [])
   // Clear highlight when workbench closes.
   const clearHighlight = useCraftingStore((s) => s.clearHighlight)
   const titleId = useId()
   const [tab, setTab] = useState<'recipes' | 'upgrades'>('recipes')
 
+  // A tooltip left over from a closed bench must not come back on reopening (adjust during render).
+  if (!workbenchOpen && tip !== null) setTip(null)
+
   useEffect(() => {
-    if (!workbenchOpen) clearHighlight()
-  }, [workbenchOpen, clearHighlight])
+    if (!workbenchOpen) {
+      clearHighlight()
+      selectRecipe(null)
+    }
+  }, [workbenchOpen, clearHighlight, selectRecipe])
 
   // Stable callback so UnlockedEntry children don't re-render on every tick.
   const handleCraft = useCallback(
@@ -311,6 +346,11 @@ export function RecipeBook() {
       return [r.id, result]
     }),
   )
+
+  const tipId = tooltipTarget(workbenchOpen, tip?.id ?? null)
+  const tooltipShown = tipId !== null
+  const tipRecipe = tipId ? RECIPES.find((r) => r.id === tipId) : undefined
+  const tipCard = tipRecipe ? recipeCard(tipRecipe, craftability.get(tipRecipe.id)?.missing ?? []) : undefined
 
   return (
     <div
@@ -361,7 +401,12 @@ export function RecipeBook() {
                 highlighted={isHighlighted}
                 isCrafting={isCrafting}
                 craftProgress={craftProgress}
+                discovered={isDiscovered(recipe, collected)}
+                collected={collected}
+                pinned={pinnedRecipe === recipe.id}
                 onCraft={handleCraft}
+                onPin={togglePin}
+                onTip={onTip}
               />
             )
           })}
@@ -380,9 +425,26 @@ export function RecipeBook() {
         </ul>)}
 
         <p className="recipe-book__footer">
-          Craft at the bench — 1.5 s — world runs.
+          Craft at the bench — 1.5 s — world runs. Enter crafts, P pins.
         </p>
       </div>
+      {tooltipShown && tipRecipe && createPortal(
+        <div className="recipe-tip" role="tooltip" style={{ top: tip!.top, right: tip!.right }}>
+          <strong>{displayTitle(tipRecipe, collected, tipCard!)}</strong>
+          {isDiscovered(tipRecipe, collected) ? (
+            <ul>
+              {tipCard!.ingredients.map((i) => (
+                <li key={i.item} className={i.lack > 0 ? 'is-missing' : ''}>
+                  {i.mark} {i.label}{i.lack > 0 ? ` (${i.note})` : ''}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>Pick up one of each ingredient to learn this recipe.</p>
+          )}
+        </div>,
+        document.body,
+      )}
     </div>
   )
 }

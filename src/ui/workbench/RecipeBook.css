@@ -450,3 +450,77 @@
 .recipe-book__tabs { display: flex; gap: 0.5rem; justify-content: center; margin-bottom: 0.5rem; }
 .recipe-book__tabs .craft-btn[aria-pressed='true'] { box-shadow: 0 0 0 2px var(--ember); }
 .craft-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Names, counts, marks (spec 09, B9) ───────────────────────────────── */
+.ingredient-name {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.ingredient-mark {
+  margin-left: 0.35rem;
+  font-weight: bold;
+}
+
+.recipe-entry__ingredient--missing .ingredient-name,
+.recipe-entry__ingredient--missing .ingredient-mark,
+.recipe-entry__ingredient--missing .ingredient-missing-label {
+  color: var(--blood);
+}
+
+/* Undiscovered: the icon is a black cut-out until the ingredients were all held. */
+.recipe-entry__silhouette {
+  display: inline-flex;
+  filter: brightness(0) opacity(0.55);
+}
+
+.recipe-entry--unknown .recipe-entry__name {
+  letter-spacing: 0.2em;
+}
+
+.pin-btn {
+  margin-left: auto;
+  padding: 0.1rem 0.5rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.pin-btn[aria-pressed='true'] {
+  border-color: var(--ember);
+  background: rgba(232, 145, 58, 0.25);
+}
+
+.pin-btn:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+}
+
+/* Tooltip sits beside the hovered row, left of the book; rendered in a body portal. */
+.recipe-tip {
+  position: fixed;
+  z-index: 110;
+  max-width: 16rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.92);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  pointer-events: none;
+  font-size: 1rem;
+}
+
+.recipe-tip ul {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.recipe-tip .is-missing {
+  color: #e08a8a;
+}

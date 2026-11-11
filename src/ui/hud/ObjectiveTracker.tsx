@@ -4,6 +4,7 @@ import { useGameStore } from '../../game/state/gameStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { composeSecondLine } from '../../game/systems/objective'
+import { PinnedRecipe } from './PinnedRecipe'
 import './objectiveTracker.css'
 
 /** Countdown and prompt refresh once per second (Req 3.7, 3.8, 3.9). */
@@ -44,6 +45,7 @@ export function ObjectiveTracker() {
         </span>
       </div>
       <p className="hud-objective__second">{composeSecondLine(objective, prompt)}</p>
+      <PinnedRecipe />
     </div>
   )
 }

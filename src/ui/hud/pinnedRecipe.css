@@ -1,0 +1,24 @@
+/* Pinned recipe card: sits inside the objective tracker box, under its second line. */
+.hud-pin {
+  margin-top: 0.4rem;
+  padding-top: 0.3rem;
+  color: var(--parchment);
+  border-top: 1px solid var(--parchment-dark);
+  font-size: 1rem;
+}
+
+.hud-pin__title {
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+.hud-pin__rows {
+  margin: 0.15rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-pin__rows .is-missing {
+  color: #e08a8a;
+}
