@@ -55,7 +55,7 @@ describe('introCutscene data', () => {
     const page = FIXED_SPAWNS.find((f) => f.id === 'fx-page-1')!.position
     const toPage = Math.atan2(-page[0], -page[2])
     expect(SPAWN_YAW).toBeCloseTo(toPage, 9)
-    expect(INTRO_SHOTS[4].camera.target.at(-1)).toEqual(INTRO_END_POSE.target)
+    expect(INTRO_SHOTS[4].camera.target[INTRO_SHOTS[4].camera.target.length - 1]).toEqual(INTRO_END_POSE.target)
     expect(INTRO_FADE_S).toBeGreaterThanOrEqual(0.5)
   })
 

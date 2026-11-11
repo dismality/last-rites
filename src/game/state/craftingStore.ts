@@ -15,6 +15,7 @@ import { unlockRecipes, craft } from '../systems/crafting'
 import type { UnlockEvent, CraftResult } from '../systems/crafting'
 import { RECIPE_MAP } from '../../data/recipes'
 import { useInventoryStore } from '../state/inventoryStore'
+import { mergeCollected } from '../systems/recipeDiscovery'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -45,6 +46,18 @@ export interface CraftingState {
    * `cancelCrafting` or after the caller calls `commitCraft`.
    */
   craftingProgress: CraftingProgress | null
+
+  /** Recipe pinned to the HUD card, or null. Per run (reset with the store). */
+  pinnedRecipe: RecipeId | null
+  /** Recipe selected in the book; drives the ghost preview on the bench. */
+  selectedRecipe: RecipeId | null
+  /**
+   * Items the player has ever held this run. A recipe shows its name only once one of each
+   * ingredient is here. Not saved: it is rebuilt from the satchel after Continue.
+   */
+  collectedItems: ItemId[]
+  togglePin: (id: RecipeId) => void
+  selectRecipe: (id: RecipeId | null) => void
 
   // ── Unlock actions ────────────────────────────────────────────────────
 
@@ -111,6 +124,12 @@ export const useCraftingStore = create<CraftingState>((set, get) => ({
   highlightedItems: new Set<ItemId>(),
 
   craftingProgress: null,
+  pinnedRecipe: null,
+  selectedRecipe: null,
+  collectedItems: [],
+
+  togglePin: (id) => set((s) => ({ pinnedRecipe: s.pinnedRecipe === id ? null : id })),
+  selectRecipe: (id) => set({ selectedRecipe: id }),
 
   // ── Unlock ─────────────────────────────────────────────────────────────
 
@@ -188,3 +207,16 @@ export const useCraftingStore = create<CraftingState>((set, get) => ({
     return result
   },
 }))
+
+// Track every item the player has held. A reset replaces the store, so this reads the live one.
+function noteCollected(): void {
+  const { collectedItems } = useCraftingStore.getState()
+  const next = mergeCollected(collectedItems, useInventoryStore.getState().inventory)
+  if (next.length !== collectedItems.length) useCraftingStore.setState({ collectedItems: next })
+}
+useInventoryStore.subscribe(noteCollected)
+useCraftingStore.subscribe((s, prev) => {
+  // After a reset or a loaded save the inventory may already hold items.
+  if (s.collectedItems.length < prev.collectedItems.length) noteCollected()
+})
+noteCollected()

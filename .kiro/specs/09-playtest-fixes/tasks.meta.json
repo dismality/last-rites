@@ -30,6 +30,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297715001
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713367
       }
     ],
     "4. B2: Fair Retry Night and Retry from morning": [
@@ -86,6 +91,16 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297715948
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713441
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360724551
       }
     ],
     "12. Gate: ask the user about B10 before going on": [
@@ -107,6 +122,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716279
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713609
       }
     ],
     "15. C2: Dev log dates from git history": [
@@ -114,6 +134,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716401
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713668
       }
     ],
     "16. C3: Submission kit": [
@@ -121,6 +146,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716499
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713713
       }
     ],
     "17. B11: Movement hint clears": [
@@ -128,6 +158,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716599
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713767
       }
     ],
     "18. B12: Responsive HUD and 800x600 screenshot test": [
@@ -135,6 +170,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716702
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713830
       }
     ],
     "19. B13: Difficulty screen Begin visible": [
@@ -142,6 +182,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716821
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713874
       }
     ],
     "20. B14: Journal font size and plain-font setting": [
@@ -149,6 +194,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297716937
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713918
       }
     ],
     "21. B15: Shorter intro": [
@@ -156,6 +206,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717057
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713964
       }
     ],
     "22. B16: Quit confirmation and Continue on title": [
@@ -170,6 +225,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717265
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714059
       }
     ],
     "24.1 D1 main story path": [
@@ -177,6 +237,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717365
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714103
       }
     ],
     "24.2 D2 crafting and the workbench": [
@@ -184,6 +249,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717470
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714149
       }
     ],
     "24.3 D3 digging and materials": [
@@ -191,6 +261,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717581
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714200
       }
     ],
     "24.4 D4 chapel repairs": [
@@ -198,6 +273,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297717698
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714261
       }
     ],
     "24.5 D5 night combat and balance": [
@@ -212,6 +292,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297718012
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714308
       }
     ],
     "24.7 D7 endings and save/load": [
@@ -226,6 +311,11 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297718222
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714352
       }
     ],
     "24.9 D9 screens and settings": [
@@ -233,6 +323,32 @@
         "executionId": "9b9d958c-ab48-4234-a1fb-85e973e4c732",
         "chatSessionId": "sess_b12a3238-3253-4bae-bbd0-892f63eeb397",
         "timestamp": 1794297718347
+      },
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714394
+      }
+    ],
+    "11b. F6: Elite ammo drops only for owned guns (user approved)": [
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713500
+      }
+    ],
+    "12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval": [
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360713562
+      }
+    ],
+    "22. B16: Quit confirmation and Continue on title, with F5": [
+      {
+        "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794360714012
       }
     ]
   }

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { RECIPES } from '../../data/recipes'
 import { ITEM_MAP } from '../../data/items'
-import { recipeCard } from './recipeView'
+import { useCraftingStore } from '../../game/state/craftingStore'
+import { useInventoryStore } from '../../game/state/inventoryStore'
+import { resetRun } from '../../game/state/resetRun'
+import type { Inventory } from '../../game/types'
+import { displayTitle, ghostView, isDiscovered, pinCardView, recipeCard, tooltipTarget } from './recipeView'
 
 const recipe = (id: string) => RECIPES.find((r) => r.id === id)!
 
@@ -31,5 +35,65 @@ describe('recipeCard (spec 09, B9)', () => {
         expect(i.have).toBeLessThanOrEqual(i.need)
       }
     }
+  })
+})
+
+const invWith = (...stacks: { item: string; qty: number }[]): Inventory =>
+  ({ ...useInventoryStore.getState().inventory, slots: stacks }) as unknown as Inventory
+
+describe('recipe marks, discovery, pin, tooltip, ghost (spec 09, B9/G1)', () => {
+  it('marks missing rows with a cross and "need N more", owned with a tick', () => {
+    const c = recipeCard(recipe('r-bone-club'), [{ item: 'bone', qty: 2 }])
+    expect(c.ingredients[0]).toMatchObject({ mark: '\u2717', note: 'need 2 more' })
+    expect(c.ingredients[1]).toMatchObject({ mark: '\u2713', note: 'have enough' })
+  })
+
+  it('shows ??? until one of each ingredient was held', () => {
+    const r = recipe('r-bone-club')
+    const card = recipeCard(r, [])
+    expect(isDiscovered(r, ['bone'])).toBe(false)
+    expect(displayTitle(r, ['bone'], card)).toBe('???')
+    expect(isDiscovered(r, ['bone', 'cloth'])).toBe(true)
+    expect(displayTitle(r, ['bone', 'cloth'], card)).toBe('Bone Club')
+  })
+
+  it('tracks collected items and clears them on a new run', () => {
+    resetRun()
+    useInventoryStore.setState({ inventory: invWith({ item: 'bone', qty: 1 }) })
+    expect(useCraftingStore.getState().collectedItems).toContain('bone')
+    useInventoryStore.setState({ inventory: invWith() })
+    expect(useCraftingStore.getState().collectedItems).toContain('bone') // dropping it does not forget it
+    useCraftingStore.getState().togglePin('r-bone-club')
+    resetRun()
+    expect(useCraftingStore.getState().pinnedRecipe).toBeNull()
+    expect(useCraftingStore.getState().collectedItems).not.toContain('bone')
+  })
+
+  it('pin card follows the satchel and unpins on a second toggle', () => {
+    const unlocked = ['r-bone-club'] as const
+    expect(pinCardView(null, unlocked, invWith())).toBeNull()
+    const a = pinCardView('r-bone-club', unlocked, invWith({ item: 'bone', qty: 1 }))!
+    expect(a.craftable).toBe(false)
+    expect(a.rows[0].label).toBe('Bone 1/3')
+    const b = pinCardView('r-bone-club', unlocked, invWith({ item: 'bone', qty: 3 }, { item: 'cloth', qty: 1 }))!
+    expect(b.craftable).toBe(true)
+    expect(pinCardView('r-bone-club', [], invWith())).toBeNull()
+    resetRun()
+    useCraftingStore.getState().togglePin('r-bone-club')
+    useCraftingStore.getState().togglePin('r-bone-club')
+    expect(useCraftingStore.getState().pinnedRecipe).toBeNull()
+  })
+
+  it('hides the tooltip when the bench closes', () => {
+    expect(tooltipTarget(true, 'r-bandage')).toBe('r-bandage')
+    expect(tooltipTarget(false, 'r-bandage')).toBeNull()
+  })
+
+  it('ghost fill follows progress; owned rows are solid, missing are outlines', () => {
+    const card = recipeCard(recipe('r-bone-club'), [{ item: 'bone', qty: 2 }])
+    const g = ghostView(card, 1.5)
+    expect(g.fill).toBe(1)
+    expect(g.rows).toEqual([{ item: 'bone', solid: false }, { item: 'cloth', solid: true }])
+    expect(ghostView(card, -1).fill).toBe(0)
   })
 })

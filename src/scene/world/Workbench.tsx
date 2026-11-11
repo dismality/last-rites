@@ -24,7 +24,8 @@ import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { emit } from '../../game/events'
 import { canCraft } from '../../game/systems/crafting'
-import { RECIPES } from '../../data/recipes'
+import { RECIPES, RECIPE_MAP } from '../../data/recipes'
+import { ghostView, recipeCard } from '../../ui/workbench/recipeView'
 import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManager'
 import type { MaterialId } from '../../game/types'
 import { workbenchCameraRuntime } from './workbenchCameraRuntime'
@@ -424,6 +425,69 @@ function BenchModel() {
   )
 }
 // ---------------------------------------------------------------------------
+// RecipeGhost (spec 09, G1)
+// ---------------------------------------------------------------------------
+
+const GHOST_POS: [number, number, number] = [0, 1.2, BENCH_Z - 0.12]
+const GHOST_WASHED = new THREE.Color('#9a9a9a')
+
+/**
+ * Faint stand-in of the selected recipe's result above the bench. It is washed out while idle
+ * and fills with colour and an ember glow as the craft completes. Ingredients lie along the
+ * front of the bench: owned ones solid, missing ones as outlines. Meshes only (no lights), so
+ * the light count stays constant.
+ */
+function RecipeGhost() {
+  const selected = useCraftingStore((s) => s.selectedRecipe)
+  const progress = useCraftingStore((s) => s.craftingProgress)
+  const inventory = useInventoryStore((s) => s.inventory)
+  const ref = useRef<THREE.Mesh>(null)
+  const recipe = selected ? RECIPE_MAP[selected] : undefined
+  const view = useMemo(() => {
+    if (!recipe) return null
+    const card = recipeCard(recipe, canCraft(inventory, recipe).missing)
+    const crafting = progress && progress.recipeId === recipe.id ? progress.elapsed / progress.duration : 0
+    return ghostView(card, crafting)
+  }, [recipe, inventory, progress])
+  useFrame((_, delta) => {
+    if (ref.current) ref.current.rotation.y += delta * 0.6
+  })
+  if (!recipe || !view) return null
+  const outColor = MATERIAL_COLOR[recipe.output.item as MaterialId] ?? '#d8c9a3'
+  const tint = GHOST_WASHED.clone().lerp(new THREE.Color(outColor), view.fill)
+  return (
+    <group>
+      <mesh ref={ref} position={GHOST_POS}>
+        <octahedronGeometry args={[0.1, 0]} />
+        <meshStandardMaterial
+          color={tint}
+          transparent
+          opacity={0.25 + 0.75 * view.fill}
+          emissive="#e8913a"
+          emissiveIntensity={view.fill * 1.2}
+          roughness={0.7}
+          depthWrite={false}
+        />
+      </mesh>
+      {view.rows.map((row, i) => {
+        const id = row.item as MaterialId
+        const scale = MATERIAL_SCALE[id] ?? [0.06, 0.06, 0.06]
+        const x = (i - (view.rows.length - 1) / 2) * 0.22
+        return (
+          <mesh key={row.item} position={[x, BENCH_TOP_Y + scale[1] * 0.5 + 0.02, BENCH_Z + 0.25]} scale={scale}>
+            <boxGeometry args={[1, 1, 1]} />
+            {row.solid ? (
+              <meshStandardMaterial color={MATERIAL_COLOR[id] ?? '#b0a58a'} roughness={0.8} />
+            ) : (
+              <meshBasicMaterial color="#d8c9a3" wireframe transparent opacity={0.7} />
+            )}
+          </mesh>
+        )
+      })}
+    </group>
+  )
+}
+// ---------------------------------------------------------------------------
 // Workbench (main export)
 // ---------------------------------------------------------------------------
 
@@ -575,6 +639,7 @@ export function Workbench() {
             />
           ))}
 
+        {workbenchOpen && <RecipeGhost />}
         {/* Point light on the bench surface to warm up the material colours. */}
         {/* Always mounted: adding/removing a light recompiles every shader (0.7 s freeze). */}
         <BenchLight open={workbenchOpen} />
