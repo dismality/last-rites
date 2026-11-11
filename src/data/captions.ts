@@ -24,6 +24,7 @@ export type CaptionId =
   | 'dry-click'
   | 'reload'
   | 'weapon-break'
+  | 'weapon-crack'
   | 'board-break-front'
   | 'board-break-vestry'
   | 'bloater-hiss'
@@ -65,6 +66,13 @@ export const CAPTIONS: readonly CaptionDef[] = [
     event: 'weapon-break',
     text: '[the axe handle splinters]',
     minSeconds: 1.5,
+  },
+  {
+    id: 'weapon-crack',
+    event: 'weapon-crack',
+    text: 'NAME is cracking',
+    template: true,
+    minSeconds: 2,
   },
   {
     id: 'board-break-front',

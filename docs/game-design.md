@@ -267,6 +267,9 @@ The Bloater burst is dust and grey-green gas particles only: no gore.
 | 1 kola tonic | 15 |
 | 2 black powder | 10 |
 
+- **Ownership rule:** ammo drops only for a gun the player owns. A gun is owned when it is in the satchel or the combat state already tracks its magazine. While the revolver is not owned the cartridge row drops 2 lead shot instead, and while the shotgun is not owned the shell row drops 1 black powder instead. Weights stay the same, so the table still sums to 100.
+- **Weapon wear:** when a melee weapon has 5 hits left it shows the toast and subtitle "<weapon name> is cracking" with a crack sound, once per weapon. When it breaks, the hotbar switches to the next melee weapon (Rusty Shovel, Bone Club, Sharpened Shovel, Wood Axe, Silver Sabre), or the next filled slot if there is none.
+
 ### Boss: Father Aldous Crane (07)
 Treat him as a tragic figure who did a terrible thing, never as a joke. The rite and the church are not mocked.
 

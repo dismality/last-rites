@@ -26,6 +26,7 @@ const CAPTIONED_EVENTS: readonly CaptionEvent[] = [
   'dry-click',
   'reload',
   'weapon-break',
+  'weapon-crack',
   'board-break',
   'bloater-hiss',
   'bloater-burst',

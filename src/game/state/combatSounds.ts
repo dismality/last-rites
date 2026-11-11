@@ -25,14 +25,20 @@ export function setCombatSoundListener(fn: CombatSoundListener | null): void {
  * Raise the caption(s) for a sound, then hand it to the listener. `captionId` picks one caption
  * when several share a sound (board-break has a front-door and a vestry line).
  */
-export function emitCombatSound(id: CombatSoundId, at?: SoundPosition, captionId?: CaptionId): void {
+export function emitCombatSound(
+  id: CombatSoundId,
+  at?: SoundPosition,
+  captionId?: CaptionId,
+  /** Fills the NAME word of a template caption (e.g. the weapon that is cracking). */
+  name?: string,
+): void {
   const captions: CaptionDef[] = CAPTIONS.filter(
     (c) => c.event === id && (captionId === undefined || c.id === captionId),
   )
   // Captions first so a throwing audio listener can never swallow them.
   const chosen = captionId === undefined ? captions.slice(0, 1) : captions
   for (const c of chosen) {
-    emit({ type: 'subtitleShown', text: c.text, duration: c.minSeconds })
+    emit({ type: 'subtitleShown', text: name !== undefined && c.template ? c.text.replace('NAME', name) : c.text, duration: c.minSeconds })
   }
   listener?.(id, at)
 }

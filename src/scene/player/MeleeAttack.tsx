@@ -23,6 +23,7 @@ import { isSimFrozen } from '../../game/state/menuState'
 import { useToastStore } from '../../game/state/toastStore'
 import { startCharge, type HeavyStats } from '../../game/systems/heavyAttack'
 import { removeItem } from '../../game/systems/inventory'
+import { crossedCracking, nextSlotAfterBreak } from '../../game/systems/weaponBreak'
 import {
   REST_POSE,
   forwardFromYaw,
@@ -62,24 +63,28 @@ interface SwingInfo {
 const isHeavyId = (id: string | null): id is HeavyMeleeId =>
   id === 'wood-axe' || id === 'silver-sabre'
 
-/** Equips the next hotbar slot that still holds an item, after the held one broke. */
+/** After the held weapon broke: the next melee weapon on the hotbar, else the next filled slot. */
 function equipNextItem(): void {
   const inv = useInventoryStore.getState()
-  const from = inv.equippedSlot ?? 0
-  for (let i = 1; i <= HOTBAR_SLOTS.length; i++) {
-    const slot = HOTBAR_SLOTS[(from + i) % HOTBAR_SLOTS.length]
-    if (hotbarItem(inv.inventory, slot)) {
-      inv.equipSlot(slot)
-      return
-    }
-  }
+  const slots = HOTBAR_SLOTS.map((s) => hotbarItem(inv.inventory, s))
+  const next = nextSlotAfterBreak(slots, inv.equippedSlot ?? 0)
+  if (next !== null) inv.equipSlot(next as (typeof HOTBAR_SLOTS)[number])
 }
 
 /** Spends 1 durability for a hitting swing; at 0 the weapon breaks and leaves the satchel (Req 8.10, 8.11). */
 function spendSwingDurability(id: CraftedItemId): boolean {
   const combat = useCombatStore.getState()
   if (combat.durability[id as 'bone-club'] === undefined) return false
-  if (!combat.spendDurability(id as 'bone-club')) return false
+  const before = combat.durability[id as 'bone-club']
+  if (!combat.spendDurability(id as 'bone-club')) {
+    if (crossedCracking(before, useCombatStore.getState().durability[id as 'bone-club'])) {
+      const name = ITEM_MAP[id]?.name ?? 'Your weapon'
+      useToastStore.getState().push(`${name} is cracking`)
+      // The caption is raised even when audio is muted or unavailable.
+      emitCombatSound('weapon-crack', undefined, undefined, name)
+    }
+    return false
+  }
   const inv = useInventoryStore.getState()
   inv.setInventory(removeItem(inv.inventory, id, 1).inv)
   // The only break caption in the bible is the axe's; other weapons get a toast.
