@@ -1137,6 +1137,11 @@
         "executionId": "e74f783c-e6bc-401f-b847-89e10abfbb2d",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794193127792
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925652
       }
     ],
     "1. Progression data and data tests": [
@@ -1493,21 +1498,6 @@
     ],
     "11.2 Verify playtest items 1 to 15 in Chrome": [
       {
-        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
-        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
-        "timestamp": 1794199465928
-      },
-      {
-        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
-        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
-        "timestamp": 1794200866389
-      },
-      {
-        "executionId": "ebc84343-6697-47b9-b7d4-e4a517b48d03",
-        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
-        "timestamp": 1794200870580
-      },
-      {
         "executionId": "7c71439c-b290-416a-a2d9-96cfd83dc5df",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794212363791
@@ -1541,6 +1531,96 @@
         "executionId": "780f0dfb-cc0b-4cf9-9f2a-cc549f3bc7ea",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794214565968
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925607
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794240712363
+      },
+      {
+        "executionId": "68608c7d-b731-4dfd-b297-bebc4b6bd167",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794241992216
+      }
+    ],
+    "12.1 Mute all audio behind one constant": [
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925381
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236933360
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794237528994
+      }
+    ],
+    "12.2 Mouse look flicker, lag and snapping": [
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925444
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236933458
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794237529112
+      }
+    ],
+    "12.3 Digging is hard to find": [
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925493
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794237529179
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794237870951
+      }
+    ],
+    "12.4 Invisible obstruction among headstones": [
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794236925547
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794237871033
+      },
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794240712208
+      }
+    ],
+    "12. Hand-playtest bugs (graveyard by day, objective \"Find the Rusted Crypt Key\"; do not commit or push)": [
+      {
+        "executionId": "bdc9c9ad-bb3d-4290-864f-7869d851645e",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794240712291
       }
     ]
   }

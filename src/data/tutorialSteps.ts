@@ -39,6 +39,9 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
 /** The one item whose pickup finishes step 2 (spec 09, B4). */
 export const TUTORIAL_PICKUP_ITEM = 'lamp-oil' as const
 
+/** The step that asks the player to dig; guidance points at a mound while it is current. */
+export const DIG_STEP_ID: TutorialStepId = 4
+
 /** Distance in metres the player must walk to finish step 1. */
 export const TUTORIAL_WALK_TARGET_M = 3
 

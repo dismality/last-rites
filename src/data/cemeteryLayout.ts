@@ -174,8 +174,6 @@ export interface Headstone {
 
 export const HEADSTONE = {
   count: 60,
-  width: 0.6,
-  depth: 0.2,
   minHeight: 0.8,
   maxHeight: 1.4,
   seed: 1891,
@@ -291,10 +289,6 @@ export const TREE = {
   seed: 1849,
   pines: 16,
   trunks: 8,
-  /** Trunk collider half-extent for pines (the model's trunk is about 0.5 m across). */
-  pineColliderHalf: 0.35,
-  pineColliderHalfHeight: 3,
-  trunkColliderHalf: 0.4,
   /** Keep pines this far from spawn points so pickups are never hidden. */
   clearance: 3,
 } as const
@@ -340,7 +334,6 @@ export const LAMP_POSTS: ReadonlyArray<{ position: Vec3; rotationY: number }> = 
   { position: [22.5, 0, 37.5], rotationY: 0 },
   { position: [-5, 0, 14], rotationY: 1 },
 ]
-export const LAMP_COLLIDER = { half: 0.25, halfHeight: 1.5 } as const
 
 // --- Set pieces -------------------------------------------------------------
 

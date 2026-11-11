@@ -6,19 +6,25 @@ import {
   CHAPEL_CENTER,
   CHAPEL_DOORS,
   CORRIDORS,
-  CRANE_CRYPT,
   GROUNDS_HALF,
-  HEADSTONE,
   HUT,
   FENCE,
-  LAMP_COLLIDER,
   LAMP_POSTS,
-  TREE,
   buildFenceSegments,
   craneCryptPosition,
   generateHeadstones,
   generateTrees,
 } from '../../src/data/cemeteryLayout'
+import {
+  CRANE_CRYPT_BODY,
+  headstoneCollider,
+  headstoneKind,
+  headstoneScale,
+  lampCollider,
+  treeCollider,
+  treeScale,
+} from '../../src/data/colliderFootprints'
+import { TOMBSTONES } from '../../src/data/tombstones'
 import { FIXED_SPAWNS, SPAWN_POINTS } from '../../src/data/zones'
 import type { Vec2 } from '../../src/game/systems/combat'
 
@@ -77,23 +83,37 @@ export function structureBoxes(): Box[] {
     }
   }
   const [kx, , kz] = craneCryptPosition()
-  out.push(box(kx, kz, CRANE_CRYPT.halfX, CRANE_CRYPT.halfZ))
+  out.push(box(kx, kz, CRANE_CRYPT_BODY.halfX, CRANE_CRYPT_BODY.halfZ))
   return out
 }
 
-/** Headstones, trees and lamp posts: small obstacles a zombie must steer around. */
+/** Axis-aligned box around a (possibly turned) cuboid collider, as the zombies' wall probe sees it. */
+function turnedBox(c: { position: readonly number[]; rotationY: number; half: readonly number[] }): Box {
+  const cos = Math.abs(Math.cos(c.rotationY))
+  const sin = Math.abs(Math.sin(c.rotationY))
+  return box(c.position[0], c.position[2], c.half[0] * cos + c.half[2] * sin, c.half[0] * sin + c.half[2] * cos)
+}
+
+/** Headstones, tombstones, trees and lamp posts: small obstacles a zombie must steer around. */
 export function propBoxes(): Box[] {
   const out: Box[] = []
-  for (const h of generateHeadstones()) out.push(box(h.position[0], h.position[2], HEADSTONE.width / 2, HEADSTONE.depth / 2))
+  generateHeadstones().forEach((h, i) =>
+    out.push(turnedBox(headstoneCollider(headstoneKind(i), headstoneScale(h.height), h.position, h.rotationY))),
+  )
+  for (const t of TOMBSTONES)
+    out.push(turnedBox(headstoneCollider(t.model, headstoneScale(t.height), t.position, t.rotationY)))
   const avoid = [...SPAWN_POINTS.map((p) => p.position), ...FIXED_SPAWNS.map((p) => p.position)]
-  for (const t of generateTrees(avoid)) {
-    const half = t.kind.startsWith('pine') ? TREE.pineColliderHalf : TREE.trunkColliderHalf
-    out.push(box(t.position[0], t.position[2], half, half))
+  generateTrees(avoid).forEach((t, i) => {
+    // A square around the round trunk: never smaller than the real collider.
+    const r = treeCollider(t.kind, treeScale(i), t.position).radius
+    out.push(box(t.position[0], t.position[2], r, r))
+  })
+  for (const l of LAMP_POSTS) {
+    const r = lampCollider(l.position).radius
+    out.push(box(l.position[0], l.position[2], r, r))
   }
-  for (const l of LAMP_POSTS) out.push(box(l.position[0], l.position[2], LAMP_COLLIDER.half, LAMP_COLLIDER.half))
   return out
 }
-
 /** Slab test for a segment against one box. */
 function hits(b: Box, a: Vec2, d: Vec2, len: number): boolean {
   let t0 = 0

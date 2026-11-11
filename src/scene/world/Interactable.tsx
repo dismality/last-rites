@@ -9,7 +9,8 @@ import * as THREE from 'three'
 import { useLanternStore } from '../../game/state/lanternStore'
 import { useInteractionStore } from '../../game/state/interactionStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
-import { ACTION_RUNE, isWithinLantern, type InteractAction } from '../../game/systems/interaction'
+import { useWorldStore } from '../../game/state/worldStore'
+import { ACTION_RUNE, isRuneVisible, type InteractAction } from '../../game/systems/interaction'
 import { cinematicActive } from '../../game/state/menuState'
 import { endingCameraRuntime } from '../effects/endingCameraRuntime'
 import { introCameraRuntime } from '../effects/introCameraRuntime'
@@ -55,6 +56,10 @@ interface Props {
   size?: [number, number, number]
   /** Height of the rune above the object's origin. */
   runeHeight?: number
+  /** Rune scale; large targets seen from afar (grave mounds) use a bigger glyph. */
+  runeScale?: number
+  /** Also show the rune by day within this many metres even with the lantern off. */
+  dayRuneRange?: number
   children?: ReactNode
 }
 
@@ -64,6 +69,8 @@ export function Interactable({
   id,
   size = [0.5, 0.5, 0.5],
   runeHeight = 0.8,
+  runeScale = 0.25,
+  dayRuneRange,
   children,
 }: Props) {
   const autoId = useId()
@@ -101,7 +108,13 @@ export function Interactable({
     g.getWorldPosition(world)
     const dist = state.camera.position.distanceTo(world)
     const { fuel, on } = useLanternStore.getState()
-    const lit = isWithinLantern(dist, fuel, on)
+    const lit = isRuneVisible({
+      distance: dist,
+      fuel,
+      lanternOn: on,
+      day: useWorldStore.getState().phase === 'day',
+      dayRuneRangeM: dayRuneRange,
+    })
     const hide = cinematicActive({
       ending: endingCameraRuntime.active,
       intro: introCameraRuntime.active,
@@ -113,7 +126,13 @@ export function Interactable({
     // Slow pulse; held steady when the flashing-lights setting is off.
     const pulse = animate ? 0.5 + 0.5 * Math.sin(t * 2.4) : 0.5
     // No glow volume: an additive box read as a glowing crate. The rune pulses instead.
-    if (rune.current) rune.current.opacity = isHover ? 1 : lit && !hide ? 0.25 + 0.3 * pulse : 0
+    if (rune.current) rune.current.opacity = isHover
+        ? 1
+        : lit && !hide
+          ? dayRuneRange !== undefined
+            ? 0.55 + 0.35 * pulse // daylight washes out the faint pulse; keep mounds readable
+            : 0.25 + 0.3 * pulse
+          : 0
   })
 
   return (
@@ -130,7 +149,7 @@ export function Interactable({
           />
         </lineSegments>
       )}
-      <sprite position={[0, runeHeight, 0]} scale={[0.25, 0.25, 0.25]} raycast={() => null}>
+      <sprite position={[0, runeHeight, 0]} scale={[runeScale, runeScale, runeScale]} raycast={() => null}>
         <spriteMaterial ref={rune} map={map} transparent opacity={0} depthWrite={false} />
       </sprite>
     </group>

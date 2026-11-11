@@ -1,14 +1,15 @@
 // Cemetery -- the four zones, dressed with the Kenney graveyard kit (public/assets/models/world).
 //
-// Mount inside <Physics>. Everything here is static: fixed rigid bodies with
-// explicit CuboidColliders (cheap, exact) that kept their greybox sizes, so
-// the models are purely visual. Gates live in Gates.tsx; no rules live here.
+// Mount inside <Physics>. Everything here is static: fixed rigid bodies with explicit colliders.
+// Scattered props (headstones, trees, lamps, the Crane crypt) get colliders cut to their model's
+// real footprint (data/colliderFootprints.ts), so nothing blocks the player that they cannot see.
+// Gates live in Gates.tsx; no rules live here.
 //
 // Draw-call budget: every repeated prop goes through <InstancedModel>, one call
 // per model type (~20 total), plus a handful of floor/ceiling slabs.
 
 import { useMemo } from 'react'
-import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { CuboidCollider, CylinderCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import {
   AVENUE_CRYPT_SIZE,
@@ -17,13 +18,9 @@ import {
   FENCE,
   FENCE_PANEL_WIDTH,
   GROUNDS_HALF,
-  HEADSTONE,
   HEADSTONE_KINDS,
-  HEADSTONE_MODEL_HEIGHT,
-  LAMP_COLLIDER,
   LAMP_POSTS,
   PLAYABLE_BOUNDS,
-  TREE,
   WALL_MODEL_HEIGHT,
   WALL_MODEL_THICKNESS,
   WALL_PANEL_WIDTH,
@@ -39,6 +36,15 @@ import {
   type TreeKind,
   type Vec3,
 } from '../../data/cemeteryLayout'
+import {
+  CRANE_CRYPT_BODY,
+  headstoneCollider,
+  headstoneKind,
+  headstoneScale,
+  lampCollider,
+  treeCollider,
+  treeScale,
+} from '../../data/colliderFootprints'
 import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
 import { ChapelBuilding } from './ChapelBuilding'
 import { Gate, OssuaryDoor } from './Gates'
@@ -65,8 +71,8 @@ const unit = (position: Vec3, rotationY = 0, s = 1): Placement => ({
 // Headstones: five models cycled by index, each a single instanced draw call.
 const HEADSTONE_PLACEMENTS = HEADSTONE_KINDS.map((_kind, k) =>
   HEADSTONES.flatMap((h, i) =>
-    i % HEADSTONE_KINDS.length === k
-      ? [unit(h.position, h.rotationY, h.height / HEADSTONE_MODEL_HEIGHT)]
+    headstoneKind(i) === HEADSTONE_KINDS[k]
+      ? [unit(h.position, h.rotationY, headstoneScale(h.height))]
       : [],
   ),
 )
@@ -82,7 +88,7 @@ const SPAWN_AVOID: Vec3[] = [
 const TREES = generateTrees(SPAWN_AVOID)
 const treesOf = (kind: TreeKind) =>
   TREES.flatMap((t, i) =>
-    t.kind === kind ? [unit(t.position, t.rotationY, 0.9 + (i % 4) * 0.1)] : [],
+    t.kind === kind ? [unit(t.position, t.rotationY, treeScale(i))] : [],
   )
 const PINE_PLACEMENTS = treesOf('pine-crooked')
 const PLAIN_PINE_PLACEMENTS = treesOf('pine')
@@ -158,14 +164,10 @@ function Headstones() {
         <InstancedModel key={kind} model={kind} placements={HEADSTONE_PLACEMENTS[k]} />
       ))}
       <RigidBody type="fixed" colliders={false}>
-        {HEADSTONES.map((h, i) => (
-          <CuboidCollider
-            key={i}
-            args={[HEADSTONE.width / 2, h.height / 2, HEADSTONE.depth / 2]}
-            position={[h.position[0], h.height / 2, h.position[2]]}
-            rotation={[0, h.rotationY, 0]}
-          />
-        ))}
+        {HEADSTONES.map((h, i) => {
+          const c = headstoneCollider(headstoneKind(i), headstoneScale(h.height), h.position, h.rotationY)
+          return <CuboidCollider key={i} args={[...c.half]} position={[...c.position]} rotation={[0, c.rotationY, 0]} />
+        })}
       </RigidBody>
     </>
   )
@@ -205,16 +207,8 @@ function Trees() {
       <InstancedModel model="trunk-long" placements={LONG_TRUNK_PLACEMENTS} />
       <RigidBody type="fixed" colliders={false}>
         {TREES.map((t, i) => {
-          const pine = t.kind.startsWith('pine')
-          const halfH = pine ? TREE.pineColliderHalfHeight : t.kind === 'trunk' ? 0.33 : 0.75
-          const half = pine ? TREE.pineColliderHalf : TREE.trunkColliderHalf
-          return (
-            <CuboidCollider
-              key={i}
-              args={[half, halfH, half]}
-              position={[t.position[0], halfH, t.position[2]]}
-            />
-          )
+          const c = treeCollider(t.kind, treeScale(i), t.position)
+          return <CylinderCollider key={i} args={[c.halfHeight, c.radius]} position={[...c.position]} />
         })}
       </RigidBody>
     </>
@@ -226,13 +220,10 @@ function LampPosts() {
     <>
       <InstancedModel model="lightpost-single" placements={LAMP_PLACEMENTS} />
       <RigidBody type="fixed" colliders={false}>
-        {LAMP_POSTS.map((l, i) => (
-          <CuboidCollider
-            key={i}
-            args={[LAMP_COLLIDER.half, LAMP_COLLIDER.halfHeight, LAMP_COLLIDER.half]}
-            position={[l.position[0], LAMP_COLLIDER.halfHeight, l.position[2]]}
-          />
-        ))}
+        {LAMP_POSTS.map((l, i) => {
+          const c = lampCollider(l.position)
+          return <CylinderCollider key={i} args={[c.halfHeight, c.radius]} position={[...c.position]} />
+        })}
       </RigidBody>
     </>
   )
@@ -265,8 +256,8 @@ function CraneCrypt() {
       />
       <RigidBody type="fixed" colliders={false}>
         <CuboidCollider
-          args={[CRANE_CRYPT.halfX, CRANE_CRYPT.height / 2, CRANE_CRYPT.halfZ]}
-          position={[x, CRANE_CRYPT.height / 2, z]}
+          args={[CRANE_CRYPT_BODY.halfX, CRANE_CRYPT_BODY.height / 2, CRANE_CRYPT_BODY.halfZ]}
+          position={[x, CRANE_CRYPT_BODY.height / 2, z]}
         />
       </RigidBody>
     </>

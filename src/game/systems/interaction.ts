@@ -50,6 +50,21 @@ export function isWithinLantern(distance: number, fuel: number, lanternOn: boole
   return distance <= lanternRadius(fuel)
 }
 
+export interface RuneVisibility {
+  distance: number
+  fuel: number
+  lanternOn: boolean
+  day: boolean
+  /** Interactables that opt in show their rune by day inside this range, lantern or not. */
+  dayRuneRangeM?: number
+}
+
+/** Whether the rune pulse shows: inside the lantern, or (opt-in) within a fixed range by day. */
+export function isRuneVisible(v: RuneVisibility): boolean {
+  if (isWithinLantern(v.distance, v.fuel, v.lanternOn)) return true
+  return v.day && v.dayRuneRangeM !== undefined && v.distance <= v.dayRuneRangeM
+}
+
 /** Req 1.2: hover needs the crosshair on the object and it within reach. */
 export function isInteractRange(distance: number): boolean {
   return distance <= INTERACT_RANGE_M

@@ -5,6 +5,7 @@
 
 import { Howl, Howler } from 'howler'
 import { SOUND_RECIPES, type SoundId, type SoundRecipe } from '../data/sounds'
+import { isAudioEnabled } from './audioEnabled'
 
 /** Most voices alive at once; the oldest is cut when a new one would exceed this (Req 23.9). */
 export const MAX_VOICES = 16
@@ -179,6 +180,8 @@ let primer: Howl | null = null
  * silent, non-preloaded primer is enough; call this from the first user gesture (title click).
  */
 export function unlockAudio(): SynthEngine | null {
+  // Muted: never create a Howl, AudioContext use or buses, so music/rain/sfx all find no engine.
+  if (!isAudioEnabled()) return null
   try {
     if (engine) {
       void engine.ctx.resume?.()
@@ -203,6 +206,7 @@ export function getSynth(): SynthEngine | null {
 
 /** Play a recipe. Safe to call before unlock, on a silent device, or with an unknown id. */
 export function playSound(id: SoundId, at?: SoundPosition, volume = 1): void {
+  if (!isAudioEnabled()) return
   try {
     engine?.play(id, at, volume)
   } catch {

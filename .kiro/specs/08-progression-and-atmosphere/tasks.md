@@ -490,12 +490,34 @@ Data comes first (every **(08)** row of `docs/game-design.md` §12 and its "Plac
     - Keep the `pointLight` in `Workbench.tsx` mounted at intensity 0 and raise it when the bench opens; find other lights that mount or unmount during play and treat them the same; precompile shaders during loading if it helps. Measure the first bench open in a real browser and report the longest frame.
   - [x] 10.16 Log the playtest fixes
     - Append `docs/kiro-log.md` entries with the real date for items 1 to 15, including the item 13 conclusion and the item 14 placeholder list. Do not mark task 9 done.
+- [x] 12. Hand-playtest bugs (graveyard by day, objective "Find the Rusted Crypt Key"; do not commit or push)
+  - [x] 12.1 Mute all audio behind one constant
+    - Mute music, sound effects and the procedural synth layers with one clearly named constant (for example `AUDIO_ENABLED = false` in `src/data/audio.ts` or `src/audio/`) so it can be switched back on later. Do not delete audio code or the volume settings.
+    - Test: with the constant off nothing reaches Howler or the Web Audio buses (gains 0 or no voices); with it on, behaviour is unchanged.
+  - [x] 12.2 Mouse look flicker, lag and snapping
+    - `src/scene/player/input.ts`: filter implausible single-event `movementX/Y` spikes without eating genuine fast flicks.
+    - Request pointer lock with `{ unadjustedMovement: true }` where supported and fall back to normal lock when rejected, at every place that requests lock.
+    - `FirstPersonController.tsx`: discard look movement collected while a menu, the workbench, intro or ending camera owns the view, so it never releases as one big turn.
+    - Measure frame times while turning on the spot, including in the graveyard, before and after; find the cause of any hitch. Check the cost of `useInteractionRaycast.ts` (array build plus recursive raycast per interactable per frame) without assuming it is the cause. Report numbers, and say that headless software rendering cannot prove the real mouse fix or real frame rates.
+    - Tests for the spike filter, the lock fallback and the discard.
+  - [x] 12.3 Digging is hard to find
+    - Make the three mounds at (-15, 12), (14, -20) and (22, 24) clearly visible in daylight and easy to target.
+    - `Interactable.tsx` shows the rune only inside lantern range; fix that for mounds so they show by day with the lantern off.
+    - Show a clear prompt when close; with no shovel in hand, say a shovel is needed.
+    - The Rusted Crypt Key lies on the ground at (-12, -18) and is not dug up; no dig hint may suggest digging finds it.
+    - While the dig tutorial step is active, guide the player to a mound.
+    - Tests for each.
+  - [x] 12.4 Invisible obstruction among headstones
+    - Reproduce first: with the dev hook, walk into the area around the key and page 2 at (-12.5, -17) from several directions and confirm both can be reached and picked up.
+    - Compare every graveyard collider with its visible model (all headstones use one 0.6 x 0.2 m collider whatever the model, tombstones the same; also trees, lamp posts and anything with no visible match). Make colliders match what the player sees.
+    - If the block cannot be reproduced, say so and list what was checked; do not claim it fixed.
+    - Tests where they make sense.
 - [ ] 11. Real-browser verification of the playtest fixes (user approved Playwright as a devDependency and a dev-only debug hook)
   - [x] 11.1 Browser harness
     - Add `@playwright/test` (or `playwright`) as a pinned exact-version devDependency only, using the system Chrome (`channel: 'chrome'`) so no browser download is needed if possible. Add a dev-only debug hook (compiled out of production builds with `import.meta.env.DEV`, exposed as `window.__lastRites`) that can start a run in a chosen mode, set the phase and night, skip to dusk or night, spawn zombies at given points, give items, teleport the player, read store snapshots (world, waves, enemies, progression, inventory, combat, doors, spawn, player) and read the longest frame time. Add `npm run e2e` that starts the dev server and runs the Playwright specs under `e2e/`. Exclude `e2e/` from vitest and lint config as needed. Document in `docs/` only if asked.
     - Test: the hook is absent from a production build (structure test or a grep of `dist`).
     - Do not touch task 9
-  - [ ] 11.2 Verify playtest items 1 to 15 in Chrome
+  - [-] 11.2 Verify playtest items 1 to 15 in Chrome
     - Write Playwright specs and run them headed-or-headless in real Chrome for: nights 1, 2 and 3 in a row (items 1), a shovel kill paying score and a coin pile (2), zombies standing at the start reaching the player at night (3), New Game restoring the revolver and axe pickups (4), Retry Night and Continue moving the body (5), materials back on day 2 (6), zombie appearance screenshots at 1 to 2 m (7, saved for the user to look at), final rite objective text (8), boss name card vs bar bounding boxes (9), no rune during intro and ending (10), ending reaching the end screen unskipped in about 45 s (11), Endless objective, stats rows and Best combo (12), barricade timing observed in a night 3 setup (13), icons in hotbar and satchel at 64 px, hover and slot-switch names, the 2 s hold and 0.6 s fade (14), and the longest frame on the first workbench open (15). Report each result honestly; where Playwright cannot decide (visual taste), save screenshots under `e2e/screenshots/` and say so. Fix real bugs found, with tests.
     - Append `docs/kiro-log.md` entries with the real date. Do not mark task 9 done
 - [ ] 9. Checkpoint: playtest in a real browser
