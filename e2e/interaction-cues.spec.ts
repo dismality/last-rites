@@ -127,6 +127,10 @@ test.describe('interaction cues never mislead', () => {
     const before = await page.evaluate((i) => window.__lastRites!.interactableCue(i), id)
     expect(before!.bodyMeshes).toBeGreaterThan(0)
 
+    // The steady fade is the Flashing-lights-off behaviour; with it on, a small guttering ripple rides
+    // on the fade by design (interactionCue.fadeAlpha). 270 ms SwiftShader frames hid that ripple, so
+    // this check passed only by luck before the GPU switch.
+    await page.evaluate(() => window.__lastRites!.setSetting('flashingLights', false))
     // Sample the cue every 16 ms while a real E press takes the item.
     const run = await page.evaluate(async (i) => {
       const h = window.__lastRites!

@@ -170,6 +170,14 @@ describe('structure rule: this spec adds no binary assets', () => {
     'stone-wall-column stone-wall-curve stone-wall-damaged stone-wall trunk-long trunk urn-round urn-square'
   ).split(' ')
   for (const w of WORLD) ALLOWED.add(`models/world/${w}.glb`)
+  /** The 31 world item models from tools/blender/world_items.py, credited in docs/CREDITS.md. */
+  const ITEMS = (
+    'bandage black-powder blessed-rounds bone-club bone candle-wax cloth grave-salt holy-water-flask ' +
+    'holy-water iron-nail journal-page kola-tonic lamp-oil lantern-refill lantern-trap lead-shot nail-bomb ' +
+    'parish-ledger revolver-cartridge revolver rusty-shovel salt-circle sharpened-shovel shotgun-shell ' +
+    'shotgun silver-filings silver-sabre tallow-candle wood-axe wood-plank'
+  ).split(' ')
+  for (const i of ITEMS) ALLOWED.add(`models/items/${i}.glb`)
 
   it('has only the recorded .ogg, .mp3 and .glb files', () => {
     const found = Object.keys(import.meta.glob('../public/assets/**/*.{ogg,mp3,glb}'))

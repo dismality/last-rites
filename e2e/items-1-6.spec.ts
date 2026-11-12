@@ -212,7 +212,9 @@ test('item 2: a shovel kill pays score, combo, stats and one coin pile', async (
   const t = trace as { created: number; piles: number[]; banked: number }[]
   expect(Math.max(...t.map((x) => x.created))).toBe(2)
   // The first pile lay exactly 1.5 m away and was banked at once; the second (1.53 m) is still on the ground.
-  expect(t.some((x) => x.created === 1 && x.piles.length === 1)).toBe(true)
+  // On fast (GPU) frames pile 1 can be created and banked between two 20 ms samples, so check the
+  // balance it left behind (1 coin before pile 2 appeared) rather than catching it on the ground.
+  expect(t.some((x) => x.created === 1 && (x.piles.length === 1 || x.banked === 1))).toBe(true)
   expect((await snap<{ piles: unknown[] }>(page, 'coins')).piles).toHaveLength(1)
   // Walk onto it: it must bank once and be gone.
   await page.evaluate(() => window.__lastRites!.teleport(0.3, -1.2))
@@ -226,6 +228,14 @@ test('item 2: a shovel kill pays score, combo, stats and one coin pile', async (
   expect((await snap<typeof p1>(page, 'progression')).stats.kills.shambler).toBe(2)
   expect(errors).toEqual([])
 })
+
+/**
+ * The player stands inside the hut, so zombies queue at the door: separation keeps bodies 1 m
+ * apart and a zombie behind the first stops just outside attack range. 2 m allows that queue, like
+ * the crowding allowance in tests/zombieNavigation.test.ts; a stall (the old bug) is caught by
+ * maxStuckFar. Was 1.5 m, which only held on slow SwiftShader frames.
+ */
+const REACH_M = 2
 
 test('item 3: zombies reach a player standing still at the hut at night', async ({ page }) => {
   test.setTimeout(900_000)
@@ -250,7 +260,7 @@ test('item 3: zombies reach a player standing still at the hut at night', async 
         let tr = tracks[e.uid]
         if (!tr) tr = tracks[e.uid] = { min: d, anchor: { ...e.pos }, anchorT: t, maxStuckFar: 0, reachedT: null, first: { ...e.pos } }
         tr.min = Math.min(tr.min, d)
-        if (tr.reachedT === null && d <= 1.5) tr.reachedT = t
+        if (tr.reachedT === null && d <= 2) tr.reachedT = t // REACH_M; runs in the page, so a literal
         if (Math.hypot(e.pos.x - tr.anchor.x, e.pos.z - tr.anchor.z) > 0.5) {
           tr.anchor = { ...e.pos }
           tr.anchorT = t
@@ -282,7 +292,7 @@ test('item 3: zombies reach a player standing still at the hut at night', async 
   const all = Object.values(tracks)
   expect(all.length).toBeGreaterThanOrEqual(4)
   for (const t of all) {
-    expect(t.min).toBeLessThanOrEqual(1.5)
+    expect(t.min).toBeLessThanOrEqual(REACH_M)
     expect(t.maxStuckFar).toBeLessThanOrEqual(20)
   }
   expect(errors).toEqual([])
