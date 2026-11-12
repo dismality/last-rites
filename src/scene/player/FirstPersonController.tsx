@@ -84,6 +84,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
       bodyRuntime.body = null
       bodyRuntime.camera = null
       bodyRuntime.scene = null
+      bodyRuntime.gl = null
       bodyRuntime.world = null
     },
     [],
@@ -110,6 +111,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     bodyRuntime.body = rb
     bodyRuntime.camera = camera
     bodyRuntime.scene = state.scene
+    bodyRuntime.gl = state.gl
     bodyRuntime.world = world
     // Retry, Continue and New Game queue a move; apply it before anything reads the body, so
     // the stale position is never copied back into the store. Runs even while a menu is open.

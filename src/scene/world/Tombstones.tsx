@@ -39,7 +39,8 @@ export function Tombstones() {
             </RigidBody>
             <Interactable
               id={`tombstone-${t.id}`}
-              action="read"
+              kind="tombstone"
+              subject={t.id}
               size={[hx * 2 + 0.2, hy * 2, hz * 2 + 0.2]}
               runeHeight={hy * 2 + 0.4}
               onInteract={() => useTombstoneStore.getState().open(t.id)}

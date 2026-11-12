@@ -163,7 +163,6 @@ function JournalBody({ onClose }: { onClose: () => void }) {
   })
 
   useEffect(() => {
-    if (document.pointerLockElement) document.exitPointerLock()
     tabRefs.current.pages?.focus()
   }, [])
 

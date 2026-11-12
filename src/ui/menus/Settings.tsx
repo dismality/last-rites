@@ -19,6 +19,7 @@ type BooleanSetting =
   | 'accessibleHUD'
   | 'tutorialPrompts'
   | 'damageNumbers'
+  | 'showMinimap'
 type RangeSetting = keyof typeof SETTINGS_RANGES
 
 const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
@@ -30,6 +31,7 @@ const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
   { key: 'accessibleHUD', label: 'Accessible HUD (numeric values)' },
   { key: 'tutorialPrompts', label: 'Tutorial prompts' },
   { key: 'damageNumbers', label: 'Damage numbers' },
+  { key: 'showMinimap', label: 'Show minimap' },
 ]
 
 const SLIDERS: ReadonlyArray<{ key: RangeSetting; label: string; step: number }> = [

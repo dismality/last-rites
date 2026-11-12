@@ -1,16 +1,14 @@
-// What the player can see versus what blocks them, for the scattered graveyard props.
+// What the player can see versus what blocks them, for the readable tombstones and lamp posts.
 // Pure data and maths (no three.js, React or Rapier), so a test can pin every collider to its model.
 //
 // Footprints are measured from the real .glb files (accessor bounds, unscaled, metres, y from the
 // ground). tests/colliderFootprints.test.ts reads the files and fails if this table drifts from
-// them. Tree trunks are not in the accessor bounds (the canopy is far wider), so their radius is a
-// measured constant: the lowest vertex ring of the pine (y = 0.49, about 1.0 x 0.9 m across).
+// them. The random headstones, trees and crypts now come from the graveyard scene, whose boxes live
+// in graveyard-colliders.json (see graveyardColliders.ts).
 
 import {
-  HEADSTONE_KINDS,
   HEADSTONE_MODEL_HEIGHT,
   type HeadstoneKind,
-  type TreeKind,
   type Vec3,
 } from './cemeteryLayout'
 
@@ -38,37 +36,12 @@ export interface RoundFootprint {
   readonly height: number
 }
 
-/**
- * Tree trunks and stumps. Pines: trunk radius at the lowest ring (the foliage starts at y = 0.95 and
- * is walked through, like leaves). Height is the lower of the two pine tops (6.02 and 6.61 m).
- * Fallen trunks are upright stumps 0.81 m across.
- */
-export const TREE_FOOTPRINTS: Readonly<Record<TreeKind, RoundFootprint>> = {
-  'pine-crooked': { radius: 0.47, height: 6 },
-  pine: { radius: 0.47, height: 6 },
-  trunk: { radius: 0.405, height: 0.675 },
-  'trunk-long': { radius: 0.405, height: 1.5 },
-}
-
 /** Lamp post: the plinth is 0.5 m across and the post is 3.04 m tall (the lantern arm is overhead). */
 export const LAMP_FOOTPRINT: RoundFootprint = { radius: 0.25, height: 3.04 }
-
-/** Crane crypt body (the roof overhangs it by 0.15 m, well above head height). */
-export const CRANE_CRYPT_BODY = { halfX: 2.22, halfZ: 2.88, height: 4.22 } as const
-
-/** Headstone model for the i-th generated headstone: the five kinds are cycled by index. */
-export function headstoneKind(index: number): HeadstoneKind {
-  return HEADSTONE_KINDS[index % HEADSTONE_KINDS.length]
-}
 
 /** Uniform scale that turns a layout height into the model's height. */
 export function headstoneScale(layoutHeight: number): number {
   return layoutHeight / HEADSTONE_MODEL_HEIGHT
-}
-
-/** Tree scale, by index in the generated list (also used to size the instanced model). */
-export function treeScale(index: number): number {
-  return 0.9 + (index % 4) * 0.1
 }
 
 export interface CuboidSpec {
@@ -108,16 +81,6 @@ export function headstoneCollider(
     position: [position[0] + ox, position[1] + height / 2, position[2] + oz],
     rotationY,
     half: [((f.maxX - f.minX) / 2) * scale, height / 2, ((f.maxZ - f.minZ) / 2) * scale],
-  }
-}
-
-export function treeCollider(kind: TreeKind, scale: number, position: Vec3): CylinderSpec {
-  const f = TREE_FOOTPRINTS[kind]
-  const halfHeight = (f.height * scale) / 2
-  return {
-    position: [position[0], position[1] + halfHeight, position[2]],
-    radius: f.radius * scale,
-    halfHeight,
   }
 }
 

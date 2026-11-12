@@ -387,6 +387,7 @@ Scare zones are trigger volumes placed in Mausoleum Row alleys, the catacombs an
 | Satchel | Tab |
 | Journal / map | J |
 | Lantern on/off | F |
+| Minimap on/off | M **(09)** |
 | Pause | Esc |
 
 ---

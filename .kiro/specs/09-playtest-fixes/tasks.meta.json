@@ -55,6 +55,16 @@
         "executionId": "e70fcf18-1167-4f25-8cf8-598d70cdb2b6",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794373292957
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577374
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577438
       }
     ],
     "4. B2: Fair Retry Night and Retry from morning": [
@@ -152,6 +162,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713609
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577792
       }
     ],
     "15. C2: Dev log dates from git history": [
@@ -164,6 +179,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713668
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577834
       }
     ],
     "16. C3: Submission kit": [
@@ -176,6 +196,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713713
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577883
       }
     ],
     "17. B11: Movement hint clears": [
@@ -188,6 +213,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713767
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577950
       }
     ],
     "18. B12: Responsive HUD and 800x600 screenshot test": [
@@ -200,6 +230,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713830
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577995
       }
     ],
     "19. B13: Difficulty screen Begin visible": [
@@ -212,6 +247,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713874
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578043
       }
     ],
     "20. B14: Journal font size and plain-font setting": [
@@ -224,6 +264,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713918
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578091
       }
     ],
     "21. B15: Shorter intro": [
@@ -236,6 +281,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713964
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578133
       }
     ],
     "22. B16: Quit confirmation and Continue on title": [
@@ -255,6 +305,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714059
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578228
       }
     ],
     "24.1 D1 main story path": [
@@ -267,6 +322,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714103
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578270
       }
     ],
     "24.2 D2 crafting and the workbench": [
@@ -279,6 +339,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714149
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578312
       }
     ],
     "24.3 D3 digging and materials": [
@@ -291,6 +356,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714200
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578360
       }
     ],
     "24.4 D4 chapel repairs": [
@@ -303,6 +373,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714261
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578411
       }
     ],
     "24.5 D5 night combat and balance": [
@@ -322,6 +397,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714308
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578458
       }
     ],
     "24.7 D7 endings and save/load": [
@@ -341,6 +421,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714352
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578498
       }
     ],
     "24.9 D9 screens and settings": [
@@ -353,6 +438,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714394
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578539
       }
     ],
     "11b. F6: Elite ammo drops only for owned guns (user approved)": [
@@ -377,6 +467,11 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360713562
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577741
       }
     ],
     "22. B16: Quit confirmation and Continue on title, with F5": [
@@ -384,6 +479,162 @@
         "executionId": "815653b0-4370-49bb-8f37-b72079cdbba5",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794360714012
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374578180
+      }
+    ],
+    "11c. Interaction cues never mislead": [
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577507
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374597161
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374674532
+      },
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374680560
+      },
+      {
+        "executionId": "12f839b6-b10c-4f71-81f4-aab1d84b6dd8",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794375001302
+      },
+      {
+        "executionId": "12f839b6-b10c-4f71-81f4-aab1d84b6dd8",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794376414997
+      }
+    ],
+    "11d. Crypt key pickup from the south": [
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577549
+      },
+      {
+        "executionId": "12f839b6-b10c-4f71-81f4-aab1d84b6dd8",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794376415081
+      },
+      {
+        "executionId": "12f839b6-b10c-4f71-81f4-aab1d84b6dd8",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794377993530
+      }
+    ],
+    "11e. Minimap on the HUD": [
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577599
+      },
+      {
+        "executionId": "12f839b6-b10c-4f71-81f4-aab1d84b6dd8",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794377993591
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794379797425
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794380025807
+      }
+    ],
+    "11f. Finish the spec 08 task 11.2 browser checks on the merged tree": [
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577648
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794380025892
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384148859
+      }
+    ],
+    "11g. package.json license matches LICENSE": [
+      {
+        "executionId": "78921396-e2ab-449e-bfcf-35e8773791ad",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794374577699
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384148925
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384158737
+      }
+    ],
+    "11h. Dawn boon picker can be clicked and shows its icons": [
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384211197
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384721996
+      }
+    ],
+    "11i. Swap in the new graveyard scene": [
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794384722323
+      },
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794386511022
+      }
+    ],
+    "11j. Use the rune and mark images": [
+      {
+        "executionId": "355d9677-a9b6-4a2b-a37f-573b9f643586",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794386511328
+      },
+      {
+        "executionId": "c7af26ba-6447-4f6c-be85-c1a76e59808b",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794482588347
+      },
+      {
+        "executionId": "c7af26ba-6447-4f6c-be85-c1a76e59808b",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794482596082
+      },
+      {
+        "executionId": "a87834b8-aa53-42a3-b40c-491138e3f80a",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794489405171
       }
     ]
   }

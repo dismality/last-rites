@@ -1,114 +1,55 @@
-// Cemetery -- the four zones, dressed with the Kenney graveyard kit (public/assets/models/world).
+// Cemetery -- the four zones. The open grounds, Mausoleum Row crypts, oaks, headstones and fences
+// come from one Draco scene (GraveyardScene.tsx, with its collision boxes). This file keeps the
+// y = 0 physics floor, the catacomb corridor, the avenue rails and invisible walls, lamp posts,
+// coffin dressing, the hut and chapel, and the boundary walls.
 //
 // Mount inside <Physics>. Everything here is static: fixed rigid bodies with explicit colliders.
-// Scattered props (headstones, trees, lamps, the Crane crypt) get colliders cut to their model's
-// real footprint (data/colliderFootprints.ts), so nothing blocks the player that they cannot see.
 // Gates live in Gates.tsx; no rules live here.
 //
-// Draw-call budget: every repeated prop goes through <InstancedModel>, one call
-// per model type (~20 total), plus a handful of floor/ceiling slabs.
-
+// Draw-call budget: every repeated prop goes through <InstancedModel>, one call per model type.
 import { useMemo } from 'react'
 import { CuboidCollider, CylinderCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import {
-  AVENUE_CRYPT_SIZE,
   CORRIDORS,
-  CRANE_CRYPT,
-  FENCE,
   FENCE_PANEL_WIDTH,
   GROUNDS_HALF,
-  HEADSTONE_KINDS,
   LAMP_POSTS,
   PLAYABLE_BOUNDS,
   WALL_MODEL_HEIGHT,
   WALL_MODEL_THICKNESS,
   WALL_PANEL_WIDTH,
-  avenueCrypts,
   avenueFarZ,
-  buildFenceSegments,
-  craneCryptPosition,
-  generateHeadstones,
-  generateTrees,
   panelRun,
   type CorridorSpec,
   type Placement,
-  type TreeKind,
   type Vec3,
 } from '../../data/cemeteryLayout'
-import {
-  CRANE_CRYPT_BODY,
-  headstoneCollider,
-  headstoneKind,
-  headstoneScale,
-  lampCollider,
-  treeCollider,
-  treeScale,
-} from '../../data/colliderFootprints'
-import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
+import { lampCollider } from '../../data/colliderFootprints'
+import { SPAWN_POINTS } from '../../data/zones'
 import { ChapelBuilding } from './ChapelBuilding'
 import { Gate, OssuaryDoor } from './Gates'
+import { GraveyardScene } from './GraveyardScene'
 import { Hut } from './Hut'
 import { InstancedModel } from './InstancedModel'
 
-// Shared materials for the primitives that remain (ground, floors, ceilings).
+// Shared materials for the primitives that remain (catacomb floors, walls and ceilings).
 const MATERIALS = {
-  grass: new THREE.MeshStandardMaterial({ color: '#2b3326', roughness: 1 }),
   stone: new THREE.MeshStandardMaterial({ color: '#5a5550', roughness: 0.95 }),
   darkStone: new THREE.MeshStandardMaterial({ color: '#3a3733', roughness: 1 }),
 }
 type MaterialKey = keyof typeof MATERIALS
-
-const HEADSTONES = generateHeadstones()
-const FENCE_SEGMENTS = buildFenceSegments()
 
 const unit = (position: Vec3, rotationY = 0, s = 1): Placement => ({
   position,
   rotationY,
   scale: [s, s, s],
 })
-
-// Headstones: five models cycled by index, each a single instanced draw call.
-const HEADSTONE_PLACEMENTS = HEADSTONE_KINDS.map((_kind, k) =>
-  HEADSTONES.flatMap((h, i) =>
-    headstoneKind(i) === HEADSTONE_KINDS[k]
-      ? [unit(h.position, h.rotationY, headstoneScale(h.height))]
-      : [],
-  ),
-)
-
-const FENCE_PLACEMENTS = FENCE_SEGMENTS.flatMap((s) =>
-  panelRun(s.axis, s.fixed, s.from, s.to, FENCE_PANEL_WIDTH),
-)
-
-const SPAWN_AVOID: Vec3[] = [
-  ...SPAWN_POINTS.map((p) => p.position),
-  ...FIXED_SPAWNS.map((p) => p.position),
-]
-const TREES = generateTrees(SPAWN_AVOID)
-const treesOf = (kind: TreeKind) =>
-  TREES.flatMap((t, i) =>
-    t.kind === kind ? [unit(t.position, t.rotationY, treeScale(i))] : [],
-  )
-const PINE_PLACEMENTS = treesOf('pine-crooked')
-const PLAIN_PINE_PLACEMENTS = treesOf('pine')
-const TRUNK_PLACEMENTS = treesOf('trunk')
-const LONG_TRUNK_PLACEMENTS = treesOf('trunk-long')
-
 const LAMP_PLACEMENTS = LAMP_POSTS.map((l) => unit(l.position, l.rotationY))
 
 // Coffins sit beside their pickup point so the stacks aren't buried inside the mesh.
 const COFFIN_PLACEMENTS = SPAWN_POINTS.filter((p) => p.lootTable === 'broken-coffin').map((p, i) =>
   unit([p.position[0], 0, p.position[2] + 1.2], 0.5 + i * 0.9),
-)
-
-const CRYPT_PLACEMENTS = [unit(craneCryptPosition())]
-
-// Crypts lining Mausoleum Row, grouped by model so each is one instanced draw call.
-const AVENUE_CRYPTS = avenueCrypts()
-const AVENUE_MODELS = Object.keys(AVENUE_CRYPT_SIZE) as Array<keyof typeof AVENUE_CRYPT_SIZE>
-const AVENUE_PLACEMENTS = AVENUE_MODELS.map((model) =>
-  AVENUE_CRYPTS.filter((c) => c.model === model).map((c) => unit(c.position, c.rotationY)),
 )
 
 /** A box that is both visible and solid. Must sit inside a fixed RigidBody. */
@@ -155,66 +96,6 @@ function wallRun(
   )
 }
 
-// --- Grounds ---------------------------------------------------------------
-
-function Headstones() {
-  return (
-    <>
-      {HEADSTONE_KINDS.map((kind, k) => (
-        <InstancedModel key={kind} model={kind} placements={HEADSTONE_PLACEMENTS[k]} />
-      ))}
-      <RigidBody type="fixed" colliders={false}>
-        {HEADSTONES.map((h, i) => {
-          const c = headstoneCollider(headstoneKind(i), headstoneScale(h.height), h.position, h.rotationY)
-          return <CuboidCollider key={i} args={[...c.half]} position={[...c.position]} rotation={[0, c.rotationY, 0]} />
-        })}
-      </RigidBody>
-    </>
-  )
-}
-
-function Fences() {
-  return (
-    <>
-      <InstancedModel model="iron-fence" placements={FENCE_PLACEMENTS} centerXZ />
-      <RigidBody type="fixed" colliders={false}>
-        {FENCE_SEGMENTS.map((s, i) => {
-          const mid = (s.from + s.to) / 2
-          const half = (s.to - s.from) / 2
-          const t = FENCE.colliderHalfThickness
-          return (
-            <CuboidCollider
-              key={i}
-              args={s.axis === 'x' ? [half, FENCE.height / 2, t] : [t, FENCE.height / 2, half]}
-              position={
-                s.axis === 'x' ? [mid, FENCE.height / 2, s.fixed] : [s.fixed, FENCE.height / 2, mid]
-              }
-            />
-          )
-        })}
-      </RigidBody>
-    </>
-  )
-}
-
-/** Dead oaks (crooked pines), stumps and logs. Trunks are solid; canopies are out of reach. */
-function Trees() {
-  return (
-    <>
-      <InstancedModel model="pine-crooked" placements={PINE_PLACEMENTS} />
-      <InstancedModel model="pine" placements={PLAIN_PINE_PLACEMENTS} />
-      <InstancedModel model="trunk" placements={TRUNK_PLACEMENTS} />
-      <InstancedModel model="trunk-long" placements={LONG_TRUNK_PLACEMENTS} />
-      <RigidBody type="fixed" colliders={false}>
-        {TREES.map((t, i) => {
-          const c = treeCollider(t.kind, treeScale(i), t.position)
-          return <CylinderCollider key={i} args={[c.halfHeight, c.radius]} position={[...c.position]} />
-        })}
-      </RigidBody>
-    </>
-  )
-}
-
 function LampPosts() {
   return (
     <>
@@ -238,38 +119,12 @@ function SpawnDressing() {
   )
 }
 
-/**
- * Crane family crypt: body, door and roof share a position; the roof is lifted
- * (docs/world-models.md). Decorative backdrop at the end of Mausoleum Row, so the
- * 1.77 m door opening (tight for the 1.7 m capsule) is never walked through.
- */
-function CraneCrypt() {
-  const [x, , z] = craneCryptPosition()
-  return (
-    <>
-      <InstancedModel model="crypt-large" placements={CRYPT_PLACEMENTS} />
-      <InstancedModel model="crypt-large-door" placements={CRYPT_PLACEMENTS} />
-      <InstancedModel
-        model="crypt-large-roof"
-        placements={CRYPT_PLACEMENTS}
-        lift={CRANE_CRYPT.roofLift}
-      />
-      <RigidBody type="fixed" colliders={false}>
-        <CuboidCollider
-          args={[CRANE_CRYPT_BODY.halfX, CRANE_CRYPT_BODY.height / 2, CRANE_CRYPT_BODY.halfZ]}
-          position={[x, CRANE_CRYPT_BODY.height / 2, z]}
-        />
-      </RigidBody>
-    </>
-  )
-}
-
 function Grounds() {
   const span = GROUNDS_HALF * 2 + 4
   return (
     <RigidBody type="fixed" colliders={false}>
-      {/* Top face at y = 0. */}
-      <Block position={[0, -0.2, 0]} size={[span, 0.4, GROUNDS_HALF * 2]} material="grass" />
+      {/* Top face at y = 0. Invisible: the graveyard scene draws the ground. */}
+      <Block position={[0, -0.2, 0]} size={[span, 0.4, GROUNDS_HALF * 2]} material="stone" visible={false} />
     </RigidBody>
   )
 }
@@ -357,6 +212,7 @@ function Avenue({ spec }: { spec: CorridorSpec }) {
             position={[0, -0.2, floorMidZ]}
             size={[AVENUE_FLOOR_WIDTH, 0.4, floorLength]}
             material="darkStone"
+            visible={false}
           />
           {[-1, 1].map((side) => (
             <Block
@@ -370,9 +226,6 @@ function Avenue({ spec }: { spec: CorridorSpec }) {
         </RigidBody>
         <Gate spec={spec} />
       </group>
-      {AVENUE_MODELS.map((model, i) => (
-        <InstancedModel key={model} model={model} placements={AVENUE_PLACEMENTS[i]} />
-      ))}
     </>
   )
 }
@@ -395,9 +248,7 @@ export function Cemetery() {
   return (
     <group name="cemetery">
       <Grounds />
-      <Headstones />
-      <Fences />
-      <Trees />
+      <GraveyardScene />
       <LampPosts />
       <SpawnDressing />
       <Hut />
@@ -405,7 +256,6 @@ export function Cemetery() {
       {CORRIDORS.map((c) =>
         c.open ? <Avenue key={c.id} spec={c} /> : <Corridor key={c.id} spec={c} />,
       )}
-      <CraneCrypt />
       <Boundary />
     </group>
   )

@@ -9,7 +9,9 @@ import { HitMarker } from './HitMarker'
  */
 export function Crosshair() {
   const playerTarget = usePlayerStore((s) => s.interactTarget !== null)
-  const hovering = useInteractionStore((s) => s.hover !== null)
+  // The hand shows only when pressing Interact would start something: a "needs a shovel" or
+  // "door is full" prompt keeps the dot.
+  const hovering = useInteractionStore((s) => s.hover !== null && s.hover.actionable !== false)
   const cinematic = useCinematic()
   const hasTarget = (playerTarget || hovering) && !cinematic
 

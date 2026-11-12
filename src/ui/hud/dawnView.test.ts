@@ -2,9 +2,23 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { upgradeCard } from '../../game/systems/dawnUpgrades'
 import { announce, emptySilence, fired, majorScareActive } from '../../game/systems/scareSilence'
 import { useProgressionStore } from '../../game/state/progressionStore'
-import { dawnCardView, dawnPickerView, nextCardIndex, pickCard } from './dawnView'
+import { cardIndexForKey, dawnCardView, dawnPickerView, nextCardIndex, pickCard } from './dawnView'
 
 beforeEach(() => useProgressionStore.getState().reset())
+
+describe('cardIndexForKey', () => {
+  it('maps Digit1 to Digit3 and the numpad to cards 0 to 2', () => {
+    expect(['Digit1', 'Digit2', 'Digit3'].map((c) => cardIndexForKey(c, 3))).toEqual([0, 1, 2])
+    expect(['Numpad1', 'Numpad2', 'Numpad3'].map((c) => cardIndexForKey(c, 3))).toEqual([0, 1, 2])
+  })
+
+  it('ignores other keys, Digit4 and cards that are not offered', () => {
+    expect(cardIndexForKey('Digit4', 3)).toBeNull()
+    expect(cardIndexForKey('KeyA', 3)).toBeNull()
+    expect(cardIndexForKey('Enter', 3)).toBeNull()
+    expect(cardIndexForKey('Digit3', 2)).toBeNull()
+  })
+})
 
 describe('dawnPickerView', () => {
   const offer = ['long-wick', 'steady-hands', 'marksman'] as const

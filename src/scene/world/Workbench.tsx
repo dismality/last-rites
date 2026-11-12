@@ -30,7 +30,6 @@ import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManag
 import type { MaterialId } from '../../game/types'
 import { workbenchCameraRuntime } from './workbenchCameraRuntime'
 import { Interactable } from './Interactable'
-import { requestLock } from '../player/input'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { BENCH_Z } from '../../data/cemeteryLayout'
 import { rampIntensity } from '../../game/systems/lightRamp'
@@ -500,7 +499,6 @@ export function Workbench() {
   const workbenchOpen = useUiWorldStore((s) => s.workbenchOpen)
   const closeWorkbench = useUiWorldStore((s) => s.closeWorkbench)
   const openWorkbench = useUiWorldStore((s) => s.openWorkbench)
-  const gl = useThree((s) => s.gl)
   const lastDamageAt = useUiWorldStore((s) => s.lastDamageAt)
   const inventory = useInventoryStore((s) => s.inventory)
   const highlightedItems = useCraftingStore((s) => s.highlightedItems)
@@ -528,19 +526,7 @@ export function Workbench() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [workbenchOpen, closeWorkbench])
 
-  // ----- Pointer lock: release on open, re-acquire on close -----
-  useEffect(() => {
-    if (workbenchOpen) {
-      // Release pointer lock so the player can interact with the recipe book UI.
-      if (document.pointerLockElement) {
-        document.exitPointerLock()
-      }
-    }
-    return () => {
-      // Closing came from a key press (a user gesture), so the browser allows re-locking.
-      if (workbenchOpen) requestLock(gl.domElement)
-    }
-  }, [workbenchOpen, gl])
+  // Pointer lock release and re-lock for the open workbench live in cursorRelease.ts.
 
   // ----- Crafting tick: advance timer and commit when done (Req 3.1) -----
   useFrame((_, delta) => {
@@ -616,7 +602,7 @@ export function Workbench() {
         <group position={[0, 0, BENCH_Z]}>
           <Interactable
             id="workbench"
-            action="open"
+            kind="workbench"
             size={[1.4, 1.1, 0.8]}
             runeHeight={1.2}
             onInteract={openWorkbench}

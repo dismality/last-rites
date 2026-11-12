@@ -96,7 +96,8 @@ export function GraveMounds() {
         <group key={g.id} position={[g.position[0], 0, g.position[2]]} rotation={[0, i * 0.4, 0]}>
           <Interactable
             id={`${DIG_ID_PREFIX}${g.id}`}
-            action="dig"
+            kind="grave-mound"
+            subject={g.id}
             size={[1.6, 0.6, 2.6]}
             runeHeight={1.9}
             runeScale={0.5}

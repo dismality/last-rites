@@ -1,5 +1,7 @@
 // Compass strip constants (design bible §11). Pure data.
 
+import type { MarkId } from './assets'
+
 export const COMPASS = {
   /** The strip shows heading ± this many degrees (180° total). */
   halfSpanDeg: 90,
@@ -18,6 +20,15 @@ export const COMPASS_MARKERS: Readonly<Record<CompassMarkerKind, { glyph: string
   hut: { glyph: '⌂', label: 'Hut' },
   spawn: { glyph: '☠', label: 'Graves' },
   merchant: { glyph: '⚱', label: 'Silas' },
+}
+
+/** Which mark image (`-light` on the HUD) stands in for each marker's glyph. */
+export const COMPASS_MARK_ID: Readonly<Record<CompassMarkerKind, MarkId>> = {
+  objective: 'objective',
+  chapel: 'chapel',
+  hut: 'hut',
+  spawn: 'graves',
+  merchant: 'merchant',
 }
 
 export const COMPASS_LETTERS = { 0: 'N', 90: 'E', 180: 'S', 270: 'W' } as const

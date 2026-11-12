@@ -9,7 +9,7 @@ import { startRun } from '../../game/state/progressionActions'
 import { useGameStore } from '../../game/state/gameStore'
 import { resetRun } from '../../game/state/resetRun'
 import { parseCredits } from '../../game/systems/credits'
-import { activeLine, fadeAlpha } from '../../game/systems/endingSequence'
+import { activeLine, fadeAlpha, handleSkipKey } from '../../game/systems/endingSequence'
 import { endingCameraRuntime } from '../../scene/effects/endingCameraRuntime'
 import { MODES } from '../../data/modes'
 import type { ModeId } from '../../game/types'
@@ -43,7 +43,7 @@ function Sequence() {
   // Escape skips; the button does the same for pointer users.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' || e.key === ' ' || e.key === 'Enter') showSummary()
+      handleSkipKey(e, showSummary)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)

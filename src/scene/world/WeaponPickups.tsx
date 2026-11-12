@@ -8,6 +8,7 @@ import { WEAPON_PICKUPS, type WeaponPickupId } from '../../data/weaponPickups'
 import { takeWeaponPickup } from '../../game/state/combatActions'
 import { useCombatStore } from '../../game/state/combatStore'
 import { Interactable } from './Interactable'
+import { useLingerAfter } from './useLingering'
 
 const WOOD = '#4a3626'
 const IRON = '#5a5d60'
@@ -144,13 +145,11 @@ function Prop({ id }: { id: WeaponPickupId }) {
         </>
       )
     case 'wood-axe':
+      // The woodpile is scenery (WeaponPickup draws it); only the axe is taken and fades.
       return (
-        <>
-          <Woodpile />
-          <group position={[0, 0.8, 0.12]}>
-            <AxeProp />
-          </group>
-        </>
+        <group position={[0, 0.8, 0.12]}>
+          <AxeProp />
+        </group>
       )
     case 'silver-sabre':
       return (
@@ -165,34 +164,37 @@ function Prop({ id }: { id: WeaponPickupId }) {
   }
 }
 
+/** One findable weapon. Taken, it fades with its cues for a moment, then the prop is gone. */
+function WeaponPickup({ id, position }: { id: WeaponPickupId; position: readonly [number, number, number] }) {
+  const isTaken = useCombatStore((s) => s.takenPickups.includes(id))
+  const shown = useLingerAfter(isTaken)
+  return (
+    <group name={`weapon-pickup:${id}`} position={[...position]}>
+      {id === 'wood-axe' && <Woodpile />}
+      {shown && (
+        <Interactable
+          id={`weapon:${id}`}
+          kind="weapon-pickup"
+          subject={id}
+          size={[0.8, 0.8, 0.8]}
+          runeHeight={id === 'wood-axe' ? 1.3 : 0.5}
+          onInteract={() => {
+            takeWeaponPickup(id)
+          }}
+        >
+          <Prop id={id} />
+        </Interactable>
+      )}
+    </group>
+  )
+}
+
 export function WeaponPickups() {
-  const taken = useCombatStore((s) => s.takenPickups)
   return (
     <>
-      {WEAPON_PICKUPS.map((p) => {
-        // The woodpile stays as scenery once the axe is gone; the other props vanish with the weapon.
-        const isTaken = taken.includes(p.id)
-        if (isTaken && p.id !== 'wood-axe') return null
-        return (
-          <group key={p.id} name={`weapon-pickup:${p.id}`} position={[...p.position]}>
-            {isTaken ? (
-              <Woodpile />
-            ) : (
-              <Interactable
-                id={`weapon:${p.id}`}
-                action="pickup"
-                size={[0.8, 0.8, 0.8]}
-                runeHeight={p.id === 'wood-axe' ? 1.3 : 0.5}
-                onInteract={() => {
-                  takeWeaponPickup(p.id)
-                }}
-              >
-                <Prop id={p.id} />
-              </Interactable>
-            )}
-          </group>
-        )
-      })}
+      {WEAPON_PICKUPS.map((p) => (
+        <WeaponPickup key={p.id} id={p.id} position={p.position} />
+      ))}
     </>
   )
 }

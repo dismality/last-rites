@@ -2,6 +2,8 @@
   /* Compass strip height; the wave tally and rite meter sit below it. */
   --hud-compass-h: 5rem;
   --hud-below-compass: calc(0.75rem + var(--hud-compass-h) + 0.5rem);
+  /* Minimap side: 96 px at 600 px tall up to 168 px, so it clears the effect icons at 800x600. */
+  --hud-minimap-size: clamp(96px, 16vh, 168px);
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -79,9 +81,29 @@
   transition: opacity 150ms ease-out;
 }
 
+/* Used-up target: the prompt fades out steadily (linear, no flicker) over the cue fade time. */
+.hud-prompt--fading {
+  animation: hud-prompt-fade 0.5s linear forwards;
+}
+
+@keyframes hud-prompt-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
 .hud-prompt__rune {
   margin-right: 8px;
   color: var(--ember);
+}
+
+/* Rune art sits on the text line; the font rune fallback inherits the ember colour. */
+img.hud-prompt__rune-img {
+  vertical-align: middle;
+  image-rendering: pixelated;
 }
 
 .hud-subtitles {
@@ -141,10 +163,22 @@
   }
 }
 
+/*
+  The summary owns the top of the screen and the boon picker (menu__backdrop--dawn) the bottom.
+  The two max-heights add up to less than the viewport, so they cannot overlap at any size.
+  z-index sits above the picker's dimming backdrop (300) so the summary stays readable.
+*/
 .hud-dawn {
-  max-width: 360px;
-  margin: 0 auto;
-  padding: 20px 28px;
+  position: fixed;
+  top: 1.5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 310;
+  box-sizing: border-box;
+  width: min(560px, 94vw);
+  max-height: 30vh;
+  overflow-y: auto;
+  padding: 12px 28px;
   background: var(--parchment);
   color: var(--ink);
   border: 2px solid var(--parchment-dark);
@@ -153,8 +187,14 @@
 }
 
 .hud-dawn__title {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-family: var(--font-heading);
+}
+
+.hud-dawn__body {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 28px;
 }
 
 .hud-dawn__list {
@@ -292,4 +332,15 @@
 .hud-dig__fill {
   height: 100%;
   background: var(--ember);
+}
+/* Top right column: score panel, then the minimap (spec 09 task 11e). */
+.hud-right-stack {
+  position: absolute;
+  top: 88px;
+  right: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
 }

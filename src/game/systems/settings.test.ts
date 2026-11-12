@@ -35,6 +35,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   accessibleHUD: fc.boolean(),
   tutorialPrompts: fc.boolean(),
   damageNumbers: fc.boolean(),
+  showMinimap: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -110,6 +111,24 @@ describe('settings persistence', () => {
       HeavyAttack: 'KeyV',
       Block: 'MouseRight',
     })
+  })
+
+  it('defaults Show minimap on and binds Minimap to M without clashing with another action', () => {
+    expect(DEFAULT_SETTINGS.showMinimap).toBe(true)
+    expect(DEFAULT_SETTINGS.bindings.Minimap).toBe('KeyM')
+    const codes = Object.values(DEFAULT_SETTINGS.bindings)
+    expect(new Set(codes).size).toBe(codes.length)
+  })
+
+  it('round-trips showMinimap false and loads old saves with the map on and M bound', () => {
+    const storage = memoryStorage()
+    saveSettings({ ...DEFAULT_SETTINGS, showMinimap: false }, storage)
+    expect(loadSettings(storage).showMinimap).toBe(false)
+    const { Minimap: _m, ...oldBindings } = DEFAULT_SETTINGS.bindings
+    void _m
+    const old = loadSettings(memoryStorage(JSON.stringify({ fov: 80, bindings: oldBindings })))
+    expect(old.showMinimap).toBe(true)
+    expect(old.bindings.Minimap).toBe('KeyM')
   })
 
   it('round-trips damageNumbers false', () => {

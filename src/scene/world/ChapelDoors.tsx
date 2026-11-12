@@ -102,7 +102,8 @@ function Door({ id, boards }: DoorProps) {
   return (
     <group position={[spec.point[0], 0, spec.point[2]]} rotation={[0, rotationY(id), 0]}>
       <Interactable
-        action="nail"
+        kind="barricade-door"
+        subject={id}
         id={`nail-${id}`}
         size={[spec.width, DOOR_HEIGHT, 0.4]}
         runeHeight={DOOR_HEIGHT + 0.2}

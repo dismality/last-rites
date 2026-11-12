@@ -1,0 +1,30 @@
+{
+  "runs": [
+    {
+      "map": "on",
+      "longestMs": 402.89999999999964,
+      "draws": 16,
+      "frames": 17
+    },
+    {
+      "map": "off",
+      "longestMs": 395.7999999999993,
+      "draws": 0,
+      "frames": 0
+    },
+    {
+      "map": "on",
+      "longestMs": 375,
+      "draws": 18,
+      "frames": 18
+    },
+    {
+      "map": "off",
+      "longestMs": 389,
+      "draws": 0,
+      "frames": 0
+    }
+  ],
+  "worstOnMs": 402.89999999999964,
+  "worstOffMs": 395.7999999999993
+}

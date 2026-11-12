@@ -87,7 +87,6 @@ async function walkUntil(page: Page, target: { x: number; z: number }, stop: num
     await page.evaluate(() => window.__lastRites!.release('MoveForward'))
   }
 }
-
 /** Teleports to a start point facing the target, then walks the rest of the way. */
 async function leg(
   page: Page,
@@ -112,27 +111,37 @@ async function lookAt(page: Page, p: Vec3): Promise<void> {
     ({ x, y, z, yaw, pitch }) => window.__lastRites!.teleport(x, z, { y, yaw, pitch }),
     { x: b.feet[0], y: b.feet[1], z: b.feet[2], yaw, pitch },
   )
+  // Two rendered frames, so the interaction raycast has run against the new aim (SwiftShader frames are slow).
+  await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))))
   await page.waitForTimeout(150)
 }
 
 /** Aims at the object (trying a few heights), waits for the hover, and presses the real Interact. */
 async function interact(page: Page, hoverId: string, at: Vec3): Promise<void> {
-  const heights = [0.12, 0.0, 0.3, 0.5, 0.8, -0.1]
+  // Aim first at the middle of the object's real meshes (as a player centres the crosshair), then
+  // at a few heights around the data position. Small items on a table were missed by the guesses.
+  const centre = await page.evaluate((id) => window.__lastRites!.interactableCentre(id), hoverId)
+  const aims: Vec3[] = [
+    ...(centre ? [centre as Vec3] : []),
+    ...[0.12, 0.0, 0.3, 0.5, 0.8, -0.1].map((dy): Vec3 => [at[0], at[1] + dy, at[2]]),
+  ]
   let hovered = false
-  for (const dy of heights) {
-    await lookAt(page, [at[0], at[1] + dy, at[2]])
+  const seen: (string | null)[] = []
+  for (const aim of aims) {
+    await lookAt(page, aim)
     hovered = await page
       .waitForFunction(
         (want) => (window.__lastRites!.snapshot('hover') as { id: string } | null)?.id === want,
         hoverId,
-        { timeout: 1_500 },
+        { timeout: 3_000 },
       )
       .then(() => true)
       .catch(() => false)
     if (hovered) break
+    seen.push(((await page.evaluate(() => window.__lastRites!.snapshot('hover'))) as { id: string } | null)?.id ?? null)
   }
   const f = await feet(page)
-  expect(hovered, `hover ${hoverId} from feet ${f.map((v) => v.toFixed(2))}`).toBe(true)
+  expect(hovered, `hover ${hoverId} from feet ${f.map((v) => v.toFixed(2))}; hovered instead: ${JSON.stringify(seen)}`).toBe(true)
   await page.evaluate(() => window.__lastRites!.action('Interact', 400))
   console.log(
     `interact ${hoverId}: hover now ${JSON.stringify(await page.evaluate(() => window.__lastRites!.snapshot('hover')))}, game ${JSON.stringify(await page.evaluate(() => window.__lastRites!.snapshot('game')))}`,
@@ -144,7 +153,9 @@ async function pickUp(page: Page, spawnId: string): Promise<void> {
   await interact(page, `fixed:${spawnId}`, spawn(spawnId))
   const dialog = page.getByRole('dialog', { name: /^Examine / })
   await expect(dialog).toBeVisible({ timeout: 5_000 })
-  await dialog.getByRole('button', { name: /Put away/ }).click()
+  // Keyboard, not a mouse click: in the hook's no-pointer-lock mode, Playwright's move to the button
+  // reaches the look input and turned the next leg's start heading (seen once: 1.4 rad).
+  await dialog.getByRole('button', { name: /Put away/ }).press('Enter')
   await expect(dialog).toHaveCount(0)
 }
 
@@ -202,8 +213,10 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   await expectObjective(page, /^Search Mausoleum Row for the sexton's whistle \(0\/1\)$/)
 
   // --- Leg 3: the Row gate (start 6 m south of it), opened with the key ----------------------
-  await leg(page, { x: -20, z: -30 }, { x: -20, z: -37.2 }, 1.6)
-  await interact(page, 'gate-mausoleum-row', [-20, 1.5, -37.2])
+  // The gate bars stand at z = entranceZ + dir * wallThickness / 2 = -40 - 0.2 (cemeteryLayout.ts). The old
+  // target, -37.2, stopped the player ~4.5 m short: outside the 2.5 m interact range, so no hover.
+  await leg(page, { x: -20, z: -33 }, { x: -20, z: -40.2 }, 1.6)
+  await interact(page, 'gate-mausoleum-row', [-20, 1.5, -40.2])
 
   // --- Leg 4: down the alley to the bone whistle: walked through the opened gate -------------
   const whistle = spawn('fx-bone-whistle')
@@ -227,6 +240,9 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   expect((await inventory(page)).inventory.keyItems).toContain('iron-ossuary-key')
   await expectObjective(page, /^Gather the relics of the rite \(0\/5\)$/)
   const rosary = spawn('fx-rosary')
+  // The ossuary-key leg ends 0.5 m from the rosary, with no hover from any aim there:
+  // step back and walk the last stretch in, as for every other pickup.
+  await leg(page, { x: rosary[0], z: rosary[2] + 4 }, { x: rosary[0], z: rosary[2] }, 1.3)
   await pickUp(page, 'fx-rosary')
   await expectObjective(page, /^Gather the relics of the rite \(1\/5\)$/)
   expect(rosary).toBeDefined()

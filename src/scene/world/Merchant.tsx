@@ -109,7 +109,7 @@ function MerchantProps() {
       </group>
       <group position={[silas[0], silas[1], silas[2]]} rotation={[0, yaw, 0]}>
         <Interactable
-          action="trade"
+          kind="merchant"
           id="merchant"
           size={[0.8, 2.1, 0.8]}
           runeHeight={2.4}

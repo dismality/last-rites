@@ -1,0 +1,17 @@
+/* HUD minimap: top right, in the column under the score panel (see .hud-right-stack).
+   Square, a little see-through, parchment-dark frame like the other HUD boxes. */
+.minimap {
+  box-sizing: border-box;
+  width: var(--hud-minimap-size);
+  height: var(--hud-minimap-size);
+  background: rgb(20 17 15 / 0.45);
+  border: 1px solid var(--parchment-dark);
+  pointer-events: none;
+}
+
+.minimap__canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+}

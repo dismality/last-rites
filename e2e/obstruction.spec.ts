@@ -10,6 +10,9 @@ import { expect, test, type Page } from '@playwright/test'
 const KEY = { id: 'rusted-crypt-key', spawn: 'fx-crypt-key', x: -12, z: -18 }
 const PAGE2 = { id: 'journal-page-2', spawn: 'fx-page-2', x: -12.5, z: -17 }
 const START_M = 9
+// The graveyard scene (task 11i) has a 0.84 m prop at (-15.87, -17.94), dead on the straight line in
+// from the west to the key. A player walks round it, so that one walk starts this far south.
+const KEY_WEST_SIDESTEP_M = 2.5
 const DIRS: ReadonlyArray<readonly [string, number, number]> = [
   ['N', 0, -1],
   ['NE', Math.SQRT1_2, -Math.SQRT1_2],
@@ -43,10 +46,10 @@ async function walkIn(
   dir: readonly [string, number, number],
 ): Promise<WalkResult> {
   return page.evaluate(
-    async ([tx, tz, dx, dz, start]) => {
+    async ([tx, tz, dx, dz, start, lateral]) => {
       const h = window.__lastRites!
       const sx = tx + dx * start
-      const sz = tz + dz * start
+      const sz = tz + dz * start + lateral
       h.teleport(sx, sz, { yaw: Math.atan2(-(tx - sx), -(tz - sz)) })
       // The teleport is applied on the next frame; give the sim a moment to settle.
       await new Promise((r) => setTimeout(r, 1500))
@@ -74,7 +77,7 @@ async function walkIn(
           .map((c) => ({ owner: c.owner, distance: c.distance })),
       } as WalkResult
     },
-    [target.x, target.z, dir[1], dir[2], START_M] as const,
+    [target.x, target.z, dir[1], dir[2], START_M, target === KEY && dir[0] === 'W' ? KEY_WEST_SIDESTEP_M : 0] as const,
   )
 }
 
@@ -89,6 +92,12 @@ async function lookAtAndInteract(
     const [tx, ty, tz] = h.interactableCentre(`fixed:${spawnId}`) ?? [0, 0.05, 0]
     const K = 0.0022 // radians per pixel at sensitivity 1.0 (src/game/systems/movement.ts)
     const wait = (ms: number) => new Promise((r) => setTimeout(r, ms))
+    // Mouse travel only turns the camera when a frame samples it, and the hover is only raycast
+    // per frame. SwiftShader frames can outlast any fixed wait, so step by rendered frames: two
+    // animation frames guarantee the game's useFrame has consumed the move and raycast after it.
+    const frames = async (n: number) => {
+      for (let i = 0; i < n; i++) await new Promise((r) => requestAnimationFrame(() => r(null)))
+    }
     const wrap = (a: number) => Math.atan2(Math.sin(a), Math.cos(a))
     for (let i = 0; i < 80; i++) {
       const b = h.body()!
@@ -100,19 +109,20 @@ async function lookAtAndInteract(
       if (Math.abs(eYaw) < 0.01 && Math.abs(ePitch) < 0.01) break
       const clamp = (v: number) => Math.max(-60, Math.min(60, v))
       h.input.mouseMove(clamp(eYaw / K), clamp(ePitch / K))
-      await wait(60)
+      await frames(2)
     }
-    await wait(300)
+    await frames(2)
     // The crosshair must sit on the item's real mesh (a small thing lying on the ground), so nudge
-    // the mouse in a small grid the way a player would until the prompt appears.
-    const onItem = () => (h.snapshot('hover') as { id: string } | null)?.id?.startsWith('fixed:') === true
+    // the mouse in a small grid the way a player would until the prompt appears. Page 2 lies 1.1 m
+    // from the key, so only this item's own prompt counts.
+    const onItem = () => (h.snapshot('hover') as { id: string } | null)?.id === `fixed:${spawnId}`
     const nudges: Array<[number, number]> = [[0, 0]]
     for (const r of [6, 12, 18, 24]) for (const [a, b] of [[1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]]) nudges.push([a * r, b * r])
     let at: [number, number] = [0, 0]
     for (const [nx, ny] of nudges) {
       h.input.mouseMove(nx - at[0], ny - at[1])
       at = [nx, ny]
-      await wait(250)
+      await frames(2)
       if (onItem()) break
     }
     const hover = h.snapshot('hover')
@@ -172,3 +182,6 @@ test.describe('walking in to the Rusted Crypt Key and page 2', () => {
     }
   })
 })
+
+
+

@@ -30,7 +30,11 @@ export function ItemNameLabel() {
       const elapsed = performance.now() - shownAt
       const reduced = reducedMotion()
       el.style.opacity = String(itemNameOpacity(elapsed, reduced))
-      if (itemNameFinished(elapsed, reduced)) return
+      if (itemNameFinished(elapsed, reduced)) {
+        // Remove the element once faded: an invisible live region left mounted is stale text.
+        useItemNameStore.getState().expire(ticket)
+        return
+      }
       raf = requestAnimationFrame(tick)
     }
     tick()

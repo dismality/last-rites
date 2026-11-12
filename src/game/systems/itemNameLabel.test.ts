@@ -69,7 +69,7 @@ describe('itemNameStore', () => {
   it('has no leave action: moving the cursor away leaves the timing untouched', () => {
     // Only the timer ends a name; the store exposes show and clear (clear is for tests and resets).
     expect(Object.keys(useItemNameStore.getState()).sort()).toEqual(
-      ['clear', 'name', 'shownAt', 'show', 'ticket'].sort(),
+      ['clear', 'expire', 'name', 'shownAt', 'show', 'ticket'].sort(),
     )
   })
 })
@@ -100,5 +100,22 @@ describe('item names are never title attributes', () => {
     }
     expect(Object.keys(sources).length).toBeGreaterThan(10)
     expect(offenders).toEqual([])
+  })
+})
+
+describe('itemNameStore.expire', () => {
+  it('removes the faded name, but never a newer one that replaced it', () => {
+    const s = useItemNameStore.getState()
+    s.show('bandage', 0)
+    const first = useItemNameStore.getState().ticket
+    useItemNameStore.getState().expire(first)
+    expect(useItemNameStore.getState().name).toBeNull()
+
+    useItemNameStore.getState().show('bandage', 0)
+    const old = useItemNameStore.getState().ticket
+    useItemNameStore.getState().show('cloth', 10)
+    useItemNameStore.getState().expire(old)
+    expect(useItemNameStore.getState().name).toBe('Cloth')
+    useItemNameStore.getState().clear()
   })
 })

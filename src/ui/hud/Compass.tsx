@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react'
-import { COMPASS, COMPASS_LETTERS } from '../../data/compass'
+import { iconUrl } from '../../data/assets'
+import { COMPASS, COMPASS_LETTERS, COMPASS_MARK_ID, type CompassMarkerKind } from '../../data/compass'
+import { HUD_MARK_PX } from '../markImages'
 import { MERCHANT_SPOT } from '../../data/merchant'
 import { isMerchantPresent } from '../../game/state/merchantPresence'
 import { useChapelStore } from '../../game/state/chapelStore'
@@ -27,7 +29,30 @@ function syncMarker(el: HTMLElement, m: CompassMarker): void {
   const arrow = el.querySelector('.compass__arrow')
   const text = el.querySelector('.compass__text')
   if (arrow) setText(arrow, m.pinned === 'left' ? '◂' : m.pinned === 'right' ? '▸' : '')
-  if (text) setText(text, `${m.glyph} ${m.label}`)
+  // The image replaces the glyph once it has loaded; until then, or if it fails, the glyph stays.
+  if (text) setText(text, el.dataset.mark === 'img' ? m.label : `${m.glyph} ${m.label}`)
+}
+
+/** The mark image for a marker, with its load state mirrored onto the marker element. */
+function makeMarkImg(el: HTMLElement, id: string): HTMLImageElement {
+  const kind = id.split('-')[0] as CompassMarkerKind
+  const img = document.createElement('img')
+  img.className = 'compass__mark'
+  img.alt = ''
+  img.width = HUD_MARK_PX
+  img.height = HUD_MARK_PX
+  img.draggable = false
+  img.hidden = true
+  img.onload = () => {
+    img.hidden = false
+    el.dataset.mark = 'img'
+  }
+  img.onerror = () => {
+    img.hidden = true
+    el.dataset.mark = 'glyph'
+  }
+  img.src = iconUrl('mark-light', COMPASS_MARK_ID[kind])
+  return img
 }
 
 function makeMarkerEl(id: string): HTMLElement {
@@ -38,7 +63,7 @@ function makeMarkerEl(id: string): HTMLElement {
   arrow.setAttribute('aria-hidden', 'true')
   const text = document.createElement('span')
   text.className = 'compass__text'
-  el.append(arrow, text)
+  el.append(arrow, makeMarkImg(el, id), text)
   return el
 }
 

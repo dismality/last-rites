@@ -17,8 +17,6 @@ export function ExamineOverlay() {
 
   useEffect(() => {
     if (!item) return
-    // Free the cursor so the mouse can rotate the item.
-    if (document.pointerLockElement) document.exitPointerLock()
     closeRef.current?.focus()
     // Capture phase so the pause trigger and other window handlers never see these keys.
     const onKey = (e: KeyboardEvent) => {

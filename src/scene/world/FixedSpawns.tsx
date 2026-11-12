@@ -14,6 +14,7 @@ import { useWorldStore } from '../../game/state/worldStore'
 import { availableFixedSpawns } from '../../game/systems/spawns'
 import '../assets/preloadModels'
 import { Interactable } from './Interactable'
+import { useLingering } from './useLingering'
 
 /**
  * Hero models are real-world size (a key is about 10 cm), which is invisible from
@@ -92,18 +93,22 @@ export function FixedSpawns() {
   const world = useSpawnStore((s) => s.world)
   const collect = useSpawnStore((s) => s.collectFixed)
   const phase = useWorldStore((s) => s.phase)
-  const spawns = useMemo(() => availableFixedSpawns(world, phase), [world, phase])
+  const available = useMemo(() => availableFixedSpawns(world, phase), [world, phase])
+  // A taken key, relic or page lingers for the cue fade instead of blinking out.
+  const spawns = useLingering(available, (s) => s.id)
 
   return (
     <>
-      {spawns.map((s) => {
+      {spawns.map(({ item: s, gone }) => {
         const model = ITEM_MAP[s.item].model
         const pageNo = /^journal-page-([1-5])$/.exec(s.item)?.[1]
         return (
           <group key={s.id} position={[...s.position]}>
             <Interactable
-              id={`fixed:${s.id}`}
-              action="examine"
+              kind="fixed-spawn"
+              subject={s.id}
+              usedUp={gone}
+              id={gone ? `fixed:${s.id}~gone` : `fixed:${s.id}`}
               size={[0.4, 0.2, 0.4]}
               runeHeight={0.5}
               onInteract={() => collect(s.id)}

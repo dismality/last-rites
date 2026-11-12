@@ -19,6 +19,7 @@ export const CONTROL_ACTIONS: ReadonlyArray<{ action: string; label: string }> =
   { action: 'Satchel', label: 'Satchel' },
   { action: 'Journal', label: 'Journal / map' },
   { action: 'Lantern', label: 'Lantern on/off' },
+  { action: 'Minimap', label: 'Minimap on/off' },
   { action: 'Skip', label: 'Skip cutscene' },
 ]
 

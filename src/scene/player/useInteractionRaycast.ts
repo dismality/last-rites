@@ -7,8 +7,9 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { INTERACT_RANGE_M } from '../../data/balance'
 import { isMenuOpen } from '../../game/state/menuState'
-import { useInteractionStore } from '../../game/state/interactionStore'
+import { useInteractionStore, type HoverTarget } from '../../game/state/interactionStore'
 import { pickHoverTarget } from '../../game/systems/interaction'
+import type { InteractionCue } from '../../game/systems/interactionCue'
 import { interactableRegistry } from '../world/interactableRegistry'
 import { input } from './input'
 
@@ -27,6 +28,7 @@ export function useInteractionRaycast(): void {
   const raycaster = useRef(new THREE.Raycaster())
   const wasDown = useRef(false)
   const wasMenuOpen = useRef(false)
+  const prevHover = useRef<HoverTarget | null>(null)
 
   useFrame((state) => {
     const { setHover } = useInteractionStore.getState()
@@ -37,6 +39,7 @@ export function useInteractionRaycast(): void {
     if (menuOpen || wasMenuOpen.current) {
       wasMenuOpen.current = menuOpen
       wasDown.current = input.peek().interact
+      prevHover.current = null
       setHover(null)
       return
     }
@@ -44,14 +47,38 @@ export function useInteractionRaycast(): void {
     rc.far = INTERACT_RANGE_M
     rc.setFromCamera(CENTRE, state.camera)
 
-    const objects = [...interactableRegistry.values()].map((e) => e.object)
+    // Used-up objects are never candidates. Interactable keeps `userData.targetable` current
+    // for nearby ones; the cue is re-read below for whatever the ray actually hits.
+    const objects: THREE.Object3D[] = []
+    for (const e of interactableRegistry.values()) {
+      if (e.object.userData.targetable !== false) objects.push(e.object)
+    }
+    const cues = new Map<string, InteractionCue>()
     const hits = rc.intersectObjects(objects, true).flatMap((h) => {
       const id = findTag(h.object)
-      return id ? [{ id, distance: h.distance }] : []
+      const entry = id ? interactableRegistry.get(id) : undefined
+      if (!id || !entry) return []
+      const cue = entry.cue()
+      if (!cue.targetable) return []
+      cues.set(id, cue)
+      return [{ id, distance: h.distance }]
     })
     const target = pickHoverTarget(hits)
     const entry = target ? interactableRegistry.get(target.id) : undefined
-    setHover(entry ? { id: entry.id, action: entry.action } : null)
+    const cue = target ? cues.get(target.id) : undefined
+    const next: HoverTarget | null =
+      entry && cue
+        ? { id: entry.id, action: entry.action, prompt: cue.prompt, actionable: cue.actionable }
+        : null
+    // A target that was just used up (taken, dug, examined, opened) fades its prompt out. Looking
+    // away or stepping back leaves the entry targetable and cuts the prompt as before.
+    const prev = prevHover.current
+    if (!next && prev) {
+      const was = interactableRegistry.get(prev.id)
+      if (!was || !was.cue().targetable) useInteractionStore.getState().startFading(prev)
+    }
+    prevHover.current = next
+    setHover(next)
 
     const down = input.peek().interact
     if (down && !wasDown.current && entry) entry.onInteract()

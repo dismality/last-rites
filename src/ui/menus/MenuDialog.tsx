@@ -16,7 +16,7 @@ interface MenuDialogProps {
   onEscape?: () => void
   children: ReactNode
   /** Extra class on the backdrop, e.g. a full-screen variant. */
-  variant?: 'overlay' | 'screen'
+  variant?: 'overlay' | 'screen' | 'dawn'
 }
 
 export function MenuDialog({ titleId, onEscape, children, variant = 'overlay' }: MenuDialogProps) {

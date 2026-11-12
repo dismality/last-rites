@@ -5,7 +5,7 @@ import { TUTORIAL_STEPS } from '../../data/tutorialSteps'
 import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
 import type { Inventory } from '../types'
 import {
-  digPromptNote,
+  digNeed,
   impliesDigFindsCryptKey,
   MOUND_DAY_RUNE_RANGE_M,
   nearestMound,
@@ -36,30 +36,17 @@ describe('mound rune by day', () => {
   })
 })
 
-describe('digPromptNote', () => {
-  it('is silent with a shovel in hand', () => {
+describe('digNeed', () => {
+  it('is null with a shovel in hand', () => {
     const inventory = withShovel(['rusty-shovel', null, null, null])
-    expect(digPromptNote({ inventory, equippedSlot: 0, bindings, dugToday: false })).toBeNull()
+    expect(digNeed({ inventory, equippedSlot: 0, bindings })).toBeNull()
   })
   it('asks for a shovel and names the hotbar key when it is bound elsewhere', () => {
     const inventory = withShovel([null, 'rusty-shovel', null, null])
-    const note = digPromptNote({ inventory, equippedSlot: null, bindings, dugToday: false })
-    expect(note).toBe('Need a shovel in hand to dig: press 2')
+    expect(digNeed({ inventory, equippedSlot: null, bindings })).toBe('a shovel in hand: press 2')
   })
   it('asks for a shovel with none carried', () => {
-    const note = digPromptNote({
-      inventory: createInventory(),
-      equippedSlot: null,
-      bindings,
-      dugToday: false,
-    })
-    expect(note).toBe('Need a shovel in hand to dig')
-  })
-  it('says a dug grave is spent', () => {
-    const inventory = withShovel(['rusty-shovel', null, null, null])
-    expect(digPromptNote({ inventory, equippedSlot: 0, bindings, dugToday: true })).toBe(
-      'Already dug today',
-    )
+    expect(digNeed({ inventory: createInventory(), equippedSlot: null, bindings })).toBe('a shovel')
   })
 })
 

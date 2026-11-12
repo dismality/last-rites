@@ -23,6 +23,7 @@ import { DoorStatus } from './DoorStatus'
 import { BossBar } from './BossBar'
 import { BossNameCard } from './BossNameCard'
 import { ScorePanel } from './ScorePanel'
+import { Minimap, MinimapHotkey } from './Minimap'
 import { AchievementToasts } from './AchievementToasts'
 import { DawnCard } from './DawnCard'
 import { MerchantMenu } from '../merchant/MerchantMenu'
@@ -74,7 +75,12 @@ export function Hud() {
       <Subtitles />
       <Toast />
       <DuskHint />
-      <ScorePanel />
+      {/* Score on top, minimap beneath it: one column, so the map never lands on the score. */}
+      <div className="hud-right-stack">
+        <ScorePanel />
+        <Minimap />
+      </div>
+      <MinimapHotkey />
       <AchievementToasts />
       <DawnCard />
       <MerchantMenu />

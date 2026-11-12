@@ -23,17 +23,18 @@ const PILLAR_HEIGHT = 2.7
 
 /**
  * The whistle answers at the altar: stone shifts and the catacomb stair opens. The hotspot only
- * exists while the stair is sealed and the whistle is held, so ordinary altar use is untouched.
+ * exists while the whistle is held and shows cues only while the stair is sealed, so ordinary
+ * altar use is untouched.
  */
 function AltarStairReveal({ z }: { z: number }) {
-  const sealed = useMysteryStore((s) => !s.mystery.gates.catacombs)
   const hasWhistle = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
-  if (!sealed || !hasWhistle) return null
+  // Stays mounted after the stair opens so its cues fade; then it is used up and not targetable.
+  if (!hasWhistle) return null
   return (
     <group position={[0, 0, z]}>
       <Interactable
         id="altar-whistle"
-        action="open"
+        kind="altar-whistle"
         size={[1.6, 1.1, 0.8]}
         runeHeight={1.6}
         onInteract={() => useMysteryStore.getState().interactGate('catacombs', 'altar')}

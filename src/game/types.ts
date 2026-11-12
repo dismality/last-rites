@@ -260,6 +260,8 @@ export interface Settings {
   tutorialPrompts: boolean
   /** Show floating damage numbers on hits */
   damageNumbers: boolean
+  /** Show the HUD minimap (the Minimap binding toggles it) */
+  showMinimap: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

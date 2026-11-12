@@ -1,59 +1,68 @@
-import { DIG_ID_PREFIX, useDigStore } from '../../game/state/digStore'
-import { useWorldStore } from '../../game/state/worldStore'
-import { digPromptNote } from '../../game/systems/digGuidance'
-import { useDoorStore } from '../../game/state/doorStore'
+import { useEffect } from 'react'
+import { CUE_FADE_S } from '../../data/interactables'
 import { useInteractionStore } from '../../game/state/interactionStore'
-import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCinematic } from '../../game/state/menuState'
-import { useSettingsStore } from '../../game/state/settingsStore'
-import { nailPrompt } from '../../game/systems/barricade'
-import { ACTION_RUNE, promptText } from '../../game/systems/interaction'
-import type { DoorId } from '../../game/types'
+import { ACTION_RUNE } from '../../game/systems/interaction'
+import { iconUrl } from '../../data/assets'
+import { PixelIcon } from '../PixelIcon'
 
-const NAIL_PREFIX = 'nail-'
+/** The rune image is 64 px art shown at 32 px. */
+const RUNE_PX = 32
 
-/** "E: Dig" with the action's rune, so the cue is a shape and text, not only colour. */
+/**
+ * "E: Dig" with the action's rune, so the cue is a shape and text, not only colour. The text comes
+ * from the one cue rule (systems/interactionCue.ts) via the hover target: a thing that cannot be
+ * used shows what it needs ("Needs a shovel in hand: press 1") and never "Hold E". A target that
+ * was just used up keeps its prompt for CUE_FADE_S while it fades (a steady linear fade, which
+ * is also the reduced-motion and Flashing-lights-off behaviour).
+ */
 export function InteractPrompt() {
   const hover = useInteractionStore((s) => s.hover)
-  const key = useSettingsStore((s) => s.bindings.Interact) ?? 'KeyE'
-  const built = useDoorStore((s) => s.built)
-  const doors = useDoorStore((s) => s.doors)
-  const inventory = useInventoryStore((s) => s.inventory)
+  const fading = useInteractionStore((s) => s.fading)
+  const clearFading = useInteractionStore((s) => s.clearFading)
   const cinematic = useCinematic()
-  const equippedSlot = useInventoryStore((s) => s.equippedSlot)
-  const bindings = useSettingsStore((s) => s.bindings)
-  const day = useWorldStore((s) => s.nightNumber)
-  const dugOnDay = useDigStore((s) => s.dig.dugOnDay)
-  if (!hover || cinematic) return null
 
-  // A door that cannot take a board says why: full, or the first missing material (Req 16.4).
-  let note: string | null = null
-  if (hover.action === 'nail' && hover.id.startsWith(NAIL_PREFIX)) {
-    const door = hover.id.slice(NAIL_PREFIX.length) as DoorId
-    if (door in doors) {
-      const p = nailPrompt({ built, doors }, inventory, door)
-      if (!p.canStart) note = p.text
-    }
+  useEffect(() => {
+    if (!fading) return
+    const timer = setTimeout(clearFading, CUE_FADE_S * 1000)
+    return () => clearTimeout(timer)
+  }, [fading, clearFading])
+
+  if (cinematic) return null
+  if (hover?.prompt) {
+    return (
+      <p className="hud-prompt" role="status" data-actionable={hover.actionable ?? true}>
+        <span className="hud-prompt__rune" aria-hidden="true">
+          <PixelIcon
+            url={iconUrl('interact-rune', hover.action)}
+            fallback={ACTION_RUNE[hover.action]}
+            sizePx={RUNE_PX}
+            className="hud-prompt__rune-img"
+          />
+        </span>
+        {hover.prompt}
+      </p>
+    )
   }
-
-  let label = promptText(hover.action, key)
-  if (hover.action === 'dig' && hover.id.startsWith(DIG_ID_PREFIX)) {
-    label = `Hold ${label}`
-    note = digPromptNote({
-      inventory,
-      equippedSlot,
-      bindings,
-      dugToday: dugOnDay[hover.id.slice(DIG_ID_PREFIX.length)] === day,
-    })
+  if (!hover && fading) {
+    return (
+      <p
+        key={fading.serial}
+        className="hud-prompt hud-prompt--fading"
+        aria-hidden="true"
+        data-testid="prompt-fading"
+      >
+        <span className="hud-prompt__rune">
+          <PixelIcon
+            url={iconUrl('interact-rune', fading.action)}
+            fallback={ACTION_RUNE[fading.action]}
+            sizePx={RUNE_PX}
+            className="hud-prompt__rune-img"
+          />
+        </span>
+        {fading.prompt}
+      </p>
+    )
   }
-
-  return (
-    <p className="hud-prompt" role="status">
-      <span className="hud-prompt__rune" aria-hidden="true">
-        {ACTION_RUNE[hover.action]}
-      </span>
-      {label}
-      {note && <span className="hud-prompt__note">{` (${note})`}</span>}
-    </p>
-  )
+  return null
 }

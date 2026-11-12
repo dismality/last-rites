@@ -63,26 +63,26 @@ export function Gate({ spec }: { spec: CorridorSpec }) {
   return (
     <>
       {!open && (
-        <>
-          <RigidBody type="fixed" colliders={false}>
-            <CuboidCollider args={[w / 2, height / 2, t / 2]} position={[0, height / 2, z]} />
-          </RigidBody>
-          <group position={[0, 0, z]}>
-            <Interactable
-              id={`gate-${spec.id}`}
-              action="open"
-              size={[w, 1.4, t]}
-              runeHeight={1.6}
-              onInteract={() => useMysteryStore.getState().interactGate(spec.id, 'gate')}
-            >
-              {/* Invisible but raycastable: the bars themselves are instanced and thin. */}
-              <mesh visible={false} position={[0, height / 2, 0]}>
-                <boxGeometry args={[w, height, t]} />
-              </mesh>
-            </Interactable>
-          </group>
-        </>
+        <RigidBody type="fixed" colliders={false}>
+          <CuboidCollider args={[w / 2, height / 2, t / 2]} position={[0, height / 2, z]} />
+        </RigidBody>
       )}
+      {/* Stays mounted once open so its cues can fade; an open gate is used up and not targetable. */}
+      <group position={[0, 0, z]}>
+        <Interactable
+          id={`gate-${spec.id}`}
+          kind="gate"
+          subject={spec.id}
+          size={[w, 1.4, t]}
+          runeHeight={1.6}
+          onInteract={() => useMysteryStore.getState().interactGate(spec.id, 'gate')}
+        >
+          {/* Invisible but raycastable: the bars themselves are instanced and thin. */}
+          <mesh visible={false} position={[0, height / 2, 0]}>
+            <boxGeometry args={[w, height, t]} />
+          </mesh>
+        </Interactable>
+      </group>
       {barsMounted && (
         <group ref={liftRef}>
           <InstancedModel model="iron-fence" placements={bars} centerXZ />
@@ -101,28 +101,27 @@ export function OssuaryDoor() {
   return (
     <>
       {!open && (
-        <>
-          <RigidBody type="fixed" colliders={false}>
-            <CuboidCollider
-              args={[width / 2, height / 2, thickness / 2]}
-              position={[0, height / 2, z]}
-            />
-          </RigidBody>
-          <group position={[0, 0, z]}>
-            <Interactable
-              id="gate-ossuary"
-              action="open"
-              size={[width, 1.4, thickness]}
-              runeHeight={1.6}
-              onInteract={() => useMysteryStore.getState().interactGate('ossuary', 'gate')}
-            >
-              <mesh visible={false} position={[0, height / 2, 0]}>
-                <boxGeometry args={[width, height, thickness]} />
-              </mesh>
-            </Interactable>
-          </group>
-        </>
+        <RigidBody type="fixed" colliders={false}>
+          <CuboidCollider
+            args={[width / 2, height / 2, thickness / 2]}
+            position={[0, height / 2, z]}
+          />
+        </RigidBody>
       )}
+      <group position={[0, 0, z]}>
+        <Interactable
+          id="gate-ossuary"
+          kind="gate"
+          subject="ossuary"
+          size={[width, 1.4, thickness]}
+          runeHeight={1.6}
+          onInteract={() => useMysteryStore.getState().interactGate('ossuary', 'gate')}
+        >
+          <mesh visible={false} position={[0, height / 2, 0]}>
+            <boxGeometry args={[width, height, thickness]} />
+          </mesh>
+        </Interactable>
+      </group>
       {barsMounted && (
         <group ref={liftRef}>
           <mesh

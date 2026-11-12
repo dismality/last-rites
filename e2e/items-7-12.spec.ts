@@ -470,6 +470,11 @@ test('item 10b: no rune or hover cue during an ending (Taken, reached through th
   // No relics and every wave cleared: FinalRite.tsx itself calls startEnding('taken').
   await clearWaves(page, async () => (await snap<EndingSnap>(page, 'ending')).ending !== null)
   await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).ending === 'taken', null, 60_000)
+  // The ending is set before the screen switches, and a SwiftShader frame lasts ~250 ms: sample only
+  // once the ending screen is up and the scene has rendered after it, or the first sample reads the
+  // last gameplay frame (seen once: 1 rune and a stale hover, then 7 clean samples).
+  await until(page, () => (window.__lastRites!.snapshot('game') as { screen: string }).screen === 'ending', null, 30_000)
+  await renderedFrames(page, 2)
   const samples: Awaited<ReturnType<typeof cueState>>[] = []
   for (let i = 0; i < 8; i++) {
     const e = await snap<EndingSnap>(page, 'ending')
@@ -505,7 +510,9 @@ async function installEndingWatch(page: Page) {
     setInterval(() => {
       const e = h.snapshot('ending') as { ending: string | null; stage: string }
       if (e.ending === null || w.__end.wall !== null) return
+      // Start the wall clock when the sequence itself starts, not when `ending` is first set.
       if (w.__end.start === null) {
+        if (e.stage !== 'sequence') return
         w.__end.start = performance.now()
         w.__end.ending = e.ending
       }
@@ -572,12 +579,11 @@ test('item 11: Taken ending reaches the summary unskipped (real night-5 check, 0
   expect(errors).toEqual([])
 })
 
-test('item 11: Space and Enter skip the ending sequence', async ({ page }) => {
-  test.setTimeout(300_000)
-  let errors = await boot(page)
-  for (const [key, id] of [['Space', 'rest'], ['Enter', 'taken']] as const) {
-    // Second pass needs a fresh page: the first ending leaves the screen on 'ending'.
-    if (key === 'Enter') errors = await boot(page)
+// One fresh page per key: a second boot() on the same page left the first ending's screen state behind.
+for (const [key, id] of [['Space', 'rest'], ['Enter', 'taken']] as const) {
+  test(`item 11: ${key} skips the ending sequence`, async ({ page }) => {
+    test.setTimeout(300_000)
+    const errors = await boot(page)
     await page.evaluate((e) => window.__lastRites!.startEnding(e), id)
     await until(page, () => (window.__lastRites!.snapshot('game') as { screen: string }).screen === 'ending', null, 30_000)
     await page.waitForTimeout(3000)
@@ -587,9 +593,9 @@ test('item 11: Space and Enter skip the ending sequence', async ({ page }) => {
     await page.keyboard.press(key)
     await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).stage === 'summary', null, 10_000)
     log(`item11 skip: ${key} at sequence clock ${clock.toFixed(1)} s went to the summary`)
-  }
-  expect(errors).toEqual([])
-})
+    expect(errors).toEqual([])
+  })
+}
 
 // ---------------------------------------------------------------------------------------------
 // Item 12
