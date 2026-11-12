@@ -1,6 +1,7 @@
 // Environmental clues: small props the player can examine to record a clue.
 // Rules (ledger required or not) live in the mystery store; this only draws and wires them.
 import { CLUE_SPOTS, type ClueSpot } from '../../data/tombstones'
+import { pushJournalAddedToast } from '../../game/state/journalToast'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { useToastStore } from '../../game/state/toastStore'
 import { canDiscoverClue } from '../../game/systems/tombstones'
@@ -46,7 +47,9 @@ export function ClueSpots() {
         <group key={spot.clueId} position={spot.position}>
           <Interactable
             id={`clue-${spot.clueId}`}
-            action="examine"
+            kind="clue-spot"
+            subject={spot.clueId}
+            onUsedUp={pushJournalAddedToast}
             size={[0.8, 0.6, 0.8]}
             runeHeight={0.9}
             onInteract={() => examineSpot(spot)}

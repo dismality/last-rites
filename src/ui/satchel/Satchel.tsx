@@ -17,6 +17,7 @@ import {
   useUiWorldStore,
 } from '../../game/state'
 import { useIntroStore } from '../../game/state/introStore'
+import { isOverlayOpen } from '../../game/state/menuState'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { emit } from '../../game/events'
 import { assignHotbar } from '../../game/systems/inventory'
@@ -59,7 +60,9 @@ export function Satchel() {
         gs.taken ||
         useIntroStore.getState().playing ||
         ui.workbenchOpen ||
-        ui.chapelRepairOpen
+        ui.chapelRepairOpen ||
+        // The dawn picker reads 1 to 3 itself; they must not also equip a hotbar slot.
+        isOverlayOpen()
 
       if (e.code === bindings.Satchel) {
         if (blocked) return
@@ -102,7 +105,6 @@ export function Satchel() {
 
   useEffect(() => {
     if (!open) return
-    if (document.pointerLockElement) document.exitPointerLock()
     // Wait a frame so the cells exist before taking focus.
     const raf = requestAnimationFrame(() => {
       setFocusIdx(0)

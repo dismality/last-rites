@@ -12,6 +12,8 @@ export interface ItemNameState {
   ticket: number
   show: (id: ItemId | null | undefined, now?: number) => void
   clear: () => void
+  /** Clears the name only if it is still the one that started with `ticket` (a newer name keeps running). */
+  expire: (ticket: number) => void
 }
 
 export const useItemNameStore = create<ItemNameState>((set) => ({
@@ -25,6 +27,7 @@ export const useItemNameStore = create<ItemNameState>((set) => ({
       return def ? { name: def.name, shownAt: now, ticket: s.ticket + 1 } : s
     }),
   clear: () => set({ name: null }),
+  expire: (ticket) => set((s) => (s.ticket === ticket && s.name !== null ? { name: null } : s)),
 }))
 
 /** Shorthand for hover, focus and hotbar-switch call sites. */

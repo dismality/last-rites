@@ -1,16 +1,9 @@
 // Dev-only: names the object that owns a Rapier collider, so a block can be attributed.
 // Colliders carry no names, so each one is matched by position against the same layout data the
 // scene builds them from. Anything that matches nothing is reported as 'unknown' (a stray collider).
-import {
-  HUT,
-  CHAPEL_CENTER,
-  LAMP_POSTS,
-  craneCryptPosition,
-  generateHeadstones,
-  generateTrees,
-} from '../data/cemeteryLayout'
+import { HUT, CHAPEL_CENTER, LAMP_POSTS } from '../data/cemeteryLayout'
+import { GRAVEYARD_COLLIDERS } from '../data/graveyardColliders'
 import { TOMBSTONES } from '../data/tombstones'
-import { FIXED_SPAWNS, SPAWN_POINTS } from '../data/zones'
 
 interface Anchor {
   name: string
@@ -24,17 +17,9 @@ let anchors: Anchor[] | null = null
 
 function build(): Anchor[] {
   const out: Anchor[] = []
-  generateHeadstones().forEach((h, i) =>
-    out.push({ name: `headstone#${i}`, x: h.position[0], z: h.position[2] }),
-  )
-  const avoid = [...SPAWN_POINTS.map((p) => p.position), ...FIXED_SPAWNS.map((p) => p.position)]
-  generateTrees(avoid).forEach((t, i) =>
-    out.push({ name: `tree#${i}(${t.kind})`, x: t.position[0], z: t.position[2] }),
-  )
+  GRAVEYARD_COLLIDERS.forEach((b, i) => out.push({ name: `graveyard#${i}`, x: b.center[0], z: b.center[2] }))
   LAMP_POSTS.forEach((l, i) => out.push({ name: `lamp#${i}`, x: l.position[0], z: l.position[2] }))
   for (const t of TOMBSTONES) out.push({ name: `tombstone:${t.id}`, x: t.position[0], z: t.position[2] })
-  const [kx, , kz] = craneCryptPosition()
-  out.push({ name: 'crane-crypt', x: kx, z: kz })
   out.push({ name: 'hut', x: 0, z: 0 })
   out.push({ name: 'chapel', x: CHAPEL_CENTER[0], z: CHAPEL_CENTER[2] })
   return out

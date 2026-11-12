@@ -38,6 +38,14 @@ export function nextCardIndex(index: number, key: string, count: number): number
   return null
 }
 
+/** Digit1 to Digit3 (or the numpad) pick card 0 to 2; null for other keys or a card that isn't offered. */
+export function cardIndexForKey(code: string, count: number): number | null {
+  const m = /^(?:Digit|Numpad)([1-9])$/.exec(code)
+  if (!m) return null
+  const i = Number(m[1]) - 1
+  return i < count ? i : null
+}
+
 /** The single path from a card to the action; `pick` is injectable for tests. */
 export function pickCard(id: DawnUpgradeId, pick: (id: DawnUpgradeId) => boolean = pickUpgrade): boolean {
   return pick(id)

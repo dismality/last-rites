@@ -37,5 +37,6 @@ test('mound rune and dig prompt show by day with the lantern off', async ({ page
     h.give('bandage', 1, 1)
     h.equip(1)
   })
-  await expect(prompt).toContainText('Need a shovel in hand to dig: press 1')
+  await expect(prompt).toContainText('Needs a shovel in hand: press 1')
+  await expect(prompt).not.toContainText('Hold')
 })

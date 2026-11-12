@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { ENDINGS } from '../../data/endings'
-import { activeLine, advanceSequence, cameraProgress, easeInOut, fadeAlpha, FADE_S, isSequenceDone } from './endingSequence'
+import { activeLine, advanceSequence, cameraProgress, easeInOut, fadeAlpha, FADE_S, handleSkipKey, isSequenceDone } from './endingSequence'
 
 describe('endingSequence', () => {
   it('eases from 0 to 1 and clamps outside the range', () => {
@@ -69,5 +69,17 @@ describe('ending driver (no Skip)', () => {
       real += 0.2
     }
     expect(real).toBeLessThanOrEqual(def.duration)
+  })
+
+  it('Escape, Space and Enter skip and cancel the default action; other keys do nothing', () => {
+    for (const key of ['Escape', ' ', 'Enter']) {
+      let prevented = false
+      let skipped = 0
+      expect(handleSkipKey({ key, preventDefault: () => (prevented = true) }, () => skipped++)).toBe(true)
+      expect({ prevented, skipped }).toEqual({ prevented: true, skipped: 1 })
+    }
+    let skipped = 0
+    expect(handleSkipKey({ key: 'a', preventDefault: () => {} }, () => skipped++)).toBe(false)
+    expect(skipped).toBe(0)
   })
 })

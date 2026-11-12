@@ -8,24 +8,11 @@ import {
   CORRIDORS,
   GROUNDS_HALF,
   HUT,
-  FENCE,
   LAMP_POSTS,
-  buildFenceSegments,
-  craneCryptPosition,
-  generateHeadstones,
-  generateTrees,
 } from '../../src/data/cemeteryLayout'
-import {
-  CRANE_CRYPT_BODY,
-  headstoneCollider,
-  headstoneKind,
-  headstoneScale,
-  lampCollider,
-  treeCollider,
-  treeScale,
-} from '../../src/data/colliderFootprints'
+import { headstoneCollider, headstoneScale, lampCollider } from '../../src/data/colliderFootprints'
+import { GRAVEYARD_COLLIDERS } from '../../src/data/graveyardColliders'
 import { TOMBSTONES } from '../../src/data/tombstones'
-import { FIXED_SPAWNS, SPAWN_POINTS } from '../../src/data/zones'
 import type { Vec2 } from '../../src/game/systems/combat'
 
 export interface Box {
@@ -37,7 +24,7 @@ export interface Box {
 
 const box = (cx: number, cz: number, hx: number, hz: number): Box => ({ cx, cz, hx, hz })
 
-/** Hut, chapel, fences, corridor walls and the crypt: the big structures. */
+/** Hut, chapel and catacomb corridor walls: the big structures (fences and crypts are graveyard boxes). */
 export function structureBoxes(): Box[] {
   const out: Box[] = []
   const { halfX, halfZ, wallThickness: ht, doorWidth } = HUT
@@ -69,12 +56,6 @@ export function structureBoxes(): Box[] {
     box(cx + chx, cz, ct / 2, chz),
   )
 
-  for (const s of buildFenceSegments()) {
-    const mid = (s.from + s.to) / 2
-    const half = (s.to - s.from) / 2
-    const t = FENCE.colliderHalfThickness
-    out.push(s.axis === 'x' ? box(mid, s.fixed, half, t) : box(s.fixed, mid, t, half))
-  }
   for (const c of CORRIDORS) {
     if (c.open) continue
     const mid = c.entranceZ + (c.dir * c.length) / 2
@@ -82,8 +63,6 @@ export function structureBoxes(): Box[] {
       out.push(box(c.centerX + side * (c.width / 2 + c.wallThickness / 2), mid, c.wallThickness / 2, c.length / 2))
     }
   }
-  const [kx, , kz] = craneCryptPosition()
-  out.push(box(kx, kz, CRANE_CRYPT_BODY.halfX, CRANE_CRYPT_BODY.halfZ))
   return out
 }
 
@@ -94,24 +73,21 @@ function turnedBox(c: { position: readonly number[]; rotationY: number; half: re
   return box(c.position[0], c.position[2], c.half[0] * cos + c.half[2] * sin, c.half[0] * sin + c.half[2] * cos)
 }
 
-/** Headstones, tombstones, trees and lamp posts: small obstacles a zombie must steer around. */
+/** The graveyard scene's boxes (perimeter fences, oaks, logs, headstones, crypts) seen from above, as the zombies' wall probe sees them. */
+export function graveyardBoxes(): Box[] {
+  return GRAVEYARD_COLLIDERS.map((b) => turnedBox({ position: b.center, rotationY: b.rotY, half: b.half }))
+}
+
+/** Tombstones, lamp posts and the graveyard scene's boxes: obstacles a zombie must steer around. */
 export function propBoxes(): Box[] {
   const out: Box[] = []
-  generateHeadstones().forEach((h, i) =>
-    out.push(turnedBox(headstoneCollider(headstoneKind(i), headstoneScale(h.height), h.position, h.rotationY))),
-  )
   for (const t of TOMBSTONES)
     out.push(turnedBox(headstoneCollider(t.model, headstoneScale(t.height), t.position, t.rotationY)))
-  const avoid = [...SPAWN_POINTS.map((p) => p.position), ...FIXED_SPAWNS.map((p) => p.position)]
-  generateTrees(avoid).forEach((t, i) => {
-    // A square around the round trunk: never smaller than the real collider.
-    const r = treeCollider(t.kind, treeScale(i), t.position).radius
-    out.push(box(t.position[0], t.position[2], r, r))
-  })
   for (const l of LAMP_POSTS) {
     const r = lampCollider(l.position).radius
     out.push(box(l.position[0], l.position[2], r, r))
   }
+  out.push(...graveyardBoxes())
   return out
 }
 /** Slab test for a segment against one box. */

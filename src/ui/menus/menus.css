@@ -6,6 +6,8 @@
   position: fixed;
   inset: 0;
   z-index: 300;
+  /* Some menus render inside the HUD layer, which is pointer-events: none. */
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -13,6 +15,17 @@
 }
 .menu__backdrop--screen {
   background: radial-gradient(ellipse at 50% 40%, var(--ink-mid) 0%, var(--ink) 75%);
+}
+
+/* Dawn picker: sits at the bottom so the dawn summary keeps the top (see .hud-dawn). */
+.menu__backdrop--dawn {
+  align-items: flex-end;
+  padding-bottom: 1.5vh;
+  box-sizing: border-box;
+}
+.menu__backdrop--dawn .menu {
+  width: clamp(300px, 70vw, 760px);
+  max-height: 64vh;
 }
 
 .menu {

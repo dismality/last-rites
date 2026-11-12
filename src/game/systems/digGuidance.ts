@@ -26,23 +26,22 @@ export interface DigNoteInput {
   inventory: Inventory
   equippedSlot: number | null
   bindings: Readonly<Record<string, string>>
-  dugToday: boolean
 }
 
-/** Short note shown beside "Hold E: Dig", or null when digging can start right now. */
-export function digPromptNote(i: DigNoteInput): string | null {
-  if (i.dugToday) return 'Already dug today'
+/**
+ * What a mound is missing, worded to follow "Needs " ("Needs a shovel in hand: press 2"), or null
+ * when digging can start right now. A dug grave never gets here: it is used up and has no prompt.
+ */
+export function digNeed(i: DigNoteInput): string | null {
   const inHand = i.equippedSlot === null ? null : hotbarItem(i.inventory, i.equippedSlot)
   if (hasShovel(inHand)) return null
   const slot = shovelHotbarSlot(i.inventory)
   if (slot !== null) {
     const code = i.bindings[`Hotbar${slot + 1}`] ?? `Digit${slot + 1}`
-    return `Need a shovel in hand to dig: press ${keyLabel(code)}`
+    return `a shovel in hand: press ${keyLabel(code)}`
   }
   const carried = i.inventory.slots.some((s) => SHOVELS.includes(s.item))
-  return carried
-    ? 'Need a shovel in hand to dig: bind it to a hotbar slot in the satchel'
-    : 'Need a shovel in hand to dig'
+  return carried ? 'a shovel in hand: bind it to a hotbar slot in the satchel' : 'a shovel'
 }
 
 const dist2 = (a: Vec3, b: Vec3): number => (a[0] - b[0]) ** 2 + (a[2] - b[2]) ** 2

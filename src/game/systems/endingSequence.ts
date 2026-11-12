@@ -53,3 +53,15 @@ export function advanceSequence(
 export function isSequenceDone(def: EndingDef, t: number): boolean {
   return t >= def.duration
 }
+
+/**
+ * Escape, Space and Enter skip the sequence. The default action is cancelled on purpose: skipping mounts
+ * the summary and moves focus to its first button, and an uncancelled Enter would then click that button
+ * (sending the player straight back to the title).
+ */
+export function handleSkipKey(e: { key: string; preventDefault: () => void }, skip: () => void): boolean {
+  if (e.key !== 'Escape' && e.key !== ' ' && e.key !== 'Enter') return false
+  e.preventDefault()
+  skip()
+  return true
+}

@@ -1,7 +1,7 @@
 // Asset paths. Everything under public/assets/ is addressed from here so no
 // scene file hard-codes a URL. Pure data: no React / three.js imports.
 
-import type { ItemId } from '../game/types'
+import type { DawnUpgradeId, ItemId } from '../game/types'
 import { ITEMS } from './items'
 
 /** Self-hosted Draco decoder (copied from three's examples); nothing loads from a CDN. */
@@ -147,9 +147,61 @@ export const ITEM_ICON_URLS: Readonly<Record<ItemId, string>> = {
   'reliquary-heart': icon('reliquary-heart'),
 }
 
-export function itemIconUrl(id: ItemId): string {
-  return ITEM_ICON_URLS[id]
+/** Ids that have a map/compass mark image (`<id>-light.png` and `<id>-dark.png`, 32 px). */
+export type MarkId =
+  | 'hut'
+  | 'chapel'
+  | 'graves'
+  | 'merchant'
+  | 'objective'
+  | 'gate'
+  | 'relic'
+  | 'workbench'
+  | 'player'
+
+/** Verbs that have an interaction rune image (64 px; shown at 32 px). */
+export type InteractRuneId = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail' | 'trade'
+
+export interface IconIds {
+  item: ItemId
+  boon: DawnUpgradeId
+  'boon-rune': DawnUpgradeId
+  'interact-rune': InteractRuneId
+  'mark-light': MarkId
+  'mark-dark': MarkId
 }
+
+export type IconKind = keyof IconIds
+
+const ICON_DIR = '/assets/icons'
+
+/**
+ * The one place an icon path is built. Items go through ITEM_ICON_URLS (the five journal pages
+ * share a file); `mark-light` is for dark HUD surfaces, `mark-dark` for the parchment map.
+ */
+export function iconUrl<K extends IconKind>(kind: K, id: IconIds[K]): string {
+  switch (kind) {
+    case 'item':
+      return ITEM_ICON_URLS[id as ItemId]
+    case 'boon':
+      return `${ICON_DIR}/boons/${id}.png`
+    case 'boon-rune':
+      return `${ICON_DIR}/runes/boons/${id}.png`
+    case 'interact-rune':
+      return `${ICON_DIR}/runes/interact/${id}.png`
+    case 'mark-light':
+      return `${ICON_DIR}/marks/${id}-light.png`
+    default:
+      return `${ICON_DIR}/marks/${id}-dark.png`
+  }
+}
+
+export function itemIconUrl(id: ItemId): string {
+  return iconUrl('item', id)
+}
+
+/** The whole graveyard (ground, stones, oaks, crypts, fences) as one Draco GLB in game coordinates. */
+export const GRAVEYARD_MODEL_URL = '/assets/models/scene/graveyard.glb'
 
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {

@@ -1,0 +1,19 @@
+[
+  {
+    "dest": "crane step",
+    "target": [
+      -18.9,
+      -58.099999999999994
+    ],
+    "ok": true,
+    "endsAt": [
+      -19.82,
+      0.05,
+      -57.72
+    ],
+    "distance": 0.99,
+    "seconds": 77.1,
+    "stuckAt": null,
+    "near": null
+  }
+]

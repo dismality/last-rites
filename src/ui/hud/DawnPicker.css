@@ -32,6 +32,38 @@
   border-color: var(--ember);
 }
 
+.dawn-picker__card {
+  position: relative;
+}
+
+/* The number key that picks this card; text, so it never relies on colour. */
+.dawn-picker__key {
+  position: absolute;
+  top: 0.3rem;
+  left: 0.5rem;
+  font-family: var(--font-num);
+  font-size: 1rem;
+  opacity: 0.8;
+}
+
+.dawn-picker__art {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+}
+
+.dawn-picker__art-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.dawn-picker__rune-img {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
 .dawn-picker__rune {
   font-size: 2rem;
   line-height: 1;

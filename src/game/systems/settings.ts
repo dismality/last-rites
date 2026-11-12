@@ -29,6 +29,7 @@ type BooleanKey =
   | 'accessibleHUD'
   | 'tutorialPrompts'
   | 'damageNumbers'
+  | 'showMinimap'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -39,6 +40,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'subtitles',
   'accessibleHUD',
   'tutorialPrompts',
+  'showMinimap',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -57,6 +59,7 @@ export const DEFAULT_SETTINGS: Settings = {
   accessibleHUD: false,
   tutorialPrompts: true,
   damageNumbers: true,
+  showMinimap: true,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',
@@ -77,6 +80,7 @@ export const DEFAULT_SETTINGS: Settings = {
     Satchel: 'Tab',
     Journal: 'KeyJ',
     Lantern: 'KeyF',
+    Minimap: 'KeyM',
     Pause: 'Escape',
     // Skips the intro cutscene; Enter is always accepted too.
     Skip: 'Space',

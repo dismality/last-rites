@@ -18,7 +18,7 @@ export function DawnCard() {
       <section className="hud-dawn" aria-label="Dawn summary">
         <h2 className="hud-dawn__title">Dawn</h2>
         {view && (
-          <>
+          <div className="hud-dawn__body">
             <ul className="hud-dawn__list">
               {view.rows.map((r) => (
                 <li key={r.label}>
@@ -33,7 +33,7 @@ export function DawnCard() {
                 </li>
               ))}
             </ul>
-          </>
+          </div>
         )}
       </section>
       <DawnPicker />

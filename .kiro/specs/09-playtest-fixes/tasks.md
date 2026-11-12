@@ -26,11 +26,6 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 2.1-2.12_
 
-- [-] 3. A2: Automated playthrough test
-  - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
-  - Finish
-  - _Requirements: 3.1-3.3_
-
 - [x] 4. B2: Fair Retry Night and Retry from morning
   - Finish
   - _Requirements: 4.1-4.3_
@@ -73,6 +68,66 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Roll revolver ammo only once the revolver is owned and shells only once the shotgun is owned; otherwise drop materials; property test
   - Finish
   - _Requirements: 12.7_
+
+- [x] 11c. Interaction cues never mislead
+  - Rule: show a cue (prompt text, hover outline, rune, pulse, hand crosshair) only when pressing Interact right now would do something
+  - Used up (picked up, dug today, looted, examined, opened, sold out): all cues fade out over about 0.5 s (a steady fade with Flashing lights off) and the object stops being targeted; collected items and their meshes fade away
+  - A dug grave shows only the open pit with no cue until the next day refills it, then its cues return
+  - Blocked but fixable: keep the prompt and say what is needed ("Needs a shovel", "Locked: needs the Rusted Crypt Key", "Satchel full"); never "Hold E" for an action that cannot happen
+  - Repeatable (workbench, tombstone reading, merchant with stock, damaged barricade): keep the prompt; stop the rune's attract pulse once there is nothing new to do
+  - A journal page or clue that fades shows "Added to your journal (J)" with the current binding
+  - Audit every interactable (all pickups including dug-grave loot, clues, tombstones, gates, grave mounds, weapon pickups, merchant, barricade boards, doors, workbench) into one data table marked used up / needs something (what) / repeatable; code follows the table; state resets correctly on a new day, Retry Night, Continue and New Game
+  - Unit tests: the table and the cue rule. Browser tests: a dug grave's cue goes and returns the next day; a picked-up item fades and stops being targeted; an examined clue's cue goes
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11d. Crypt key pickup from the south
+  - `e2e/obstruction.spec.ts` fails picking up the Rusted Crypt Key from the south: the player stops 0.9 m away with the key hovered but Interact does not collect it. Find why, fix it, get the spec passing
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11e. Minimap on the HUD
+  - Reuse the Journal map's explored 8 m cells, `mapReveal` and `mapDraw` (no second reveal system; the Journal map keeps working); same pencil style, slightly see-through
+  - North up; the player is an arrow shape showing facing; about 40 m around the player; unexplored stays blank; new cells ink in (plain fade with reduced motion)
+  - Objective marker and discovered landmarks; an off-edge objective is pinned to the border pointing toward it
+  - Top right below the score; no overlap with the compass, objective text, hotbar, health bar or boss bar at 1920x1080, 1280x720 and 800x600; fits B12
+  - Hidden during the intro, endings, menus, the workbench view and other cinematics
+  - "Show minimap" setting (on by default) and a rebindable toggle key (M)
+  - No per-frame React render: redraw the canvas only on movement, a noticeable turn or a revealed cell, at most about 15 per second; report the longest frame walking and turning with the map on and off
+  - Unit tests: view window, edge pinning, redraw throttle. Browser test: reveals new ground, no HUD overlap at the three sizes, hidden during the intro
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11f. Finish the spec 08 task 11.2 browser checks on the merged tree
+  - Run e2e/items-1-6, items-7-12, items-13-15, dig-mound and look-perf, plus the new 11c and 11e specs and obstruction; keep the dev server up or run in small groups
+  - Item 11 also measures the Taken ending; item 12 confirms Best combo; item 13 re-times the barricades; item 15 measures the workbench's longest frame on first open
+  - Real game bugs: fix and retest; setup failures: fix the setup and say so. Spec 08 task 9 stays open
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11g. package.json license matches LICENSE
+  - "license": "ISC" becomes "MIT"
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11h. Dawn boon picker can be clicked and shows its icons
+  - Any screen that needs the mouse releases pointer lock when it opens and the game takes it back when it closes; one shared hook keyed off `isOverlayOpen` in menuState.ts (which includes `isDawnPickPending`), not a one-off in DawnPicker.tsx; check Journal, Satchel, Examine, Workbench, Settings, pause, the dawn summary and the dawn picker use it; relock only after a user gesture
+  - Each card shows `public/assets/icons/boons/<boonId>.png` at 64 px, `image-rendering: pixelated`; on load failure the rune text as now
+  - The dawn summary and the picker do not overlap at 1920x1080, 1280x720 and 800x600
+  - Keys 1 to 3 (or arrows and Enter) pick a card
+  - Tests: every boon id has an icon file; a browser test reaches dawn, clicks a card with a real mouse click, sees the boon applied and pointer lock back after the next canvas click; picker screenshots at the three sizes
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11i. Swap in the new graveyard scene
+  - Wiring only (assets in the repo). Do not change gameplay positions, the hut, the chapel, the catacombs tunnel, gates, lamp posts, interactables, scare props, grave mounds or the 5 readable tombstones
+  - New `src/scene/world/GraveyardScene.tsx` loads `public/assets/models/scene/graveyard.glb` once with drei `useGLTF` (Draco at `/draco/`), mounted in Cemetery.tsx, no transform (game coordinates); vertex colours on for lr-stone, lr-iron, lr-bark, lr-ground, lr-grass (lr-grass double-sided)
+  - Shadows: castShadow on stone, iron and bark meshes; receiveShadow on all; if frame time rises, no castShadow on `outer-*` and `grass*`
+  - Colliders: one fixed rigid body with a cuboid per box in `graveyard-colliders.json` (`{center, half, rotY}`, Y rotation only)
+  - Remove what the scene replaces: the flat grounds block (keep the y=0 physics floor), the 60 random headstones (seed 1891) with their models and colliders, the fence models (keep the invisible boundary walls), the generateTrees() pines and trunks, the avenue crypt and Crane crypt visuals (keep their interactions; colliders from the old code or the JSON but never both), the darkStone avenue floor (keep rails and invisible walls)
+  - Navigation: waypoint and zombie path tests; in the browser walk from the hut to row-mouth, crane step, cat-mouth, the merchant, the chapel doors, each of the 8 wave graves and the 4 grounds clue spots; no collider on a waypoint edge; a blocking box is reported by index and position, not deleted
+  - Performance: `longestFrameMs()` over a 20 s walk no more than 2 ms worse than before; if so, drop shadows on outer-* and grass* first
+  - Screenshots: hut door looking north-west, Mausoleum Row from the gate, the south grounds from the chapel vestry
+  - Log in docs/kiro-log.md; do not commit
+- [x] 11j. Use the rune and mark images
+  - `public/assets/icons/runes/interact/{pickup,dig,open,read,examine,nail,trade}.png` replace the font rune in the interaction prompt (`ACTION_RUNE` in interaction.ts), shown at 32 px; font rune as alt text and load-failure fallback
+  - `public/assets/icons/runes/boons/<boonId>.png` replace `{c.rune}` on the dawn boon cards at 32 px beside the boon icon; fallback the font rune
+  - `public/assets/icons/marks/{hut,chapel,graves,merchant,objective,gate,relic,workbench,player}-{light,dark}.png`: `-light` on the HUD compass and minimap (COMPASS_MARKERS objective, chapel, hut, spawn = graves, merchant) at 20 px; `-dark` on the journal Map tab (workbench, chapel, gate, relic, plus hut, merchant, graves, objective and the player arrow) at 24 px; text glyphs stay as fallback
+  - All pixel art with `image-rendering: pixelated`; one `iconUrl(kind, id)` helper for every path; unit test that every id used by ACTION_RUNE, the dawn upgrades, COMPASS_MARKERS and the map landmarks has a file on disk
+  - Done (with 11i) when lint, build, all unit tests and the e2e suite pass, with the 11i screenshots plus one each of the interaction prompt, the dawn picker and the journal map
+  - Log in docs/kiro-log.md; do not commit
+- [ ] 3. A2: Automated playthrough test
+  - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
+  - Finish
+  - _Requirements: 3.1-3.3_
 
 - [ ] 12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval
 

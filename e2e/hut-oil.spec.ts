@@ -53,7 +53,10 @@ test('the hut table oil shows "E: Take" and a real E press takes it', async ({ p
   )
   await expect(page.locator('.hud-prompt')).toContainText('E: Take')
 
-  await page.evaluate(() => window.__lastRites!.press('KeyE', 150))
+  // Held for 600 ms: a 150 ms tap can fall between two slow software-rendered frames and be missed.
+  await page.evaluate(() => window.__lastRites!.hold('Interact'))
+  await page.waitForTimeout(600)
+  await page.evaluate(() => window.__lastRites!.release('Interact'))
   await page.waitForFunction(() => {
     const inv = window.__lastRites!.snapshot('inventory') as { inventory: { slots: { item: string }[] } }
     return inv.inventory.slots.some((s) => s.item === 'lamp-oil')

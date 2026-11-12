@@ -12,4 +12,6 @@ export const bodyRuntime: {
   scene: THREE.Scene | null
   /** The Rapier world, so the debug hook can list the colliders near a point. */
   world: World | null
-} = { body: null, camera: null, scene: null, world: null }
+  /** The renderer, so the debug hook can read draw-call stats. */
+  gl: THREE.WebGLRenderer | null
+} = { body: null, camera: null, scene: null, world: null, gl: null }

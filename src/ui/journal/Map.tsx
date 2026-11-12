@@ -1,13 +1,29 @@
 // Journal map: the keeper's pencil sketch. Canvas 2D; cells explored since the
 // journal was last open ink themselves in, one after another (fade when reduced motion).
-import { useEffect, useMemo, useRef } from 'react'
-import { LANDMARKS, MAP_INK } from '../../data/mapLandmarks'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { COMPASS_MARKERS } from '../../data/compass'
+import { LANDMARKS, MAP_INK, type Landmark } from '../../data/mapLandmarks'
+import { MERCHANT_SPOT } from '../../data/merchant'
+import { WAVE_GRAVES } from '../../data/waves'
 import { useMapStore, usePlayerStore, useWorldStore } from '../../game/state'
+import { useChapelStore } from '../../game/state/chapelStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
+import { isMerchantPresent } from '../../game/state/merchantPresence'
 import { cellKey, discoveredLandmarks, exploredCells } from '../../game/systems/mapReveal'
-import { MAP_HEIGHT, MAP_WIDTH, drawMap } from './mapDraw'
+import { isBellActive } from '../../game/systems/repairs'
+import { marksVersion, onMarksLoaded } from '../markImages'
+import { MAP_HEIGHT, MAP_WIDTH, drawMap, type ExtraMark } from './mapDraw'
+
+/** The hut sits at the world origin; it shows once its cell is explored (the compass always shows it). */
+const HUT_LANDMARK: Landmark = { id: 'hut', kind: 'workbench', name: "Keeper's hut", position: [0, 0, 0] }
 
 const KIND_LABEL = { workbench: 'Workbench', chapel: 'Chapel', gate: 'Gate', relic: 'Relic site' } as const
+
+const EXTRA_LABEL: Partial<Record<string, string>> = {
+  hut: "Keeper's hut",
+  merchant: 'Silas, the undertaker',
+  graves: 'Open graves',
+}
 
 function prefersReducedMotion(): boolean {
   return globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
@@ -26,6 +42,26 @@ export function JournalMap() {
     () => discoveredLandmarks(map, LANDMARKS).filter((l) => !l.nightOnly || phase === 'night'),
     [map, phase],
   )
+
+  // Hut, merchant and wave graves are not landmarks; they show on the sheet like on the compass.
+  const bellBuilt = useChapelStore((s) => isBellActive(s.chapel))
+  const extraMarks = useMemo<ExtraMark[]>(() => {
+    const marks: ExtraMark[] = []
+    const hut = discoveredLandmarks(map, [HUT_LANDMARK])
+    if (hut.length > 0) marks.push({ id: 'hut', x: 0, z: 0, glyph: COMPASS_MARKERS.hut.glyph })
+    if (isMerchantPresent()) {
+      marks.push({ id: 'merchant', x: MERCHANT_SPOT.silas[0], z: MERCHANT_SPOT.silas[2], glyph: COMPASS_MARKERS.merchant.glyph })
+    }
+    if ((phase === 'dusk' || phase === 'night') && bellBuilt) {
+      for (const g of WAVE_GRAVES) marks.push({ id: 'graves', x: g.x, z: g.z, glyph: COMPASS_MARKERS.spawn.glyph })
+    }
+    return marks
+    // The journal pauses the clock, so presence is read once per open or phase change.
+  }, [map, phase, bellBuilt])
+
+  // Images load after the first draw; redraw once each is in.
+  const [marksV, setMarksV] = useState(marksVersion())
+  useEffect(() => onMarksLoaded(() => setMarksV(marksVersion())), [])
 
   // Snapshot what is new at open time; the store clears it once the animation ends.
   const pendingKeys = useRef<string[]>(useMapStore.getState().unseen.map((c) => cellKey(c.cx, c.cz)))
@@ -51,7 +87,14 @@ export function JournalMap() {
         if (progress < 1) done = false
         return { cell, progress }
       })
-      drawMap(ctx, { cells: drawn, landmarks, player: { x: px[0], z: px[2], yaw }, objective, reducedMotion: reduced })
+      drawMap(ctx, {
+        cells: drawn,
+        landmarks,
+        extraMarks,
+        player: { x: px[0], z: px[2], yaw },
+        objective,
+        reducedMotion: reduced,
+      })
       if (done) {
         pendingKeys.current = []
         useMapStore.getState().markSeen()
@@ -61,7 +104,7 @@ export function JournalMap() {
     }
     raf = requestAnimationFrame(frame)
     return () => cancelAnimationFrame(raf)
-  }, [map, landmarks, px, yaw, objective])
+  }, [map, landmarks, extraMarks, marksV, px, yaw, objective])
 
   const explored = exploredCells(map).length
   return (
@@ -83,6 +126,11 @@ export function JournalMap() {
             {landmarks.map((l) => (
               <li key={l.id}>
                 <strong>{KIND_LABEL[l.kind]}:</strong> {l.name}
+              </li>
+            ))}
+            {[...new Set(extraMarks.map((m) => m.id))].map((id) => (
+              <li key={id}>
+                <strong>{EXTRA_LABEL[id] ?? id}</strong>
               </li>
             ))}
           </ul>

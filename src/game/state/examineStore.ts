@@ -9,6 +9,7 @@ import type { ItemId, PageNumber } from '../types'
 import { useCraftingStore } from './craftingStore'
 import { useGameStore } from './gameStore'
 import { useInventoryStore } from './inventoryStore'
+import { pushJournalAddedToast } from './journalToast'
 import { useMysteryStore } from './mysteryStore'
 import { useToastStore } from './toastStore'
 
@@ -38,8 +39,10 @@ export const useExamineStore = create<ExamineState>((set, get) => ({
     if (!id) return
     const res = addItem(useInventoryStore.getState().inventory, id, 1)
     useInventoryStore.getState().setInventory(res.inv)
-    useToastStore.getState().push(`Added to journal: ${ITEM_MAP[id].name}`)
     const pageMatch = /^journal-page-([1-5])$/.exec(id)
+    // A page says where to find it again; keys and relics keep their name in the toast.
+    if (pageMatch) pushJournalAddedToast()
+    else useToastStore.getState().push(`Added to journal: ${ITEM_MAP[id].name}`)
     if (pageMatch) {
       const page = Number(pageMatch[1]) as PageNumber
       useMysteryStore.getState().collectPage(page)

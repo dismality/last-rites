@@ -15,7 +15,6 @@ export function TombstoneOverlay() {
 
   useEffect(() => {
     if (!id) return
-    if (document.pointerLockElement) document.exitPointerLock()
     closeRef.current?.focus()
     // Capture phase so the pause trigger never sees these keys.
     const onKey = (e: KeyboardEvent) => {

@@ -304,10 +304,11 @@ test('item 4: New Game puts the revolver and axe back', async ({ page }) => {
   expect(took).toEqual([true, true])
   await until(page, () => (window.__lastRites!.snapshot('combat') as { takenPickups: string[] }).takenPickups.length === 2, null)
   const after = await snap<{ takenPickups: string[]; durability: Record<string, number>; firearms: Record<string, unknown> }>(page, 'combat')
-  await until(page, () => window.__lastRites!.meshesUnder('weapon-pickup:revolver') === -1, null, 30_000)
+  await until(page, () => window.__lastRites!.meshesUnder('weapon-pickup:revolver') <= 0, null, 30_000)
   const gone = await meshes()
   log(`item4 after pickup: taken=${after.takenPickups} durability=${JSON.stringify(after.durability)} firearms=${JSON.stringify(after.firearms)} meshes=${JSON.stringify(gone)}`)
-  expect(gone.revolver).toBe(-1)
+  // Since 11c the group stays mounted and only the faded prop is removed, so 0 meshes (was -1).
+  expect(gone.revolver).toBeLessThanOrEqual(0)
   expect(gone.axe).toBeLessThan(fresh.axe)
   expect(after.durability['wood-axe']).toBeGreaterThan(0)
 

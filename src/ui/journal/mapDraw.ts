@@ -2,7 +2,9 @@
 // icons and the quill marker. Stateless; the Map component owns animation timing.
 
 import { MAP_EXTENT, MAP_PX, type Landmark, type LandmarkKind } from '../../data/mapLandmarks'
+import { iconUrl, type MarkId } from '../../data/assets'
 import { createRng } from '../../game/rng'
+import { drawMarkImage } from '../markImages'
 import { clampToMap, worldToMap } from '../../game/systems/mapProject'
 import type { Cell } from '../../game/systems/mapReveal'
 
@@ -29,8 +31,39 @@ export interface MapScene {
   player: { x: number; z: number; yaw: number }
   /** Current objective; the marker is drawn only when it has a world position. */
   objective?: { position?: readonly [number, number, number]; marker?: string; main: string } | null
+  /** Marks with no landmark entry (hut, merchant, wave graves); the caller decides which show. */
+  extraMarks?: readonly ExtraMark[]
   /** Fade cells in instead of drawing strokes (prefers-reduced-motion). */
   reducedMotion: boolean
+}
+
+export interface ExtraMark {
+  id: MarkId
+  x: number
+  z: number
+  /** Text glyph drawn if the image is not ready. */
+  glyph: string
+}
+
+/** Journal marks are drawn at this size (px on the 1:1 map sheet). */
+export const MAP_MARK_PX = 24
+
+/** The old text glyph, kept as the fallback for marks that have no sketched icon. */
+function drawGlyphMark(ctx: CanvasRenderingContext2D, glyph: string): void {
+  ctx.fillStyle = GRAPHITE
+  ctx.font = '18px "IM Fell English", serif'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.fillText(glyph, 0, 0)
+}
+
+/** A landmark as its dark mark image, or the sketched icon while that loads or if it fails. */
+export function drawLandmark(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: number, y: number): void {
+  ctx.save()
+  ctx.translate(x, y)
+  const drawn = drawMarkImage(ctx, iconUrl('mark-dark', kind), MAP_MARK_PX)
+  ctx.restore()
+  if (!drawn) drawIcon(ctx, kind, x, y)
 }
 
 export function drawMap(ctx: CanvasRenderingContext2D, scene: MapScene): void {
@@ -40,7 +73,14 @@ export function drawMap(ctx: CanvasRenderingContext2D, scene: MapScene): void {
   for (const { cell, progress } of scene.cells) drawCell(ctx, cell, progress, scene.reducedMotion)
   for (const l of scene.landmarks) {
     const [px, pz] = toPx(l.position[0], l.position[2])
-    drawIcon(ctx, l.kind, px, pz)
+    drawLandmark(ctx, l.kind, px, pz)
+  }
+  for (const m of scene.extraMarks ?? []) {
+    const [px, pz] = toPx(m.x, m.z)
+    ctx.save()
+    ctx.translate(px, pz)
+    if (!drawMarkImage(ctx, iconUrl('mark-dark', m.id), MAP_MARK_PX)) drawGlyphMark(ctx, m.glyph)
+    ctx.restore()
   }
   drawObjective(ctx, scene.objective)
   drawQuill(ctx, scene.player)
@@ -52,24 +92,30 @@ function drawObjective(ctx: CanvasRenderingContext2D, o: MapScene['objective']):
   const [x, y] = clampToMap(...toPx(o.position[0], o.position[2]))
   const label = o.marker ?? o.main
   ctx.save()
+  ctx.translate(x, y)
+  const withImage = drawMarkImage(ctx, iconUrl('mark-dark', 'objective'), MAP_MARK_PX)
+  ctx.translate(-x, -y)
   ctx.fillStyle = '#e8913a'
   ctx.strokeStyle = '#14110f'
   ctx.lineWidth = 1.6
-  ctx.beginPath()
-  ctx.moveTo(x, y - 9)
-  ctx.lineTo(x + 7, y)
-  ctx.lineTo(x, y + 9)
-  ctx.lineTo(x - 7, y)
-  ctx.closePath()
-  ctx.fill()
-  ctx.stroke()
+  if (!withImage) {
+    ctx.beginPath()
+    ctx.moveTo(x, y - 9)
+    ctx.lineTo(x + 7, y)
+    ctx.lineTo(x, y + 9)
+    ctx.lineTo(x - 7, y)
+    ctx.closePath()
+    ctx.fill()
+    ctx.stroke()
+  }
   ctx.font = '16px "IM Fell English", serif'
   ctx.textBaseline = 'middle'
   const w = ctx.measureText(label).width
   // Flip the label left of the glyph near the right edge so it stays on the sheet.
-  const flip = x + 12 + w > MAP_WIDTH
+  const gap = withImage ? MAP_MARK_PX / 2 + 4 : 12
+  const flip = x + gap + w > MAP_WIDTH
   ctx.textAlign = flip ? 'right' : 'left'
-  const tx = flip ? x - 12 : x + 12
+  const tx = flip ? x - gap : x + gap
   ctx.lineWidth = 3
   ctx.strokeStyle = 'rgba(216, 201, 163, 0.9)'
   ctx.strokeText(label, tx, y)
@@ -79,7 +125,14 @@ function drawObjective(ctx: CanvasRenderingContext2D, o: MapScene['objective']):
 }
 
 /** A wobbly pencil outline plus diagonal hatching; the jitter is seeded per cell so it never shimmers. */
-function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, progress: number, reduced: boolean): void {
+export function drawCell(
+  ctx: CanvasRenderingContext2D,
+  cell: Cell,
+  progress: number,
+  reduced: boolean,
+  /** Multiplies the pencil line widths; the HUD minimap draws the same cells scaled down. */
+  lineScale = 1,
+): void {
   if (progress <= 0) return
   const x = MARGIN_PX + (cell.cx - MAP_EXTENT.minCx) * CELL_PX
   const y = MARGIN_PX + (cell.cz - MAP_EXTENT.minCz) * CELL_PX
@@ -91,7 +144,7 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, progress: number, r
   ctx.fillStyle = WASH
   ctx.fillRect(x, y, CELL_PX, CELL_PX)
   ctx.strokeStyle = GRAPHITE
-  ctx.lineWidth = 1
+  ctx.lineWidth = lineScale
 
   // Hatching: draw only the first `progress` share of strokes while animating.
   const visible = reduced ? STROKES_PER_CELL : Math.ceil(STROKES_PER_CELL * progress)
@@ -106,7 +159,7 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, progress: number, r
 
   // Outline: four sides drawn in order, so it appears to be sketched around the cell.
   ctx.globalAlpha = reduced ? progress : 1
-  ctx.lineWidth = 1.4
+  ctx.lineWidth = 1.4 * lineScale
   const corners: Array<[number, number]> = [
     [x, y],
     [x + CELL_PX, y],
@@ -123,7 +176,7 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, progress: number, r
 }
 
 /** Sketched icons: each kind has its own silhouette so colour is never the only cue. */
-function drawIcon(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: number, y: number): void {
+export function drawIcon(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: number, y: number): void {
   ctx.save()
   ctx.translate(x, y)
   ctx.fillStyle = 'rgba(216, 201, 163, 0.9)'
@@ -182,6 +235,11 @@ function drawQuill(ctx: CanvasRenderingContext2D, p: { x: number; z: number; yaw
   const angle = -p.yaw
   ctx.save()
   ctx.translate(x, y)
+  // The player mark image keeps the quill's facing: rotated by the same angle.
+  if (drawMarkImage(ctx, iconUrl('mark-dark', 'player'), MAP_MARK_PX, angle)) {
+    ctx.restore()
+    return
+  }
   ctx.rotate(angle)
   ctx.fillStyle = '#e8913a'
   ctx.strokeStyle = '#14110f'

@@ -31,6 +31,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     accessibleHUD: current.accessibleHUD,
     tutorialPrompts: current.tutorialPrompts,
     damageNumbers: current.damageNumbers,
+    showMinimap: current.showMinimap,
     bindings: current.bindings,
   }
 }

@@ -20,6 +20,7 @@ import { runTick, type TickInput } from '../game/systems/gameTick'
 import type { GameEvent, StaminaState } from '../game/types'
 import { input } from './player/input'
 import { usePauseTriggers } from './player/usePauseTriggers'
+import { useCursorRelease } from './player/cursorRelease'
 
 export { STEP, MAX_DELTA } from '../game/systems/fixedStep'
 
@@ -50,6 +51,7 @@ function withProgression(base: TickInput): TickInput {
 
 function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput }) {
   usePauseTriggers()
+  useCursorRelease()
   const accumulator = useRef(0)
 
   useFrame((_state, delta) => {

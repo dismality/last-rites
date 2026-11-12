@@ -8,11 +8,11 @@ import { WAYPOINT_EDGES, WAYPOINT_NODES } from '../src/data/waypoints'
 import type { Vec2 } from '../src/game/systems/combat'
 import { createEnemy, tickEnemies, type AIEnemy } from '../src/game/systems/enemyAI'
 import { DEFAULT_GRAPH } from '../src/game/systems/navigation'
-import { makeBlocked, propBoxes, structureBoxes } from './helpers/layoutWalls'
+import { graveyardBoxes, makeBlocked, propBoxes, structureBoxes } from './helpers/layoutWalls'
 
 const DT = 1 / 60
 const structures = structureBoxes()
-const blockedByStructures = makeBlocked(structures)
+const blockedByStructures = makeBlocked([...structures, ...graveyardBoxes()])
 const blocked = makeBlocked([...structures, ...propBoxes()])
 
 const PLAYERS: Record<string, Vec2[]> = {
@@ -103,7 +103,7 @@ describe('zombies reach the player through the real layout', () => {
 })
 
 describe('waypoint graph against the real structures', () => {
-  it('every edge is walkable past the hut, chapel, fences and corridor walls', () => {
+  it('every edge is walkable past the hut, chapel, corridor walls and the graveyard boxes', () => {
     for (const [a, b] of WAYPOINT_EDGES) {
       const pa = DEFAULT_GRAPH.nodes.get(a)!
       const pb = DEFAULT_GRAPH.nodes.get(b)!
@@ -114,7 +114,7 @@ describe('waypoint graph against the real structures', () => {
   it('no node sits inside a structure', () => {
     for (const n of WAYPOINT_NODES) {
       const p = { x: n.x, z: n.z }
-      const hit = structures.some((s) => Math.abs(p.x - s.cx) <= s.hx && Math.abs(p.z - s.cz) <= s.hz)
+      const hit = [...structures, ...graveyardBoxes()].some((s) => Math.abs(p.x - s.cx) <= s.hx && Math.abs(p.z - s.cz) <= s.hz)
       expect(hit, n.id).toBe(false)
     }
   })

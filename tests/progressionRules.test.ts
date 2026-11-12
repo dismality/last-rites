@@ -153,7 +153,7 @@ describe('structure rule: this spec adds no binary assets', () => {
       'models/enemies/zombie-brute.glb models/enemies/zombie.glb models/items/bone-whistle.glb ' +
       'models/items/burial-shroud.glb models/items/childs-locket.glb models/items/crane-rosary.glb ' +
       'models/items/iron-ossuary-key.glb models/items/reliquary-heart.glb models/items/rusted-crypt-key.glb ' +
-      'models/items/sextons-bell-clapper.glb'
+      'models/items/sextons-bell-clapper.glb models/scene/graveyard.glb'
     ).split(' '),
   )
   const WORLD = (

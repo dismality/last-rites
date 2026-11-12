@@ -46,6 +46,9 @@ import { showItemName } from '../game/state/itemNameStore'
 import { useChapelStore } from '../game/state/chapelStore'
 import { useSpawnStore } from '../game/state/spawnStore'
 import { usePlayerStore } from '../game/state/playerStore'
+import { useMapStore } from '../game/state/mapStore'
+import { useMysteryStore } from '../game/state/mysteryStore'
+import { minimapRuntime } from '../ui/hud/minimapRuntime'
 import { useEndingStore } from '../game/state/endingStore'
 import { useBossStore } from '../game/state/bossStore'
 import { startEnding } from '../game/state/startEnding'
@@ -108,6 +111,8 @@ export type SnapshotName =
   | 'intro'
   | 'lantern'
   | 'uiWorld'
+  | 'map'
+  | 'mystery'
 
 const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   game: () => useGameStore.getState(),
@@ -132,6 +137,9 @@ const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   intro: () => useIntroStore.getState(),
   lantern: () => useLanternStore.getState(),
   uiWorld: () => useUiWorldStore.getState(),
+  // Explored 8 m cells (the Journal map's data, which the minimap also draws).
+  map: () => useMapStore.getState().map,
+  mystery: () => useMysteryStore.getState(),
 }
 
 let keepAliveTimer: ReturnType<typeof setInterval> | null = null
@@ -229,6 +237,10 @@ const api = {
     })
     // wavesCleared is deliberately not reset: a stale flag from the previous night is exactly what
     // the real tick has to cope with (playtest item 1).
+  },
+  /** Night with its waves cleared: the next sim tick ends the night and starts dawn (summary and offer). */
+  skipToDawn(): void {
+    useWorldStore.getState().applyWorldState({ phase: 'night', phaseTime: 0, wavesCleared: true })
   },
   /** Puts the clock just before night; the next sim tick emits `nightStarted` and the waves begin. */
   skipToNight(night?: number): void {
@@ -361,6 +373,52 @@ const api = {
     const c = box.getCenter(new Vector3())
     return [c.x, c.y, c.z]
   },
+  /** Ids of mounted interactables whose id starts with `prefix` (all of them when empty). */
+  interactableIds(prefix = ''): string[] {
+    return [...interactableRegistry.keys()].filter((k) => k.startsWith(prefix))
+  },
+  /**
+   * Live cue of one interactable (spec 09 task 11c): what the shared cue rule says, the cue fade
+   * strength, the rune sprite's opacity and how many of its own meshes are still visible. Null
+   * when it is not mounted.
+   */
+  interactableCue(id: string): {
+    targetable: boolean
+    actionable: boolean
+    prompt: string | null
+    pulse: boolean
+    fading: boolean
+    alpha: number
+    runeOpacity: number
+    bodyMeshes: number
+  } | null {
+    const entry = interactableRegistry.get(id)
+    if (!entry) return null
+    const cue = entry.cue()
+    let runeOpacity = 0
+    let bodyMeshes = 0
+    entry.object.traverseVisible((o) => {
+      const sprite = o as THREE.Sprite
+      if (sprite.isSprite) {
+        runeOpacity = Math.max(runeOpacity, (sprite.material as THREE.SpriteMaterial).opacity)
+        return
+      }
+      const mesh = o as THREE.Mesh
+      if (!mesh.isMesh) return
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      if (mats.some((m) => m.visible && m.opacity > 0.01)) bodyMeshes++
+    })
+    return {
+      targetable: cue.targetable,
+      actionable: cue.actionable,
+      prompt: cue.prompt,
+      pulse: cue.pulse,
+      fading: cue.fade !== null,
+      alpha: (entry.object.userData.cueAlpha as number | undefined) ?? 1,
+      runeOpacity,
+      bodyMeshes,
+    }
+  },
   /** Mesh count under the named scene group (-1 when no such group is mounted). */
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
@@ -469,6 +527,21 @@ const api = {
   setHealth(hp: number): void {
     usePlayerStore.getState().setHealth(hp)
   },
+  /** Shows the boss bar for layout checks: a distant, held Father Crane and the 'risen' stage. */
+  showBossBar(): void {
+    const [crane] = api.spawnZombies([{ type: 'father-crane', x: 0, z: -70 }])
+    api.holdZombies([crane], 600)
+    const boss = useBossStore.getState()
+    boss.setBoss({ ...boss.boss, stage: 'risen' })
+  },
+  /** Sets one boolean or numeric setting through the real store action (saved like in the Settings menu). */
+  setSetting(key: 'showMinimap' | 'flashingLights' | 'cameraShake', value: boolean): void {
+    useSettingsStore.getState().setSetting(key, value)
+  },
+  /** Minimap redraw and loop-frame counts since page load (the redraw budget check reads these). */
+  minimapStats(): { draws: number; frames: number } {
+    return { draws: minimapRuntime.draws, frames: minimapRuntime.frames }
+  },
   /** Reads a JSON-safe copy of one store. */
   snapshot(name: SnapshotName): unknown {
     return toSnapshot(SNAPSHOTS[name]())
@@ -523,6 +596,26 @@ const api = {
   /** Longest frame in the last `windowMs` (default the whole rolling window), in ms. */
   longestFrameMs(windowMs?: number): number {
     return frames?.longest(windowMs) ?? 0
+  },
+  /**
+   * Draw calls and triangles per loop frame over a number of frames (renderer.info with autoReset
+   * off, so the shadow and post-processing passes are included). Null with no rig.
+   */
+  async renderInfo(frames = 30): Promise<{ calls: number; triangles: number } | null> {
+    const gl = bodyRuntime.gl
+    if (!gl) return null
+    gl.info.autoReset = false
+    gl.info.reset()
+    const f0 = minimapRuntime.frames
+    await new Promise<void>((resolve) => {
+      let n = 0
+      const step = () => (++n < frames ? requestAnimationFrame(step) : resolve())
+      requestAnimationFrame(step)
+    })
+    const df = Math.max(1, minimapRuntime.frames - f0)
+    const out = { calls: gl.info.render.calls / df, triangles: gl.info.render.triangles / df }
+    gl.info.autoReset = true
+    return out
   },
   resetFrames(): void {
     frames?.reset()

@@ -1,4 +1,4 @@
-import { useEffect, useId } from 'react'
+import { useId } from 'react'
 import { useGameStore } from '../../game/state/gameStore'
 import { hasMorningSnapshot, retryFromMorning, retryNight } from '../../game/state/retryNight'
 import { requestLock } from '../../scene/player/input'
@@ -20,11 +20,7 @@ export function TakenScreen() {
   const mode = useProgressionStore((s) => s.mode)
   const view = takenModel(mode)
 
-  // While the pointer is locked every click goes to the canvas, so the buttons below would
-  // be unreachable by mouse. Found in a real-browser playtest (spec 06 task 7).
-  useEffect(() => {
-    if (taken && document.pointerLockElement) document.exitPointerLock()
-  }, [taken])
+  // The pointer lock is released while `taken` is set by cursorRelease.ts (isMenuOpen).
 
   if (!taken || screen !== 'game') return null
 

@@ -3,7 +3,8 @@
 .achievement-toasts {
   position: fixed;
   top: 168px;
-  right: 24px;
+  /* Left of the minimap column so a toast never covers the map. */
+  right: calc(24px + var(--hud-minimap-size) + 12px);
   display: flex;
   flex-direction: column;
   align-items: flex-end;
