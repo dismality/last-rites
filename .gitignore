@@ -26,3 +26,6 @@ Thumbs.db
 # Playwright output
 test-results/
 playwright-report/
+
+# Python bytecode from the Blender tools
+__pycache__/
