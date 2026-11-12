@@ -639,4 +639,6 @@ def main():
     print("HERO_RESULT " + json.dumps(results))
 
 
-main()
+# world_items.py imports this file for its helpers and sets this so the hero items aren't rebuilt.
+if os.environ.get("HERO_ITEMS_NO_MAIN") != "1":
+    main()

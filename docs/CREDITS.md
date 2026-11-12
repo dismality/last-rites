@@ -5,6 +5,7 @@ Every third-party asset used in Last Rites. Only CC0, CC-BY (with attribution be
 | File | Asset | Author | Source | License |
 |---|---|---|---|---|
 | `public/assets/models/items/*.glb` | 8 hero items (relics and keys) | David Wong, built with Claude Code using `tools/blender/hero_items.py` | Original, this repository | MIT (project license) |
+| `public/assets/models/items/*.glb` (31 more: every material, ammo, weapon, tool, consumable, the journal page and the parish ledger) | 31 item models | David Wong, built with Claude Code using `tools/blender/world_items.py` | Original, this repository | MIT (project license) |
 | `public/assets/icons/items/*.png` | 39 pixel-art item icons | David Wong, built with Claude Code | Original, this repository | MIT (project license) |
 | `public/assets/icons/boons/*.png` | 10 pixel-art dawn boon icons | David Wong, built with Claude Code | Original, this repository | MIT (project license) |
 | `public/assets/icons/runes/**/*.png`, `public/assets/icons/marks/*.png` | 35 pixel-art interaction runes, boon card runes and map/compass marks | David Wong, built with Claude Code | Original, this repository | MIT (project license) |
