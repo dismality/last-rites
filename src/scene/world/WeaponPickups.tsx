@@ -1,18 +1,19 @@
 // The four findable weapons as props with an Interactable each (Req 2.1-2.6, 23.8).
-// Primitive meshes only. Whether the weapon can be taken (satchel room, already taken) is
+// Each weapon is its Blender model lying on a primitive prop (cupboard, table, woodpile, step).
+// Whether the weapon can be taken (satchel room, already taken) is
 // decided by the pure pickup rule inside takeWeaponPickup; a refusal leaves the prop in place.
 
 import { useLayoutEffect, useRef } from 'react'
 import * as THREE from 'three'
+import { WEAPON_PICKUP_POSES } from '../../data/itemModels'
 import { WEAPON_PICKUPS, type WeaponPickupId } from '../../data/weaponPickups'
 import { takeWeaponPickup } from '../../game/state/combatActions'
 import { useCombatStore } from '../../game/state/combatStore'
 import { Interactable } from './Interactable'
+import { GroundItem } from './ItemModel'
 import { useLingerAfter } from './useLingering'
 
 const WOOD = '#4a3626'
-const IRON = '#5a5d60'
-const SILVER = '#b9c2cc'
 const STONE = '#6b6a68'
 
 const LOG_COUNT = 9
@@ -50,79 +51,23 @@ function Woodpile() {
   )
 }
 
-function AxeProp() {
-  return (
-    <group rotation={[0, 0.5, -0.9]}>
-      <mesh>
-        <cylinderGeometry args={[0.02, 0.025, 0.7, 6]} />
-        <meshStandardMaterial color={WOOD} roughness={0.9} />
-      </mesh>
-      <mesh position={[0.07, 0.3, 0]}>
-        <boxGeometry args={[0.16, 0.1, 0.03]} />
-        <meshStandardMaterial color={IRON} metalness={0.5} roughness={0.6} />
-      </mesh>
-    </group>
-  )
-}
-
-function SabreProp() {
-  return (
-    <group rotation={[Math.PI / 2, 0, 0.4]}>
-      <mesh position={[0, 0.3, 0]}>
-        <boxGeometry args={[0.04, 0.6, 0.01]} />
-        <meshStandardMaterial color={SILVER} metalness={0.8} roughness={0.3} />
-      </mesh>
-      <mesh>
-        <boxGeometry args={[0.16, 0.02, 0.02]} />
-        <meshStandardMaterial color={IRON} metalness={0.5} roughness={0.5} />
-      </mesh>
-      <mesh position={[0, -0.07, 0]}>
-        <cylinderGeometry args={[0.015, 0.015, 0.12, 6]} />
-        <meshStandardMaterial color={WOOD} roughness={0.9} />
-      </mesh>
-    </group>
-  )
-}
-
-function RevolverProp() {
-  return (
-    <group>
-      <mesh>
-        <boxGeometry args={[0.22, 0.05, 0.04]} />
-        <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
-      </mesh>
-      <mesh position={[-0.08, -0.07, 0]} rotation={[0, 0, 0.3]}>
-        <boxGeometry args={[0.05, 0.12, 0.04]} />
-        <meshStandardMaterial color={WOOD} roughness={0.9} />
-      </mesh>
-    </group>
-  )
-}
-
-function ShotgunProp() {
-  return (
-    <group rotation={[0, 0.3, 0]}>
-      {[-0.02, 0.02].map((z) => (
-        <mesh key={z} position={[0.15, 0, z]} rotation={[0, 0, Math.PI / 2]}>
-          <cylinderGeometry args={[0.014, 0.014, 0.7, 6]} />
-          <meshStandardMaterial color={IRON} metalness={0.6} roughness={0.5} />
-        </mesh>
-      ))}
-      <mesh position={[-0.28, -0.03, 0]}>
-        <boxGeometry args={[0.25, 0.06, 0.05]} />
-        <meshStandardMaterial color={WOOD} roughness={0.9} />
-      </mesh>
-    </group>
-  )
-}
-
 /** A small cupboard (revolver) or a low table (shotgun) for the item to rest on. */
-function Shelf({ height }: { height: number }) {
+function Shelf({ height, width = 0.6 }: { height: number; width?: number }) {
   return (
     <mesh position={[0, -height / 2 - 0.03, 0]}>
-      <boxGeometry args={[0.6, height, 0.4]} />
+      <boxGeometry args={[width, height, 0.4]} />
       <meshStandardMaterial color={STONE} roughness={0.9} />
     </mesh>
+  )
+}
+
+/** The weapon's Blender model lying on its resting place (pose in data/itemModels.ts). */
+function Weapon({ id }: { id: WeaponPickupId }) {
+  const pose = WEAPON_PICKUP_POSES[id]
+  return (
+    <group position={[...pose.surface]}>
+      <GroundItem item={id} scale={pose.scale} yaw={pose.yaw} />
+    </group>
   )
 }
 
@@ -132,25 +77,19 @@ function Prop({ id }: { id: WeaponPickupId }) {
       return (
         <>
           <Shelf height={0.9} />
-          <RevolverProp />
+          <Weapon id={id} />
         </>
       )
     case 'shotgun':
       return (
         <>
-          <Shelf height={0.8} />
-          <group position={[0, 0.05, 0]}>
-            <ShotgunProp />
-          </group>
+          <Shelf height={0.8} width={1} />
+          <Weapon id={id} />
         </>
       )
     case 'wood-axe':
       // The woodpile is scenery (WeaponPickup draws it); only the axe is taken and fades.
-      return (
-        <group position={[0, 0.8, 0.12]}>
-          <AxeProp />
-        </group>
-      )
+      return <Weapon id={id} />
     case 'silver-sabre':
       return (
         <>
@@ -158,7 +97,7 @@ function Prop({ id }: { id: WeaponPickupId }) {
             <boxGeometry args={[0.9, 0.3, 0.5]} />
             <meshStandardMaterial color={STONE} roughness={0.95} />
           </mesh>
-          <SabreProp />
+          <Weapon id={id} />
         </>
       )
   }

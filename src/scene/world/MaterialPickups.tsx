@@ -8,7 +8,7 @@ import { ITEM_MAP } from '../../data/items'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import type { ItemId } from '../../game/types'
 import { Interactable } from './Interactable'
-import { MaterialShape } from './MaterialShape'
+import { GroundItem } from './ItemModel'
 import { useLingering } from './useLingering'
 
 interface StackView {
@@ -61,7 +61,7 @@ export function MaterialPickups() {
             onInteract={() => collectDrop(d.id)}
           >
             <group name={ITEM_MAP[d.item].name}>
-              <MaterialShape item={d.item} />
+              <GroundItem item={d.item} />
             </group>
           </Interactable>
         </group>
@@ -78,7 +78,7 @@ export function MaterialPickups() {
             onInteract={() => collect(s.spawnId, s.index)}
           >
             <group name={ITEM_MAP[s.item].name} position={[s.index * 0.35, 0, 0]}>
-              <MaterialShape item={s.item} />
+              <GroundItem item={s.item} yaw={s.index * 1.3} />
             </group>
           </Interactable>
         </group>

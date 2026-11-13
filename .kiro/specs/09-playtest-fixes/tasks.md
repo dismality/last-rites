@@ -124,7 +124,25 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - All pixel art with `image-rendering: pixelated`; one `iconUrl(kind, id)` helper for every path; unit test that every id used by ACTION_RUNE, the dawn upgrades, COMPASS_MARKERS and the map landmarks has a file on disk
   - Done (with 11i) when lint, build, all unit tests and the e2e suite pass, with the 11i screenshots plus one each of the interaction prompt, the dawn picker and the journal map
   - Log in docs/kiro-log.md; do not commit
-- [ ] 3. A2: Automated playthrough test
+- [-] 11k. Every item uses its Blender model
+  - Data: in `src/data/items.ts` every item gets `model: assets/models/items/<id>.glb`; journal pages 1–5 use `journal-page.glb`; delete `BORROWED_MODEL`. Orientation, grip offset, rotation and scale live in data (shovels grip +Y; club, axe, sabre grip −Y; guns barrel +X; ground items lie flat). Never rotate or scale the GLB files. Sizes and orientation from `docs/world-items.md`
+  - Use the model wherever the item is drawn: ground pickups (MaterialPickups; MaterialShape only as the Suspense fallback), fixed spawns (TornPaper → journal-page.glb, LedgerBook → parish-ledger.glb, the hut oil and the hut shelf), dug-grave loot and elite drops, weapon pickups (WeaponPickups.tsx: axe, sabre, revolver, shotgun; the woodpile stays), placed items (LanternTraps, SaltCircles, placed tallow candles), the workbench RecipeGhost (owned ingredients use their model, missing ones stay wireframe), the examine view (check it shows the new models), and the first-person held weapons (Viewmodel.tsx, viewmodelWeaponGeometry.ts) keeping the swing and recoil animations and the lantern hand, with no weapon clipping the camera at 1280x720 and 800x600
+  - Performance: each GLB loaded once (drei useGLTF, preloaded); repeated pickups via `<Clone>` or instancing; no new lights (an emissive material on the ember vertex colour of candles and lanterns is allowed); report draw calls and longestFrameMs() on a 20 s walk before and after
+  - The 11c hover outline, rune and fade work on every new mesh; collected items still fade their mesh (useLingering)
+  - Unit: every item in ITEMS has a model file on disk; every held weapon has a grip transform
+  - Browser: screenshots into `e2e/screenshots/items/` of a ground pickup of each material, the journal page in the hut, the oil, each weapon pickup and each held weapon; every model is visible at its spot and targetable
+  - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11k)`), never push
+- [ ] 11l. Big map on M with clickable pins
+  - M opens a full-screen map overlay in the Journal map's pencil style (mapDraw): explored cells, landmarks (`-dark` marks), player arrow, objective. Esc or M closes it; uses the shared cursor-release hook (11h). Pauses by day like the journal; at night follows F8 (dims, sound on) if F8 is in, otherwise pauses
+  - Mouse: wheel zooms from the whole grounds to about 30 m across; drag pans; left-click places a pin; clicking a landmark pins it and names the pin after it; clicking or right-clicking a pin removes it; pins may sit on unexplored ground ("?") anywhere inside PLAYABLE_BOUNDS. Keyboard: arrows move a cursor, Enter places, Delete removes, 1–3 select a pin, +/− zoom
+  - Pins: up to 3, numbered 1–3 in distinct shapes (not colour only); a 4th replaces the oldest; a legend lists them with distance and "Clear all"
+  - Compass: one marker per pin ("① 23 m"), off-range pins at the edge with an arrow like the objective. Minimap: drawn, and pinned to the border when off-map (reuse minimapView edge pinning). Journal Map tab: shown and editable
+  - World: a faint upright pencil-line beacon per pin, visible through fog; emissive mesh only, no light, no flashing; fades out within 4 m; setting "Show pins in the world" (default On)
+  - Walking within 2 m clears a pin with a soft sound and the caption "[pin reached]". Pins saved and restored on Continue and Retry, cleared on New Game
+  - Key change: M opens the big map; the minimap toggle moves to N (rebindable); the "Show minimap" setting stays. Update `src/data/controls.ts`, the controls screen, the design bible §10 and §11, and any tutorial or hint text that mentions M
+  - Pure rules in `src/game/systems/mapPins.ts` (add, remove, limit, reach-to-clear, save/restore) with tests. Click-to-world uses the exact inverse of the map draw transform; property test: world → map → world returns the same point at every zoom and pan
+  - Browser: press M and click a spot; the compass shows the pin with a distance that drops while walking to it; the minimap shows it; it clears on arrival. M and N work keyboard-only; the overlay does not overlap the HUD at 1920x1080, 1280x720 and 800x600; screenshots
+  - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11l)`), never push- [ ] 3. A2: Automated playthrough test
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_

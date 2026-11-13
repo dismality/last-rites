@@ -9,7 +9,7 @@
 // Architecture: this component reads durability from the player store (to be
 // wired in a later task) and is pure rendering — no game logic lives here.
 
-import { useRef, useMemo, useState } from 'react'
+import { Suspense, useRef, useMemo, useState } from 'react'
 import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGameStore, useInventoryStore, usePlayerStore, useSettingsStore } from '../../game/state'
@@ -48,7 +48,8 @@ import {
 } from '../../game/systems/viewmodel'
 import { weaponRuntime } from './weaponRuntime'
 import { WeaponMesh } from './viewmodelWeapons'
-import { MUZZLE_TIP, isHeldWeaponId } from './viewmodelWeaponGeometry'
+import { isHeldWeaponId } from './viewmodelWeaponGeometry'
+import { HELD_GRIPS, HELD_ORIGIN, type HeldGrip } from '../../data/itemModels'
 
 // ---------------------------------------------------------------------------
 // Props
@@ -105,66 +106,8 @@ function crackOpacity(weaponState: WeaponState): number {
  * Currently a placeholder low-poly box; this will be replaced with a proper
  * GLTF viewmodel in a later art pass.
  */
-const HELD_POSITION: [number, number, number] = [0.22, -0.18, -0.4]
-const HELD_ROTATION: [number, number, number] = [0.1, -0.15, 0]
-/** Cylinders stand along Y; this lays them along the view axis (-Z is away from the player). */
-const ALONG_Z: [number, number, number] = [Math.PI / 2, 0, 0]
-
-/** Wooden shaft with a flat blade at the far end. Sharpened: paler steel and a pointed tip. */
-function ShovelMesh({ sharpened }: { sharpened: boolean }) {
-  const steel = sharpened ? '#9aa3ab' : '#6b5a4a'
-  return (
-    <group position={HELD_POSITION} rotation={HELD_ROTATION}>
-      <mesh rotation={ALONG_Z}>
-        <cylinderGeometry args={[0.014, 0.016, 0.5, 8]} />
-        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
-      </mesh>
-      {/* D-grip at the near end */}
-      <mesh position={[0, 0, 0.25]}>
-        <boxGeometry args={[0.08, 0.018, 0.018]} />
-        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0, -0.3]}>
-        <boxGeometry args={[0.11, 0.012, 0.13]} />
-        <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
-      </mesh>
-      <mesh
-        position={[0, 0, -0.385]}
-        rotation={[-Math.PI / 2, Math.PI / 4, 0]}
-        scale={[1, 1, sharpened ? 1.4 : 0.6]}
-      >
-        <coneGeometry args={[0.078, 0.07, 4]} />
-        <meshStandardMaterial color={steel} roughness={0.55} metalness={0.6} />
-      </mesh>
-    </group>
-  )
-}
-
-/** A thigh bone: tapered shaft, a heavy knob at the striking end, a small knob at the grip. */
-function BoneClubMesh() {
-  const bone = '#d8d2c0'
-  return (
-    <group position={HELD_POSITION} rotation={HELD_ROTATION}>
-      <mesh rotation={ALONG_Z}>
-        <cylinderGeometry args={[0.03, 0.017, 0.42, 8]} />
-        <meshStandardMaterial color={bone} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0, -0.22]}>
-        <sphereGeometry args={[0.055, 10, 8]} />
-        <meshStandardMaterial color={bone} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0, 0.21]}>
-        <sphereGeometry args={[0.026, 8, 6]} />
-        <meshStandardMaterial color={bone} roughness={0.9} />
-      </mesh>
-      {/* Cloth wrap on the grip */}
-      <mesh position={[0, 0, 0.12]} rotation={ALONG_Z}>
-        <cylinderGeometry args={[0.024, 0.024, 0.12, 8]} />
-        <meshStandardMaterial color="#6e6048" roughness={1} />
-      </mesh>
-    </group>
-  )
-}
+const HELD_POSITION: [number, number, number] = [...HELD_ORIGIN.position]
+const HELD_ROTATION: [number, number, number] = [...HELD_ORIGIN.rotation]
 
 /**
  * Additive flash sprite at the barrel tip. Opacity is driven per frame by Viewmodel
@@ -200,21 +143,20 @@ function ViewmodelMesh({
   muzzleRef: React.RefObject<THREE.Mesh | null>
 }) {
   if (isHeldWeaponId(item)) {
+    const grip: HeldGrip = HELD_GRIPS[item]
     return (
       <group position={HELD_POSITION} rotation={HELD_ROTATION}>
-        <WeaponMesh id={item} />
-        {(item === 'revolver' || item === 'shotgun') && (
-          <MuzzleQuad tip={MUZZLE_TIP[item]} quadRef={muzzleRef} />
-        )}
+        {/* Preloaded, so this rarely suspends; nothing is drawn for the frame it does. */}
+        <Suspense fallback={null}>
+          <WeaponMesh id={item} />
+        </Suspense>
+        {grip.muzzle && <MuzzleQuad tip={grip.muzzle} quadRef={muzzleRef} />}
       </group>
     )
   }
-  if (item === 'rusty-shovel') return <ShovelMesh sharpened={false} />
-  if (item === 'sharpened-shovel') return <ShovelMesh sharpened />
-  if (item === 'bone-club') return <BoneClubMesh />
   return (
     <mesh position={HELD_POSITION} rotation={HELD_ROTATION}>
-      {/* Stand-in for items without their own held model (flasks, bandages, ...). */}
+      {/* Stand-in for items without a grip yet (flasks, bandages, ...). */}
       <boxGeometry args={[0.06, 0.06, 0.45]} />
       <meshStandardMaterial color="#5c3d1e" roughness={0.9} metalness={0} />
     </mesh>

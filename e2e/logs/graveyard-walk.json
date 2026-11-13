@@ -1,5 +1,22 @@
 [
   {
+    "dest": "row-mouth",
+    "target": [
+      -20,
+      -37
+    ],
+    "ok": true,
+    "endsAt": [
+      -19.97,
+      0.05,
+      -35.81
+    ],
+    "distance": 1.19,
+    "seconds": 40.1,
+    "stuckAt": null,
+    "near": null
+  },
+  {
     "dest": "crane step",
     "target": [
       -18.9,
@@ -7,12 +24,284 @@
     ],
     "ok": true,
     "endsAt": [
-      -19.82,
+      -19.68,
       0.05,
-      -57.72
+      -57.2
     ],
-    "distance": 0.99,
-    "seconds": 77.1,
+    "distance": 1.19,
+    "seconds": 61,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "cat-mouth",
+    "target": [
+      25,
+      37
+    ],
+    "ok": true,
+    "endsAt": [
+      24.09,
+      0.05,
+      36.23
+    ],
+    "distance": 1.19,
+    "seconds": 35.7,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "merchant",
+    "target": [
+      -5.6,
+      36.2
+    ],
+    "ok": true,
+    "endsAt": [
+      -4.68,
+      0.05,
+      35.46
+    ],
+    "distance": 1.18,
+    "seconds": 35.3,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "chapel front door",
+    "target": [
+      10,
+      -2
+    ],
+    "ok": true,
+    "endsAt": [
+      9.3,
+      0.05,
+      -2.97
+    ],
+    "distance": 1.19,
+    "seconds": 18.1,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "chapel vestry door",
+    "target": [
+      6.5,
+      9.5
+    ],
+    "ok": true,
+    "endsAt": [
+      5.42,
+      0.05,
+      9
+    ],
+    "distance": 1.19,
+    "seconds": 8.8,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-northwest",
+    "target": [
+      -30,
+      -22
+    ],
+    "ok": true,
+    "endsAt": [
+      -29.3,
+      0.01,
+      -21.04
+    ],
+    "distance": 1.19,
+    "seconds": 36.1,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-north",
+    "target": [
+      2,
+      -34
+    ],
+    "ok": true,
+    "endsAt": [
+      0.81,
+      0.05,
+      -34.1
+    ],
+    "distance": 1.2,
+    "seconds": 60.5,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-northeast",
+    "target": [
+      30,
+      -26
+    ],
+    "ok": true,
+    "endsAt": [
+      29.72,
+      0.05,
+      -24.84
+    ],
+    "distance": 1.2,
+    "seconds": 49.6,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-west",
+    "target": [
+      -35,
+      8
+    ],
+    "ok": true,
+    "endsAt": [
+      -34.19,
+      0.05,
+      7.12
+    ],
+    "distance": 1.19,
+    "seconds": 40.2,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-east",
+    "target": [
+      34,
+      14
+    ],
+    "ok": true,
+    "endsAt": [
+      33.29,
+      0.05,
+      13.05
+    ],
+    "distance": 1.19,
+    "seconds": 42.6,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-southwest",
+    "target": [
+      -26,
+      30
+    ],
+    "ok": true,
+    "endsAt": [
+      -25.23,
+      0.05,
+      29.08
+    ],
+    "distance": 1.2,
+    "seconds": 31.7,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-south",
+    "target": [
+      -2,
+      35
+    ],
+    "ok": true,
+    "endsAt": [
+      -1.15,
+      0.05,
+      34.19
+    ],
+    "distance": 1.18,
+    "seconds": 32.5,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "wave grave wg-southeast",
+    "target": [
+      28,
+      32
+    ],
+    "ok": true,
+    "endsAt": [
+      27.2,
+      0.05,
+      32.88
+    ],
+    "distance": 1.19,
+    "seconds": 39.4,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "clue clue-hut-boots",
+    "target": [
+      -2.2,
+      1.6
+    ],
+    "ok": true,
+    "endsAt": [
+      -1.25,
+      0.05,
+      0.88
+    ],
+    "distance": 1.19,
+    "seconds": 1.2,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "clue clue-empty-graves",
+    "target": [
+      12.5,
+      -20.5
+    ],
+    "ok": true,
+    "endsAt": [
+      12.03,
+      0.05,
+      -19.4
+    ],
+    "distance": 1.19,
+    "seconds": 27.4,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "clue clue-west-hill-glint",
+    "target": [
+      -24.5,
+      9
+    ],
+    "ok": true,
+    "endsAt": [
+      -23.34,
+      0.05,
+      8.78
+    ],
+    "distance": 1.18,
+    "seconds": 21.7,
+    "stuckAt": null,
+    "near": null
+  },
+  {
+    "dest": "clue clue-ledger-week",
+    "target": [
+      7.6,
+      -4
+    ],
+    "ok": true,
+    "endsAt": [
+      6.55,
+      0.05,
+      -4.52
+    ],
+    "distance": 1.17,
+    "seconds": 15.5,
     "stuckAt": null,
     "near": null
   }

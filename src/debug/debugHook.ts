@@ -485,6 +485,14 @@ const api = {
   collectMaterial(spawnId: string, index = 0): void {
     useSpawnStore.getState().collectMaterial(spawnId, index)
   },
+  /** Replaces what lies at a material spawn point with one stack of each item, so a spec can see any item. */
+  setSpawnStacks(spawnId: string, items: readonly ItemId[], qty = 1): void {
+    const s = useSpawnStore.getState()
+    s.setWorld({
+      ...s.world,
+      materials: { ...s.world.materials, [spawnId]: items.map((item) => ({ item, qty })) },
+    })
+  },
   /** One zombie blow on the player through the real damage path. */
   hurt(dmg: number): boolean {
     return hurtPlayer(dmg, false, 'zombie')

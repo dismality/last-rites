@@ -26,8 +26,8 @@ test('the hut table oil shows "E: Take" and a real E press takes it', async ({ p
   const index = stacks.findIndex((s) => s.item === 'lamp-oil')
   expect(index).toBeGreaterThanOrEqual(0)
 
-  // MaterialPickups lays stacks out 0.35 m apart along x; the tin's centre is 0.06 m up.
-  const target = { x: SHELF[0] + index * 0.35, y: SHELF[1] + 0.06, z: SHELF[2] }
+  // MaterialPickups lays stacks out 0.35 m apart along x; the oil model (164 mm tall, drawn at 1.5x) rests on the shelf, so its centre is 0.123 m up.
+  const target = { x: SHELF[0] + index * 0.35, y: SHELF[1] + 0.123, z: SHELF[2] }
   await page.evaluate((s) => window.__lastRites!.teleport(s.x, s.z, { yaw: -Math.PI / 2 }), STAND)
   await page.waitForFunction(
     (s) => {

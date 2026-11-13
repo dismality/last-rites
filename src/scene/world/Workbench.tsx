@@ -27,7 +27,10 @@ import { canCraft } from '../../game/systems/crafting'
 import { RECIPES, RECIPE_MAP } from '../../data/recipes'
 import { ghostView, recipeCard } from '../../ui/workbench/recipeView'
 import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManager'
-import type { MaterialId } from '../../game/types'
+import type { ItemId, MaterialId } from '../../game/types'
+import { ITEM_MAP } from '../../data/items'
+import { fitScale } from '../../data/itemModels'
+import { GroundItem } from './ItemModel'
 import { workbenchCameraRuntime } from './workbenchCameraRuntime'
 import { Interactable } from './Interactable'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
@@ -428,6 +431,9 @@ function BenchModel() {
 // ---------------------------------------------------------------------------
 
 const GHOST_POS: [number, number, number] = [0, 1.2, BENCH_Z - 0.12]
+/** Longest edge of an ingredient laid on the bench: a plank or a shovel shrinks to fit the row. */
+const BENCH_INGREDIENT_MAX_EDGE_M = 0.2
+const benchScale = (id: ItemId): number => fitScale(id, BENCH_INGREDIENT_MAX_EDGE_M)
 const GHOST_WASHED = new THREE.Color('#9a9a9a')
 
 /**
@@ -472,14 +478,18 @@ function RecipeGhost() {
         const id = row.item as MaterialId
         const scale = MATERIAL_SCALE[id] ?? [0.06, 0.06, 0.06]
         const x = (i - (view.rows.length - 1) / 2) * 0.22
+        // Owned ingredients are their Blender model, fitted to the bench; missing ones stay an outline.
+        if (row.solid && ITEM_MAP[row.item as ItemId]?.model) {
+          return (
+            <group key={row.item} position={[x, BENCH_TOP_Y + 0.02, BENCH_Z + 0.25]}>
+              <GroundItem item={row.item as ItemId} scale={benchScale(row.item as ItemId)} />
+            </group>
+          )
+        }
         return (
           <mesh key={row.item} position={[x, BENCH_TOP_Y + scale[1] * 0.5 + 0.02, BENCH_Z + 0.25]} scale={scale}>
             <boxGeometry args={[1, 1, 1]} />
-            {row.solid ? (
-              <meshStandardMaterial color={MATERIAL_COLOR[id] ?? '#b0a58a'} roughness={0.8} />
-            ) : (
-              <meshBasicMaterial color="#d8c9a3" wireframe transparent opacity={0.7} />
-            )}
+            <meshBasicMaterial color="#d8c9a3" wireframe transparent opacity={0.7} />
           </mesh>
         )
       })}
