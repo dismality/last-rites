@@ -65,7 +65,7 @@ export function ThrowControls() {
     const released = !attack && prevAttack.current
     prevAttack.current = attack
 
-    const paused = gs.paused || gs.examining || gs.journalOpen || gs.satchelOpen
+    const paused = gs.paused || gs.examining || gs.journalOpen || gs.mapOpen || gs.satchelOpen
     const inv = useInventoryStore.getState()
     const held = inv.equippedSlot === null ? null : hotbarItem(inv.inventory, inv.equippedSlot)
     const player = usePlayerStore.getState()

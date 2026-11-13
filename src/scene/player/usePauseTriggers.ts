@@ -5,9 +5,9 @@ import { useUiWorldStore } from '../../game/state/uiWorldStore'
 
 /** True when an overlay that owns Esc (it closes itself on Esc) is open. */
 function escOwnedByOverlay(): boolean {
-  const { examining, journalOpen, satchelOpen } = useGameStore.getState()
+  const { examining, journalOpen, mapOpen, satchelOpen } = useGameStore.getState()
   const { workbenchOpen, chapelRepairOpen } = useUiWorldStore.getState()
-  return examining || journalOpen || satchelOpen || workbenchOpen || chapelRepairOpen
+  return examining || journalOpen || mapOpen || satchelOpen || workbenchOpen || chapelRepairOpen
 }
 
 /**

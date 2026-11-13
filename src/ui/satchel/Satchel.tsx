@@ -57,6 +57,7 @@ export function Satchel() {
         gs.paused ||
         gs.examining ||
         gs.journalOpen ||
+        gs.mapOpen ||
         gs.taken ||
         useIntroStore.getState().playing ||
         ui.workbenchOpen ||

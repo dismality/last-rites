@@ -458,7 +458,8 @@ Each has a telegraph and a subtitle, keeps the cooldown rules, and is added to t
 | Satchel | Tab |
 | Journal / map | J |
 | Lantern on/off | F |
-| Minimap on/off | M **(09)** |
+| Big map (pins) | M **(09)** |
+| Minimap on/off | N **(09)** (moved from M) |
 | Pause | Esc |
 
 ---
@@ -540,6 +541,28 @@ A marker behind the player sits at the strip's nearer edge with an arrow. **(09)
 
 ### Map
 The journal map shows the player as an arrow at their position, pointing their way, plus the objective marker.
+
+### Big map and pins (09)
+**M opens the big map**, a full-screen overlay in the Journal map's pencil style. It shows explored cells, landmarks, the player arrow, the objective and the pins. Esc or M closes it. It frees the cursor through the shared cursor-release hook. It pauses the game by day like the journal. At night it should keep the world running (the screen dims, sound goes on) once the F8 rule of spec 10 is built; until then it pauses at night too, like the journal does.
+
+| Input | Effect |
+|---|---|
+| Wheel | Zoom, from the whole grounds down to about 30 m across |
+| Drag | Pan |
+| Left-click on ground | Place a pin (anywhere inside the playable bounds; unexplored ground shows a "?") |
+| Left-click on a landmark | Pin the landmark and name the pin after it |
+| Click or right-click on a pin | Remove it |
+| Arrow keys, Enter, Delete | Move a cursor, place a pin, remove the pin under the cursor (or the selected one) |
+| 1, 2, 3 | Select a pin; the cursor jumps to it |
+| + / − | Zoom |
+
+**Pins:** up to 3, numbered 1–3 with distinct shapes (circle, square, triangle), never colour alone. A 4th pin replaces the oldest and takes its number. A small legend lists each pin with its name and distance, and has "Clear all". Pins also show:
+- **Compass:** one marker per pin, "① 23 m", with the pin's number glyph; off-range pins sit at the strip's edge with an arrow like the objective.
+- **Minimap:** drawn on it; off-map pins are pinned to its border with a chevron.
+- **Journal Map tab:** shown and editable (click to place, click a pin to remove).
+- **World:** a faint upright pencil-line beacon at each pin, emissive only, no light, no flashing, visible through fog, fading out within 4 m. The setting **Show pins in the world** (default On) controls it.
+- **Reaching a pin:** walking within 2 m clears it, with a soft sound and the caption "[pin reached]".
+- **Saving:** pins are saved with the run and restored on Continue and both Retry options; New Game clears them.
 
 ### Zone name cards
 Entering a zone shows its name for 2.5 s in IM Fell English SC, with a short line underneath. Each zone has a 30 s cooldown so walking along a boundary doesn't repeat it.

@@ -32,6 +32,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     tutorialPrompts: current.tutorialPrompts,
     damageNumbers: current.damageNumbers,
     showMinimap: current.showMinimap,
+    showPinsInWorld: current.showPinsInWorld,
     bindings: current.bindings,
   }
 }

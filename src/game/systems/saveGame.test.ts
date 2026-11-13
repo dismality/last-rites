@@ -100,6 +100,15 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7] as TutorialStepId[]).map((a) => new Set(a)),
   introSeen: fc.boolean(),
   progression: fc.constant(defaultProgressionSave()),
+  // Map pins (spec 09 task 11l): up to two here, with their own numbers.
+  pins: fc.constantFrom(
+    [],
+    [{ slot: 1 as const, x: 3, z: -4, name: 'Pin 1' }],
+    [
+      { slot: 2 as const, x: -10, z: 22, name: 'Chapel' },
+      { slot: 3 as const, x: 0, z: 0, name: 'Pin 3' },
+    ],
+  ),
   stage: fc.record({
     stage: fc.constantFrom(1 as const, 2 as const, 3 as const),
     caseSolved: fc.boolean(),

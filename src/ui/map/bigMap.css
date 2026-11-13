@@ -1,0 +1,76 @@
+/* Big map overlay: one pencil sheet fills the screen; two small paper panels sit in its top corners. */
+.bigmap {
+  position: fixed;
+  inset: 0;
+  z-index: 245;
+  background: linear-gradient(160deg, #e2d4b0 0%, var(--parchment) 45%, #cfc0a8 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  animation: bigmap-fade var(--transition-normal) both;
+}
+@keyframes bigmap-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bigmap { animation: none; }
+}
+.bigmap__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+  touch-action: none;
+}
+.bigmap__canvas:active { cursor: grabbing; }
+.bigmap__canvas:focus-visible { outline: 3px solid var(--ember); outline-offset: -6px; }
+
+.bigmap__panel {
+  position: absolute;
+  top: 0.75rem;
+  max-width: min(17rem, 42vw);
+  padding: 0.5rem 0.75rem;
+  background: rgba(226, 212, 176, 0.94);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 4px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  line-height: 1.35;
+}
+.bigmap__panel p { margin: 0 0 0.35rem; }
+.bigmap__panel--help { left: 0.75rem; }
+.bigmap__panel--legend { right: 0.75rem; }
+.bigmap__title { margin: 0 0 0.25rem; font-family: var(--font-heading); font-size: 1.25rem; }
+.bigmap__subtitle { margin: 0 0 0.25rem; font-family: var(--font-heading); font-size: 1.1rem; }
+.bigmap__status { min-height: 1.35em; font-style: italic; }
+.bigmap__pins { list-style: none; margin: 0 0 0.35rem; padding: 0; }
+.bigmap__pin { display: flex; gap: 0.25rem; align-items: stretch; margin-bottom: 0.25rem; }
+.bigmap__pin[data-selected='true'] .bigmap__pinbtn { border-style: dashed; border-color: var(--ember); border-width: 2px; }
+.bigmap__pinbtn,
+.bigmap__remove,
+.bigmap__btn {
+  font: inherit;
+  color: var(--parchment);
+  background: var(--ink-mid);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+}
+.bigmap__pinbtn { flex: 1; text-align: left; }
+.bigmap__btn:disabled { opacity: 0.5; cursor: default; }
+.bigmap__pinbtn:hover,
+.bigmap__remove:hover,
+.bigmap__btn:hover:not(:disabled) { border-color: var(--ember); }
+.bigmap__pinbtn:focus-visible,
+.bigmap__remove:focus-visible,
+.bigmap__btn:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+.bigmap__actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.bigmap__note { margin: 0.35rem 0 0; font-size: 1rem; }
+
+/* Short screens (800x600): keep the panels compact so they never reach each other. */
+@media (max-width: 900px), (max-height: 640px) {
+  .bigmap__panel { max-width: min(14rem, 46vw); padding: 0.4rem 0.6rem; }
+  .bigmap__note { display: none; }
+}

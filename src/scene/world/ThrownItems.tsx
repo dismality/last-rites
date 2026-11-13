@@ -86,7 +86,7 @@ function Thrown({ item, onBurst }: { item: ThrownItem; onBurst: (flash: Flash) =
 
   useFrame((_s, rawDelta) => {
     const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen) return
+    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen) return
     const dt = Math.min(rawDelta, 0.1)
     age.current += dt
     if (item.kind === 'nail-bomb') {

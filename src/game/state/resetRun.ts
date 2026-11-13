@@ -38,6 +38,7 @@ import { useMysteryStore } from './mysteryStore'
 import { clearNightState } from './nightState'
 import { useOverlayStore } from './overlayStore'
 import { takePlayerPush } from './playerPush'
+import { usePinStore } from './pinStore'
 import { usePlayerStore } from './playerStore'
 import { queueTeleportToStore } from './playerTeleport'
 import { resetProgressionEventsRuntime } from './progressionEvents'
@@ -68,6 +69,7 @@ export const REPLACED_STORES = [
   usePlayerStore,
   useLanternStore,
   useMapStore,
+  usePinStore,
   useSpawnStore,
   useUiWorldStore,
   useMysteryStore,
@@ -115,7 +117,7 @@ export function resetRun(): void {
   clearNightState()
   // Achievements and the Endless best are not run state, so only the toasts are cleared.
   useAchievementStore.getState().resetSession()
-  useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, satchelOpen: false })
+  useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, mapOpen: false, satchelOpen: false })
 
   // Module-level runtimes.
   resetCombatTickRuntime()

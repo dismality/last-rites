@@ -6,6 +6,7 @@ import { COMPASS, COMPASS_DOOR_LABEL, COMPASS_LETTERS, COMPASS_MARKERS } from '.
 import { CHAPEL_CENTER, HUT_DOOR_OUTSIDE, isInsideHut } from '../../data/cemeteryLayout'
 import { WAVE_GRAVES } from '../../data/waves'
 import type { Phase } from '../types'
+import { PIN_GLYPHS, type Pin } from './mapPins'
 import { eligibleGraves } from './waves'
 
 export interface CompassVec2 {
@@ -73,10 +74,11 @@ const makeMarker = (
   rel: number,
   label: string = COMPASS_MARKERS[kind].label,
   distanceM?: number,
+  glyph: string = COMPASS_MARKERS[kind].glyph,
 ): CompassMarker => {
   const pinned = rel > COMPASS.halfSpanDeg ? 'right' : rel < -COMPASS.halfSpanDeg ? 'left' : null
   const x = Math.max(-1, Math.min(1, rel / COMPASS.halfSpanDeg))
-  const marker: CompassMarker = { id, glyph: COMPASS_MARKERS[kind].glyph, label, rel, x, pinned }
+  const marker: CompassMarker = { id, glyph, label, rel, x, pinned }
   if (distanceM !== undefined) marker.distanceM = distanceM
   return marker
 }
@@ -89,6 +91,8 @@ export interface CompassContext {
   bellBuilt: boolean
   /** Silas's spot; pass it only while he is at the gate. */
   merchant?: readonly [number, number, number]
+  /** The player's map pins: one marker each, "① 23 m". */
+  pins?: readonly Pin[]
 }
 
 /**
@@ -116,6 +120,11 @@ export const buildCompassMarkers = (c: CompassContext): CompassMarker[] => {
   }
   markers.push(makeMarker('chapel', 'chapel', rel({ x: CHAPEL_CENTER[0], z: CHAPEL_CENTER[2] })))
   markers.push(makeMarker('hut', 'hut', rel({ x: 0, z: 0 })))
+
+  for (const pin of c.pins ?? []) {
+    const dist = Math.round(Math.hypot(pin.x - c.player.x, pin.z - c.player.z))
+    markers.push(makeMarker(`pin-${pin.slot}`, 'objective', rel({ x: pin.x, z: pin.z }), `${dist} m`, dist, PIN_GLYPHS[pin.slot]))
+  }
 
   if (c.merchant) {
     markers.push(makeMarker('merchant', 'merchant', rel({ x: c.merchant[0], z: c.merchant[2] })))

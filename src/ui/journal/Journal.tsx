@@ -232,7 +232,7 @@ export function Journal() {
     const onKey = (e: KeyboardEvent) => {
       const gs = useGameStore.getState()
       if (e.code === useSettingsStore.getState().bindings.Journal && !e.repeat) {
-        if (gs.paused || gs.examining) return
+        if (gs.paused || gs.examining || gs.mapOpen) return
         e.preventDefault()
         if (gs.journalOpen) gs.setJournalOpen(false)
         else {

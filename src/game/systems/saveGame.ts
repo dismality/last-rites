@@ -13,6 +13,7 @@ import { defaultProgressionSave } from './progressionSave'
 import { parseTutorial, serializeTutorial } from './tutorial'
 import { MODES } from '../../data/modes'
 import { STAGE_COUNT, type StageNumber } from '../../data/stages'
+import { restorePins, serializePins, type Pin } from './mapPins'
 import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 
 export const SAVE_KEY = 'lastrites:save'
@@ -37,11 +38,14 @@ export interface SaveState {
   progression?: ProgressionSave
   /** Stage block (spec 10). Optional on input; the loader migrates old night-only saves. */
   stage?: StageSave
+  /** Map pins (spec 09 task 11l). Optional on input and on read; the loader sanitises them. */
+  pins?: Pin[]
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
 export interface SaveFile
-  extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat' | 'progression'> {
+  extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat' | 'progression' | 'pins'> {
+  pins: Pin[]
   combat: CombatSave
   progression: ProgressionSave
   version: typeof SAVE_VERSION
@@ -87,6 +91,7 @@ export function toSaveFile(state: SaveState): SaveFile {
       doors: { built: false, front: [], vestry: [] },
     },
     progression: state.progression ?? defaultProgressionSave(),
+    pins: serializePins(state.pins ?? []),
     // Always written, so a reload never mistakes a stage number for an old night number.
     stage:
       state.stage ??
@@ -201,6 +206,8 @@ export function fromSaveFile(
     combat: raw.combat as CombatSave | undefined,
     // Raw block; the loader runs sanitizeProgression so a bad field never fails the whole save.
     progression: raw.progression as ProgressionSave | undefined,
+    // Older saves have none; bad entries are dropped one by one.
+    pins: restorePins(raw.pins),
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,

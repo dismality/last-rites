@@ -290,7 +290,7 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
     syncCamera(camera, settings.fov, aspect)
 
     const gs = useGameStore.getState()
-    const frozen = gs.paused || gs.examining || gs.journalOpen
+    const frozen = gs.paused || gs.examining || gs.journalOpen || gs.mapOpen
     const dt = frozen ? 0 : Math.min(rawDelta, 0.1)
 
     if (dt > 0) {
