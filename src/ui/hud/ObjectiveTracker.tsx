@@ -27,13 +27,14 @@ export function ObjectiveTracker() {
   const tutorialDone = useGuidanceStore((s) => s.tutorialDone)
   const promptsOn = useSettingsStore((s) => s.tutorialPrompts)
   const bindings = useSettingsStore((s) => s.bindings)
+  const near = useGuidanceStore((s) => s.hintNear)
 
   useEffect(() => {
     const read = () => setPrompt(readTutorialPrompt())
     read()
     const id = window.setInterval(read, SECOND_LINE_REFRESH_MS)
     return () => window.clearInterval(id)
-  }, [tutorialDone, promptsOn, bindings])
+  }, [tutorialDone, promptsOn, bindings, near])
 
   if (screen !== 'game' || objective === null) return null
 

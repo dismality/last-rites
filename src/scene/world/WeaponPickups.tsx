@@ -115,7 +115,6 @@ function WeaponPickup({ id, position }: { id: WeaponPickupId; position: readonly
           id={`weapon:${id}`}
           kind="weapon-pickup"
           subject={id}
-          size={[0.8, 0.8, 0.8]}
           runeHeight={id === 'wood-axe' ? 1.3 : 0.5}
           onInteract={() => {
             takeWeaponPickup(id)

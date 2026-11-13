@@ -1,6 +1,8 @@
 // First-day tutorial (design bible §11). Templates carry `{Action}` tokens that are
 // replaced with the player's current key bindings, so rebinding changes the prompt.
 
+import type { HintPlace } from './objectiveHints'
+
 export type TutorialStepId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 
 export type TutorialAction =
@@ -16,7 +18,12 @@ export type TutorialAction =
 export interface TutorialStepDef {
   readonly id: TutorialStepId
   readonly action: TutorialAction
+  /** Near hint: the key and the action, shown within reach of `place` (or always, with no place). */
   readonly template: string
+  /** Where the step's object is; with `farTemplate` it makes the prompt switch by distance (11o). */
+  readonly place?: HintPlace
+  /** Far hint: where to go. Shown away from `place`, or in another building. */
+  readonly farTemplate?: string
 }
 
 export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
@@ -25,10 +32,28 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
     action: 'walk',
     template: '{MoveForward} {MoveLeft} {MoveBackward} {MoveRight} to move, mouse to look',
   },
-  { id: 2, action: 'pickup', template: '{Interact} to pick up the oil on the table' },
-  { id: 3, action: 'readPage', template: '{Interact} to read the page Elias left' },
+  {
+    id: 2,
+    action: 'pickup',
+    template: '{Interact} to pick up the oil on the table',
+    place: { kind: 'spawn-point', id: 'hut-shelf' },
+    farTemplate: 'Go to the hut: there is oil on the table',
+  },
+  {
+    id: 3,
+    action: 'readPage',
+    template: '{Interact} to read the page Elias left',
+    place: { kind: 'fixed-spawn', id: 'fx-page-1' },
+    farTemplate: 'Go to the hut to read the page Elias left',
+  },
   { id: 4, action: 'dig', template: 'Hold {Interact} on a grave mound to dig (shovel in hand)' },
-  { id: 5, action: 'craft', template: '{Interact} at the workbench to craft' },
+  {
+    id: 5,
+    action: 'craft',
+    template: '{Interact} at the workbench to craft',
+    place: { kind: 'workbench' },
+    farTemplate: 'Go to the workbench in the hut to craft',
+  },
   {
     id: 6,
     action: 'bindHotbar',

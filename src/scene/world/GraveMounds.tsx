@@ -98,7 +98,6 @@ export function GraveMounds() {
             id={`${DIG_ID_PREFIX}${g.id}`}
             kind="grave-mound"
             subject={g.id}
-            size={[1.6, 0.6, 2.6]}
             runeHeight={1.9}
             runeScale={0.5}
             dayRuneRange={MOUND_DAY_RUNE_RANGE_M}

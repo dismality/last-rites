@@ -111,7 +111,6 @@ function MerchantProps() {
         <Interactable
           kind="merchant"
           id="merchant"
-          size={[0.8, 2.1, 0.8]}
           runeHeight={2.4}
           onInteract={() => {
             tryTrade()

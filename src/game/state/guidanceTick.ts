@@ -20,7 +20,9 @@ import {
   type Vec3,
 } from '../systems/objective'
 import { withDigTutorialMarker } from '../systems/digGuidance'
+import { hintNear, hintPlacePosition } from '../systems/objectiveHint'
 import {
+  currentTutorialPlace,
   currentTutorialStep,
   markActionDone,
   isWalkComplete,
@@ -171,7 +173,16 @@ export const readTutorialPrompt = (): string | null => {
     phase: world.phase,
     nightNumber: world.nightNumber,
     bindings: s.bindings,
+    near: useGuidanceStore.getState().hintNear,
   })
+}
+
+/** Near/far state for the current tutorial step: stays near with no place to measure against. */
+const nextHintNear = (was: boolean, x: number, z: number): boolean => {
+  const place = currentTutorialPlace(useGuidanceStore.getState().tutorialDone)
+  const target = place ? hintPlacePosition(place) : undefined
+  if (!target) return true
+  return hintNear(was, { x, z }, { x: target[0], z: target[2] })
 }
 
 const completeAction = (action: TutorialAction): void => {
@@ -207,6 +218,7 @@ export const tickGuidance = (dt: number): void => {
   patch.zone = zone
   patch.zoneLastShown = lastShown
   patch.card = card
+  patch.hintNear = nextHintNear(s.hintNear, x, z)
   useGuidanceStore.setState(patch)
 
   if (isWalkComplete(walk)) completeAction('walk')

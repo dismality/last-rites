@@ -9,6 +9,9 @@ import { useInventoryStore } from '../../game/state/inventoryStore'
 import { Interactable } from './Interactable'
 import { PART_MATERIALS } from './partMaterials'
 
+/** The clue's outline fades in inside this distance (spec 09 task 11o). */
+const CLUE_OUTLINE_RANGE_M = 4
+
 function examineSpot(spot: ClueSpot): void {
   if (!canDiscoverClue(spot.clueId, useInventoryStore.getState().inventory)) {
     useToastStore.getState().push('The entries mean nothing without the parish ledger to compare.')
@@ -50,7 +53,7 @@ export function ClueSpots() {
             kind="clue-spot"
             subject={spot.clueId}
             onUsedUp={pushJournalAddedToast}
-            size={[0.8, 0.6, 0.8]}
+            outlineRange={CLUE_OUTLINE_RANGE_M}
             runeHeight={0.9}
             onInteract={() => examineSpot(spot)}
           >

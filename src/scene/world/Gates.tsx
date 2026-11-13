@@ -73,7 +73,6 @@ export function Gate({ spec }: { spec: CorridorSpec }) {
           id={`gate-${spec.id}`}
           kind="gate"
           subject={spec.id}
-          size={[w, 1.4, t]}
           runeHeight={1.6}
           onInteract={() => useMysteryStore.getState().interactGate(spec.id, 'gate')}
         >
@@ -113,7 +112,6 @@ export function OssuaryDoor() {
           id="gate-ossuary"
           kind="gate"
           subject="ossuary"
-          size={[width, 1.4, thickness]}
           runeHeight={1.6}
           onInteract={() => useMysteryStore.getState().interactGate('ossuary', 'gate')}
         >

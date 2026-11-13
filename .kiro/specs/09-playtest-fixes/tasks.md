@@ -151,7 +151,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Bench stock piles (Workbench.tsx boxGeometry Instances) drawn with the item models, keeping the ember glow as emissive (no light); the recipe ghost's missing-ingredient outline becomes the item's silhouette (model in flat dark material); any other box/cylinder standing in for an item gets its model (list them)
   - Browser: source text on an unknown recipe; Mark on map puts a pin on the compass; bench screenshots at 1280x720 and 800x600
   - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11m)`), never push
-- [ ] 11o. Objective hint fits where you are; clue outline fits the clue
+- [x] 11o. Objective hint fits where you are; clue outline fits the clue
   - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 11o
   - Each objective rule has a near hint (key and action) and a far hint (where to go); near only within 6 m and in the same building (hut, chapel, catacombs vs outside), far again past 8 m (hysteresis); reuse objectiveAim and the hut-door logic; pure logic in the objective system, texts in data; unit tests for near, far, inside/outside and hysteresis
   - Clue highlight hugs the clue model (inverted-hull outline or soft ground ring), sized from model bounds, fades in within about 4 m and out after examining; no box, no wireframe; follows whichever model is shown (11n-d clue GLBs); replace any other wireframe highlight box
