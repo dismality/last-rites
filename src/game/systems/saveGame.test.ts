@@ -100,6 +100,7 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   recipes: fc.subarray(['r-bone-club', 'r-bandage']),
   tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7, 8] as TutorialStepId[]).map((a) => new Set(a)),
   introSeen: fc.boolean(),
+  controlHints: fc.subarray(['move', 'sprint', 'charge'] as const).map((a) => new Set(a)),
   progression: fc.constant(defaultProgressionSave()),
   // Map pins (spec 09 task 11l): up to two here, with their own numbers.
   pins: fc.constantFrom(

@@ -31,6 +31,7 @@ type BooleanKey =
   | 'damageNumbers'
   | 'showMinimap'
   | 'showPinsInWorld'
+  | 'showControlHints'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -43,6 +44,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'tutorialPrompts',
   'showMinimap',
   'showPinsInWorld',
+  'showControlHints',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -63,6 +65,7 @@ export const DEFAULT_SETTINGS: Settings = {
   damageNumbers: true,
   showMinimap: true,
   showPinsInWorld: true,
+  showControlHints: true,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',

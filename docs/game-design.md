@@ -471,6 +471,8 @@ Each has a telegraph and a subtitle, keeps the cooldown rules, and is added to t
 | Minimap on/off | N **(09)** (moved from M) |
 | Pause | Esc |
 
+The Move, Sprint and Heavy attack keys are also shown on the **Controls hint panel** (§11), read live from these bindings, so a rebound key shows correctly. Key names are written readably: "Shift", "Mouse 2", "Space", "Ctrl".
+
 ---
 
 ## 11. HUD, guidance and navigation (06)
@@ -489,6 +491,23 @@ A horizontal bar at the bottom left, with current and max HP as text ("72 / 100"
 
 ### Lantern
 The flame icon shows **fuel only**: its height and brightness follow fuel, with "Oil 64%" beside it. Below 20% the label reads "Low oil" and the flame gutters (held steady when flashing lights is off).
+
+### Controls hint panel (09)
+A small parchment-on-dark panel at the bottom left, in the same column as the health bar and oil gauge and **above** them, so it never overlaps them. One line per action, each a key cap plus a word. Data in `src/data/controlHints.ts`, rules in `src/game/systems/controlHints.ts`.
+
+| Line | Shows | Clears when |
+|---|---|---|
+| Move | W A S D Move (keys from the four movement bindings) | The player has moved about 10 m |
+| Sprint | Shift Sprint | The player has sprinted for 2 s |
+| Charge | "Hold V Charge a heavy swing". **Only while a weapon that can charge is in hand** (Wood Axe, Silver Sabre); left out with any other weapon, since V does nothing then | One charged heavy swing is released |
+
+- **When:** from the end of the intro. A used line fades out over 0.6 s (a steady linear fade, so it suits Flashing lights off too); a line that merely stops applying (axe put away) goes at once. When every line is gone the panel is gone. The charge line returns whenever an axe or sabre is equipped until a heavy swing has been made.
+- **Setting:** **Show control hints** (Settings, default On, saved with the others) hides the whole panel. Turning it back on shows every line again.
+- **Hidden** in menus (pause, journal, satchel, merchant, altar panel, mode select), the workbench view, the big map, examine, cutscenes and endings.
+- **Saved:** the used lines are saved with the run (next to the tutorial steps). Continue restores them, so the panel does not come back unless the setting is turned back on. New Game clears them. Retry Night and Retry from morning leave them alone, like the tutorial.
+- **With the tutorial:** tutorial step 1 ("W A S D to move, mouse to look") stays in the objective tracker's second line. The panel is the permanent reminder and the tutorial is the first-day prompt; both clear on their own actions and neither blocks the other.
+- **Fit:** lines wrap inside the panel (at most 22 rem or 40% of the width). Checked with the body font at 800x600; there is no plain-font setting yet (spec 09 task 20 adds it, and must re-check this panel).
+- **Stamina caption:** the stamina bar carries a small "Stamina" caption above it, so the Sprint line's meaning is clear.
 
 ### Objective tracker
 Always visible at the top left: one main goal with a progress count, plus a smaller second line. Picked from game state by the first matching rule:
@@ -547,6 +566,8 @@ A strip at the top centre spanning 180° of heading, with N / E / S / W letters 
 | Wave spawn direction | ☠ | Dusk and night, only once bell repair stage 3 is built |
 
 A marker behind the player sits at the strip's nearer edge with an arrow. **(09)** While only one of the player and the objective is inside the hut, the objective marker points 1 m outside the hut door instead of through the wall, labelled "Door · 22 m" with the real distance to the objective. Each marker is a glyph and text, never colour alone.
+
+**Label overlap rule (09):** two labels never draw over each other. Labels are laid out in priority order (objective, chapel, hut, pins, merchant, skulls) with their real measured widths (mark image, glyph and text) plus a 6 px gap. A label that clashes with the bottom row drops to a second row above it; if that row is also taken it slides sideways to the nearest free spot. Only the spawn skulls are dropped when both rows are full, because the nearer ones already show that direction. This covers the objective distance over "Hut", Chapel and Hut sharing a bearing, and the pin labels. The layout is the pure function `layoutCompassLabels` in `systems/compassLayout.ts`.
 
 ### Map
 The journal map shows the player as an arrow at their position, pointing their way, plus the objective marker.

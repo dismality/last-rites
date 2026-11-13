@@ -264,6 +264,8 @@ export interface Settings {
   showMinimap: boolean
   /** Draw a faint beacon at each map pin in the world */
   showPinsInWorld: boolean
+  /** Show the controls hint panel at the bottom left (design bible §11) */
+  showControlHints: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

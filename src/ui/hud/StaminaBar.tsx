@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { STAMINA_CAPTION } from '../../data/controlHints'
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { formatValue, toFraction } from './hudMath'
@@ -42,6 +43,9 @@ export function StaminaBar() {
       aria-valuemax={100}
       aria-valuenow={Math.round(stamina)}
     >
+      <span className="hud-stamina__caption" aria-hidden="true">
+        {STAMINA_CAPTION}
+      </span>
       <div className="hud-stamina__fill" style={{ width: `${toFraction(stamina) * 100}%` }} />
       {accessible && <span className="hud-num hud-stamina__num">{formatValue(stamina)}</span>}
     </div>
