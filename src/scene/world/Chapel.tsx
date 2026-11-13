@@ -1,7 +1,7 @@
 // Chapel -- R3F scene component.
 //
-// Geometry: a cross-shaped footprint built from three overlapping box meshes
-// (nave + transept). This is a placeholder while full model assets are pending.
+// Geometry: none here. The floor, walls and altar are the chapel models, mounted by
+// ChapelBuilding.tsx (spec 09 task 11n-a).
 //
 // Interaction triggers:
 //  - "Repair point" near the door: E within 2.5 m -> openChapelRepair()
@@ -43,35 +43,6 @@ const DOOR_OFFSET = new THREE.Vector3(0, 0, -4.5)
  * Offset from chapel centre to the altar trigger near the +Z apse.
  */
 const ALTAR_OFFSET = new THREE.Vector3(0, 0, 4.5)
-
-// ---------------------------------------------------------------------------
-// Sub-components
-// ---------------------------------------------------------------------------
-
-/**
- * Cross-shaped chapel footprint: a central nave + a shorter transept.
- * Dimensions chosen to look plausible as a small Victorian chapel.
- *
- *      [transept]
- *  ══════════════════  y = 0 floor
- *       [nave]
- */
-function ChapelGeometry() {
-  return (
-    <group>
-      {/* Nave — long axis along Z */}
-      {/* Walls and roof now live in Cemetery.tsx as a hollow shell with colliders. */}
-
-      {/* Transept — crosses the nave near the altar end */}
-
-      {/* Floor slab */}
-      <mesh position={[0, 0.02, 0]} receiveShadow>
-        <boxGeometry args={[4.8, 0.1, 11.8]} />
-        <meshStandardMaterial color="#3c3530" roughness={1} metalness={0} />
-      </mesh>
-    </group>
-  )
-}
 
 // ---------------------------------------------------------------------------
 // Chapel (main export)
@@ -161,8 +132,7 @@ export function Chapel() {
   })
 
   return (
-    <group position={[CHAPEL_POS.x, CHAPEL_POS.y, CHAPEL_POS.z]} name="chapel">
-      <ChapelGeometry />
-    </group>
+    // The floor, walls and altar are the chapel models (ChapelBuilding.tsx); nothing is drawn here.
+    <group position={[CHAPEL_POS.x, CHAPEL_POS.y, CHAPEL_POS.z]} name="chapel" />
   )
 }

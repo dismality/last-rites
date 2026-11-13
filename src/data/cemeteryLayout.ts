@@ -467,7 +467,8 @@ export const LODGE = {
 } as const
 
 export const WOODPILE_POSITION: Vec3 = [-5, 0, 2]
-export const CHAPEL_CUPBOARD_POSITION: Vec3 = [7.9, 0.9, 7.6]
+/** On the cupboard's shelf (top 0.88, chapel scene JSON), 1 cm proud so the model never z-fights. */
+export const CHAPEL_CUPBOARD_POSITION: Vec3 = [7.9, 0.89, 7.6]
 export const CRANE_CRYPT_STEP: Vec3 = [-18.9, 0.35, -59.3]
 export const POWDER_TIN_HUT: Vec3 = [-1.8, 0.8, -1]
 export const POWDER_TIN_BELL_TOWER: Vec3 = [29, 0.4, -24]

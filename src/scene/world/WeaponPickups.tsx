@@ -1,5 +1,5 @@
 // The four findable weapons as props with an Interactable each (Req 2.1-2.6, 23.8).
-// Each weapon is its Blender model lying on a primitive prop (cupboard, table, woodpile, step).
+// Each weapon is its Blender model lying on its prop (the chapel cupboard's shelf, a table, woodpile, step).
 // Whether the weapon can be taken (satchel room, already taken) is
 // decided by the pure pickup rule inside takeWeaponPickup; a refusal leaves the prop in place.
 
@@ -51,7 +51,7 @@ function Woodpile() {
   )
 }
 
-/** A small cupboard (revolver) or a low table (shotgun) for the item to rest on. */
+/** A low table (shotgun) for the item to rest on. */
 function Shelf({ height, width = 0.6 }: { height: number; width?: number }) {
   return (
     <mesh position={[0, -height / 2 - 0.03, 0]}>
@@ -74,12 +74,8 @@ function Weapon({ id }: { id: WeaponPickupId }) {
 function Prop({ id }: { id: WeaponPickupId }) {
   switch (id) {
     case 'revolver':
-      return (
-        <>
-          <Shelf height={0.9} />
-          <Weapon id={id} />
-        </>
-      )
+      // Rests on the chapel scene's own cupboard shelf, so it brings no prop.
+      return <Weapon id={id} />
     case 'shotgun':
       return (
         <>

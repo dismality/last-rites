@@ -1,0 +1,23 @@
+{
+  "label": "before",
+  "chapel": {
+    "longestMs": 7.100000000000364,
+    "calls": 167,
+    "triangles": 394953
+  },
+  "hut": {
+    "longestMs": 7.100000000000364,
+    "calls": 194,
+    "triangles": 408699
+  },
+  "catacombs": {
+    "longestMs": 7.100000000002183,
+    "calls": 278,
+    "triangles": 439163
+  },
+  "grounds": {
+    "longestMs": 7.100000000002183,
+    "calls": 262,
+    "triangles": 458811
+  }
+}

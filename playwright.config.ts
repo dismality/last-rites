@@ -14,7 +14,7 @@ const GPU_ARGS = ['--use-angle=d3d11', '--enable-gpu', '--ignore-gpu-blocklist']
 const SWIFTSHADER_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
 
 /** Specs that measure frame times: they run alone, on one worker, after everything else. */
-const PERF_SPECS = ['**/look-perf.spec.ts', '**/graveyard-perf.spec.ts', '**/minimap.spec.ts', '**/items-13-15.spec.ts']
+const PERF_SPECS = ['**/look-perf.spec.ts', '**/graveyard-perf.spec.ts', '**/scenery-perf.spec.ts', '**/minimap.spec.ts', '**/items-13-15.spec.ts']
 
 export default defineConfig({
   testDir: 'e2e',

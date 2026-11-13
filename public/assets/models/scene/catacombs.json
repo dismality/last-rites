@@ -1,0 +1,283 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "surfaces": {
+  "ledges-y": 0.95,
+  "bier-top-y": 0.78,
+  "altar-top-y": 0.78,
+  "move-items": {
+   "cat-wall-a [24.5, 1, 45]": [
+    23.88,
+    0.95,
+    45.0
+   ],
+   "cat-wall-b [25.5, 1, 50]": [
+    26.12,
+    0.95,
+    50.0
+   ],
+   "cat-wall-c [24.5, 1, 55]": [
+    23.88,
+    0.95,
+    54.9
+   ],
+   "fx-page-4 [25, 1, 52]": [
+    24.2,
+    0.78,
+    52.6
+   ],
+   "fx-shroud [24.5, 0.8, 53]": [
+    24.35,
+    0.78,
+    53.4
+   ],
+   "fx-heart [25, 0.8, 58]": [
+    25.0,
+    0.78,
+    58.0
+   ]
+  }
+ },
+ "anchors": {
+  "bone-wall-top-west": {
+   "position": [
+    23.83,
+    1.544,
+    49.0
+   ]
+  },
+  "bone-wall-top-east": {
+   "position": [
+    26.17,
+    1.544,
+    49.0
+   ]
+  },
+  "ledge-45": {
+   "position": [
+    23.88,
+    0.95,
+    45.0
+   ],
+   "surfaceY": 0.95
+  },
+  "ledge-50": {
+   "position": [
+    26.12,
+    0.95,
+    50.0
+   ],
+   "surfaceY": 0.95
+  },
+  "ledge-54.9": {
+   "position": [
+    23.88,
+    0.95,
+    54.9
+   ],
+   "surfaceY": 0.95
+  },
+  "bier-top": {
+   "position": [
+    24.225,
+    0.78,
+    53.1
+   ],
+   "surfaceY": 0.78,
+   "size": [
+    0.8499999999999979,
+    1.7999999999999972
+   ]
+  },
+  "altar-top": {
+   "position": [
+    25.0,
+    0.78,
+    58.0
+   ],
+   "surfaceY": 0.78
+  },
+  "candle-0": {
+   "position": [
+    23.85,
+    1.1,
+    45.45
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "candle-1": {
+   "position": [
+    26.15,
+    1.1,
+    49.55
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "candle-2": {
+   "position": [
+    24.55,
+    1.0,
+    59.7
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "candle-3": {
+   "position": [
+    25.45,
+    1.0,
+    59.7
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "candle-4": {
+   "position": [
+    25.4,
+    0.93,
+    58.2
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "candle-5": {
+   "position": [
+    23.95,
+    0.93,
+    53.8
+   ],
+   "note": "dim warm light (no shadows) if the budget allows"
+  },
+  "portal-lantern": {
+   "position": [
+    26.95,
+    2.75,
+    39.95
+   ]
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    23.87,
+    0.91,
+    45.0
+   ],
+   "half": [
+    0.14,
+    0.04,
+    0.6
+   ],
+   "rotY": 0.0,
+   "note": "ledge"
+  },
+  {
+   "center": [
+    26.13,
+    0.91,
+    50.0
+   ],
+   "half": [
+    0.14,
+    0.04,
+    0.6
+   ],
+   "rotY": 0.0,
+   "note": "ledge"
+  },
+  {
+   "center": [
+    23.87,
+    0.91,
+    54.9
+   ],
+   "half": [
+    0.14,
+    0.04,
+    0.6
+   ],
+   "rotY": 0.0,
+   "note": "ledge"
+  },
+  {
+   "center": [
+    24.225,
+    0.39,
+    53.1
+   ],
+   "half": [
+    0.465,
+    0.39,
+    0.94
+   ],
+   "rotY": 0.0,
+   "note": "bier"
+  },
+  {
+   "center": [
+    25.0,
+    0.39,
+    58.0
+   ],
+   "half": [
+    0.65,
+    0.39,
+    0.45
+   ],
+   "rotY": 0.0,
+   "note": "reliquary altar"
+  },
+  {
+   "center": [
+    23.05,
+    1.3,
+    39.98
+   ],
+   "half": [
+    0.36,
+    1.3,
+    0.3
+   ],
+   "rotY": 0.0,
+   "note": "portal pier"
+  },
+  {
+   "center": [
+    26.95,
+    1.3,
+    39.98
+   ],
+   "half": [
+    0.36,
+    1.3,
+    0.3
+   ],
+   "rotY": 0.0,
+   "note": "portal pier"
+  },
+  {
+   "center": [
+    21.8,
+    1.0,
+    40.55
+   ],
+   "half": [
+    0.9,
+    1.0,
+    0.55
+   ],
+   "rotY": 0.6,
+   "note": "wing wall"
+  },
+  {
+   "center": [
+    28.2,
+    1.0,
+    40.55
+   ],
+   "half": [
+    0.9,
+    1.0,
+    0.55
+   ],
+   "rotY": -0.6,
+   "note": "wing wall"
+  }
+ ]
+}

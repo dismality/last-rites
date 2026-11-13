@@ -201,9 +201,15 @@ export function itemIconUrl(id: ItemId): string {
 /** The whole graveyard (ground, stones, oaks, crypts, fences) as one Draco GLB in game coordinates. */
 export const GRAVEYARD_MODEL_URL = '/assets/models/scene/graveyard.glb'
 
+/** The chapel's inside and outside from the Blender scene (chapel-local space, origin CHAPEL_CENTER). */
+export const CHAPEL_INTERIOR_MODEL_URL = '/assets/models/scene/chapel-interior.glb'
+export const CHAPEL_EXTERIOR_MODEL_URL = '/assets/models/scene/chapel-exterior.glb'
+
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {
   return [
+    CHAPEL_INTERIOR_MODEL_URL,
+    CHAPEL_EXTERIOR_MODEL_URL,
     ...WORLD_MODEL_IDS.map(worldModelUrl),
     ...itemModelUrls(),
     ZOMBIE_MODEL_URL,

@@ -34,6 +34,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     showMinimap: current.showMinimap,
     showPinsInWorld: current.showPinsInWorld,
     showControlHints: current.showControlHints,
+    lowGraphics: current.lowGraphics,
     bindings: current.bindings,
   }
 }

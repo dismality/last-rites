@@ -63,7 +63,10 @@ export function FixedSpawns() {
               {itemSizeM(s.item) ? (
                 // Pages and the ledger lie flat on whatever is under them; each page lies a
                 // little differently.
-                <GroundItem item={s.item} yaw={pageNo ? Number(pageNo) * 0.9 : 0.5} />
+                // A sloped rest (the lectern) tilts the whole page, so it lies flat on the slope.
+                <group rotation={[-((s.tiltDeg ?? 0) * Math.PI) / 180, 0, 0]}>
+                  <GroundItem item={s.item} yaw={pageNo ? Number(pageNo) * 0.9 : 0.5} />
+                </group>
               ) : model ? (
                 <HeroItem url={assetUrl(model)} />
               ) : null}

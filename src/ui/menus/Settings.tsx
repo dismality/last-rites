@@ -22,6 +22,7 @@ type BooleanSetting =
   | 'showMinimap'
   | 'showPinsInWorld'
   | 'showControlHints'
+  | 'lowGraphics'
 type RangeSetting = keyof typeof SETTINGS_RANGES
 
 const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
@@ -36,6 +37,7 @@ const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
   { key: 'showMinimap', label: 'Show minimap' },
   { key: 'showPinsInWorld', label: 'Show pins in the world' },
   { key: 'showControlHints', label: 'Show control hints' },
+  { key: 'lowGraphics', label: 'Low graphics (no ambient occlusion or moon shadows)' },
 ]
 
 const SLIDERS: ReadonlyArray<{ key: RangeSetting; label: string; step: number }> = [

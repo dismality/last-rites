@@ -1,0 +1,12 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "lock": {
+   "position": [
+    0,
+    1.0,
+    0.08
+   ]
+  }
+ }
+}

@@ -32,6 +32,7 @@ type BooleanKey =
   | 'showMinimap'
   | 'showPinsInWorld'
   | 'showControlHints'
+  | 'lowGraphics'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -45,6 +46,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'showMinimap',
   'showPinsInWorld',
   'showControlHints',
+  'lowGraphics',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -66,6 +68,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showMinimap: true,
   showPinsInWorld: true,
   showControlHints: true,
+  lowGraphics: false,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',

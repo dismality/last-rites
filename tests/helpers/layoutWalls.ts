@@ -13,6 +13,7 @@ import {
 import { headstoneCollider, headstoneScale, lampCollider } from '../../src/data/colliderFootprints'
 import { GRAVEYARD_COLLIDERS } from '../../src/data/graveyardColliders'
 import { TOMBSTONES } from '../../src/data/tombstones'
+import { chapelSceneColliders } from '../../src/game/systems/chapelColliders'
 import type { Vec2 } from '../../src/game/systems/combat'
 
 export interface Box {
@@ -55,6 +56,8 @@ export function structureBoxes(): Box[] {
     box(cx - chx, cz + chz - westB / 2, ct / 2, westB / 2),
     box(cx + chx, cz, ct / 2, chz),
   )
+  // Pews, font, cupboard, altar and buttresses from the chapel scene's JSON (ChapelBuilding.tsx).
+  for (const b of chapelSceneColliders()) out.push(box(cx + b.center[0], cz + b.center[2], b.half[0], b.half[2]))
 
   for (const c of CORRIDORS) {
     if (c.open) continue

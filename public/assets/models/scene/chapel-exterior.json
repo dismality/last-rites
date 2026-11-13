@@ -1,0 +1,221 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "surfaces": {
+  "note": "walls keep the game colliders; boxes here are the new buttresses"
+ },
+ "anchors": {
+  "door-lantern-light": {
+   "position": [
+    1.35,
+    1.88,
+    -6.55
+   ]
+  },
+  "bell-pivot": {
+   "position": [
+    0,
+    6.03,
+    -4.9
+   ],
+   "note": "mesh chapel-ext-bell pivots here; swing about local X"
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    -3.0,
+    1.48,
+    -3.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -3.0,
+    1.48,
+    0.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -3.0,
+    1.48,
+    3.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -3.0,
+    1.48,
+    -5.9
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -3.0,
+    1.48,
+    5.9
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    3.0,
+    1.48,
+    -3.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    3.0,
+    1.48,
+    0.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    3.0,
+    1.48,
+    3.0
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    3.0,
+    1.48,
+    -5.9
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    3.0,
+    1.48,
+    5.9
+   ],
+   "half": [
+    0.36,
+    1.48,
+    0.29
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -2.15,
+    1.48,
+    -6.5
+   ],
+   "half": [
+    0.29,
+    1.48,
+    0.36
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    2.15,
+    1.48,
+    -6.5
+   ],
+   "half": [
+    0.29,
+    1.48,
+    0.36
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    -2.15,
+    1.48,
+    6.5
+   ],
+   "half": [
+    0.29,
+    1.48,
+    0.36
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  },
+  {
+   "center": [
+    2.15,
+    1.48,
+    6.5
+   ],
+   "half": [
+    0.29,
+    1.48,
+    0.36
+   ],
+   "rotY": 0.0,
+   "note": "buttress"
+  }
+ ]
+}

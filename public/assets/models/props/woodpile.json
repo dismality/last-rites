@@ -1,0 +1,43 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "axe-rest": {
+   "position": [
+    0.75,
+    0.456,
+    0.1
+   ],
+   "note": "seat the wood axe here, blade in the block"
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.38,
+    0
+   ],
+   "half": [
+    0.6,
+    0.38,
+    0.47
+   ],
+   "rotY": 0.0,
+   "note": "log stack"
+  },
+  {
+   "center": [
+    0.75,
+    0.23,
+    0.1
+   ],
+   "half": [
+    0.25,
+    0.23,
+    0.25
+   ],
+   "rotY": 0.0,
+   "note": "chopping block"
+  }
+ ]
+}

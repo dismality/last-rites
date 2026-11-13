@@ -1,0 +1,13 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "neck": {
+   "position": [
+    0,
+    0.17,
+    0.005
+   ],
+   "note": "turn meshes \"head\" and \"eyes\" about Y toward the player"
+  }
+ }
+}

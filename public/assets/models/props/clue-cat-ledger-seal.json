@@ -1,0 +1,19 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.2,
+    0
+   ],
+   "half": [
+    0.3,
+    0.2,
+    0.23
+   ],
+   "rotY": 0.0,
+   "note": "stone"
+  }
+ ]
+}

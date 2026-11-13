@@ -98,8 +98,11 @@ export const SPAWN_POINTS: readonly SpawnPoint[] = [
   { id: 'grave-north-row', zone: 'grounds', position: [14, 0, -20], lootTable: 'grave-dig' },
   { id: 'grave-low-field', zone: 'grounds', position: [22, 0, 24], lootTable: 'grave-dig' },
   // Chapel
-  { id: 'chapel-font', zone: 'chapel', position: [11.5, 0.9, 3], lootTable: 'chapel-font' },
-  { id: 'chapel-pews', zone: 'chapel', position: [9, 0.4, 8], lootTable: 'crypt-shelves' },
+  // Seated on the chapel scene's surfaces (chapel-interior-colliders.json): the font lid at 0.88
+  // and the west pew seat at 0.40, each 1 cm proud. Position y is the surface the model rests on.
+  { id: 'chapel-font', zone: 'chapel', position: [11.5, 0.89, 3], lootTable: 'chapel-font' },
+  // x 8.5 so up to three stacks (0.35 m apart, to the east) stay on the seat (world x 8.2..9.35).
+  { id: 'chapel-pews', zone: 'chapel', position: [8.5, 0.41, 8], lootTable: 'crypt-shelves' },
   // Mausoleum Row
   { id: 'row-shelf-a', zone: 'mausoleum-row', position: [-21, 0.3, -46], lootTable: 'crypt-shelves' },
   { id: 'row-shelf-b', zone: 'mausoleum-row', position: [-19, 0.3, -52], lootTable: 'crypt-shelves' },
@@ -121,6 +124,8 @@ export interface FixedSpawn {
   item: KeyItemId | RelicId
   /** Only visible and collectable during Night (Requirement 7.3). */
   nightOnly?: boolean
+  /** A flat item resting on a slope: degrees its surface leans toward -Z (the chapel door). */
+  tiltDeg?: number
 }
 
 export const FIXED_SPAWNS: readonly FixedSpawn[] = [
@@ -137,5 +142,6 @@ export const FIXED_SPAWNS: readonly FixedSpawn[] = [
   { id: 'fx-page-4', zone: 'catacombs', position: [25, 1, 52], item: 'journal-page-4' },
   { id: 'fx-shroud', zone: 'catacombs', position: [24.5, 0.8, 53], item: 'burial-shroud' },
   { id: 'fx-heart', zone: 'catacombs', position: [25, 0.8, 58], item: 'reliquary-heart' },
-  { id: 'fx-page-5', zone: 'chapel', position: [10, 1, 5], item: 'journal-page-5' },
+  // On the lectern's book rest (0.97), 1 cm proud, tilted to match its slope toward the door.
+  { id: 'fx-page-5', zone: 'chapel', position: [10, 0.98, 5], item: 'journal-page-5', tiltDeg: 14 },
 ]

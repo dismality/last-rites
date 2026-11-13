@@ -1,0 +1,19 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.3,
+    0
+   ],
+   "half": [
+    0.43,
+    0.3,
+    0.43
+   ],
+   "rotY": 0.0,
+   "note": "plinth"
+  }
+ ]
+}

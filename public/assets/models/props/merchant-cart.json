@@ -1,0 +1,28 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "lantern": {
+   "position": [
+    0.55,
+    1.93,
+    1.15
+   ]
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.8,
+    0
+   ],
+   "half": [
+    0.8,
+    0.8,
+    1.35
+   ],
+   "rotY": 0.0,
+   "note": "cart body and wheels"
+  }
+ ]
+}
