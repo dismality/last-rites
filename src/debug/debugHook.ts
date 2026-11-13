@@ -607,7 +607,10 @@ const api = {
     boss.setBoss({ ...boss.boss, stage: 'risen' })
   },
   /** Sets one boolean or numeric setting through the real store action (saved like in the Settings menu). */
-  setSetting(key: 'showMinimap' | 'showPinsInWorld' | 'flashingLights' | 'cameraShake', value: boolean): void {
+  setSetting(
+    key: 'showMinimap' | 'showPinsInWorld' | 'showControlHints' | 'flashingLights' | 'cameraShake',
+    value: boolean,
+  ): void {
     useSettingsStore.getState().setSetting(key, value)
   },
   /** The map pins, whether the big map is open, and how many pin beacons are in the scene. */

@@ -33,6 +33,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     damageNumbers: current.damageNumbers,
     showMinimap: current.showMinimap,
     showPinsInWorld: current.showPinsInWorld,
+    showControlHints: current.showControlHints,
     bindings: current.bindings,
   }
 }

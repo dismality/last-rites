@@ -11,6 +11,8 @@ import type { CombatSave } from './combatSave'
 import type { ProgressionSave } from './progressionSave'
 import { defaultProgressionSave } from './progressionSave'
 import { parseTutorial, serializeTutorial } from './tutorial'
+import type { ControlHintId } from '../../data/controlHints'
+import { parseHintsUsed, serializeHintsUsed } from './controlHints'
 import { MODES } from '../../data/modes'
 import { STAGE_COUNT, type StageNumber } from '../../data/stages'
 import { restorePins, serializePins, type Pin } from './mapPins'
@@ -33,6 +35,8 @@ export interface SaveState {
   tutorial?: ReadonlySet<TutorialStepId>
   /** Intro cutscene already seen. Optional on input (derived from the world); always set on read. */
   introSeen?: boolean
+  /** Controls hint lines already used (design bible §11). Optional on input; always set on read. */
+  controlHints?: ReadonlySet<ControlHintId>
   /** Combat block (spec 07). Optional on input; on read it is the raw saved block, sanitised by the loader with sanitizeCombat. */
   combat?: CombatSave
   /** Progression block (spec 08). Optional on input and on read; the loader sanitises the raw block. */
@@ -47,8 +51,9 @@ export interface SaveState {
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
 export interface SaveFile
-  extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'combat' | 'progression' | 'pins'> {
+  extends Omit<SaveState, 'mystery' | 'tutorial' | 'introSeen' | 'controlHints' | 'combat' | 'progression' | 'pins'> {
   pins: Pin[]
+  controlHints: ControlHintId[]
   combat: CombatSave
   progression: ProgressionSave
   version: typeof SAVE_VERSION
@@ -86,6 +91,7 @@ export function toSaveFile(state: SaveState): SaveFile {
     recipes: state.recipes,
     tutorial: serializeTutorial(state.tutorial ?? new Set()),
     introSeen: state.introSeen ?? hasPassedFirstDay(state.world),
+    controlHints: serializeHintsUsed(state.controlHints ?? new Set()),
     combat: state.combat ?? {
       firearms: {},
       durability: {},
@@ -209,6 +215,8 @@ export function fromSaveFile(
     recipes,
     tutorial: parseTutorial(raw.tutorial),
     introSeen: typeof raw.introSeen === 'boolean' ? raw.introSeen : hasPassedFirstDay(world),
+    // Older saves have none: every line shows again until used.
+    controlHints: parseHintsUsed(raw.controlHints),
     combat: raw.combat as CombatSave | undefined,
     // Raw block; the loader runs sanitizeProgression so a bad field never fails the whole save.
     progression: raw.progression as ProgressionSave | undefined,

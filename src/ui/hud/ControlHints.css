@@ -1,0 +1,62 @@
+/* Parchment-on-dark panel above the health bar and oil gauge (same column, so no overlap). */
+.control-hints {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0.35rem 0.6rem;
+  max-width: min(22rem, 40vw);
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  color: var(--parchment);
+  background: rgb(20 17 15 / 0.7);
+  border: 1px solid var(--parchment-dark);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px #000;
+}
+
+.control-hints__line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.15rem 0.4rem;
+  opacity: 1;
+  transition: opacity var(--hint-fade, 0.6s) linear;
+}
+
+/* A cleared line fades steadily (linear, no pulse), so it also suits Flashing lights off. */
+.control-hints__line[data-leaving='true'] {
+  opacity: 0;
+}
+
+.control-hints__keys {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.control-hints__key {
+  min-width: 1.4rem;
+  padding: 0 0.35rem;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: var(--font-num);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-bottom-width: 3px;
+  border-radius: 3px;
+}
+
+.control-hints__word {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .control-hints__line {
+    transition-duration: 0.01s;
+  }
+}

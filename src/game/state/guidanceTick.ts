@@ -10,6 +10,7 @@ import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
 import { ZONE_CARD_SHOW_S } from '../../data/zoneCards'
 import { subscribeToType } from '../events'
 import { craneFighting } from '../systems/bossDirector'
+import { installControlHintWatchers } from './controlHintState'
 import { countRelics, riteAvailability } from '../systems/finalRite'
 import { cellAt, isExplored } from '../systems/mapReveal'
 import {
@@ -224,6 +225,7 @@ export const installGuidanceWatchers = (): (() => void) => {
     subscribeToType('hotbarBound', () => completeAction('bindHotbar')),
     subscribeToType('journalOpened', () => completeAction('openJournal')),
     subscribeToType('caseTabOpened', () => completeAction('openCaseTab')),
+    installControlHintWatchers(),
     useMysteryStore.subscribe((state, prev) => {
       if (state.mystery !== prev.mystery && state.mystery.pages.has(1)) {
         completeAction('readPage')

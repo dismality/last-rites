@@ -37,6 +37,7 @@ import {
   type SwingState,
 } from '../../game/systems/melee'
 import { hotbarItem } from '../../game/systems/satchel'
+import { markChargeUsed } from '../../game/state/controlHintState'
 import type { CraftedItemId, HeavyMeleeId } from '../../game/types'
 import { emit } from '../../game/events'
 import { meleeHitEvents } from './meleeEvents'
@@ -157,6 +158,8 @@ export function MeleeAttack() {
       ) {
         const res = releaseHeavy(heavyId)
         if (res.kind !== 'none' && res.stats) {
+          // A charged (heavy) release clears the controls hint; an early tap is a normal swing.
+          if (res.kind === 'heavy') markChargeUsed()
           swing.current = startSwing(melee?.cooldown ?? 0.9)
           info.current = {
             weapon: heavyId,

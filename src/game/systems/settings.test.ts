@@ -37,6 +37,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   damageNumbers: fc.boolean(),
   showMinimap: fc.boolean(),
   showPinsInWorld: fc.boolean(),
+  showControlHints: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -117,6 +118,7 @@ describe('settings persistence', () => {
   it('defaults Show minimap on, Map to M and Minimap to N without clashing with another action', () => {
     expect(DEFAULT_SETTINGS.showMinimap).toBe(true)
     expect(DEFAULT_SETTINGS.showPinsInWorld).toBe(true)
+    expect(DEFAULT_SETTINGS.showControlHints).toBe(true)
     expect(DEFAULT_SETTINGS.bindings.Map).toBe('KeyM')
     expect(DEFAULT_SETTINGS.bindings.Minimap).toBe('KeyN')
     const codes = Object.values(DEFAULT_SETTINGS.bindings)

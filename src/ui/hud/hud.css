@@ -39,6 +39,20 @@
   background: rgba(0, 0, 0, 0.5);
 }
 
+/* Names the bar so the Sprint hint line has something to point at. */
+.hud-stamina__caption {
+  position: absolute;
+  bottom: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.1;
+  color: var(--parchment);
+  text-shadow: 0 1px 2px var(--ink);
+}
+
 .hud-stamina__fill {
   height: 100%;
   background: var(--parchment);

@@ -11,6 +11,7 @@ import { usePlayerStore } from '../../game/state/playerStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { buildCompassMarkers, compassTicks, headingDeg } from '../../game/systems/compass'
 import type { CompassMarker } from '../../game/systems/compass'
+import { layoutCompassLabels, type LabelBox } from '../../game/systems/compassLayout'
 import { isBellActive } from '../../game/systems/repairs'
 import './Compass.css'
 
@@ -114,11 +115,8 @@ export function Compass() {
       })
       if (!layer) return
       const seen = new Set<string>()
-      // Two lanes: a marker that would overlap one already placed drops to the second lane,
-      // so labels such as "Hut" and "Chapel" stay readable when they share a bearing.
       const half = layer.clientWidth / 2
-      const lane0: [number, number][] = []
-      const lane1: [number, number][] = []
+      const placed: { m: CompassMarker; el: HTMLElement }[] = []
       for (const m of markers) {
         seen.add(m.id)
         let el = els.get(m.id)
@@ -128,33 +126,26 @@ export function Compass() {
           layer.appendChild(el)
         }
         syncMarker(el, m)
-        const w = (el.textContent?.length ?? 0) * COMPASS.glyphWidthPx + COMPASS.markerPadPx
-        const c = half + m.x * half
-        const span: [number, number] =
-          m.pinned === 'left' ? [c, c + w] : m.pinned === 'right' ? [c - w, c] : [c - w / 2, c + w / 2]
-        const overlaps = (lane: [number, number][]) => lane.some(([a, b]) => span[0] < b && span[1] > a)
-        let laneNo = 0
-        if (overlaps(lane0)) laneNo = 1
-        if (laneNo === 1 && overlaps(lane1) && m.id.startsWith('spawn-')) laneNo = -1
-        // A skull that would sit on top of another label is dropped: the nearer ones already
-        // show that direction, and unreadable overlap helps nobody.
-        // Always-on markers (chapel, hut, objective) are never dropped: when both lanes are
-        // taken they slide sideways along the second lane until they clear their neighbour.
-        let shift = 0
-        if (laneNo === 1) {
-          for (const [a, b] of lane1) {
-            const s0 = span[0] + shift
-            const s1 = span[1] + shift
-            if (s0 < b && s1 > a) shift = m.pinned === 'right' ? shift - (s1 - a) : shift + (b - s0)
-          }
-          span[0] += shift
-          span[1] += shift
-        }
-        el.style.marginLeft = shift === 0 ? '' : `${shift}px`
-        if (laneNo === 0) lane0.push(span)
-        else if (laneNo === 1) lane1.push(span)
-        el.hidden = laneNo === -1
-        el.dataset.lane = String(Math.max(0, laneNo))
+        // Unhide before measuring: a hidden label has no width, and would creep back under a neighbour.
+        el.hidden = false
+        placed.push({ m, el })
+      }
+      // Real widths (mark image, glyph and text), read after every write so layout runs once.
+      const boxes: LabelBox[] = placed.map(({ m, el }) => ({
+        id: m.id,
+        centerPx: half + m.x * half,
+        widthPx: el.offsetWidth > 0 ? el.offsetWidth : (el.textContent?.length ?? 0) * COMPASS.glyphWidthPx + COMPASS.markerPadPx,
+        pinned: m.pinned,
+        droppable: m.id.startsWith('spawn-'),
+      }))
+      // Labels that would overlap stack on a second row or slide aside, never draw over each other.
+      const layout = new Map(layoutCompassLabels(boxes).map((p) => [p.id, p]))
+      for (const { m, el } of placed) {
+        const p = layout.get(m.id)
+        if (!p) continue
+        el.style.marginLeft = p.shiftPx === 0 ? '' : `${p.shiftPx}px`
+        el.hidden = p.hidden
+        el.dataset.lane = String(p.lane)
       }
       for (const [id, el] of els) {
         if (!seen.has(id)) {

@@ -5,6 +5,7 @@ import { subscribeToType } from '../events'
 import { sanitizeCombat } from '../systems/combatSave'
 import { sanitizeProgression } from '../systems/progressionSave'
 import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
+import { serializeHintsUsed } from '../systems/controlHints'
 import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
 import type { StageSave } from '../systems/stageSave'
@@ -75,6 +76,7 @@ export function captureSave(): SaveState {
     recipes: [...useCraftingStore.getState().unlockedRecipes],
     // Zone last-shown times and the zone clock are deliberately not saved.
     tutorial: useGuidanceStore.getState().tutorialDone,
+    controlHints: useGuidanceStore.getState().hintsUsed,
     introSeen: useIntroStore.getState().seen,
     combat: captureCombatSave(pickDoors()),
     progression: captureProgressionSave(),
@@ -106,7 +108,10 @@ export function loadGame(): boolean {
   useMysteryStore.setState({ mystery: save.mystery })
   useChapelStore.setState({ chapel: save.chapel })
   useCraftingStore.setState({ unlockedRecipes: save.recipes as RecipeId[] })
-  useGuidanceStore.getState().restore(serializeTutorial(save.tutorial ?? new Set()))
+  useGuidanceStore.getState().restore(
+    serializeTutorial(save.tutorial ?? new Set()),
+    serializeHintsUsed(save.controlHints ?? new Set()),
+  )
   useIntroStore.getState().setSeen(save.introSeen ?? false)
   const combat = sanitizeCombat(save.combat, { inventory: save.inventory, chapel: save.chapel })
   const { built, front, vestry } = combat.doors

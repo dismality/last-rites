@@ -198,7 +198,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 9.3_
 
-- [ ] 17. B11: Controls hint at the bottom left (rewritten 2026-11-14)
+- [x] 17. B11: Controls hint at the bottom left (rewritten 2026-11-14)
   - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 17; read design bible §11 first
   - Panel above the health bar and oil gauge, parchment on dark: "W A S D Move", "Shift Sprint" (stamina bar named), "Hold V Charge a heavy swing" only while the axe or sabre is in hand; keys read live from the bindings with readable names ("Shift", "Mouse 2")
   - Shows from the end of the intro; each line fades (steady with Flashing lights off) after its action (about 10 m moved, 2 s sprinted, one charged swing); the charge line returns on the first axe or sabre equip; setting "Show control hints" (On) hides it or brings every line back; hidden in menus, workbench, big map, examine, cutscenes and endings; used lines saved

@@ -7,6 +7,7 @@ import { emit } from '../game/events'
 import { useDigStore } from '../game/state/digStore'
 import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '../game/state'
 import { tickCombat } from '../game/state/combatTick'
+import { tickControlHints } from '../game/state/controlHintState'
 import { tickGuidance } from '../game/state/guidanceTick'
 import { currentModifiers } from '../game/state/derivedStats'
 import { devTimeScaleTicks } from '../game/state/devCheats'
@@ -94,6 +95,10 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       progressionTick(STEP)
       tickStageClock(STEP)
       tickGuidance(STEP)
+      tickControlHints(
+        STEP,
+        snap.sprint && (snap.forward !== 0 || snap.strafe !== 0) && usePlayerStore.getState().stamina > 0,
+      )
     }
 
     // Publish after all systems have run so subscribers see consistent state.

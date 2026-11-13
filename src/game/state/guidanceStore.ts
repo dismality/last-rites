@@ -3,7 +3,9 @@
 // never touches tutorial progress (design: Req 4.13, 9.7).
 
 import { create } from 'zustand'
+import type { ControlHintId } from '../../data/controlHints'
 import type { TutorialStepId } from '../../data/tutorialSteps'
+import { freshHintProgress, parseHintsUsed, type HintProgress } from '../systems/controlHints'
 import type { ZoneId } from '../../data/zones'
 import type { Objective } from '../systems/objective'
 import { parseTutorial } from '../systems/tutorial'
@@ -32,13 +34,20 @@ interface GuidanceData {
   zoneLastShown: ZoneLastShown
   /** Sim clock for card cooldowns; advanced by tickGuidance so pause does not run it down. */
   zoneClock: number
+  /** Controls hint lines the player has already used (saved with the tutorial steps). */
+  hintsUsed: ReadonlySet<ControlHintId>
+  /** Distance and sprint time toward clearing the lines; not saved. */
+  hintProgress: HintProgress
+  /** Last ground position the hint tally saw, or null before the first tick. */
+  hintLast: readonly [number, number] | null
 }
 
 interface GuidanceStoreState extends GuidanceData {
   setObjective: (o: Objective | null) => void
   setTutorialDone: (done: ReadonlySet<TutorialStepId>) => void
   /** Loads saved tutorial steps and clears every transient field. */
-  restore: (steps?: unknown) => void
+  restore: (steps?: unknown, hints?: unknown) => void
+  setHints: (patch: Partial<Pick<GuidanceData, 'hintsUsed' | 'hintProgress' | 'hintLast'>>) => void
   reset: () => void
 }
 
@@ -50,13 +59,18 @@ const fresh = (): GuidanceData => ({
   zone: null,
   zoneLastShown: {},
   zoneClock: 0,
+  hintsUsed: new Set(),
+  hintProgress: freshHintProgress(),
+  hintLast: null,
 })
 
 export const useGuidanceStore = create<GuidanceStoreState>((set) => ({
   ...fresh(),
   setObjective: (objective) => set({ objective }),
   setTutorialDone: (tutorialDone) => set({ tutorialDone }),
-  restore: (steps) => set({ ...fresh(), tutorialDone: parseTutorial(steps) }),
+  restore: (steps, hints) =>
+    set({ ...fresh(), tutorialDone: parseTutorial(steps), hintsUsed: parseHintsUsed(hints) }),
+  setHints: (patch) => set(patch),
   reset: () => set(fresh()),
 }))
 

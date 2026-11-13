@@ -19,6 +19,7 @@ import { DigBar } from './DigBar'
 import { AmmoReadout } from './AmmoReadout'
 import { EffectIcons } from './EffectIcons'
 import { ChargeMeter } from './ChargeMeter'
+import { ControlHints } from './ControlHints'
 import { DoorStatus } from './DoorStatus'
 import { BossBar } from './BossBar'
 import { BossNameCard } from './BossNameCard'
@@ -64,6 +65,7 @@ export function Hud() {
       <AmmoReadout />
       {/* Health over lantern, bottom left; stamina is bottom centre and the hotbar bottom right. */}
       <div className="hud-corner">
+        <ControlHints />
         <HealthBar />
         <LanternGauge />
       </div>
