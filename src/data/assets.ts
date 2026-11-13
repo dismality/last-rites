@@ -74,11 +74,9 @@ export function assetUrl(path: string): string {
   return path.startsWith('/') ? path : `/${path}`
 }
 
-/** URLs of every hero item model (keys and relics), taken from items.ts. */
+/** URLs of every item model, taken from items.ts. The five journal pages share one file. */
 export function itemModelUrls(): string[] {
-  return ITEMS.flatMap((i) =>
-    i.model && (i.kind === 'key' || i.kind === 'relic') ? [assetUrl(i.model)] : [],
-  )
+  return [...new Set(ITEMS.flatMap((i) => (i.model ? [assetUrl(i.model)] : [])))]
 }
 
 /** Rigged zombie shared by all three enemy types (see docs/enemy-models.md). */

@@ -2,29 +2,29 @@
   "runs": [
     {
       "map": "on",
-      "longestMs": 402.89999999999964,
-      "draws": 16,
-      "frames": 17
+      "longestMs": 7.100000000000364,
+      "draws": 87,
+      "frames": 866
     },
     {
       "map": "off",
-      "longestMs": 395.7999999999993,
+      "longestMs": 7.100000000002183,
       "draws": 0,
       "frames": 0
     },
     {
       "map": "on",
-      "longestMs": 375,
-      "draws": 18,
-      "frames": 18
+      "longestMs": 7.100000000002183,
+      "draws": 87,
+      "frames": 865
     },
     {
       "map": "off",
-      "longestMs": 389,
+      "longestMs": 7.100000000002183,
       "draws": 0,
       "frames": 0
     }
   ],
-  "worstOnMs": 402.89999999999964,
-  "worstOffMs": 395.7999999999993
+  "worstOnMs": 7.100000000002183,
+  "worstOffMs": 7.100000000002183
 }

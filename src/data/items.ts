@@ -32,41 +32,17 @@ export interface ItemDef {
   stackLimit: number
   /** Rune icon name used by the satchel and the interact prompt. */
   icon: string
-  /** Path under public/assets/ for the examine-mode model. */
+  /** Path under public/assets/ of the item's Blender model: world, hand and examine view. */
   model?: string
   clue?: ClueDef
 }
 
 const ITEM_MODEL_DIR = 'assets/models/items'
 
-// Materials and crafted items have no bespoke art, so they borrow props from the
-// world kit (examine view only; they are never spawned from these paths).
-const WORLD_MODEL_DIR = 'assets/models/world'
-
-/** Stand-in prop for each item without its own hero model. */
-const BORROWED_MODEL: Partial<Record<ItemId, string>> = {
-  bone: 'debris',
-  'iron-nail': 'iron-fence-bar',
-  'candle-wax': 'candle',
-  'holy-water': 'detail-chalice',
-  cloth: 'detail-plate',
-  'lamp-oil': 'lantern-glass',
-  'grave-salt': 'detail-bowl',
-  'rusty-shovel': 'shovel',
-  'sharpened-shovel': 'shovel',
-  'bone-club': 'debris-wood',
-  'holy-water-flask': 'urn-round',
-  'nail-bomb': 'urn-square',
-  'lantern-trap': 'fire-basket',
-  'salt-circle': 'detail-bowl',
-  'tallow-candle': 'candle-multiple',
-  bandage: 'detail-plate',
-  'lantern-refill': 'lantern-candle',
-}
-
-function borrowedModel(id: ItemId): string | undefined {
-  const file = BORROWED_MODEL[id]
-  return file ? `${WORLD_MODEL_DIR}/${file}.glb` : undefined
+/** Model path of an item. The five journal pages share one model (docs/world-items.md). */
+function modelPath(id: ItemId): string {
+  const file = id.startsWith('journal-page-') ? 'journal-page' : id
+  return `${ITEM_MODEL_DIR}/${file}.glb`
 }
 
 function material(id: MaterialId, name: string): ItemDef {
@@ -76,13 +52,20 @@ function material(id: MaterialId, name: string): ItemDef {
     kind: 'material',
     stackLimit: MATERIAL_STACK_LIMIT,
     icon: `rune-${id}`,
-    model: borrowedModel(id),
+    model: modelPath(id),
   }
 }
 
 function ammo(id: AmmoId, name: string): ItemDef {
   // Each ammo stack takes one satchel slot.
-  return { id, name, kind: 'ammo', stackLimit: AMMO_STACK_LIMITS[id], icon: `rune-${id}` }
+  return {
+    id,
+    name,
+    kind: 'ammo',
+    stackLimit: AMMO_STACK_LIMITS[id],
+    icon: `rune-${id}`,
+    model: modelPath(id),
+  }
 }
 
 function crafted(
@@ -91,7 +74,7 @@ function crafted(
   kind: 'weapon' | 'consumable' | 'placeable',
 ): ItemDef {
   // One crafted item per slot (design bible §3).
-  return { id, name, kind, stackLimit: 1, icon: `rune-${id}`, model: borrowedModel(id) }
+  return { id, name, kind, stackLimit: 1, icon: `rune-${id}`, model: modelPath(id) }
 }
 
 function key(id: KeyItemId, name: string, extra: Partial<ItemDef> = {}): ItemDef {
@@ -105,13 +88,20 @@ function relic(id: RelicId, name: string): ItemDef {
     kind: 'relic',
     stackLimit: 1,
     icon: `rune-${id}`,
-    model: `${ITEM_MODEL_DIR}/${id}.glb`,
+    model: modelPath(id),
   }
 }
 
 function page(n: 1 | 2 | 3 | 4 | 5): ItemDef {
   const id = `journal-page-${n}` as const
-  return { id, name: `Journal Page ${n}`, kind: 'lore', stackLimit: 1, icon: 'rune-journal-page' }
+  return {
+    id,
+    name: `Journal Page ${n}`,
+    kind: 'lore',
+    stackLimit: 1,
+    icon: 'rune-journal-page',
+    model: modelPath(id),
+  }
 }
 
 export const ITEMS: readonly ItemDef[] = [
@@ -163,6 +153,7 @@ export const ITEMS: readonly ItemDef[] = [
     kind: 'lore',
     stackLimit: 1,
     icon: 'rune-parish-ledger',
+    model: modelPath('parish-ledger'),
   },
 
   // Journal pages

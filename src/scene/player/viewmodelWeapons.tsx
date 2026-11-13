@@ -1,16 +1,15 @@
-// Component half of the held weapon meshes (Req 2.8, 23.8). Geometry, materials and ids live in viewmodelWeaponGeometry.ts so this file only exports a component.
+// A held item's Blender model, placed by its grip transform from data/itemModels.ts. The caller
+// places and poses the surrounding group. The GLB is shared with the world copies (one load).
 
-import { useMemo } from 'react'
-import { getWeaponGeometry, getWeaponMaterials, type HeldWeaponId } from './viewmodelWeaponGeometry'
+import { HELD_GRIPS, type HeldGrip } from '../../data/itemModels'
+import { ItemMesh } from '../world/ItemModel'
+import type { HeldWeaponId } from './viewmodelWeaponGeometry'
 
-/** Two meshes, two draw calls. The caller places and poses the surrounding group. */
 export function WeaponMesh({ id }: { id: HeldWeaponId }) {
-  const geo = useMemo(() => getWeaponGeometry(id), [id])
-  const mat = useMemo(() => getWeaponMaterials(id), [id])
+  const grip: HeldGrip = HELD_GRIPS[id]
   return (
-    <>
-      <mesh geometry={geo.metal} material={mat.metal} />
-      <mesh geometry={geo.wood} material={mat.wood} />
-    </>
+    <group position={[...grip.position]} rotation={[...grip.rotation]} scale={grip.scale}>
+      <ItemMesh item={id} />
+    </group>
   )
 }

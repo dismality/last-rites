@@ -2,8 +2,13 @@
 // Ticks the pure trap logic and renders a small lantern that lights the area when sprung.
 import { useFrame } from '@react-three/fiber'
 import { playThrowSfx } from '../../audio/AudioManager'
-import { useRef } from 'react'
-import type { PointLight } from 'three'
+import { Suspense, useEffect, useMemo, useRef } from 'react'
+import { useGLTF } from '@react-three/drei'
+import { Color, type Mesh, type MeshStandardMaterial, type PointLight } from 'three'
+import { DRACO_PATH, assetUrl } from '../../data/assets'
+import { groundPose } from '../../data/itemModels'
+import { ITEM_MAP } from '../../data/items'
+import '../assets/preloadModels'
 import { rampIntensity } from '../../game/systems/lightRamp'
 import { TRAP_BURN_RADIUS_M, TRAP_LIGHT_INTENSITY, TRAP_LIGHT_POOL } from '../../data/projectiles'
 import { useEnemyStore, useGameStore, useLanternStore, useProjectileStore } from '../../game/state'
@@ -12,6 +17,8 @@ import { emit } from '../../game/events'
 import { killReports } from '../../game/systems/killReports'
 
 const MAX_DT = 0.1
+/** The file is 556 mm tall; at 0.6 the trap stands about 33 cm, readable on the ground without being a prop. */
+const TRAP_MODEL_SCALE = 0.6
 
 const POOL_INDEXES = Array.from({ length: TRAP_LIGHT_POOL }, (_, i) => i)
 const TRAP_LIGHT_RATE = 14
@@ -57,6 +64,48 @@ function TrapLightPool() {
   )
 }
 
+const TRAP_EMISSIVE = new Color('#e8913a')
+/** Armed it smoulders; sprung it burns. An emissive tint, never a light: the pool above lights the area. */
+const EMBER_ARMED = 0.12
+const EMBER_BURNING = 0.9
+
+/** The trap's lantern model. Materials are cloned per trap so one trap's glow never lights another. */
+function TrapLantern({ burning }: { burning: boolean }) {
+  const { scene } = useGLTF(assetUrl(ITEM_MAP['lantern-trap'].model ?? ''), DRACO_PATH)
+  const pose = groundPose('lantern-trap', TRAP_MODEL_SCALE)
+  const object = useMemo(() => {
+    const clone = scene.clone(true)
+    clone.traverse((o) => {
+      const mesh = o as Mesh
+      if (!mesh.isMesh) return
+      const mat = (mesh.material as MeshStandardMaterial).clone()
+      mat.emissive = TRAP_EMISSIVE
+      mesh.material = mat
+    })
+    return clone
+  }, [scene])
+  useEffect(() => {
+    object.traverse((o) => {
+      const mesh = o as Mesh
+      if (mesh.isMesh) (mesh.material as MeshStandardMaterial).emissiveIntensity = burning ? EMBER_BURNING : EMBER_ARMED
+    })
+  }, [object, burning])
+  useEffect(
+    () => () => {
+      object.traverse((o) => {
+        const mesh = o as Mesh
+        if (mesh.isMesh) (mesh.material as MeshStandardMaterial).dispose()
+      })
+    },
+    [object],
+  )
+  return (
+    <group position={[0, pose.lift, 0]} scale={pose.scale}>
+      <primitive object={object} />
+    </group>
+  )
+}
+
 export function LanternTraps() {
   const traps = useProjectileStore((s) => s.traps)
 
@@ -95,14 +144,9 @@ export function LanternTraps() {
       <TrapLightPool />
       {traps.map((t) => (
         <group key={t.id} position={[t.pos.x, 0, t.pos.z]}>
-          <mesh position={[0, 0.12, 0]}>
-            <cylinderGeometry args={[0.08, 0.1, 0.24, 8]} />
-            <meshStandardMaterial
-              color="#2a2522"
-              emissive="#e8913a"
-              emissiveIntensity={t.state === 'burning' ? 2 : 0.3}
-            />
-          </mesh>
+          <Suspense fallback={null}>
+            <TrapLantern burning={t.state === 'burning'} />
+          </Suspense>
           {t.state === 'burning' && (
             <>
               <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.04, 0]}>
