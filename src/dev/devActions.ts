@@ -2,6 +2,9 @@
 // play, and returns a short line for the panel's status bar. No React imports.
 
 import { BOSS } from '../data/boss'
+import { caseOfStage, type MinigameId } from '../data/cases'
+import { useCaseStore } from '../game/state/caseStore'
+import { useOverlayStore } from '../game/state/overlayStore'
 import { DUSK_DURATION_S } from '../data/balance'
 import { REPAIR_STAGES } from '../data/repairs'
 import { RECIPES } from '../data/recipes'
@@ -174,6 +177,55 @@ export function solveCurrentCase(): string {
   if (s.caseSolved) return `Case ${s.stage} is already solved`
   s.solveCase()
   return `Solved the case of stage ${s.stage}`
+}
+
+// ---------------------------------------------------------------------------
+// The case (spec 10 task 2.6)
+// ---------------------------------------------------------------------------
+
+const activeCaseDef = () => caseOfStage(useStageStore.getState().stage)
+
+/** Minigames of the active case that are not solved yet, in case order. */
+export function unsolvedMinigames(): MinigameId[] {
+  const def = activeCaseDef()
+  const solved = useCaseStore.getState().cases[def.id].minigames
+  return def.minigames.filter((m) => !solved.includes(m))
+}
+
+/** Marks every clue of the active case found, through the real store action. */
+export function giveAllClues(): string {
+  const def = activeCaseDef()
+  const added = def.clues.filter((c) => useCaseStore.getState().findClue(c.id)).length
+  return added > 0 ? `Found ${added} clues of ${def.title}` : `All clues of ${def.title} are already found`
+}
+
+/** Marks one clue found (the e2e uses it to lay out a board without walking the grounds). */
+export function giveClue(id: string): string {
+  return useCaseStore.getState().findClue(id) ? `Found clue ${id}` : `Clue ${id} is unknown or already found`
+}
+
+/**
+ * Solves the first unsolved minigame of the active case with a right verdict (the same
+ * `submitMinigame` the overlays call, so its clues are found too). Reports "none" when the case
+ * has no minigame left to solve.
+ */
+export function solveCurrentMinigame(): string {
+  const next = unsolvedMinigames()[0]
+  if (!next) return 'No unsolved minigame in this case'
+  useCaseStore.getState().submitMinigame(next, true)
+  return `Solved minigame ${next}`
+}
+
+/** Draws a string between two found clues, as the board does. */
+export function linkClues(a: string, b: string): string {
+  const r = useCaseStore.getState().link(a, b)
+  return r.added ? `Linked ${a} and ${b}` : `Could not link ${a} and ${b} (not found, or already linked)`
+}
+
+/** Opens or closes the altar answer panel (the overlay the player opens at the altar). */
+export function setAltarPanel(open: boolean): string {
+  useOverlayStore.getState().setAltarPanelOpen(open)
+  return `Altar panel ${open ? 'open' : 'closed'}`
 }
 
 // ---------------------------------------------------------------------------

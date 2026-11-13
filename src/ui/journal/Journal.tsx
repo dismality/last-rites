@@ -1,6 +1,7 @@
-// Journal overlay: Pages / Clues / Relics / Map. The Journal key (default J) toggles it;
-// Esc closes it. Opening freezes the simulation (gameStore.journalOpen) so nothing
-// scares the player while they read, and the pause menu stays out of the way.
+// Journal overlay: Pages / Clues / Case / Closed cases / Relics / Contracts / Map. The Journal key
+// (default J) toggles it. By day, opening freezes the simulation (gameStore.journalOpen) and Esc
+// closes it. At dusk, night and dawn the world keeps running: the screen dims, no scare begins
+// while it is open, J still closes it and Esc opens the pause menu instead (spec 10 F8).
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { CLUES } from '../../data/clues'
 import { JOURNAL_PAGES } from '../../data/journal'
@@ -13,10 +14,13 @@ import {
   useMysteryStore,
   usePlayerStore,
   useSettingsStore,
+  useWorldStore,
 } from '../../game/state'
+import { escClosesOverlay } from '../../game/systems/journalPause'
 import type { PageNumber } from '../../game/types'
 import { NamedItemIcon } from '../satchel/NamedItemIcon'
 import { CaseBoard } from './CaseBoard'
+import { ClosedCases } from './ClosedCases'
 import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import './journal.css'
@@ -25,6 +29,7 @@ const TABS = [
   { id: 'pages', label: 'Pages' },
   { id: 'clues', label: 'Clues' },
   { id: 'case', label: 'Case' },
+  { id: 'closed', label: 'Closed cases' },
   { id: 'relics', label: 'Relics' },
   { id: 'contracts', label: 'Contracts' },
   { id: 'map', label: 'Map' },
@@ -160,14 +165,22 @@ function JournalBody({ onClose }: { onClose: () => void }) {
     pages: null,
     clues: null,
     case: null,
+    closed: null,
     relics: null,
     contracts: null,
     map: null,
   })
 
+  const running = useWorldStore((s) => s.phase !== 'day')
+
   useEffect(() => {
     tabRefs.current.pages?.focus()
   }, [])
+
+  // The tutorial's "Opening the Case tab" step (Req 10.5). Re-emitting is harmless.
+  useEffect(() => {
+    if (tab === 'case') emit({ type: 'caseTabOpened' })
+  }, [tab])
 
   const onTabKey = (e: ReactKeyboardEvent) => {
     const i = TABS.findIndex((t) => t.id === tab)
@@ -183,9 +196,20 @@ function JournalBody({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="journal" role="dialog" aria-modal="true" aria-label="Journal">
+    <div
+      className={running ? 'journal journal--running' : 'journal'}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Journal"
+    >
       <div className="journal__page journal__page--book">
         <h2 className="journal__title">Keeper&apos;s Journal</h2>
+        {/* By night the world does not wait; a word says so, so the dimmed screen is never the only cue. */}
+        {running && (
+          <p className="journal__running" role="note">
+            ✦ The world is still moving. Esc pauses.
+          </p>
+        )}
         <div className="journal-tabs" role="tablist" aria-label="Journal sections" onKeyDown={onTabKey}>
           {TABS.map((t) => (
             <button
@@ -215,6 +239,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
           {tab === 'pages' && <PagesTab />}
           {tab === 'clues' && <CluesTab />}
           {tab === 'case' && <CaseBoard />}
+          {tab === 'closed' && <ClosedCases />}
           {tab === 'relics' && <RelicsTab />}
           {tab === 'contracts' && <ContractsTab />}
           {tab === 'map' && <JournalMap />}
@@ -245,7 +270,12 @@ export function Journal() {
           gs.setJournalOpen(true)
           emit({ type: 'journalOpened' })
         }
-      } else if (e.code === 'Escape' && gs.journalOpen) {
+      } else if (
+        e.code === 'Escape' &&
+        gs.journalOpen &&
+        escClosesOverlay(useWorldStore.getState().phase, true)
+      ) {
+        // By day only: the page closes. At night Esc goes on to the pause menu (Req 10.6).
         // Capture phase so the pause trigger never sees it.
         e.preventDefault()
         e.stopPropagation()

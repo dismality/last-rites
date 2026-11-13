@@ -120,6 +120,7 @@ export function resetRun(): void {
   // Achievements and the Endless best are not run state, so only the toasts are cleared.
   useAchievementStore.getState().resetSession()
   useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, mapOpen: false, satchelOpen: false })
+  useOverlayStore.getState().setAltarPanelOpen(false)
 
   // Module-level runtimes.
   resetCombatTickRuntime()

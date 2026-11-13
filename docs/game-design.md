@@ -508,7 +508,7 @@ Always visible at the top left: one main goal with a progress count, plus a smal
 - **Keeper's hunch (E11):** if no new clue has been found for 2 minutes of play by day, the lantern flame leans toward the nearest unfound clue. It is a lean in shape, not a flash, and obeys head bob and reduced motion.
 - **Dawn card:** shows "Clues found N/M" for the next case.
 - **Short Vigil (E11):** a Story option with 3 stages and 2-minute days, so a full run fits in about 15 minutes for judges. Minigame rules, hints and the case are unchanged; only the day length is.
-- **Tutorial (10):** tutorial step 7 is followed on the first day by "Opening the Case tab on the journal", done when the Case tab has been opened.
+- **Tutorial (10):** tutorial step 7 is followed on the first day by step 8, "Open the Case tab in the journal to pin clues together", done when the Case tab has been opened.
 
 By day the second line shows "Dusk in 3:12". A tutorial prompt, when one is showing, takes the second line's place.
 
@@ -543,7 +543,7 @@ A marker behind the player sits at the strip's nearer edge with an arrow. **(09)
 The journal map shows the player as an arrow at their position, pointing their way, plus the objective marker.
 
 ### Big map and pins (09)
-**M opens the big map**, a full-screen overlay in the Journal map's pencil style. It shows explored cells, landmarks, the player arrow, the objective and the pins. Esc or M closes it. It frees the cursor through the shared cursor-release hook. It pauses the game by day like the journal. At night it should keep the world running (the screen dims, sound goes on) once the F8 rule of spec 10 is built; until then it pauses at night too, like the journal does.
+**M opens the big map**, a full-screen overlay in the Journal map's pencil style. It shows explored cells, landmarks, the player arrow, the objective and the pins. Esc or M closes it. It frees the cursor through the shared cursor-release hook. It pauses the game by day like the journal. At night, dusk and dawn it keeps the world running (the screen dims, sound goes on), the F8 rule of spec 10.
 
 | Input | Effect |
 |---|---|
@@ -766,9 +766,10 @@ Detailed puzzle design: `docs/case-design.md`. If it and this section differ, it
 ### Case board (journal tab "Case")
 A cork board, styled as the most polished screen in the game (the Costume Contest judges UI).
 - **Clue cards:** each clue is a pinned card (title, one line, small icon). Cards appear when found; nothing is auto-solved.
-- **Red string:** drag a string between two cards, or by keyboard: select a card, then the other, then Enter. A pair that belongs together shows a short deduction note, e.g. "Same hand as the ledger". These notes are the steps to the answer. A wrong pair shows nothing and costs nothing.
+- **Red string:** drag a string between two cards, or by keyboard: select a card, then the other, then Enter. A pair that belongs together shows a short deduction note, e.g. "Same hand as the ledger". These notes are the steps to the answer. A wrong pair costs nothing and gives no note: its string is thin and dashed with a square ✗ tag, a right pair's is thick and solid with a round ✓ tag (shape, not colour).
 - **Final question:** a sentence with slots at the bottom, e.g. "The one buried alive lies in ___ because ___." It can be filled by day and answered only at the altar.
-- **The journal at night:** by day it pauses the game. At night it does **not** pause: the screen dims and the sounds go on. No scare begins while it is open.
+- **The journal at night:** by day it pauses the game. At night (and dusk and dawn) it does **not** pause: the screen dims, the sounds go on and the page says "The world is still moving". Esc opens the pause menu over it at night. No scare begins while it is open. The big map follows the same rule.
+- **Altar panel:** the altar (E, "Open") shows the final question's slots, the wrong-answer count, the lock countdown ("The altar is silent: 0:24") and the link-needed message. By day it only explains that the curse does not stir.
 - **Hints:** three tiers per case, each costing Grave Coins: (1) which cards matter, (2) the rule to apply, (3) the answer. Prices: 5 / 10 / 20 coins. In Story modes (all difficulties), tier 3 is free once the night has run 3 minutes, so no judge gets stuck. Using any hint forfeits Sharp Eye and Case Closed.
 - **Doubt:** a wrong answer in a **day** minigame adds one extra shambler to that night's first wave (at most +3 a night) and costs 50 score.
 - **Sharp Eye:** solving a case with no hint and no wrong answer (day or altar) gives +300 score.

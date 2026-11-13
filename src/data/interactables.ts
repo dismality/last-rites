@@ -22,6 +22,7 @@ export type InteractableKind =
   | 'tombstone'
   | 'gate'
   | 'altar-whistle'
+  | 'case-altar'
   | 'grave-mound'
   | 'weapon-pickup'
   | 'merchant'
@@ -134,6 +135,19 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     file: 'ChapelBuilding.tsx',
     endsWhen: 'the catacomb stair is revealed',
     resetsOn: 'New Game; only exists while the Bone Whistle is held',
+  },
+  // Spec 10 Req 3: the altar takes the case's answer, at night only. By day it stays targetable
+  // so the player can read why it is silent, but it does not call for attention.
+  'case-altar': {
+    kind: 'case-altar',
+    action: 'open',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'ChapelBuilding.tsx',
+    endsWhen: 'it is not night (the curse does not stir by day)',
+    resetsOn: 'dusk, when the night begins',
+    idlePrompt: 'The curse does not stir by day',
   },
   'grave-mound': {
     kind: 'grave-mound',

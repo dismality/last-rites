@@ -25,6 +25,7 @@ import { RepairUI } from './ui/chapel/RepairUI'
 import { ExamineOverlay } from './ui/examine/ExamineOverlay'
 import { Journal } from './ui/journal/Journal'
 import { BigMap } from './ui/map/BigMap'
+import { AltarPanel } from './ui/hud/AltarPanel'
 import { TombstoneOverlay } from './ui/tombstone/TombstoneOverlay'
 import { Satchel } from './ui/satchel/Satchel'
 import { HotbarWheel } from './ui/satchel/HotbarWheel'
@@ -162,6 +163,7 @@ export default function App() {
       <TombstoneOverlay />
       <Journal />
       <BigMap />
+      <AltarPanel />
       <Satchel />
       <HotbarWheel />
       {/* Last, so the item name shows above every overlay that lists items. */}

@@ -103,6 +103,9 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
     }
     case 'altar-whistle':
       return { usedUp: useMysteryStore.getState().mystery.gates.catacombs }
+    case 'case-altar':
+      // Only night takes an answer; the other phases show the quiet prompt (Req 3.5).
+      return { usedUp: false, idle: useWorldStore.getState().phase !== 'night' }
     case 'weapon-pickup': {
       const id = subject as WeaponPickupId
       if (useCombatStore.getState().takenPickups.includes(id)) return { usedUp: true }

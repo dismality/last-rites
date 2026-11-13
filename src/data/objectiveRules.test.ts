@@ -70,8 +70,8 @@ describe('OBJECTIVE_RULES', () => {
 })
 
 describe('TUTORIAL_STEPS', () => {
-  it('has 7 steps in §11 order with §11 prompts', () => {
-    expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7])
+  it('has 8 steps in §11 order with §11 prompts (step 8 is spec 10 Req 10.5)', () => {
+    expect(TUTORIAL_STEPS.map((s) => s.id)).toEqual([1, 2, 3, 4, 5, 6, 7, 8])
     expect(TUTORIAL_STEPS.map((s) => s.action)).toEqual([
       'walk',
       'pickup',
@@ -80,6 +80,7 @@ describe('TUTORIAL_STEPS', () => {
       'craft',
       'bindHotbar',
       'openJournal',
+      'openCaseTab',
     ])
     expect(TUTORIAL_STEPS[0]?.template).toBe(
       '{MoveForward} {MoveLeft} {MoveBackward} {MoveRight} to move, mouse to look',

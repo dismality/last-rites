@@ -54,6 +54,11 @@ describe('guidanceTick', () => {
     expect([...useGuidanceStore.getState().tutorialDone].sort()).toEqual([3, 5, 6, 7])
   })
 
+  it('opening the Case tab completes step 8 (Req 10.5)', () => {
+    emit({ type: 'caseTabOpened' })
+    expect([...useGuidanceStore.getState().tutorialDone]).toEqual([8])
+  })
+
   it('walking 3 m completes step 1', () => {
     at(0, 0)
     tickGuidance(1 / 60)

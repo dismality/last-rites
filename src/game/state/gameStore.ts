@@ -10,12 +10,15 @@ interface GameStoreState {
   /** Examine mode is open: the simulation is frozen without showing the pause menu (Req 4.5). */
   examining: boolean
   setExamining: (examining: boolean) => void
-  /** Journal (map) is open: the simulation is frozen like examine mode, without the pause menu. */
+  /**
+   * Journal is open. By day the simulation is frozen like examine mode, without the pause menu;
+   * at dusk, night and dawn the world keeps running (spec 10 F8, see `pausesSim`).
+   */
   journalOpen: boolean
   setJournalOpen: (open: boolean) => void
   /**
-   * The big map (M) is open. It freezes the simulation like the journal, by day and at night
-   * (the F8 night rule of spec 10 is not built yet, so night pauses too).
+   * The big map (M) is open. It follows the same F8 rule as the journal: it freezes the
+   * simulation by day only (`pausesSim`).
    */
   mapOpen: boolean
   setMapOpen: (open: boolean) => void

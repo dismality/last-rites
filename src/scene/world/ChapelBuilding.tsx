@@ -8,6 +8,9 @@ import { GableRoof, Slab } from './buildingParts'
 import { PART_MATERIALS } from './partMaterials'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
+import { useOverlayStore } from '../../game/state/overlayStore'
+import { readRiteStatus } from '../../game/state/riteStatus'
+import { useWorldStore } from '../../game/state/worldStore'
 import { InstancedModel } from './InstancedModel'
 import { Interactable } from './Interactable'
 
@@ -28,8 +31,11 @@ const PILLAR_HEIGHT = 2.7
  */
 function AltarStairReveal({ z }: { z: number }) {
   const hasWhistle = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
+  const day = useWorldStore((s) => s.phase === 'day')
   // Stays mounted after the stair opens so its cues fade; then it is used up and not targetable.
-  if (!hasWhistle) return null
+  // By day only: at dusk and night the same spot answers the case (CaseAltar), and the stair
+  // waits for the next morning.
+  if (!hasWhistle || !day) return null
   return (
     <group position={[0, 0, z]}>
       <Interactable
@@ -38,6 +44,37 @@ function AltarStairReveal({ z }: { z: number }) {
         size={[1.6, 1.1, 0.8]}
         runeHeight={1.6}
         onInteract={() => useMysteryStore.getState().interactGate('catacombs', 'altar')}
+      >
+        <mesh visible={false} position={[0, 0.55, 0]}>
+          <boxGeometry args={[1.6, 1.1, 0.8]} />
+        </mesh>
+      </Interactable>
+    </group>
+  )
+}
+
+/**
+ * The altar takes the case's answer (spec 10, Req 3). E opens the answer panel. Two other altar
+ * uses keep the spot: the whistle (by day, while the stair is sealed) and the stage 3 rite hold
+ * (while it is ready), so this hotspot steps aside for both. The rite goes in task 4.
+ */
+function CaseAltar({ z }: { z: number }) {
+  const whistleTurn = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
+  const sealed = useMysteryStore((s) => !s.mystery.gates.catacombs)
+  const day = useWorldStore((s) => s.phase === 'day')
+  if (whistleTurn && sealed && day) return null
+  return (
+    <group position={[0, 0, z]}>
+      <Interactable
+        id="case-altar"
+        kind="case-altar"
+        size={[1.6, 1.1, 0.8]}
+        runeHeight={1.6}
+        onInteract={() => {
+          // While the final rite can be held, E at the altar belongs to the rite.
+          if (readRiteStatus().availability === 'ready') return
+          useOverlayStore.getState().setAltarPanelOpen(true)
+        }}
       >
         <mesh visible={false} position={[0, 0.55, 0]}>
           <boxGeometry args={[1.6, 1.1, 0.8]} />
@@ -216,6 +253,7 @@ export function ChapelBuilding() {
       {/* Altar at the far end, with candles. */}
       <InstancedModel model="altar-stone" placements={altar} />
       <AltarStairReveal z={altarZ} />
+      <CaseAltar z={altarZ} />
       <InstancedModel model="candle-multiple" placements={candles} />
     </group>
   )

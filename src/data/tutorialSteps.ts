@@ -1,7 +1,7 @@
 // First-day tutorial (design bible §11). Templates carry `{Action}` tokens that are
 // replaced with the player's current key bindings, so rebinding changes the prompt.
 
-export type TutorialStepId = 1 | 2 | 3 | 4 | 5 | 6 | 7
+export type TutorialStepId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
 
 export type TutorialAction =
   | 'walk'
@@ -11,6 +11,7 @@ export type TutorialAction =
   | 'craft'
   | 'bindHotbar'
   | 'openJournal'
+  | 'openCaseTab'
 
 export interface TutorialStepDef {
   readonly id: TutorialStepId
@@ -34,6 +35,8 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
     template: '{Satchel} opens the satchel; press {Hotbar1}–{Hotbar4} on an item to bind it',
   },
   { id: 7, action: 'openJournal', template: '{Journal} opens the journal and map' },
+  // Spec 10 Req 10.5: the Case tab holds the cork board the three cases are solved on.
+  { id: 8, action: 'openCaseTab', template: 'Open the Case tab in the journal to pin clues together' },
 ]
 
 /** The one item whose pickup finishes step 2 (spec 09, B4). */

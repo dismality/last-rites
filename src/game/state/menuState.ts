@@ -3,9 +3,11 @@
 // Pure zustand reads: no React / three.js imports.
 import { getDevCheats } from './devCheats'
 import { useGameStore } from './gameStore'
+import { pausesSim } from '../systems/journalPause'
 import { useIntroStore } from './introStore'
 import { useOverlayStore } from './overlayStore'
 import { useUiWorldStore } from './uiWorldStore'
+import { useWorldStore } from './worldStore'
 
 /**
  * Hook point for the dawn upgrade pick. progressionStore does not exist yet; when it lands it
@@ -19,10 +21,21 @@ export function isDawnPickPending(): boolean {
   return dawnPickProbe()
 }
 
-/** The world is stopped: pause, examine, journal or the intro cutscene. One check for every system. */
+/**
+ * The world is stopped: pause, examine, the intro cutscene, or the journal / big map by day.
+ * At dusk, night and dawn those two leave the world running (spec 10, Req 10.2).
+ * One check for every system.
+ */
 export function isSimFrozen(): boolean {
   const g = useGameStore.getState()
-  return g.paused || g.examining || g.journalOpen || g.mapOpen || useIntroStore.getState().playing
+  const phase = useWorldStore.getState().phase
+  return (
+    g.paused ||
+    g.examining ||
+    pausesSim(phase, g.journalOpen) ||
+    pausesSim(phase, g.mapOpen) ||
+    useIntroStore.getState().playing
+  )
 }
 
 /** Camera hand-off flags owned by scene code (kept as arguments so this module stays scene-free). */
@@ -61,6 +74,7 @@ export function isOverlayOpen(): boolean {
     o.merchantOpen ||
     o.achievementsOpen ||
     o.modeSelectOpen ||
+    o.altarPanelOpen ||
     isDawnPickPending() ||
     getDevCheats().panelOpen
   )
@@ -68,7 +82,8 @@ export function isOverlayOpen(): boolean {
 
 export function isMenuOpen(): boolean {
   const g = useGameStore.getState()
-  if (isSimFrozen() || g.taken || g.satchelOpen) return true
+  // The journal and big map hold the cursor and block scares even when the night keeps running.
+  if (isSimFrozen() || g.journalOpen || g.mapOpen || g.taken || g.satchelOpen) return true
   const ui = useUiWorldStore.getState()
   return ui.workbenchOpen || ui.chapelRepairOpen || isOverlayOpen()
 }

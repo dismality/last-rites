@@ -15,7 +15,7 @@ import {
 } from './tutorial'
 
 const RUNS = { numRuns: 100 }
-const stepId = fc.integer({ min: 1, max: 7 }) as fc.Arbitrary<TutorialStepId>
+const stepId = fc.integer({ min: 1, max: 8 }) as fc.Arbitrary<TutorialStepId>
 const doneSet = fc.uniqueArray(stepId).map((a) => new Set<TutorialStepId>(a))
 const phases = fc.constantFrom('day', 'dusk', 'night', 'dawn') as fc.Arbitrary<
   'day' | 'dusk' | 'night' | 'dawn'
@@ -39,7 +39,7 @@ const bindingsArb = fc
 describe('tutorial director', () => {
   it('starts at step 1 and ends at null', () => {
     expect(currentTutorialStep(new Set())).toBe(1)
-    expect(currentTutorialStep(new Set([1, 2, 3, 4, 5, 6, 7]))).toBeNull()
+    expect(currentTutorialStep(new Set([1, 2, 3, 4, 5, 6, 7, 8]))).toBeNull()
   })
 
   it('keeps existing keyLabel behaviour for mouse buttons', () => {
@@ -66,7 +66,7 @@ describe('tutorial director', () => {
             expect(done.has(cur)).toBe(false)
             for (let i = 1; i < cur; i++) expect(done.has(i as TutorialStepId)).toBe(true)
           } else {
-            expect(done.size).toBe(7)
+            expect(done.size).toBe(8)
           }
           if (before !== null && TUTORIAL_STEPS[before - 1].action === a) {
             expect(cur === null || cur > before).toBe(true)

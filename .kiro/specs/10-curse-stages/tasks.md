@@ -62,7 +62,7 @@ Common rules for all tasks:
   - [x] 1.8 Finish
     - Run the Finish steps for task 1; commit `stage loop with endless nights (spec 10 task 1)`
 
-- [ ] 2. The case board
+- [x] 2. The case board
   - [x] 2.1 Case types and data shells
     - Create `src/data/cases.ts` with the types of the design and the three Case shells (ids, titles, Stage, curse steps, hint prices); create `src/data/caseText.ts` for Closed-case pages
     - Write `cases.test.ts` (unique ids, notes reference real clues, answer within options, 6-8 clues, 2 red herrings, reachability)
@@ -77,25 +77,25 @@ Common rules for all tasks:
     - Write `caseStore.test.ts` and extend the save and retry tests
     - **Property 8: Clue sets swap per stage**; **Property 9: Case store round trip**; **Property 10: Retry keeps knowledge, New Game resets**
     - _Requirements: 4.1-4.6, 7.3, 9.4, 9.5_
-  - [-] 2.4 Case board UI
+  - [x] 2.4 Case board UI
     - Create `CaseBoard.tsx`, `ClueCard.tsx`, `RedString.tsx` and CSS in `src/ui/journal/`: cork board, pinned cards, mouse drag and keyboard linking, Deduction_Note live region, Final_Question slots, hint buttons with prices, visible focus, plain-font and reduced-motion support
     - Add the "Case" tab to `Journal.tsx`
     - Write `caseBoardView.test.ts` for the pure view model
     - _Requirements: 8.1-8.4, 8.8-8.10, 9.8_
-  - [ ] 2.5 Journal pause rule, Closed cases and altar panel
+  - [x] 2.5 Journal pause rule, Closed cases and altar panel
     - Add `pausesSim(phase, journalOpen)` and use it in `menuState.ts`; at night dim the screen and keep sound; no scare begins while the journal is open
     - Create `ClosedCases.tsx` and `AltarPanel.tsx` (answer slots, lock countdown, link-needed message); mark tutorial step "Opening the Case tab on the journal"
     - Write tests for `pausesSim` and the tutorial step
     - **Property 25: The journal pauses only by day**
     - _Requirements: 3.3, 3.4, 3.6, 6.3, 10.1-10.6_
-  - [ ] 2.6 Dev hooks for the case
+  - [x] 2.6 Dev hooks for the case
     - Add "Give all clues of the current case" and "Solve current minigame" to the Dev_Panel; add `caseState()` and `minigameState()` to the Debug_Hook
     - _Requirements: 5.3, 5.5_
-  - [ ] 2.7 Case board e2e and screenshots
+  - [x] 2.7 Case board e2e and screenshots
     - Create `e2e/case-board.spec.ts`: open the board, drag one string with the mouse and make another by keyboard, assert both notes and the curse meter; a keyboard-only run; at night the journal does not pause
     - Save the screenshot pair of the board with 5+ cards, 2 strings and a note
     - _Requirements: 8.11, 8.12, 10.1, 10.2_
-  - [ ] 2.8 Finish
+  - [x] 2.8 Finish
     - Run the Finish steps for task 2; commit `case board and case systems (spec 10 task 2)`
 
 - [ ] 3. Stage 1: Saved by the Bell

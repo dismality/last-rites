@@ -12,7 +12,18 @@ import { DAY_DURATION_S, DUSK_DURATION_S, INTERACT_RANGE_M } from '../data/balan
 import { interactableRegistry } from '../scene/world/interactableRegistry'
 import { DRACO_PATH, worldModelUrl, type WorldModelId } from '../data/assets'
 import { colliderOwner } from './colliderOwners'
-import { skipToStage, solveCurrentCase } from '../dev/devActions'
+import {
+  giveAllClues,
+  giveClue,
+  linkClues,
+  setAltarPanel,
+  skipToStage,
+  solveCurrentCase,
+  solveCurrentMinigame,
+  unsolvedMinigames,
+} from '../dev/devActions'
+import { caseOfStage } from '../data/cases'
+import { useCaseStore } from '../game/state/caseStore'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
 import { createRng, deriveSeed } from '../game/rng'
@@ -258,6 +269,42 @@ const api = {
   /** The Dev_Panel's "Solve current case" (the real store action). */
   solveCurrentCase(): string {
     return solveCurrentCase()
+  },
+  /** JSON-safe copy of the case store: found clues, links, solved minigames, slots, hints, Doubt, closed cases. */
+  caseState(): unknown {
+    return toSnapshot(useCaseStore.getState())
+  },
+  /** Minigames of the active case: which exist, which are solved and which are still open. */
+  minigameState(): { all: string[]; solved: string[]; unsolved: string[] } {
+    const def = caseOfStage(useStageStore.getState().stage)
+    return {
+      all: [...def.minigames],
+      solved: [...useCaseStore.getState().cases[def.id].minigames],
+      unsolved: unsolvedMinigames(),
+    }
+  },
+  /** The Dev_Panel's "Give all clues". */
+  giveAllClues(): string {
+    return giveAllClues()
+  },
+  giveClue(id: string): string {
+    return giveClue(id)
+  },
+  /** The Dev_Panel's "Solve current minigame" (real `submitMinigame`). */
+  solveCurrentMinigame(): string {
+    return solveCurrentMinigame()
+  },
+  /** Links two found clues of the active case through the real store action. */
+  linkClues(a: string, b: string): string {
+    return linkClues(a, b)
+  },
+  /** Sets the Grave Coin balance through the real store action (for the hint price checks). */
+  setCoins(n: number): void {
+    useProgressionStore.getState().setCoins(n)
+  },
+  /** Opens or closes the altar answer panel. */
+  setAltarPanel(open: boolean): string {
+    return setAltarPanel(open)
   },
   /** Puts the clock just before night; the next sim tick emits `nightStarted` and the waves begin. */
   skipToNight(night?: number): void {

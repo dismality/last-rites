@@ -97,7 +97,12 @@ export function CaseBoard() {
     setDrag(null)
     if (!d?.active) return
     // The press was a drag, so the click that follows must not also select the card.
+    // A click only follows when the press ends on the same card. Ending on another card (a link) or on
+    // the cork fires none, so the flag is cleared at once and cannot swallow the player's next click.
     suppressClick.current = true
+    setTimeout(() => {
+      suppressClick.current = false
+    }, 0)
     const over = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>('[data-clue-id]')
     const target = over?.dataset.clueId
     if (target && target !== d.id) {

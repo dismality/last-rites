@@ -6,7 +6,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PLAYABLE_BOUNDS } from '../../data/cemeteryLayout'
 import { iconUrl } from '../../data/assets'
 import { MAP_CELL_SIZE, MAP_PX } from '../../data/mapLandmarks'
-import { useGameStore, useMapStore, usePlayerStore, useSettingsStore } from '../../game/state'
+import { useGameStore, useMapStore, usePlayerStore, useSettingsStore, useWorldStore } from '../../game/state'
+import { escClosesOverlay } from '../../game/systems/journalPause'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useIntroStore } from '../../game/state/introStore'
 import { isOverlayOpen } from '../../game/state/menuState'
@@ -95,7 +96,8 @@ export function BigMap() {
           useMapStore.getState().reveal(usePlayerStore.getState().position)
           gs.setMapOpen(true)
         }
-      } else if (e.code === 'Escape' && gs.mapOpen) {
+      } else if (e.code === 'Escape' && gs.mapOpen && escClosesOverlay(useWorldStore.getState().phase, true)) {
+        // By day only (the map pauses the world); at night Esc goes on to the pause menu.
         // Capture phase, so the pause trigger never sees it.
         e.preventDefault()
         e.stopPropagation()
@@ -439,6 +441,7 @@ function BigMapBody({ onClose }: { onClose: () => void }) {
   const remove = usePinStore((s) => s.remove)
   const player = { x: position[0], z: position[2] }
   const sorted = [...pins].sort((a, b) => a.slot - b.slot)
+  const phase = useWorldStore((s) => s.phase)
 
   return (
     <div className="bigmap" role="dialog" aria-modal="true" aria-label="Map">
@@ -458,6 +461,7 @@ function BigMapBody({ onClose }: { onClose: () => void }) {
         <h2 className="bigmap__title">Hollowmere</h2>
         <p>Wheel zooms. Drag pans. Click to drop a pin.</p>
         <p>Keys: arrows, Enter, Delete, 1 to 3, + and −.</p>
+        {phase !== 'day' && <p className="bigmap__night">The world is still running. M closes the map.</p>}
         <p className="bigmap__status" role="status" aria-live="polite">
           {status}
         </p>
