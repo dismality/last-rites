@@ -124,7 +124,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - All pixel art with `image-rendering: pixelated`; one `iconUrl(kind, id)` helper for every path; unit test that every id used by ACTION_RUNE, the dawn upgrades, COMPASS_MARKERS and the map landmarks has a file on disk
   - Done (with 11i) when lint, build, all unit tests and the e2e suite pass, with the 11i screenshots plus one each of the interaction prompt, the dawn picker and the journal map
   - Log in docs/kiro-log.md; do not commit
-- [-] 11k. Every item uses its Blender model
+- [x] 11k. Every item uses its Blender model
   - Data: in `src/data/items.ts` every item gets `model: assets/models/items/<id>.glb`; journal pages 1–5 use `journal-page.glb`; delete `BORROWED_MODEL`. Orientation, grip offset, rotation and scale live in data (shovels grip +Y; club, axe, sabre grip −Y; guns barrel +X; ground items lie flat). Never rotate or scale the GLB files. Sizes and orientation from `docs/world-items.md`
   - Use the model wherever the item is drawn: ground pickups (MaterialPickups; MaterialShape only as the Suspense fallback), fixed spawns (TornPaper → journal-page.glb, LedgerBook → parish-ledger.glb, the hut oil and the hut shelf), dug-grave loot and elite drops, weapon pickups (WeaponPickups.tsx: axe, sabre, revolver, shotgun; the woodpile stays), placed items (LanternTraps, SaltCircles, placed tallow candles), the workbench RecipeGhost (owned ingredients use their model, missing ones stay wireframe), the examine view (check it shows the new models), and the first-person held weapons (Viewmodel.tsx, viewmodelWeaponGeometry.ts) keeping the swing and recoil animations and the lantern hand, with no weapon clipping the camera at 1280x720 and 800x600
   - Performance: each GLB loaded once (drei useGLTF, preloaded); repeated pickups via `<Clone>` or instancing; no new lights (an emissive material on the ember vertex colour of candles and lanterns is allowed); report draw calls and longestFrameMs() on a 20 s walk before and after
@@ -142,7 +142,8 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Key change: M opens the big map; the minimap toggle moves to N (rebindable); the "Show minimap" setting stays. Update `src/data/controls.ts`, the controls screen, the design bible §10 and §11, and any tutorial or hint text that mentions M
   - Pure rules in `src/game/systems/mapPins.ts` (add, remove, limit, reach-to-clear, save/restore) with tests. Click-to-world uses the exact inverse of the map draw transform; property test: world → map → world returns the same point at every zoom and pan
   - Browser: press M and click a spot; the compass shows the pin with a distance that drops while walking to it; the minimap shows it; it clears on arrival. M and N work keyboard-only; the overlay does not overlap the HUD at 1920x1080, 1280x720 and 800x600; screenshots
-  - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11l)`), never push- [ ] 3. A2: Automated playthrough test
+  - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11l)`), never push
+- [ ] 3. A2: Automated playthrough test
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_
