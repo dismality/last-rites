@@ -12,15 +12,19 @@ import {
   type NightNumber,
   type WaveComposition,
 } from '../../data/waves'
+import type { StageNumber } from '../../data/stages'
 import { createRng } from '../rng'
 import { doorAttackerCount } from './barricade'
+import { aliveCap } from './stageWaves'
 import {
   createWaveState,
   eligibleGraves,
   expandWave,
   nightTotal,
+  queueWaveNow,
   startNight,
   startRiteAssault,
+  startStageNight,
   tickWaves,
   type WaveEvent,
   type WaveSpawn,
@@ -243,6 +247,118 @@ describe('elites and door attackers in waves', () => {
     expect(
       expandWave({ shambler: 1, wailer: 1, lurker: 1, bloater: 1, brute: 1 }),
     ).toEqual(['lurker', 'shambler', 'brute', 'bloater', 'wailer'])
+  })
+})
+
+describe('Story nights are endless until the case is solved', () => {
+  const stageArb = fc.constantFrom<StageNumber>(1, 2, 3)
+
+  it('Property 1: waves run exactly while the case is unsolved', () => {
+    // Feature: 10-curse-stages, Property 1: Waves run exactly while the case is unsolved
+    // **Validates: Requirements 2.1, 2.2**
+    fc.assert(
+      fc.property(
+        stageArb,
+        fc.integer(),
+        fc.option(fc.integer({ min: 0, max: 400 }), { nil: null }),
+        (stage, seed, solvedAt) => {
+          const rng = createRng(seed)
+          let state = startStageNight(stage)
+          let live = 0
+          for (let t = 0; t < 600; t++) {
+            const solved = solvedAt !== null && t >= solvedAt
+            live = Math.max(0, live - (t % 7 === 0 ? 3 : 0))
+            const r = tickWaves(state, 1, { playerPos: FAR, liveCount: live, rng, phase: 'night', caseSolved: solved })
+            state = r.state
+            live += r.spawns.length
+            if (solved) {
+              expect(r.spawns).toHaveLength(0)
+              expect(state.phase).toBe('done')
+            } else {
+              expect(state.phase).toBe('active')
+            }
+          }
+        },
+      ),
+      { numRuns: 100 },
+    )
+  })
+
+  it('Property 3: never more than the stage cap alive (queued spawns wait)', () => {
+    // Feature: 10-curse-stages, Property 3: Alive cap holds
+    // **Validates: Requirements 2.6**
+    fc.assert(
+      fc.property(stageArb, fc.integer(), fc.integer({ min: 1, max: 900 }), (stage, seed, life) => {
+        const rng = createRng(seed)
+        let state = startStageNight(stage)
+        const deaths: number[] = []
+        for (let t = 0; t < 900; t++) {
+          while (deaths.length > 0 && deaths[0] <= t) deaths.shift()
+          const r = tickWaves(state, 1, { playerPos: FAR, liveCount: deaths.length, rng, phase: 'night' })
+          state = r.state
+          r.spawns.forEach(() => deaths.push(t + life))
+          expect(deaths.length).toBeLessThanOrEqual(aliveCap(stage))
+        }
+      }),
+      { numRuns: 100 },
+    )
+  })
+
+  it('begins the next wave 20 s after the last zombie falls', () => {
+    const rng = createRng(1)
+    let r = tickWaves(startStageNight(1), 1, { playerPos: FAR, liveCount: 0, rng, phase: 'night' })
+    expect(r.spawns).toHaveLength(4)
+    r = tickWaves(r.state, 1, { playerPos: FAR, liveCount: 0, rng, phase: 'night' })
+    expect(r.events.map((e) => e.type)).toEqual(['waveCleared'])
+    let started = false
+    for (let t = 0; t < 25 && !started; t++) {
+      r = tickWaves(r.state, 1, { playerPos: FAR, liveCount: 0, rng, phase: 'night' })
+      started = r.events.some((e) => e.type === 'waveStarted')
+      if (!started) expect(r.state.waveIndex).toBe(0)
+    }
+    expect(started).toBe(true)
+    expect(r.state.waveIndex).toBe(1)
+  })
+
+  it('begins the next wave 60 s after the previous began even if zombies still stand', () => {
+    const rng = createRng(2)
+    let state = startStageNight(1)
+    for (let t = 0; t < 59; t++) {
+      state = tickWaves(state, 1, { playerPos: FAR, liveCount: 5, rng, phase: 'night' }).state
+    }
+    expect(state.waveIndex).toBe(0)
+    state = tickWaves(state, 1, { playerPos: FAR, liveCount: 5, rng, phase: 'night' }).state
+    expect(state.waveIndex).toBe(1)
+  })
+
+  it('Property 5: nothing spawns by day, even with a queue waiting', () => {
+    // Feature: 10-curse-stages, Property 5: No zombie and no lurker lunge by day
+    // **Validates: Requirements 6.1**
+    fc.assert(
+      fc.property(stageArb, fc.integer(), fc.integer({ min: 1, max: 100 }), (stage, seed, dt) => {
+        const r = tickWaves(startStageNight(stage), dt, { playerPos: FAR, liveCount: 0, rng: createRng(seed), phase: 'day' })
+        expect(r.spawns).toHaveLength(0)
+      }),
+      { numRuns: 100 },
+    )
+  })
+
+  it('Doubt joins the first wave; a wrong altar answer queues a wave at once', () => {
+    expect(startStageNight(1, 2).pending).toHaveLength(6)
+    const s = queueWaveNow(startStageNight(1))
+    expect(s.waveIndex).toBe(1)
+    expect(s.pending).toHaveLength(4 + 4)
+    expect(queueWaveNow(createWaveState())).toEqual(createWaveState())
+  })
+
+  it('elites and door attackers need wave 4 of stage 1', () => {
+    expect(startStageNight(1).attackersLeft).toBe(1) // floor(4 / 3), no minimum yet
+    const rng = createRng(3)
+    const elite = () => 0
+    const early = tickWaves(startStageNight(1), 1, { playerPos: FAR, liveCount: 0, rng, eliteRng: elite, eliteChance: 1, phase: 'night' })
+    expect(early.spawns.some((s) => s.elite)).toBe(false)
+    const late = tickWaves({ ...startStageNight(1), waveIndex: 3 }, 1, { playerPos: FAR, liveCount: 0, rng, eliteRng: elite, eliteChance: 1, phase: 'night' })
+    expect(late.spawns.some((s) => s.elite)).toBe(true)
   })
 })
 

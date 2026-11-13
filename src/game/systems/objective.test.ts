@@ -370,3 +370,65 @@ describe('rule 12: craft a weapon before dusk (spec 09, F1)', () => {
     )
   })
 })
+
+describe('selectObjective in story stages (spec 10)', () => {
+  const stageArb = fc.record({
+    stage: fc.constantFrom(1, 2, 3) as fc.Arbitrary<1 | 2 | 3>,
+    curseLinks: fc.integer({ min: -2, max: 14 }),
+    altarLockedS: fc.integer({ min: 0, max: 30 }),
+  })
+  const stageInputArb = fc.tuple(inputArb, stageArb).map(([i, stage]) => ({ ...i, stage }))
+
+  it('Feature: 10-curse-stages, Property 26: Objective follows the rule table', () => {
+    // **Validates: Requirements 6.2-6.7**
+    fc.assert(
+      fc.property(stageInputArb, (i) => {
+        const o = selectObjective(i)
+        const riteOnLastStage = i.phase === 'night' && i.stage.stage === 3 && (i.rite.available || i.rite.running)
+        if (i.phase === 'night' && !riteOnLastStage) {
+          // Night, before the rite: the curse line, never a wave count.
+          expect(o.rule).toBe(1)
+          expect(o.main).toBe('The curse holds. Solve the case at the altar.')
+          expect(o.main).not.toMatch(/Wave|Zombies left/)
+          expect(o.curse?.max).toBe(10)
+          expect(o.curse?.value).toBeGreaterThanOrEqual(0)
+          expect(o.curse?.value).toBeLessThanOrEqual(10)
+          expect(o.position).toEqual(CHAPEL_ALTAR)
+          if (i.stage.altarLockedS > 0) expect(o.second).toMatch(/^The altar is silent: \d+:\d\d$/)
+          else expect(o.second).toBe('')
+        } else if (i.phase === 'day' && o.rule === 11) {
+          expect(o.main).toMatch(/^Solve the case: /)
+        }
+        // Only the night curse line carries the meter.
+        expect(o.curse !== undefined).toBe(o.rule === 1)
+        expect(selectObjective(i)).toEqual(o)
+      }),
+      RUNS,
+    )
+  })
+
+  it('the meter falls one per link and stops at zero', () => {
+    const base = fc.sample(stageInputArb, 1)[0]
+    const at = (curseLinks: number) =>
+      selectObjective({ ...base, phase: 'night', stage: { stage: 1, curseLinks, altarLockedS: 0 } }).curse?.value
+    expect([at(0), at(3), at(10), at(25)]).toEqual([10, 7, 0, 0])
+  })
+
+  it('shows the altar-locked line with a m:ss clock', () => {
+    const base = fc.sample(inputArb, 1)[0]
+    const o = selectObjective({ ...base, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 24 } })
+    expect(o.second).toBe('The altar is silent: 0:24')
+  })
+
+  it('names the case and its clue count by day once nothing else is missing', () => {
+    const base = fc.sample(inputArb, 1)[0]
+    const day = {
+      ...base,
+      phase: 'day' as const,
+      needsWeapon: false,
+      progress: { page1Read: true, cryptKey: true, whistle: true, stairRevealed: true, ossuaryKey: true, relics: 5 },
+    }
+    const o = selectObjective({ ...day, stage: { stage: 1, curseLinks: 0, altarLockedS: 0, clues: { found: 2, total: 7 } } })
+    expect(o.main).toBe('Solve the case: Saved by the Bell, clues 2/7')
+  })
+})

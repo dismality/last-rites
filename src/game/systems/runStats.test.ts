@@ -1,6 +1,6 @@
 ﻿import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { LAST_NIGHT } from '../../data/balance'
+import { STAGE_COUNT as LAST_NIGHT } from '../../data/stages'
 import {
   createRunStats,
   finalizeStats,

@@ -143,3 +143,20 @@ export const CRAFTED_GIVE_IDS: readonly ItemId[] = [
 export const SCARE_IDS = SCARE_EVENTS.map((e) => e.id)
 
 export const ENDING_IDS: readonly EndingId[] = ['rest', 'uneasy-peace', 'taken']
+
+/**
+ * What a player holds when stage N begins (spec 10 Req 5.4). Key items come from the story beats
+ * of the stages before it: the Rusted Crypt Key once case 1 is solved, the Bone Whistle on
+ * Mausoleum Row during stage 2. Pages are the ones mapped to earlier stages. Recipes are the dawn
+ * unlocks of every earlier stage (read from the stage data, so they follow it).
+ */
+export const STAGE_START_KEY_ITEMS: Readonly<Record<1 | 2 | 3, readonly KeyItemId[]>> = {
+  1: [],
+  2: ['rusted-crypt-key'],
+  3: ['rusted-crypt-key', 'bone-whistle'],
+}
+export const STAGE_START_PAGES: Readonly<Record<1 | 2 | 3, readonly (1 | 2 | 3 | 4 | 5)[]>> = {
+  1: [],
+  2: [1, 2],
+  3: [1, 2, 3],
+}

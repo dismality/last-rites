@@ -39,6 +39,7 @@ import { usePlayerStore } from './playerStore'
 import { queueTeleportToStore } from './playerTeleport'
 import { useSpawnStore } from './spawnStore'
 import { useUiWorldStore } from './uiWorldStore'
+import { STAGE_PERSISTED, useStageStore } from './stageStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -89,6 +90,8 @@ export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: reado
   crafting: { store: useCraftingStore as unknown as Snapshotable, omit: ['craftingProgress'] },
   chapel: { store: useChapelStore as unknown as Snapshotable },
   world: { store: useWorldStore as unknown as Snapshotable },
+  // After the world: a stage restore must win over the world's night-number sync.
+  stage: { store: fieldsOf(useStageStore, STAGE_PERSISTED) },
   player: { store: usePlayerStore as unknown as Snapshotable },
   lantern: { store: useLanternStore as unknown as Snapshotable },
   map: { store: useMapStore as unknown as Snapshotable },

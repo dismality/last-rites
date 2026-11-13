@@ -1,7 +1,7 @@
 // Final rite rules (design bible §1 and §8): when it can start, how it advances, which
 // ending it produces. Pure TypeScript; the scene feeds it positions and input.
 
-import { LAST_NIGHT } from '../../data/balance'
+import { STAGE_COUNT } from '../../data/stages'
 import type { EndingId, Phase, RelicId } from '../types'
 import { chooseEnding, isRiteComplete, RITE_DURATION, tickRite, type MysteryState } from './mystery'
 
@@ -24,10 +24,12 @@ export interface RiteContext {
   /** All night-5 waves cleared. */
   wavesCleared: boolean
   relicCount: number
+  /** The night the rite is held on. Story: the last stage; Endless passes Infinity (no rite). */
+  finalNight?: number
 }
 
 export function riteAvailability(ctx: RiteContext): RiteAvailability {
-  if (ctx.nightNumber !== LAST_NIGHT || ctx.phase !== 'night') return 'unavailable'
+  if (ctx.nightNumber !== (ctx.finalNight ?? STAGE_COUNT) || ctx.phase !== 'night') return 'unavailable'
   // Three relics are enough to start even mid-wave (Req 5.2).
   if (ctx.relicCount >= RITE_MIN_RELICS) return 'ready'
   return ctx.wavesCleared ? 'taken' : 'unavailable'

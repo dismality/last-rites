@@ -16,6 +16,10 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'coins-collected',
   'contract-done',
   'achievement-unlocked',
+  // Spec 10 captions (altar answers) are checked in stages.test.ts.
+  'altar-wrong',
+  'altar-locked',
+  'altar-solved',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

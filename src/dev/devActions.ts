@@ -41,10 +41,21 @@ import { RITE_DURATION } from '../game/systems/mystery'
 import { spawnMultipliers } from '../game/systems/modes'
 import { clearedRoute } from '../game/systems/waveDirection'
 import { expandWave, nightPlan } from '../game/systems/waves'
+import { stageWaveComposition } from '../game/systems/stageWaves'
+import { stageOfNight, useStageStore } from '../game/state/stageStore'
+import { MODES } from '../data/modes'
 import type { EndingId, ItemId, KeyItemId, MaterialId, PageNumber, RelicId } from '../game/types'
 import { scareRuntime } from '../scene/scares/scareRuntime'
 import type { ScareEventId } from '../data/scares'
-import { KEY_ITEM_IDS, MATERIAL_IDS, PAGE_NUMBERS, RELIC_IDS } from './devData'
+import { STAGES, type StageNumber } from '../data/stages'
+import {
+  KEY_ITEM_IDS,
+  MATERIAL_IDS,
+  PAGE_NUMBERS,
+  RELIC_IDS,
+  STAGE_START_KEY_ITEMS,
+  STAGE_START_PAGES,
+} from './devData'
 
 /** Just short of a boundary so the real tick performs the phase change and emits its events. */
 const BOUNDARY_EPSILON_S = 0.05
@@ -118,18 +129,51 @@ export function setTime(target: TimeTarget): string {
     case 'dawn':
       // A cleared night ends on the next tick, which emits dawnStarted for the summary.
       w.applyWorldState({ phase: 'night', phaseTime: 0, wavesCleared: true })
+      useStageStore.getState().solveCase(0)
       break
   }
   return `Time: ${target}`
 }
 
-/** Starts night `n` (1 to 5) at the next tick. */
+/** Starts night `n` at the next tick (a stage 1 to 3 in a story run). */
 export function skipToNight(n: number): string {
   resetFight()
   const w = useWorldStore.getState()
-  w.setNightNumber(n)
+  // Story nights are the three stages; Endless keeps counting.
+  const night = MODES[useProgressionStore.getState().mode].story ? stageOfNight(n) : n
+  w.setNightNumber(night)
   w.applyWorldState({ phase: 'dusk', phaseTime: DUSK_DURATION_S - BOUNDARY_EPSILON_S })
-  return `Skipping to night ${n}`
+  return `Skipping to night ${night}`
+}
+
+// ---------------------------------------------------------------------------
+// Stages (spec 10)
+// ---------------------------------------------------------------------------
+
+/**
+ * Starts stage `n` (1..3) at the beginning of its day, holding what a player would by then:
+ * the key items, pages and recipes of the earlier stages. Uses the real stores only.
+ */
+export function skipToStage(n: StageNumber): string {
+  resetFight()
+  const w = useWorldStore.getState()
+  w.setNightNumber(n)
+  useStageStore.getState().startStage(n)
+  w.applyWorldState({ phase: 'day', phaseTime: 0, wavesCleared: false })
+  emit({ type: 'phaseChanged', phase: 'day' })
+  STAGE_START_KEY_ITEMS[n].forEach(giveKeyItem)
+  STAGE_START_PAGES[n].forEach(givePage)
+  const recipes = STAGES.filter((s) => s.stage < n).flatMap((s) => s.dawnUnlocks)
+  useCraftingStore.setState((s) => ({ unlockedRecipes: [...new Set([...s.unlockedRecipes, ...recipes])] }))
+  return `Skipped to stage ${n}`
+}
+
+/** The real solve action; the stage's night ends on the next tick. Only meaningful at night. */
+export function solveCurrentCase(): string {
+  const s = useStageStore.getState()
+  if (s.caseSolved) return `Case ${s.stage} is already solved`
+  s.solveCase()
+  return `Solved the case of stage ${s.stage}`
 }
 
 // ---------------------------------------------------------------------------
@@ -162,7 +206,9 @@ function make(type: EnemyId, pos: { x: number; z: number }, elite = false): AIEn
 /** Spawns the next wave of the current night around the player (the first one when idle). */
 export function spawnWave(): string {
   const { mode, night } = modeAndNight()
-  const plan = nightPlan(mode, night)
+  const plan = MODES[mode].story
+    ? [stageWaveComposition(stageOfNight(night), useWaveStore.getState().waves.waveIndex)]
+    : nightPlan(mode, night)
   if (plan.length === 0) return `No wave plan for night ${night}`
   const index = Math.min(useWaveStore.getState().waves.waveIndex, plan.length - 1)
   const types = expandWave(plan[index])
@@ -307,7 +353,9 @@ export function completeObjective(): string {
       const waves = useWaveStore.getState().waves
       useWaveStore.getState().setWaves({ ...waves, phase: 'done', pending: [] })
       killAll()
+      // Story: solving the case ends the night; the last stage keeps the old rite flow until task 4.
       if (clearedRoute(mode, night) === 'rite') useEndingStore.getState().setNightFiveCleared(true)
+      else if (MODES[mode].story) useStageStore.getState().solveCase()
       else useWorldStore.getState().setWavesCleared(true)
       return 'Night cleared'
     }

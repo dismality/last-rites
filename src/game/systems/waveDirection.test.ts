@@ -33,7 +33,7 @@ describe('waveDirection', () => {
   })
 
   it('wavesCleared fires once per cleared night', () => {
-    let { state } = planNight('normal', 1)
+    let { state } = planNight('endless', 1)
     let cleared = 0
     const rng = () => 0.5
     for (let i = 0; i < 4000; i++) {
@@ -45,10 +45,17 @@ describe('waveDirection', () => {
   })
 
   it('runs the rite route only in story modes and caps stats accordingly', () => {
-    expect(clearedRoute('normal', 5)).toBe('rite')
+    expect(clearedRoute('normal', 3)).toBe('rite')
     expect(clearedRoute('endless', 5)).toBe('dawn')
-    expect(clearedRoute('hard', 4)).toBe('dawn')
+    expect(clearedRoute('hard', 2)).toBe('dawn')
     expect(statsAfterClear(createRunStats(), 'endless', 10).nightsSurvived).toBe(10)
-    expect(statsAfterClear(createRunStats(), 'normal', 5).nightsSurvived).toBe(0)
+    expect(statsAfterClear(createRunStats(), 'normal', 3).nightsSurvived).toBe(0)
+  })
+
+  it('story nights are endless stage nights with no wave total', () => {
+    const { state, totalWaves } = planNight('normal', 2)
+    expect(state.stage).toBe(2)
+    expect(totalWaves).toBe(0)
+    expect(planNight('normal', 9).state.stage).toBe(3)
   })
 })

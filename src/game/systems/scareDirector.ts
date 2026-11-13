@@ -197,7 +197,12 @@ function rollZone(
     .map((id) => SCARE_EVENT_MAP[id])
     .filter((def) => !isCoolingDown(def, state))
   const picked = pickWeighted(candidates, rng)
-  return picked ? fire(state, picked, zone.id, ctx) : none
+  return picked ? fire(state, dayAdjusted(picked, ctx.phase), zone.id, ctx) : none
+}
+
+/** By day there are no zombies of any kind, so a Lurker lunge becomes a door slam (spec 10). */
+export function dayAdjusted(def: ScareEventDef, phase: Phase): ScareEventDef {
+  return phase === 'day' && def.id === 'lurker-lunge' ? SCARE_EVENT_MAP['door-slam'] : def
 }
 
 export function tickScares(

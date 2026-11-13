@@ -11,6 +11,7 @@ import { usePlayerStore } from './playerStore'
 import { initialProgression, useProgressionStore } from './progressionStore'
 import { retryNight, saveDuskSnapshot } from './retryNight'
 import { useScoreStore } from './scoreStore'
+import { useStageStore } from './stageStore'
 import { CALM_STORM, stormRuntime } from './stormRuntime'
 import type { ModeId } from '../types'
 
@@ -93,5 +94,24 @@ describe('Retry Night and progression', () => {
     retryNight()
     expect(useProgressionStore.getState().coins).toBe(99)
     expect(useCoinStore.getState().piles).toHaveLength(1)
+  })
+})
+
+describe('Retry Night and the stage', () => {
+  it('restores the dusk stage state and clears the failed night', () => {
+    useStageStore.setState({ stage: 2, caseSolved: false, nightElapsed: 0, altar: { lockedUntil: 0, wrong: 1, linksAtLastWrong: 2 } })
+    expect(saveDuskSnapshot()).toBe(true)
+
+    // The failed night: a longer clock, a lock, another wrong answer.
+    useStageStore.setState({ nightElapsed: 90, altar: { lockedUntil: 120, wrong: 2, linksAtLastWrong: 4 } })
+    retryNight()
+
+    const s = useStageStore.getState()
+    expect(s.stage).toBe(2)
+    expect(s.caseSolved).toBe(false)
+    expect(s.nightElapsed).toBe(0)
+    expect(s.altar.lockedUntil).toBe(0)
+    // Wrong-answer counts come back from the snapshot, so a retry carries no penalty forward.
+    expect(s.altar.wrong).toBe(1)
   })
 })

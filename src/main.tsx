@@ -4,6 +4,7 @@ import './ui/theme/tokens.css'
 import App from './App'
 import { installNewDaySave } from './game/state/gameSave'
 import { installRunStats } from './game/state/endingStore'
+import { installCaseSolvedWatcher } from './game/state/caseSolvedWatcher'
 import { installCombatWatchers } from './game/state/combatWatchers'
 import { installGuidanceWatchers } from './game/state/guidanceTick'
 import { installProgressionWatchers } from './game/state/progressionEvents'
@@ -18,6 +19,7 @@ installCombatWatchers()
 installGuidanceWatchers()
 // Must run before the new-day save and run stats so their dawn/day handlers see progression state already updated.
 installProgressionWatchers()
+installCaseSolvedWatcher()
 installNewDaySave()
 // After the progression watchers, like the new-day save, so the morning holds the dealt stock.
 installMorningSnapshot()

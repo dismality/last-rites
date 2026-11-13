@@ -2,6 +2,7 @@
 // Pure data: no logic, no side effects.
 
 import type { WaveEnemyId } from './enemies'
+import { fogOfLadderRow } from './stages'
 
 export type NightNumber = 1 | 2 | 3 | 4 | 5
 
@@ -56,14 +57,18 @@ const wave = (shambler: number, wailer = 0, lurker = 0): WaveComposition => ({
 const repeat = (count: number, w: WaveComposition): WaveComposition[] =>
   Array.from({ length: count }, () => ({ ...w }))
 
-/** Base rows (shambler, wailer, lurker only), kept literally equal to the §8 base columns. */
+/**
+ * Base rows (shambler, wailer, lurker only), kept literally equal to the §8 base columns.
+ * Since spec 10 these are the difficulty ladder: `night` is a ladder row and its fog comes from
+ * the Stage data in `stages.ts`. Endless Survival still plays them as nights.
+ */
 const BASE_NIGHTS: readonly NightDef[] = [
-  { night: 1, fog: 0.02, waves: repeat(2, wave(4)) },
+  { night: 1, fog: fogOfLadderRow(1), waves: repeat(2, wave(4)) },
   // The wailer joins the last wave only.
-  { night: 2, fog: 0.03, waves: [wave(5), wave(5), wave(5, 1)] },
-  { night: 3, fog: 0.04, waves: repeat(3, wave(6, 1, 1)) },
-  { night: 4, fog: 0.05, waves: repeat(4, wave(6, 2, 2)) },
-  { night: 5, fog: 0.06, waves: repeat(5, wave(8, 2, 2)), finalRite: true },
+  { night: 2, fog: fogOfLadderRow(2), waves: [wave(5), wave(5), wave(5, 1)] },
+  { night: 3, fog: fogOfLadderRow(3), waves: repeat(3, wave(6, 1, 1)) },
+  { night: 4, fog: fogOfLadderRow(4), waves: repeat(4, wave(6, 2, 2)) },
+  { night: 5, fog: fogOfLadderRow(5), waves: repeat(5, wave(8, 2, 2)), finalRite: true },
 ]
 
 const NONE: Partial<WaveComposition> = {}

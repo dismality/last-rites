@@ -13,6 +13,7 @@ import { syncDerivedStats } from './derivedStats'
 import { usePlayerStore } from './playerStore'
 import { captureProgressionSave } from './progressionPersistence'
 import { useProgressionStore } from './progressionStore'
+import { useStageStore } from './stageStore'
 import { useWorldStore } from './worldStore'
 
 function stubStorage(initial: Record<string, string> = {}) {
@@ -250,3 +251,42 @@ function pickWorldForTest() {
   const { phase, phaseTime, nightNumber, fogDensity, wavesCleared } = useWorldStore.getState()
   return { phase, phaseTime, nightNumber, fogDensity, wavesCleared }
 }
+
+describe('save and load: stage block (spec 10)', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('round-trips the stage, case flag and altar state', () => {
+    stubStorage()
+    useWorldStore.getState().applyWorldState({ nightNumber: 2, phase: 'night' })
+    useStageStore.setState({
+      stage: 2,
+      caseSolved: false,
+      nightElapsed: 40,
+      altar: { lockedUntil: 55, wrong: 2, linksAtLastWrong: 3 },
+    })
+    expect(saveGame()).toBe(true)
+    useStageStore.getState().startStage(1)
+    useWorldStore.getState().applyWorldState({ nightNumber: 1, phase: 'day' })
+    expect(loadGame()).toBe(true)
+    const s = useStageStore.getState()
+    expect(s.stage).toBe(2)
+    expect(s.nightElapsed).toBe(40)
+    expect(s.altar).toEqual({ lockedUntil: 55, wrong: 2, linksAtLastWrong: 3 })
+    expect(useWorldStore.getState().nightNumber).toBe(2)
+  })
+
+  it('migrates an old story save (night 4, no stage block) to stage 2', () => {
+    const data = stubStorage()
+    useProgressionStore.getState().patch({ mode: 'normal' })
+    useWorldStore.getState().applyWorldState({ nightNumber: 4, phase: 'day' })
+    saveGame()
+    const file = JSON.parse(data.get(SAVE_KEY)!) as Record<string, unknown>
+    delete file.stage
+    ;(file.world as Record<string, unknown>).nightNumber = 4
+    data.set(SAVE_KEY, JSON.stringify(file))
+    expect(loadGame()).toBe(true)
+    expect(useWorldStore.getState().nightNumber).toBe(2)
+    expect(useStageStore.getState().stage).toBe(2)
+    expect(useStageStore.getState().caseSolved).toBe(false)
+  })
+})

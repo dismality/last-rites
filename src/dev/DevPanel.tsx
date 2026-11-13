@@ -17,6 +17,8 @@ import {
   setChapelLevel,
   setTime,
   skipToNight,
+  skipToStage,
+  solveCurrentCase,
   spawnCrane,
   spawnOneOfEach,
   spawnWave,
@@ -45,6 +47,7 @@ import './devPanel.css'
 const TIMES: readonly TimeTarget[] = ['dawn', 'midday', 'dusk', 'night']
 const SCALES: readonly TimeScale[] = [1, 5, 20]
 const NIGHTS = [1, 2, 3, 4, 5] as const
+const STAGE_NUMBERS = [1, 2, 3] as const
 const LEVELS = [0, 1, 2, 3] as const
 const WEAPONS: readonly WeaponPickupId[] = ['revolver', 'shotgun', 'wood-axe', 'silver-sabre']
 
@@ -147,6 +150,16 @@ export function DevPanel() {
                 }}
               />
             ))}
+          </Row>
+          <Row>
+            {STAGE_NUMBERS.map((n) => (
+              <button key={n} type="button" onClick={run(() => skipToStage(n))}>
+                Skip to stage {n}
+              </button>
+            ))}
+            <button type="button" onClick={run(solveCurrentCase)}>
+              Solve current case
+            </button>
           </Row>
           <Row>
             {NIGHTS.map((n) => (

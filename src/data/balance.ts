@@ -1,16 +1,22 @@
 // Tuning constants for the day/night, lantern and stamina systems.
 // Values mirror docs/game-design.md sections 6 and 8; the design bible wins on conflict.
 
+import { LADDER_FOG, LADDER_ROW_COUNT } from './stages'
+
 // --- Day / night (design bible §8) ---
 export const DAY_DURATION_S = 360
 export const DUSK_DURATION_S = 30
 export const DAWN_DURATION_S = 10
 /** Seconds of dawn left once the player has picked an upgrade (design bible §12). */
 export const DAWN_AFTER_PICK_S = 2
-export const LAST_NIGHT = 5
 
-/** Fog density per night number, index 0 = night 1. */
-export const NIGHT_FOG_DENSITY: readonly number[] = [0.02, 0.03, 0.04, 0.05, 0.06]
+// Legacy five-night view, now derived from the Stage data (spec 10). The consumers move to
+// stage numbers in tasks 1.2 and 1.4; until then the ladder row count and fog stay the same.
+/** Ladder rows across all stages (the old five nights). */
+export const LAST_NIGHT = LADDER_ROW_COUNT
+
+/** Fog density per ladder row, index 0 = row 1. Stage data owns the values. */
+export const NIGHT_FOG_DENSITY: readonly number[] = LADDER_FOG
 
 // --- Lantern (design bible §6) ---
 export const LANTERN_MAX_FUEL = 100

@@ -4,6 +4,7 @@ import { useGameStore } from '../../game/state/gameStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { composeSecondLine } from '../../game/systems/objective'
+import { CurseMeter } from './CurseMeter'
 import { PinnedRecipe } from './PinnedRecipe'
 import './objectiveTracker.css'
 
@@ -36,6 +37,8 @@ export function ObjectiveTracker() {
 
   if (screen !== 'game' || objective === null) return null
 
+  const second = composeSecondLine(objective, prompt)
+
   return (
     <div className="hud-objective">
       <div className="hud-objective__live" role="status" aria-live="polite" aria-atomic="true">
@@ -44,7 +47,8 @@ export function ObjectiveTracker() {
           {objective.main}
         </span>
       </div>
-      <p className="hud-objective__second">{composeSecondLine(objective, prompt)}</p>
+      {second !== '' && <p className="hud-objective__second">{second}</p>}
+      {objective.curse && <CurseMeter value={objective.curse.value} max={objective.curse.max} />}
       <PinnedRecipe />
     </div>
   )

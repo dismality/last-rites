@@ -7,17 +7,23 @@ import {
   LAST_NIGHT,
   NIGHT_FOG_DENSITY,
 } from '../../data/balance'
+import { STAGE_COUNT, type StageNumber } from '../../data/stages'
+import { stageFog } from './stageWaves'
 import type { GameEvent, Phase, WorldState } from '../types'
 
 export interface DayNightInput {
   /** Supplied by the wave system; night only ends when this is true. */
   wavesCleared: boolean
+  /** Story stages: when set it replaces `wavesCleared` and the last night defaults to the last stage. */
+  caseSolved?: boolean
   /** True while the dawn upgrade pick is pending; dawn then freezes. */
   holdDawn?: boolean
   /** Day length in seconds (Endless uses a shorter day). */
   dayLengthS?: number
   /** Highest night number; Endless passes Infinity. */
   lastNight?: number
+  /** Story stages: wave index of the running night, so fog follows the ladder row (0.02 -> 0.03). */
+  waveIndex?: number
 }
 
 export interface DayNightResult {
@@ -50,7 +56,10 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
   let { phase, phaseTime, nightNumber } = s
   let remaining = Math.max(0, dt)
   const dayLengthS = input.dayLengthS ?? DAY_DURATION_S
-  const lastNight = input.lastNight ?? LAST_NIGHT
+  // Story stages (spec 10): the case-solved flag is the "waves cleared" flag, and stage 3 is last.
+  const stageMode = input.caseSolved !== undefined
+  const wavesCleared = stageMode ? input.caseSolved === true : input.wavesCleared
+  const lastNight = input.lastNight ?? (stageMode ? STAGE_COUNT : LAST_NIGHT)
 
   // wavesCleared is left over from the previous night until nightStarted resets it. It must
   // never end a night on the tick that night begins, nor survive into the next day.
@@ -69,7 +78,7 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
   for (;;) {
     if (phase === 'night') {
       phaseTime += remaining
-      if (input.wavesCleared && !enteredNight) enter('dawn')
+      if (wavesCleared && !enteredNight) enter('dawn')
       break
     }
     // A pending pick freezes dawn: no time passes and no event fires.
@@ -94,9 +103,11 @@ export function tickDayNight(s: WorldState, dt: number, input: DayNightInput): D
       phase,
       phaseTime,
       nightNumber,
-      fogDensity: fogForNight(nightNumber),
+      fogDensity: stageMode
+        ? stageFog(Math.min(Math.max(Math.floor(nightNumber), 1), STAGE_COUNT) as StageNumber, phase === 'night' ? (input.waveIndex ?? 0) : 0)
+        : fogForNight(nightNumber),
       // Only a night in progress (or its dawn) can be "cleared"; day and dusk start fresh.
-      wavesCleared: (phase === 'night' && !enteredNight) || phase === 'dawn' ? input.wavesCleared : false,
+      wavesCleared: (phase === 'night' && !enteredNight) || phase === 'dawn' ? wavesCleared : false,
     },
     events,
   }

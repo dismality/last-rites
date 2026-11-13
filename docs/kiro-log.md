@@ -1383,3 +1383,8 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Wrong order of relics in the rite returns the relic and uses the altar-lock rules; a wrong Silas accusation does not lock the altar or spawn a wave.
   - The lurker-lunge scare becomes door-slam if rolled by day. Uneasy Peace is retired; Taken remains the loss outcome.
   - Page-to-stage map: pages 1-2 stage 1, page 3 stage 2, pages 4-5 stage 3.
+
+### 2026-11-12: 10-curse-stages task 1.5: Solved sequence, objective, compass and HUD
+- **Kiro feature used:** spec task / PBT
+- **What happened:** A solved case now raises the altar caption, emits `nightCleared`, collapses living zombies to dust and unlocks the stage's dawn recipes. The tracker shows the curse line, the Curse meter and the altar-locked line.
+- **What Kiro caught or sped up:** Found that no story path emitted `nightCleared` and that the dawn recipe unlock was never dispatched, so both are now wired through `caseSolvedWatcher.ts`.

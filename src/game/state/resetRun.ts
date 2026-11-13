@@ -50,6 +50,7 @@ import { resetStaminaRuntime } from './staminaRuntime'
 import { useToastStore } from './toastStore'
 import { useTombstoneStore } from './tombstoneStore'
 import { useUiWorldStore } from './uiWorldStore'
+import { useStageStore } from './stageStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -71,6 +72,7 @@ export const REPLACED_STORES = [
   useUiWorldStore,
   useMysteryStore,
   useWaveStore,
+  useStageStore,
   useEnemyStore,
   useProjectileStore,
   useCombatStore,

@@ -1,6 +1,6 @@
 ﻿// Run statistics shown after an ending (Req 6.2). Pure and immutable.
 
-import { LAST_NIGHT } from '../../data/balance'
+import { STAGE_COUNT } from '../../data/stages'
 import { ENEMIES, type EnemyId } from '../../data/enemies'
 import type { EndingId } from '../types'
 
@@ -101,7 +101,7 @@ export const recordBoard = (s: RunStats): RunStats => ({ ...s, boardsNailed: s.b
 export function recordNightSurvived(
   s: RunStats,
   night: number,
-  cap: number = LAST_NIGHT,
+  cap: number = STAGE_COUNT,
 ): RunStats {
   const n = Math.min(Math.max(Math.floor(night), 0), cap)
   return n > s.nightsSurvived ? { ...s, nightsSurvived: n } : s
@@ -195,9 +195,9 @@ export function parseStats(raw: unknown): RunStats {
     boardsNailed: count(r.boardsNailed),
   }
 }
-/** Completing the rite means night 5 was survived; the Taken ending does not. */
+/** Completing the rite means the last stage was survived; the Taken ending does not. */
 export function finalizeStats(s: RunStats, ending: EndingId): RunStats {
-  return ending === 'taken' ? s : recordNightSurvived(s, LAST_NIGHT)
+  return ending === 'taken' ? s : recordNightSurvived(s, STAGE_COUNT)
 }
 
 export function summaryRows(
@@ -207,7 +207,7 @@ export function summaryRows(
   totalClues: number,
 ): SummaryRow[] {
   return [
-    { label: 'Nights survived', value: `${s.nightsSurvived} of ${LAST_NIGHT}` },
+    { label: 'Nights survived', value: `${s.nightsSurvived} of ${STAGE_COUNT}` },
     { label: 'Zombies banished', value: String(s.zombiesBanished) },
     { label: 'Relics', value: `${relicCount} of 5` },
     { label: 'Clues found', value: `${cluesFound} of ${totalClues}` },

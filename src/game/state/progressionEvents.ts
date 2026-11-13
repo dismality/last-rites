@@ -8,6 +8,7 @@ import type { EnemyId } from '../../data/enemies'
 import { ITEM_MAP } from '../../data/items'
 import { MODES } from '../../data/modes'
 import { RECIPES } from '../../data/recipes'
+import { STAGE_COUNT, STAGE_MAP, type StageNumber } from '../../data/stages'
 import { emit, subscribeToType } from '../events'
 import { createRng, deriveSeed, type Rng } from '../rng'
 import { evaluateAchievements, type AchievementFacts } from '../systems/achievements'
@@ -233,6 +234,16 @@ function recipeNamed(night: number): string | null {
   return r ? (ITEM_MAP[r.output.item]?.name ?? null) : null
 }
 
+/** Story dawn card: the recipes the stage that just ended unlocks (spec 10), or null for none. */
+function stageRecipesNamed(night: number): string | null {
+  const ids = STAGE_MAP[Math.min(Math.max(Math.floor(night), 1), STAGE_COUNT) as StageNumber].dawnUnlocks
+  const names = ids
+    .map((id) => RECIPES.find((r) => r.id === id))
+    .map((r) => (r ? ITEM_MAP[r.output.item]?.name : undefined))
+    .filter((n): n is string => typeof n === 'string')
+  return names.length > 0 ? names.join(', ') : null
+}
+
 function onNightCleared(night: number): void {
   const pr = useProgressionStore.getState()
   const sc = useScoreStore.getState()
@@ -269,7 +280,7 @@ function onDawn(night: number): void {
       night,
       zombiesBanished: sc.nightKills,
       itemsFound: sc.nightItems,
-      recipeUnlocked: recipeNamed(night),
+      recipeUnlocked: MODES[pr.mode].story ? stageRecipesNamed(night) : recipeNamed(night),
       journalPageAvailable: pageWaiting,
       killPoints: sc.nightKillPoints,
       clearBonus: parts.clear,

@@ -7,6 +7,7 @@ import { sanitizeProgression } from '../systems/progressionSave'
 import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
 import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
+import type { StageSave } from '../systems/stageSave'
 import type { RecipeId } from '../types'
 import { useChapelStore } from './chapelStore'
 import { captureCombatSave } from './combatPersistence'
@@ -23,6 +24,7 @@ import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
 import { queueTeleportToStore } from './playerTeleport'
 import { useUiWorldStore } from './uiWorldStore'
+import { useStageStore, STAGE_PERSISTED } from './stageStore'
 import { useWorldStore } from './worldStore'
 
 function storage(): Storage | undefined {
@@ -45,6 +47,11 @@ function pickWorld(): SaveState['world'] {
   return { phase, phaseTime, nightNumber, fogDensity, wavesCleared }
 }
 
+function pickStage(): StageSave {
+  const s = useStageStore.getState()
+  return Object.fromEntries(STAGE_PERSISTED.map((k) => [k, s[k]])) as unknown as StageSave
+}
+
 function pickDoors(): DoorsSave {
   const { built, doors } = useDoorStore.getState()
   return { built, front: [...doors.front], vestry: [...doors.vestry] }
@@ -63,6 +70,7 @@ export function captureSave(): SaveState {
     introSeen: useIntroStore.getState().seen,
     combat: captureCombatSave(pickDoors()),
     progression: captureProgressionSave(),
+    stage: pickStage(),
   }
 }
 
@@ -106,6 +114,8 @@ export function loadGame(): boolean {
       takenPickups: combat.takenPickups,
     }),
   )
+  // After the world: moving the night number starts a fresh stage, and the save's block wins.
+  if (save.stage) useStageStore.setState(save.stage)
   syncDerivedStats()
   return true
 }

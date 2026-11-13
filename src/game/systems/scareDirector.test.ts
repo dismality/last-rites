@@ -220,3 +220,38 @@ describe('scareDirector', () => {
     })
   })
 })
+
+describe('no lurker lunge by day (spec 10)', () => {
+  const lungeZones = SCARE_ZONES.filter((z) => z.events.includes('lurker-lunge')).map((z) => z.id)
+
+  it('Property 5: a day roll never yields lurker-lunge', () => {
+    // Feature: 10-curse-stages, Property 5: No zombie and no lurker lunge by day
+    // **Validates: Requirements 6.1, 6.9**
+    fc.assert(
+      fc.property(fc.integer(), (seed) => {
+        const rng = createRng(seed)
+        let state = { ...createScareDirectorState(), firstScareDone: true }
+        for (let i = 0; i < 80; i++) {
+          const r = tickScares(state, 50, { ...baseCtx, phase: 'day', enteredZones: lungeZones }, rng)
+          state = r.state
+          r.cues.forEach((c) => expect(c.eventId).not.toBe('lurker-lunge'))
+        }
+      }),
+      { numRuns: 100 },
+    )
+  })
+
+  it('still allows lurker-lunge at night', () => {
+    let seen = false
+    for (let seed = 0; seed < 60 && !seen; seed++) {
+      const rng = createRng(seed)
+      let state = { ...createScareDirectorState(), firstScareDone: true }
+      for (let i = 0; i < 40; i++) {
+        const r = tickScares(state, 50, { ...baseCtx, phase: 'night', enteredZones: lungeZones }, rng)
+        state = r.state
+        if (r.cues.some((c) => c.eventId === 'lurker-lunge')) seen = true
+      }
+    }
+    expect(seen).toBe(true)
+  })
+})

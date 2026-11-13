@@ -11,6 +11,10 @@ export const SILENT_CAPTION_EVENTS = [
   'coins-collected',
   'contract-done',
   'achievement-unlocked',
+  // Spec 10: the altar's answers.
+  'altar-wrong',
+  'altar-locked',
+  'altar-solved',
 ] as const
 
 export type SilentCaptionEvent = (typeof SILENT_CAPTION_EVENTS)[number]
@@ -42,6 +46,9 @@ export type CaptionId =
   | 'coins-collected'
   | 'contract-done'
   | 'achievement-unlocked'
+  | 'altar-wrong'
+  | 'altar-locked'
+  | 'altar-solved'
 
 export interface CaptionDef {
   id: CaptionId
@@ -140,6 +147,10 @@ export const CAPTIONS: readonly CaptionDef[] = [
     template: true,
     minSeconds: 3,
   },
+  // Spec 10. The wrong note is the bible's wording; the other two are chosen unattended.
+  { id: 'altar-wrong', event: 'altar-wrong', text: '[a sour note from the altar]', minSeconds: 2 },
+  { id: 'altar-locked', event: 'altar-locked', text: '[the altar is silent]', minSeconds: 2 },
+  { id: 'altar-solved', event: 'altar-solved', text: '[a clear note from the altar]', minSeconds: 2.5 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

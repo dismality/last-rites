@@ -12,6 +12,7 @@ import { currentModifiers } from '../game/state/derivedStats'
 import { devTimeScaleTicks } from '../game/state/devCheats'
 import { deriveTickInput, progressionTick } from '../game/state/progressionTick'
 import { useProgressionStore } from '../game/state/progressionStore'
+import { tickStageClock } from '../game/state/stageStore'
 import { lanternDrainMultiplier } from '../game/systems/modes'
 import { getSprintDrainMult, readStamina, writeRegenDelay } from '../game/state/staminaRuntime'
 import { isSimFrozen } from '../game/state/menuState'
@@ -91,6 +92,7 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
         playerPos: usePlayerStore.getState().position,
       })
       progressionTick(STEP)
+      tickStageClock(STEP)
       tickGuidance(STEP)
     }
 

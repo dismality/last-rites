@@ -41,7 +41,7 @@ describe('stats live in progressionStore', () => {
       'Relics',
       'Clues found',
     ])
-    expect(rows[0].value).toBe('5 of 5')
+    expect(rows[0].value).toBe('3 of 3')
     expect(rows[1].value).toBe('1')
   })
 })
