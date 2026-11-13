@@ -29,6 +29,7 @@ import {
 import { zoneAt } from '../systems/zoneAt'
 import { recordZoneCard, shouldShowZoneCard } from '../systems/zoneCardTrigger'
 import { useBossStore } from './bossStore'
+import { riteFinalNight } from './riteStatus'
 import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
 import { isStoryRun, useGuidanceStore } from './guidanceStore'
@@ -38,6 +39,7 @@ import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
 import { useSettingsStore } from './settingsStore'
 import { useSpawnStore } from './spawnStore'
+import { useStageStore } from './stageStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -71,6 +73,7 @@ export const readObjectiveInput = (): ObjectiveInput => {
     phase: world.phase,
     wavesCleared: useEndingStore.getState().nightFiveCleared,
     relicCount: relics,
+    finalNight: riteFinalNight(),
   })
   const story = isStoryRun()
   const phaseLength =
@@ -89,7 +92,8 @@ export const readObjectiveInput = (): ObjectiveInput => {
       zombiesLeft: living,
     },
     rite: {
-      available: availability === 'ready' && useEndingStore.getState().nightFiveCleared,
+      // Story waves never end, so the rite is offered as soon as it can start (until task 4).
+      available: availability === 'ready' && (useEndingStore.getState().nightFiveCleared || story),
       running: mystery.riteProgress > 0 || useEndingStore.getState().riteStarted,
       // Only while he is on the field; before he rises or after he falls the rite line shows.
       craneAlive: craneFighting(useBossStore.getState().boss),
@@ -109,6 +113,18 @@ export const readObjectiveInput = (): ObjectiveInput => {
     relicSites: exploredRelicSites(),
     playerPos: player.position,
     story,
+    ...(story ? { stage: readStageInput() } : {}),
+  }
+}
+
+/** Stage block of the objective input: curse links (case board, task 2), the altar lock. */
+const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
+  const s = useStageStore.getState()
+  return {
+    stage: s.stage,
+    // The case board does not exist yet (task 2): no correct links can have been made.
+    curseLinks: 0,
+    altarLockedS: Math.max(0, Math.ceil(s.altar.lockedUntil - s.nightElapsed)),
   }
 }
 
@@ -118,6 +134,7 @@ const sameObjective = (a: Objective | null, b: Objective): boolean =>
   a.main === b.main &&
   a.second === b.second &&
   a.marker === b.marker &&
+  a.curse?.value === b.curse?.value &&
   a.position?.[0] === b.position?.[0] &&
   a.position?.[2] === b.position?.[2]
 

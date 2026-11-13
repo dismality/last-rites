@@ -21,6 +21,10 @@ export interface TickInput {
   dayLengthS?: number
   /** Highest night number; Endless passes Infinity. */
   lastNight?: number
+  /** Story stages: the case-solved flag ends the night. Unset in Endless. */
+  caseSolved?: boolean
+  /** Story stages: the current wave index, for the fog of the ladder row it draws from. */
+  waveIndex?: number
 }
 
 export interface TickSnapshot {
@@ -51,6 +55,8 @@ export function runTick(s: TickSnapshot, input: TickInput, dt: number): TickResu
     holdDawn: input.holdDawn,
     dayLengthS: input.dayLengthS,
     lastNight: input.lastNight,
+    caseSolved: input.caseSolved,
+    waveIndex: input.waveIndex,
   })
   events.push(...night.events)
 

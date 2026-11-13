@@ -1,0 +1,603 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Stage data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703030
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564716055
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564889273
+      }
+    ],
+    "1.2 Pure stage system and endless waves": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703081
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564889345
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794565182293
+      }
+    ],
+    "1.3 Pure altar answer rules": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703119
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564895269
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794565182352
+      }
+    ],
+    "1.4 Stores, loop wiring and persistence": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703151
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794565186438
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794565868076
+      }
+    ],
+    "1.5 Solved sequence, objective, compass and HUD": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703184
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794565872492
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794566357191
+      }
+    ],
+    "1.6 Dev hooks for stages": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703216
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794566357459
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794566557881
+      }
+    ],
+    "1.7 Stage loop e2e": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703250
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794566561975
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794567115439
+      }
+    ],
+    "1.8 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703289
+      },
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794567120038
+      },
+      {
+        "executionId": "c3da4089-5edc-407c-b5c8-677abd3e42aa",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794570817104
+      }
+    ],
+    "2.1 Case types and data shells": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703320
+      }
+    ],
+    "2.2 Pure case systems": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703359
+      }
+    ],
+    "2.3 Case store and persistence": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703395
+      }
+    ],
+    "2.4 Case board UI": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703429
+      }
+    ],
+    "2.5 Journal pause rule, Closed cases and altar panel": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703461
+      }
+    ],
+    "2.6 Dev hooks for the case": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703494
+      }
+    ],
+    "2.7 Case board e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703527
+      }
+    ],
+    "2.8 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703559
+      }
+    ],
+    "3.1 Case 1 data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703606
+      }
+    ],
+    "3.2 Minigame shell": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703635
+      }
+    ],
+    "3.3 Pure rules for 1a and 1b": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703666
+      }
+    ],
+    "3.4 Minigame 1a overlay and hut ledger": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703696
+      }
+    ],
+    "3.5 Minigame 1b overlay and bell posts": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703731
+      }
+    ],
+    "3.6 Final answer, reward and receipt": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703765
+      }
+    ],
+    "3.7 Dev hooks for Stage 1": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703798
+      }
+    ],
+    "3.8 Stage 1 e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703830
+      }
+    ],
+    "3.9 Milestone: run the full e2e suite and fix what broke": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703863
+      }
+    ],
+    "3.10 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703898
+      }
+    ],
+    "4.1 Case 3 data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703931
+      }
+    ],
+    "4.2 Pure rules for 3a, 3b, the Rite and the Accusation": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564703980
+      }
+    ],
+    "4.3 Minigame 3a overlay and hymn board props": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704008
+      }
+    ],
+    "4.4 Minigame 3b overlay and crypt props": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704037
+      }
+    ],
+    "4.5 The Rite: relic placement": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704067
+      }
+    ],
+    "4.6 Silas reveal, Accusation, epilogue and endings": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704096
+      }
+    ],
+    "4.7 Dev hooks for Stage 3": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704130
+      }
+    ],
+    "4.8 Stage 3 e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704162
+      }
+    ],
+    "4.9 Milestone: run the full e2e suite and fix what broke": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704193
+      }
+    ],
+    "4.10 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704225
+      }
+    ],
+    "5.1 Case 2 data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704259
+      }
+    ],
+    "5.2 Pure rules for 2a, 2b and 2c": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704293
+      }
+    ],
+    "5.3 Minigame 2b overlay and lodge props": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704327
+      }
+    ],
+    "5.4 Minigame 2a overlay and crest lock (cuttable, cut order 4)": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704378
+      }
+    ],
+    "5.5 Minigame 2c overlay and plaster casts (cuttable, cut order 3)": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704406
+      }
+    ],
+    "5.6 Final answer and hand-off to Stage 3": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704438
+      }
+    ],
+    "5.7 Dev hooks for Stage 2": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704469
+      }
+    ],
+    "5.8 Stage 2 e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704503
+      }
+    ],
+    "5.9 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704537
+      }
+    ],
+    "6.1 Pure win sequence": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704571
+      }
+    ],
+    "6.2 Cutscene scene and win card": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704603
+      }
+    ],
+    "6.3 Flow wiring": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704635
+      }
+    ],
+    "6.4 Dev trigger, e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704668
+      }
+    ],
+    "6.5 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704701
+      }
+    ],
+    "7.1 Pure hunch and Short Vigil data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704734
+      }
+    ],
+    "7.2 Hunch, dawn card, difficulty screen and tutorial": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704780
+      }
+    ],
+    "7.3 Dev hooks, e2e and screenshots": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704808
+      }
+    ],
+    "7.4 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704840
+      }
+    ],
+    "8.1 Pure kill-cam rules": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704872
+      }
+    ],
+    "8.2 Camera, effects and captions": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704907
+      }
+    ],
+    "8.3 Kill-cam e2e": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704939
+      }
+    ],
+    "8.4 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564704971
+      }
+    ],
+    "9.1 Pure stamina cap": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705003
+      }
+    ],
+    "9.2 Store, bar and wiring": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705037
+      }
+    ],
+    "9.3 Stamina e2e": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705069
+      }
+    ],
+    "9.4 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705103
+      }
+    ],
+    "10.1 Tier data": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705154
+      }
+    ],
+    "10.2 Pure tiered crafting": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705183
+      }
+    ],
+    "10.3 Recipe book UI": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705214
+      }
+    ],
+    "10.4 Tiered crafting e2e": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705249
+      }
+    ],
+    "10.5 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705281
+      }
+    ],
+    "11.1 Data and pure rules": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705314
+      }
+    ],
+    "11.2 Glowing grave, hold UI and captions": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705347
+      }
+    ],
+    "11.3 Name the Dead e2e": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705380
+      }
+    ],
+    "11.4 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705417
+      }
+    ],
+    "12.1 Playthrough spec": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705454
+      }
+    ],
+    "12.2 Fix what the playthrough finds": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705505
+      }
+    ],
+    "12.3 Finish": [
+      {
+        "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794564705537
+      }
+    ]
+  }
+}

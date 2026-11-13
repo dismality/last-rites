@@ -19,6 +19,7 @@ import { musicRuntime } from './musicRuntime'
 import { useScoreStore } from './scoreStore'
 import { stormRuntime } from './stormRuntime'
 import { emptySilence } from '../systems/scareSilence'
+import { useStageStore } from './stageStore'
 import { useWaveStore } from './waveStore'
 
 export function clearNightState(): void {
@@ -39,6 +40,8 @@ export function clearNightState(): void {
   useDoorStore.getState().setNail(null)
   useProjectileStore.getState().reset()
   useWaveStore.getState().reset()
+  // The failed night's case-solved flag, clock and altar lock; wrong-answer counts stay.
+  useStageStore.getState().resetNight()
   useEndingStore.getState().setRiteStarted(false)
   useChapelStore.getState().setFinalRiteActive(false)
 }

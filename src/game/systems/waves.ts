@@ -19,11 +19,14 @@ import {
 } from '../../data/waves'
 import { waveSize } from '../../data/waves'
 import { DEFAULT_MODE } from '../../data/modes'
+import { ELITE } from '../../data/elites'
+import { DOOR_ATTACKERS_FROM_WAVE, ELITES_FROM_WAVE, type StageNumber } from '../../data/stages'
 import type { Rng } from '../rng'
-import type { ModeId } from '../types'
+import type { ModeId, Phase } from '../types'
 import { endlessNight } from './endless'
 import { canBeDoorAttacker, doorAttackerCount } from './barricade'
 import { rollElite } from './elites'
+import { addDoubt, aliveCap, nextWaveDelay, stageWaveComposition } from './stageWaves'
 
 export type WavePhase = 'idle' | 'active' | 'gap' | 'done'
 
@@ -44,6 +47,12 @@ export interface WaveState {
   eliteSpawned: boolean
   /** Door_Attacker slots still unassigned this wave. Reset at every wave start. */
   attackersLeft: number
+  /** Set for a Story night (spec 10): waves are generated without end and the state never reaches `done` until the case is solved. */
+  stage?: StageNumber
+  /** Seconds since the current wave began (Story nights only). */
+  sinceWaveStart?: number
+  /** Seconds since the current wave's last zombie fell; null while any stands (Story nights only). */
+  sinceFall?: number | null
 }
 
 export interface WaveSpawn {
@@ -70,6 +79,10 @@ export interface WaveContext {
   eliteRng?: Rng
   /** Mode elite chance; defaults to Normal's. */
   eliteChance?: number
+  /** Story nights: the world phase. By day nothing spawns, not even queued zombies. */
+  phase?: Phase
+  /** Story nights: the stage's case is solved, so spawning stops this tick. */
+  caseSolved?: boolean
 }
 
 export interface WaveTick {
@@ -125,6 +138,109 @@ export function startNight(night: number, mode: ModeId = DEFAULT_MODE): WaveStat
   }
 }
 
+/** Elites and door attackers key off a "night" number; early stage-1 waves count as night 1 (none). */
+function stageFeatureNight(stage: StageNumber, waveIndex: number): number {
+  const open = stage > 1 || waveIndex + 1 >= Math.min(ELITES_FROM_WAVE, DOOR_ATTACKERS_FROM_WAVE)
+  return open ? Math.max(ELITE.fromNight, 2) : 1
+}
+
+/**
+ * A Story night (spec 10): endless escalating waves until the case is solved. `doubt` extra
+ * Shamblers join the first wave.
+ */
+export function startStageNight(stage: StageNumber, doubt = 0): WaveState {
+  const first = addDoubt(stageWaveComposition(stage, 0), doubt)
+  return {
+    phase: 'active',
+    night: stage,
+    plan: [],
+    waveIndex: 0,
+    pending: expandWave(first),
+    gapTimer: 0,
+    spawned: 0,
+    eliteSpawned: false,
+    attackersLeft: doorAttackerCount(waveSize(first), stageFeatureNight(stage, 0)),
+    stage,
+    sinceWaveStart: 0,
+    sinceFall: null,
+  }
+}
+
+/** One tick of a Story night: spawn within the stage's alive cap, then maybe begin the next wave. */
+function tickStageWaves(state: WaveState, stage: StageNumber, dt: number, ctx: WaveContext): WaveTick {
+  const events: WaveEvent[] = []
+  const spawns: WaveSpawn[] = []
+  if (ctx.caseSolved) {
+    // Spawning stops in the same tick the case is solved; queued zombies never appear.
+    return { state: state.phase === 'done' ? state : { ...state, phase: 'done', pending: [] }, spawns, events }
+  }
+  if (state.phase === 'idle' || state.phase === 'done') return { state, spawns, events }
+  if (ctx.phase === 'day') return { state, spawns, events }
+
+  const night = state.night ?? stage
+  const featureNight = stageFeatureNight(stage, state.waveIndex)
+  const graves = eligibleGraves(ctx.graves ?? WAVE_GRAVES, ctx.playerPos)
+  const room = Math.max(0, aliveCap(stage) - ctx.liveCount)
+  const count = graves.length === 0 ? 0 : Math.min(room, state.pending.length)
+  const start = graves.length === 0 ? 0 : Math.floor(ctx.rng() * graves.length)
+  let eliteSpawned = state.eliteSpawned
+  let attackersLeft = state.attackersLeft
+  for (let i = 0; i < count; i++) {
+    const g = graves[(start + i) % graves.length]
+    const type = state.pending[i]
+    const x = g.x + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
+    const z = g.z + (ctx.rng() * 2 - 1) * SPAWN_JITTER_M
+    const elite = ctx.eliteRng ? rollElite(ctx.eliteRng, type, featureNight, eliteSpawned, ctx.eliteChance) : false
+    if (elite) eliteSpawned = true
+    const doorAttacker = attackersLeft > 0 && canBeDoorAttacker(type)
+    if (doorAttacker) attackersLeft--
+    spawns.push({ type, graveId: g.id, x, z, elite, doorAttacker })
+  }
+  let pending = state.pending.slice(count)
+  const sinceWaveStart = (state.sinceWaveStart ?? 0) + dt
+  const allDown = pending.length === 0 && ctx.liveCount === 0 && count === 0
+  const prevFall = state.sinceFall ?? null
+  const sinceFall = allDown ? (prevFall === null ? 0 : prevFall + dt) : null
+  if (allDown && prevFall === null) events.push({ type: 'waveCleared', night, wave: state.waveIndex + 1 })
+
+  let next: WaveState = {
+    ...state, pending, spawned: state.spawned + count, eliteSpawned, attackersLeft, sinceWaveStart, sinceFall,
+  }
+  if (nextWaveDelay(sinceWaveStart, sinceFall) <= 0) {
+    const waveIndex = state.waveIndex + 1
+    const comp = stageWaveComposition(stage, waveIndex)
+    pending = [...pending, ...expandWave(comp)]
+    // total 0 means "no last wave": the night is endless.
+    events.push({ type: 'waveStarted', night, wave: waveIndex + 1, total: 0, size: waveSize(comp) })
+    next = {
+      ...next,
+      waveIndex,
+      pending,
+      eliteSpawned: false,
+      attackersLeft: doorAttackerCount(waveSize(comp), stageFeatureNight(stage, waveIndex)),
+      sinceWaveStart: 0,
+      sinceFall: null,
+    }
+  }
+  return { state: next, spawns, events }
+}
+
+/** Instantly queue one more wave (a wrong altar answer, Req 3.2). Story nights only; others unchanged. */
+export function queueWaveNow(state: WaveState): WaveState {
+  if (state.stage === undefined || state.phase !== 'active') return state
+  const waveIndex = state.waveIndex + 1
+  const comp = stageWaveComposition(state.stage, waveIndex)
+  return {
+    ...state,
+    waveIndex,
+    pending: [...state.pending, ...expandWave(comp)],
+    eliteSpawned: false,
+    attackersLeft: doorAttackerCount(waveSize(comp), stageFeatureNight(state.stage, waveIndex)),
+    sinceWaveStart: 0,
+    sinceFall: null,
+  }
+}
+
 /**
  * Final-rite assault: when the rite starts after night 5's waves are already cleared, one more
  * wave (the night's strongest) rises so the rite is always held under attack (Req 5.3).
@@ -157,6 +273,7 @@ export function eligibleGraves(
 export function tickWaves(state: WaveState, dt: number, ctx: WaveContext): WaveTick {
   const events: WaveEvent[] = []
   const spawns: WaveSpawn[] = []
+  if (state.stage !== undefined) return tickStageWaves(state, state.stage, dt, ctx)
   if (state.phase === 'idle' || state.phase === 'done' || state.night === null) {
     return { state, spawns, events }
   }

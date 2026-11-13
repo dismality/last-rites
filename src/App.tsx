@@ -32,6 +32,7 @@ import { GameLoop } from './scene/GameLoop'
 import { PostEffects } from './scene/effects/PostEffects'
 import { DustBurst } from './scene/effects/DustBurst'
 import { GraveBurst } from './scene/effects/GraveBurst'
+import { CaseCollapse } from './scene/enemies/CaseCollapse'
 import { EnemyDirector } from './scene/enemies/EnemyDirector'
 import { WaveDirector } from './scene/enemies/WaveDirector'
 import { FirstPersonController } from './scene/player/FirstPersonController'
@@ -111,6 +112,7 @@ function GameScreen() {
           {/* After EnemyDirector so salt reads this frame's enemy positions. */}
           <SaltCircles />
           <DustBurst />
+          <CaseCollapse />
           <GraveBurst />
           <DamageNumbers />
           <GraveGas />

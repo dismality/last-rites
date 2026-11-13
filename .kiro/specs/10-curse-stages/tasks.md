@@ -22,41 +22,41 @@ Common rules for all tasks:
 ## Tasks
 
 - [ ] 1. E1: The stage loop
-  - [ ] 1.1 Stage data
+  - [x] 1.1 Stage data
     - Create `src/data/stages.ts` (`StageDef` for 3 Stages: Case id, ladder rows, fog, alive cap 12 / 16 / 20, max stamina, dawn recipe unlocks)
     - Replace `LAST_NIGHT` and `NIGHT_FOG_DENSITY` use in `src/data/balance.ts` and `src/data/waves.ts` with the Stage data; keep Endless data
     - Update `src/data/objectiveRules.ts` text for the curse line, the altar-locked line and the per-Stage day rules; add captions for the altar sounds
     - Update `docs/game-design.md` only where the data forces a change
     - _Requirements: 1.1, 1.6, 1.7, 2.3, 2.6, 2.10, 6.4, 6.5_
-  - [ ] 1.2 Pure stage system and endless waves
+  - [x] 1.2 Pure stage system and endless waves
     - Create `src/game/systems/stage.ts` and `stageWaves.ts` (`stageWaveComposition`, `waveStrength`, `aliveCap`, `nextWaveDelay`, `addDoubt`)
     - Change `waves.ts` so Story nights never reach `done` and `dayNight.ts` takes `wavesCleared` from the case-solved flag with `lastNight` 3
     - Make the day phase spawn nothing and make `scareDirector.ts` turn a day `lurker-lunge` into `door-slam`
     - Write `stage.test.ts`, `stageWaves.test.ts`, and extend `waves.test.ts`, `dayNight.test.ts`, `scareDirector.test.ts`
     - **Property 1: Waves run exactly while the case is unsolved**; **Property 2: Wave difficulty never decreases**; **Property 3: Alive cap holds**; **Property 4: Wave pacing**; **Property 5: No zombie and no lurker lunge by day**
     - _Requirements: 1.1, 1.2, 2.1-2.11, 6.1, 6.9_
-  - [ ] 1.3 Pure altar answer rules
+  - [x] 1.3 Pure altar answer rules
     - Create `src/game/systems/altarAnswer.ts` (`giveAnswer` with the 30 s lock, the instant wave, the extra link after 2 wrong answers, day refusal, accusation kind) taking the correctness verdict as input
     - Write `altarAnswer.test.ts`
     - **Property 6: Altar answers obey the lock and the link rule**; **Property 7: A wrong accusation costs nothing**
     - _Requirements: 3.1-3.8_
-  - [ ] 1.4 Stores, loop wiring and persistence
+  - [x] 1.4 Stores, loop wiring and persistence
     - Create `stageStore.ts`; compose it in `src/game/state/index.ts`; wire `GameLoop.tsx`, `worldStore.ts`, `waveStore.ts` and `nightState.ts` to the Stage system
     - Add `stage` and `altar` fields to `gameSave.ts`, `retryNight.ts`, `duskSnapshot` data and `resetRun.ts`; write `migrateSave` for old night numbers
     - Write `stageStore.test.ts` and extend `gameSave.test.ts`, `resetRun.test.ts`, `retryProgression.test.ts`
     - **Property 11: Old saves migrate monotonically**
     - _Requirements: 1.3, 1.4, 1.5, 1.8, 4.1-4.4, 4.7_
-  - [ ] 1.5 Solved sequence, objective, compass and HUD
+  - [x] 1.5 Solved sequence, objective, compass and HUD
     - On a solved case collapse living zombies to dust (particle effect), play the sunrise and start the dawn screen; add the dawn unlocks
     - Update `objective.ts`, `compass.ts` and the HUD for the curse line, `CurseMeter.tsx` (number and bar) and the "The altar is silent: 0:24" line
     - Write `objective.test.ts` additions and `compass.test.ts` additions
     - **Property 26: Objective follows the rule table**
     - _Requirements: 1.3, 2.12, 3.3, 6.2-6.7_
-  - [ ] 1.6 Dev hooks for stages
+  - [x] 1.6 Dev hooks for stages
     - Add "Skip to stage 1/2/3", "Solve current case" to the Dev_Panel through `devActions.ts` (real store actions, key items and recipes granted per Stage)
     - Add `stageState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 5.1-5.6_
-  - [ ] 1.7 Stage loop e2e
+  - [x] 1.7 Stage loop e2e
     - Create `e2e/stage-loop.spec.ts`: a night keeps spawning waves, the dev "solve current case" ends it, zombies collapse and dawn plays; day has no zombies; Retry Night and Continue keep the Stage
     - _Requirements: 1.2, 2.1, 2.2, 2.12, 4.1, 4.3_
   - [ ] 1.8 Finish

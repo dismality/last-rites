@@ -1,3 +1,4 @@
+import { riteFinalNight } from '../../game/state/riteStatus'
 import { useEndingStore } from '../../game/state/endingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
@@ -14,7 +15,7 @@ export function RiteMeter() {
   const mystery = useMysteryStore((s) => s.mystery)
 
   const relicCount = countRelics(relics, mystery.relics)
-  const availability = riteAvailability({ nightNumber, phase, wavesCleared: cleared, relicCount })
+  const availability = riteAvailability({ nightNumber, phase, wavesCleared: cleared, relicCount, finalNight: riteFinalNight() })
   if (availability !== 'ready') return null
 
   const done = Math.min(mystery.riteProgress, RITE_DURATION)

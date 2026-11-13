@@ -1,7 +1,9 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { forwardFromYaw } from './melee'
+import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
 import { COMPASS_DOOR_LABEL } from '../../data/compass'
+import { selectObjective } from './objective'
 import {
   bearingDeg,
   buildCompassMarkers,
@@ -171,5 +173,34 @@ describe('compass properties', () => {
       bellBuilt: true,
     })
     expect(night.some((m) => m.id.startsWith('spawn-'))).toBe(true)
+  })
+})
+
+describe('compass at a story night (spec 10)', () => {
+  it('the objective marker points at the altar with its distance', () => {
+    const o = selectObjective({
+      phase: 'night',
+      nightNumber: 1,
+      secondsLeft: 0,
+      waves: { running: true, index: 1, total: 0, zombiesLeft: 3 },
+      rite: { available: false, running: false, craneAlive: false },
+      progress: { page1Read: true, cryptKey: true, whistle: true, stairRevealed: true, ossuaryKey: true, relics: 0 },
+      relicSites: [],
+      playerPos: [0, 0, 20],
+      story: true,
+      stage: { stage: 1, curseLinks: 0, altarLockedS: 0 },
+    })
+    const player = { x: 0, z: 20 }
+    const marker = buildCompassMarkers({
+      player,
+      heading: 0,
+      objective: o.position,
+      phase: 'night',
+      bellBuilt: false,
+    }).find((m) => m.id === 'objective')
+    const altar = { x: CHAPEL_ALTAR[0], z: CHAPEL_ALTAR[2] }
+    expect(marker).toBeDefined()
+    expect(circDiff(marker!.rel, relativeAngle(bearingDeg(player, altar), 0))).toBeLessThan(1e-6)
+    expect(marker!.distanceM).toBe(Math.round(Math.hypot(altar.x - player.x, altar.z - player.z)))
   })
 })

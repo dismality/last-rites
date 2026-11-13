@@ -12,6 +12,7 @@ import { DAY_DURATION_S, DUSK_DURATION_S, INTERACT_RANGE_M } from '../data/balan
 import { interactableRegistry } from '../scene/world/interactableRegistry'
 import { DRACO_PATH, worldModelUrl, type WorldModelId } from '../data/assets'
 import { colliderOwner } from './colliderOwners'
+import { skipToStage, solveCurrentCase } from '../dev/devActions'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
 import { createRng, deriveSeed } from '../game/rng'
@@ -37,6 +38,7 @@ import { useIntroStore } from '../game/state/introStore'
 import { useGameStore } from '../game/state/gameStore'
 import { useWorldStore } from '../game/state/worldStore'
 import { useWaveStore } from '../game/state/waveStore'
+import { useStageStore } from '../game/state/stageStore'
 import { useEnemyStore } from '../game/state/enemyStore'
 import { useProgressionStore } from '../game/state/progressionStore'
 import { useInventoryStore } from '../game/state/inventoryStore'
@@ -241,6 +243,20 @@ const api = {
   /** Night with its waves cleared: the next sim tick ends the night and starts dawn (summary and offer). */
   skipToDawn(): void {
     useWorldStore.getState().applyWorldState({ phase: 'night', phaseTime: 0, wavesCleared: true })
+    // Story nights end when the case is solved (Endless ignores the flag).
+    useStageStore.getState().solveCase(0)
+  },
+  /** JSON-safe copy of the stage store (stage, case solved flag, night clock, altar answers). */
+  stageState(): unknown {
+    return toSnapshot(useStageStore.getState())
+  },
+  /** The Dev_Panel's "Skip to stage N": start of that stage's day, with its key items and recipes. */
+  skipToStage(n: 1 | 2 | 3): string {
+    return skipToStage(n)
+  },
+  /** The Dev_Panel's "Solve current case" (the real store action). */
+  solveCurrentCase(): string {
+    return solveCurrentCase()
   },
   /** Puts the clock just before night; the next sim tick emits `nightStarted` and the waves begin. */
   skipToNight(night?: number): void {

@@ -11,6 +11,9 @@ import type { CombatSave } from './combatSave'
 import type { ProgressionSave } from './progressionSave'
 import { defaultProgressionSave } from './progressionSave'
 import { parseTutorial, serializeTutorial } from './tutorial'
+import { MODES } from '../../data/modes'
+import { STAGE_COUNT, type StageNumber } from '../../data/stages'
+import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 
 export const SAVE_KEY = 'lastrites:save'
 export const SAVE_VERSION = 1
@@ -32,6 +35,8 @@ export interface SaveState {
   combat?: CombatSave
   /** Progression block (spec 08). Optional on input and on read; the loader sanitises the raw block. */
   progression?: ProgressionSave
+  /** Stage block (spec 10). Optional on input; the loader migrates old night-only saves. */
+  stage?: StageSave
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
@@ -82,6 +87,10 @@ export function toSaveFile(state: SaveState): SaveFile {
       doors: { built: false, front: [], vestry: [] },
     },
     progression: state.progression ?? defaultProgressionSave(),
+    // Always written, so a reload never mistakes a stage number for an old night number.
+    stage:
+      state.stage ??
+      freshStageSave(Math.min(Math.max(Math.floor(state.world.nightNumber) || 1, 1), STAGE_COUNT) as StageNumber),
   }
 }
 
@@ -176,8 +185,13 @@ export function fromSaveFile(
     return null
   }
   const m = mystery as unknown as SaveFile['mystery']
+  // Saves from before stages carry night 1..5: story saves are mapped onto the three stages.
+  const modeId = isObj(raw.progression) ? (raw.progression as Obj).mode : undefined
+  const story = typeof modeId === 'string' && modeId in MODES ? MODES[modeId as keyof typeof MODES].story : true
+  const migrated = migrateSave(world, raw.stage, story)
   return {
-    world,
+    world: { ...world, nightNumber: migrated.nightNumber },
+    stage: migrated.stage,
     player,
     inventory,
     chapel,

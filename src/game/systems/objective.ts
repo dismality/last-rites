@@ -3,6 +3,9 @@
 
 import { BENCH_Z, CHAPEL_ALTAR } from '../../data/cemeteryLayout'
 import {
+  ALTAR_LOCKED_LINE,
+  CASE_SOLVE_LINE,
+  CURSE_RULE,
   OBJECTIVE_MAX_LINE,
   OBJECTIVE_RULES,
   PREPARE_WEAPON_BEFORE_DUSK_S,
@@ -10,6 +13,7 @@ import {
   type ObjectiveRuleDef,
   type ObjectiveRuleId,
 } from '../../data/objectiveRules'
+import { CURSE_MAX, STAGE_COUNT, STAGE_MAP } from '../../data/stages'
 import { FIXED_SPAWNS } from '../../data/zones'
 import type { Phase } from '../types'
 
@@ -40,6 +44,20 @@ export interface ObjectiveInput {
   story?: boolean
   /** The player owns no weapon except the Rusty Shovel (rule 12). Absent means false. */
   needsWeapon?: boolean
+  /**
+   * Story stage mode (spec 10). When present the night line is the curse line (no wave count),
+   * the rite belongs to stage 3, and the day fallback names the case. Absent keeps the
+   * five-night rules, which Endless and the older tests use.
+   */
+  stage?: {
+    stage: 1 | 2 | 3
+    /** Correct clue links made on the case board; each one lowers the Curse meter. */
+    curseLinks: number
+    /** Whole seconds the altar stays silent after a wrong answer; 0 when it listens. */
+    altarLockedS: number
+    /** Clues found for the case, when the case board can say. */
+    clues?: { found: number; total: number }
+  }
 }
 
 export interface Objective {
@@ -48,7 +66,13 @@ export interface Objective {
   second: string
   position?: Vec3
   marker?: string
+  /** Set on the curse line: the HUD draws the number and bar from it. */
+  curse?: { value: number; max: number }
 }
+
+/** Curse meter value: starts full and falls one per correct link, never below 0. */
+export const curseValue = (links: number): number =>
+  Math.max(0, CURSE_MAX - clampInt(links, 0, CURSE_MAX))
 
 /** The workbench centre in the hut (x 0, against the north wall). */
 const WORKBENCH_POS: Vec3 = [0, 0, BENCH_Z]
@@ -97,9 +121,12 @@ const matchRule = (i: ObjectiveInput): ObjectiveRuleId => {
   // Rite rules come before the wave line: wave state lingers during the final rite and
   // the Crane fight, and "Survive: Wave 1 of 5" is wrong once the rite has begun.
   const story = i.story !== false
-  const finalNight = story && night && i.nightNumber === FINAL_NIGHT
+  // In stage mode the rite belongs to the last stage; the curse line holds every other night.
+  const finalNight =
+    story && night && (i.stage ? i.stage.stage === STAGE_COUNT : i.nightNumber === FINAL_NIGHT)
   if (finalNight && i.rite.running && i.rite.craneAlive) return 3
   if (finalNight && (i.rite.available || i.rite.running)) return 2
+  if (night && story && i.stage) return 1
   if (night && i.waves.running) return 1
   if (i.phase === 'dusk') return 4
   if (!story) return 11
@@ -167,7 +194,7 @@ const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
   // The prepare rule stands above the story objective, which moves down to the second line.
   if (def.id === PREPARE_WEAPON_RULE) {
     const story = ruleDef(matchRule({ ...i, needsWeapon: false }))
-    return mainLine(story, i)
+    return story.id === 11 && i.stage ? stageCaseLine(i.stage) : mainLine(story, i)
   }
   const t = def.second ?? ''
   return t
@@ -175,8 +202,41 @@ const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
     .replace('{clock}', formatClock(i.secondsLeft))
 }
 
+/** Night rule 1 in a story stage: the curse line, the Curse meter and the altar-locked line. */
+const curseObjective = (stage: NonNullable<ObjectiveInput['stage']>): Objective => {
+  const curse = { value: curseValue(stage.curseLinks), max: CURSE_MAX }
+  const locked = finite(stage.altarLockedS) > 0
+  return {
+    rule: CURSE_RULE.id,
+    main: cut(CURSE_RULE.main),
+    // Locked: the silence replaces the meter text. Otherwise the HUD draws the meter in this slot.
+    second: locked ? cut(ALTAR_LOCKED_LINE.replace('{clock}', formatClock(stage.altarLockedS))) : '',
+    position: CHAPEL_ALTAR,
+    marker: CURSE_RULE.marker,
+    curse,
+  }
+}
+
+/** Day fallback in a story stage (rule 11): name the case and, when known, the clue count. */
+const stageCaseLine = (stage: NonNullable<ObjectiveInput['stage']>): string => {
+  const title = STAGE_MAP[stage.stage].caseTitle
+  const c = stage.clues
+  return c
+    ? CASE_SOLVE_LINE.replace('{title}', title).replace('{n}', String(c.found)).replace('{m}', String(c.total))
+    : `Solve the case: ${title}`
+}
+
 export const selectObjective = (i: ObjectiveInput): Objective => {
-  const def = ruleDef(matchRule(i))
+  const matched = matchRule(i)
+  if (i.stage && matched === 1) return curseObjective(i.stage)
+  const def = ruleDef(matched)
+  if (i.stage && def.id === 11 && i.story !== false) {
+    return {
+      rule: 11,
+      main: cut(stageCaseLine(i.stage)),
+      second: cut(secondLine(def, i)),
+    }
+  }
   const position = resolvePosition(def, i)
   const result: Objective = {
     rule: def.id,

@@ -83,6 +83,8 @@ function performRite(mystery: MysteryState): EndingId | undefined {
     phase: 'night',
     wavesCleared: true,
     relicCount,
+    // This checkpoint drives the legacy five-night day/night path, whose rite night is the fifth.
+    finalNight: LAST_NIGHT,
   })
   // Fewer than 3 relics: the rite is never offered; night 5 ending is 'taken'.
   if (availability === 'taken') return 'taken'

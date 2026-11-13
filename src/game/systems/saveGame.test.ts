@@ -41,7 +41,7 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   world: fc.record({
     phase: fc.constantFrom('day', 'dusk', 'night', 'dawn' as const),
     phaseTime: num,
-    nightNumber: fc.integer({ min: 1, max: 5 }),
+    nightNumber: fc.integer({ min: 1, max: 3 }),
     fogDensity: fc.double({ min: 0, max: 0.1, noNaN: true }),
     wavesCleared: fc.boolean(),
   }),
@@ -100,6 +100,17 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
   tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7] as TutorialStepId[]).map((a) => new Set(a)),
   introSeen: fc.boolean(),
   progression: fc.constant(defaultProgressionSave()),
+  stage: fc.record({
+    stage: fc.constantFrom(1 as const, 2 as const, 3 as const),
+    caseSolved: fc.boolean(),
+    solvedAtPhaseTime: fc.oneof(fc.constant(null), fc.integer({ min: 0, max: 100 })),
+    nightElapsed: fc.integer({ min: 0, max: 1000 }),
+    altar: fc.record({
+      lockedUntil: fc.integer({ min: 0, max: 1000 }),
+      wrong: fc.integer({ min: 0, max: 5 }),
+      linksAtLastWrong: fc.integer({ min: 0, max: 9 }),
+    }),
+  }),
   combat: fc.constant({
     firearms: { revolver: { magazine: 3 } },
     durability: { 'wood-axe': 10 },

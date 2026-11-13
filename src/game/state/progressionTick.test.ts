@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { DAY_DURATION_S, LAST_NIGHT } from '../../data/balance'
+import { DAY_DURATION_S } from '../../data/balance'
+import { STAGE_COUNT } from '../../data/stages'
 import { subscribeToType } from '../events'
 import { startStorm } from '../systems/storm'
 import { useCoinStore } from './coinStore'
@@ -126,7 +127,7 @@ describe('deriveTickInput', () => {
   it('uses the defaults in story modes', () => {
     for (const mode of ['easy', 'normal', 'hard'] as const) {
       useProgressionStore.getState().patch({ mode })
-      expect(deriveTickInput()).toMatchObject({ dayLengthS: DAY_DURATION_S, lastNight: LAST_NIGHT })
+      expect(deriveTickInput()).toMatchObject({ dayLengthS: DAY_DURATION_S, lastNight: STAGE_COUNT })
     }
   })
 

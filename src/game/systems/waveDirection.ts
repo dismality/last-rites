@@ -1,16 +1,21 @@
 // Pure decisions behind WaveDirector (mode-aware plan, spawn options, cleared-night routing),
 // kept out of the R3F component so they run in Node tests. No React, three.js or Howler.
-import { LAST_NIGHT } from '../../data/balance'
 import { MODES } from '../../data/modes'
+import { STAGE_COUNT, type StageNumber } from '../../data/stages'
 import { createRng, deriveSeed, type Rng } from '../rng'
 import type { ModeId } from '../types'
 import { createEnemy, type AIEnemy } from './enemyAI'
 import { spawnMultipliers } from './modes'
 import { recordNightSurvived, type RunStats } from './runStats'
-import { nightPlan, startNight, type WaveSpawn, type WaveState } from './waves'
+import { nightPlan, startNight, startStageNight, type WaveSpawn, type WaveState } from './waves'
 
 /** The fresh wave state and wave count for a night in the given mode. */
-export function planNight(mode: ModeId, night: number): { state: WaveState; totalWaves: number } {
+export function planNight(mode: ModeId, night: number, doubt = 0): { state: WaveState; totalWaves: number } {
+  // Story nights are endless (no last wave), so the tally has no total; Endless keeps its plan.
+  if (MODES[mode].story) {
+    const stage = Math.min(Math.max(Math.floor(night), 1), STAGE_COUNT) as StageNumber
+    return { state: startStageNight(stage, doubt), totalWaves: 0 }
+  }
   return { state: startNight(night, mode), totalWaves: nightPlan(mode, night).length }
 }
 
@@ -40,12 +45,12 @@ export type ClearedRoute = 'rite' | 'dawn'
 
 /** Only story modes hold night 5 for the rite; Endless goes to dawn after every night. */
 export function clearedRoute(mode: ModeId, night: number): ClearedRoute {
-  return MODES[mode].story && night >= LAST_NIGHT ? 'rite' : 'dawn'
+  return MODES[mode].story && night >= STAGE_COUNT ? 'rite' : 'dawn'
 }
 
 /** Story modes stop counting at night 5; Endless counts without a cap. */
 export function survivedCap(mode: ModeId): number {
-  return MODES[mode].story ? LAST_NIGHT : Number.POSITIVE_INFINITY
+  return MODES[mode].story ? STAGE_COUNT : Number.POSITIVE_INFINITY
 }
 
 /** Nights survived after a dawn-route clear. The rite route is credited by the ending instead. */

@@ -2,7 +2,8 @@
 // (design "Timing"). Called once per fixed step from GameLoop after tickCombat.
 // Reads stores, holds no rules; the pure functions it calls live in src/game/systems/.
 import { CAPTION_MAP } from '../../data/captions'
-import { DAY_DURATION_S, LAST_NIGHT } from '../../data/balance'
+import { DAY_DURATION_S } from '../../data/balance'
+import { STAGE_COUNT } from '../../data/stages'
 import { MODES } from '../../data/modes'
 import { emit } from '../events'
 import { stepPiles } from '../systems/coins'
@@ -24,6 +25,7 @@ import { useScoreStore } from './scoreStore'
 import { useSettingsStore } from './settingsStore'
 import { simClock, stepSimClock } from './simClock'
 import { stormRuntime } from './stormRuntime'
+import { useStageStore } from './stageStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -32,6 +34,9 @@ export interface ProgressionTickInput {
   holdDawn: boolean
   dayLengthS: number
   lastNight: number
+  /** Story stages only: the case-solved flag and the wave index for fog. Absent in Endless. */
+  caseSolved?: boolean
+  waveIndex?: number
 }
 
 /** Hold, day length and last night for the current mode. Story modes keep the defaults. */
@@ -41,7 +46,10 @@ export function deriveTickInput(): ProgressionTickInput {
   return {
     holdDawn: p.pendingPick !== null,
     dayLengthS: mode.dayLengthS ?? DAY_DURATION_S,
-    lastNight: mode.story ? LAST_NIGHT : Infinity,
+    lastNight: mode.story ? STAGE_COUNT : Infinity,
+    ...(mode.story
+      ? { caseSolved: useStageStore.getState().caseSolved, waveIndex: useWaveStore.getState().waves.waveIndex }
+      : {}),
   }
 }
 

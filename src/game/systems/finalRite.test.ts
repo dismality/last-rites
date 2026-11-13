@@ -9,7 +9,7 @@ import { createRunStats, finalizeStats, recordBanished, recordNightSurvived } fr
 import { startRiteAssault } from './waves'
 
 const night5 = (over: Partial<RiteContext> = {}): RiteContext => ({
-  nightNumber: 5,
+  nightNumber: 3,
   phase: 'night',
   wavesCleared: false,
   relicCount: 0,
@@ -17,8 +17,8 @@ const night5 = (over: Partial<RiteContext> = {}): RiteContext => ({
 })
 
 describe('riteAvailability', () => {
-  it('needs night 5 at night', () => {
-    expect(riteAvailability(night5({ relicCount: 5, nightNumber: 4 }))).toBe('unavailable')
+  it('needs the last stage at night', () => {
+    expect(riteAvailability(night5({ relicCount: 5, nightNumber: 2 }))).toBe('unavailable')
     expect(riteAvailability(night5({ relicCount: 5, phase: 'day' }))).toBe('unavailable')
   })
 
@@ -122,10 +122,10 @@ describe('run stats', () => {
     expect([s.nightsSurvived, s.zombiesBanished]).toEqual([3, 2])
   })
 
-  it('credits night 5 for completed rites but not for Taken', () => {
-    const s = recordNightSurvived(createRunStats(), 4)
-    expect(finalizeStats(s, 'rest').nightsSurvived).toBe(5)
-    expect(finalizeStats(s, 'taken').nightsSurvived).toBe(4)
+  it('credits the last stage for completed rites but not for Taken', () => {
+    const s = recordNightSurvived(createRunStats(), 2)
+    expect(finalizeStats(s, 'rest').nightsSurvived).toBe(3)
+    expect(finalizeStats(s, 'taken').nightsSurvived).toBe(2)
   })
 })
 
