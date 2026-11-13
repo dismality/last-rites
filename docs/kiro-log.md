@@ -1384,10 +1384,19 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The lurker-lunge scare becomes door-slam if rolled by day. Uneasy Peace is retired; Taken remains the loss outcome.
   - Page-to-stage map: pages 1-2 stage 1, page 3 stage 2, pages 4-5 stage 3.
 
-### 2026-11-12: 10-curse-stages task 1.5: Solved sequence, objective, compass and HUD
-- **Kiro feature used:** spec task / PBT
-- **What happened:** A solved case now raises the altar caption, emits `nightCleared`, collapses living zombies to dust and unlocks the stage's dawn recipes. The tracker shows the curse line, the Curse meter and the altar-locked line.
-- **What Kiro caught or sped up:** Found that no story path emitted `nightCleared` and that the dawn recipe unlock was never dispatched, so both are now wired through `caseSolvedWatcher.ts`.
+### 2026-11-12: 10-curse-stages task 1: The stage loop (endless nights until the case is solved)
+- **Kiro feature used:** spec task / PBT / steering / Playwright browser specs
+- **What happened:** Story runs are now three stages. Night waves never end until the case is solved at the altar; day has no zombies. Stage data, a pure stage and endless-wave system, the altar answer rules (30 s lock, instant wave, link rule), a `stageStore` with save migration, the solved sequence (altar caption, `nightCleared`, living zombies collapse to dust, dawn unlocks), the curse objective line with a Curse meter, dev hooks (skip to stage, solve current case) and `e2e/stage-loop.spec.ts` are in. The bell 20 s before each wave (bell repair stage 3) and the 20 s stuck-zombie despawn are wired in `WaveDirector` with unit tests.
+- **What Kiro caught or sped up:** Found that no story path emitted `nightCleared` and that the dawn recipe unlock was never dispatched, so both are now wired through `caseSolvedWatcher.ts`. Property tests cover waves running only while the case is unsolved, non-decreasing difficulty, the alive cap, pacing, no day zombies, altar lock rules and monotonic save migration. Gate: lint, build, 2043 unit tests and `stage-loop`, `smoke`, `dev-panel` (5 tests) pass.
+- **Decisions made unattended:** (full text in `.kiro/specs/10-curse-stages/decisions-unattended.md`)
+  - 1.1: `LAST_NIGHT` and the fog table stay in `balance.ts`, derived from stage data; the five `NIGHTS` rows stay as the difficulty ladder; max stamina is stored per stage; altar captions are "[the altar is silent]" and "[a clear note from the altar]".
+  - 1.2: Story nights use a new `startStageNight` entry point and `startNight` stays for Endless; waves are the running maximum of the ladder so they never shrink; escalation starts past the last row; pacing has no `gap` phase; elites and door attackers use a feature night of 1 for waves 1-3 and 2 after; a day `lurker-lunge` becomes `door-slam` only in the day phase.
+  - 1.3: dusk and dawn refuse answers like day; a new `wrong-accusation` verdict; after 2 wrong answers even a correct answer needs a new link.
+  - 1.4: `worldStore.nightNumber` stays the source of the stage (clamped 1..3); the altar lock runs on a per-night clock in `stageStore`; old saves map nights 1..5 to stages 1, 1, 2, 2, 3 and `SAVE_VERSION` stays 1; the rite stays reachable on stage 3 until task 4.
+  - 1.5: collapsed zombies score and drop nothing, Father Crane is skipped; dust is one puff with Camera shake or Flashing lights off; dawn unlocks come from stage data; the Curse meter max is 10 and its links wait for task 2.
+  - 1.6: "Skip to stage N" goes to the start of that stage's day and grants the key items and recipes of earlier stages; the Case-store dev actions wait for task 2.
+  - 1.7: two e2e tests (stage 1 loop; Retry Night and Continue in stage 2); Continue changes stage with `setClock` because skipping stages autosaves at the new day.
+  - 1.8: the bell and stuck despawn were already built in da3d609, so they are closed here; the bible got one line defining "stuck"; Doubt in the first wave stays with task 2.3.
 
 ### 2026-11-13: 09-playtest-fixes task 11k: Every item uses its Blender model
 - **Kiro feature used:** spec task (added from the user's playtest), Playwright browser specs, steering (tech: performance budget, structure: data in src/data)

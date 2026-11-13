@@ -21,7 +21,7 @@ Common rules for all tasks:
 
 ## Tasks
 
-- [ ] 1. E1: The stage loop
+- [x] 1. E1: The stage loop
   - [x] 1.1 Stage data
     - Create `src/data/stages.ts` (`StageDef` for 3 Stages: Case id, ladder rows, fog, alive cap 12 / 16 / 20, max stamina, dawn recipe unlocks)
     - Replace `LAST_NIGHT` and `NIGHT_FOG_DENSITY` use in `src/data/balance.ts` and `src/data/waves.ts` with the Stage data; keep Endless data
@@ -59,7 +59,7 @@ Common rules for all tasks:
   - [x] 1.7 Stage loop e2e
     - Create `e2e/stage-loop.spec.ts`: a night keeps spawning waves, the dev "solve current case" ends it, zombies collapse and dawn plays; day has no zombies; Retry Night and Continue keep the Stage
     - _Requirements: 1.2, 2.1, 2.2, 2.12, 4.1, 4.3_
-  - [ ] 1.8 Finish
+  - [x] 1.8 Finish
     - Run the Finish steps for task 1; commit `stage loop with endless nights (spec 10 task 1)`
 
 - [ ] 2. The case board

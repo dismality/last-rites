@@ -391,7 +391,7 @@ The five fixed nights above become **endless escalating nights**, one per stage.
 | 3 | Row 5 for every wave; the **rite** replaces the "final rite" hold | 0.06 | Father Crane rises when the rite's relic placement starts (see Boss) |
 
 - **Escalation:** once a night passes its last ladder row, each further wave adds 1 shambler, and every 3rd further wave adds 1 wailer or lurker (alternating), so a wave is never smaller than the one before. Difficulty never decreases within a night.
-- **Alive cap:** at most 12 / 16 / 20 zombies alive at once (stage 1 / 2 / 3). Waves wait for room. A zombie stuck out of reach for 20 s is despawned and the wave counts it as banished.
+- **Alive cap:** at most 12 / 16 / 20 zombies alive at once (stage 1 / 2 / 3). Waves wait for room. A zombie stuck out of reach for 20 s is despawned and the wave counts it as banished. "Stuck" means a chasing zombie more than 4 m from the player that has stayed within 1 m of one spot.
 - **Pace:** the next wave begins 20 s after the previous wave's last zombie falls, or 60 s after the previous wave began, whichever is first (the bell tolls 20 s before each wave if rung). The gap is the release in the tension curve.
 - **Curse:** the night ends only when the stage's case is answered correctly (§13). A correct answer stops spawning, living zombies collapse to dust and the sunrise plays. A wrong answer spawns a wave at once and locks the altar for 30 s (never ends the run).
 - **Retry Night** returns to the start of that stage's dusk. The case's solved minigames and clue links are kept.
