@@ -50,7 +50,12 @@ import {
 import { weaponRuntime } from './weaponRuntime'
 import { WeaponMesh } from './viewmodelWeapons'
 import { isHeldWeaponId } from './viewmodelWeaponGeometry'
-import { HELD_GRIPS, HELD_ORIGIN, type HeldGrip } from '../../data/itemModels'
+import { HELD_GRIPS, HELD_ORIGIN, fitScale, type HeldGrip } from '../../data/itemModels'
+import { ITEM_MAP } from '../../data/items'
+import { ItemMesh } from '../world/ItemModel'
+
+/** Longest edge of a held non-weapon item (m): big enough to read, small enough to clear the view. */
+const HELD_ITEM_MAX_EDGE_M = 0.2
 
 // ---------------------------------------------------------------------------
 // Props
@@ -155,9 +160,21 @@ function ViewmodelMesh({
       </group>
     )
   }
+  // Flasks, bandages, tonics and the like: the item's own model held upright, fitted to the hand.
+  if (item !== null && ITEM_MAP[item]?.model) {
+    return (
+      <group position={HELD_POSITION} rotation={HELD_ROTATION}>
+        <group position={[0, 0, -0.1]} scale={fitScale(item, HELD_ITEM_MAX_EDGE_M)}>
+          <Suspense fallback={null}>
+            <ItemMesh item={item} />
+          </Suspense>
+        </group>
+      </group>
+    )
+  }
   return (
     <mesh position={HELD_POSITION} rotation={HELD_ROTATION}>
-      {/* Stand-in for items without a grip yet (flasks, bandages, ...). */}
+      {/* Empty hands: nothing is held. */}
       <boxGeometry args={[0.06, 0.06, 0.45]} />
       <meshStandardMaterial color="#5c3d1e" roughness={0.9} metalness={0} />
     </mesh>

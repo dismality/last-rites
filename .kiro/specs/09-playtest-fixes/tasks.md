@@ -143,7 +143,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Pure rules in `src/game/systems/mapPins.ts` (add, remove, limit, reach-to-clear, save/restore) with tests. Click-to-world uses the exact inverse of the map draw transform; property test: world → map → world returns the same point at every zoom and pan
   - Browser: press M and click a spot; the compass shows the pin with a distance that drops while walking to it; the minimap shows it; it clears on arrival. M and N work keyboard-only; the overlay does not overlap the HUD at 1920x1080, 1280x720 and 800x600; screenshots
   - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11l)`), never push
-- [ ] 11m. Unknown recipes say where to look; bench stock uses the models
+- [x] 11m. Unknown recipes say where to look; bench stock uses the models
   - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 11m
   - Pure `itemSources(itemId)` in `src/game/systems/` from data only (lootTables, zones FIXED_SPAWNS and SPAWN_POINTS, the hut shelf, the merchant's stock); plain-word places, at most two per ingredient, nearest first; unit test that every recipe material has a source
   - Missing ingredients show "??? · <sources>" (unnamed until held); unknown-recipe tooltip "??? Needs N ingredients. You have: … Still to find: …"; known recipes with a shortfall show "Found: …" under the count; readable at 800x600 with the plain font

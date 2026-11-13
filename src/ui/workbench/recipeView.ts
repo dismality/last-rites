@@ -6,6 +6,7 @@ import { RECIPE_MAP } from '../../data/recipes'
 import type { RecipeDef } from '../../data/recipes'
 import { canCraft } from '../../game/systems/crafting'
 import { mergeCollected } from '../../game/systems/recipeDiscovery'
+import { joinSources, orSources, sourcePhrases, type Here } from '../../game/systems/itemSources'
 import type { Inventory, ItemId, RecipeId } from '../../game/types'
 
 export interface IngredientRow {
@@ -22,6 +23,10 @@ export interface IngredientRow {
   mark: '✓' | '✗'
   /** "need 2 more" when something is missing, else "have enough". */
   note: string
+  /** Where this ingredient comes from, nearest first, at most two; empty when nothing is missing. */
+  sources: string[]
+  /** "Found: dug from grave mounds, found in coffins" under a shortfall; '' when nothing is missing. */
+  found: string
 }
 
 export interface RecipeCard {
@@ -35,11 +40,13 @@ const nameOf = (id: ItemId): string => ITEM_MAP[id]?.name ?? id
 export function recipeCard(
   recipe: RecipeDef,
   missing: readonly { item: ItemId; qty: number }[],
+  from: Here = { x: 0, z: 0 },
 ): RecipeCard {
   const lackOf = new Map(missing.map((m) => [m.item, m.qty]))
   const row = (item: ItemId, need: number, tool: boolean): IngredientRow => {
     const lack = Math.min(need, Math.max(0, lackOf.get(item) ?? 0))
     const have = need - lack
+    const sources = lack > 0 ? sourcePhrases(item, from) : []
     return {
       item,
       name: nameOf(item),
@@ -50,6 +57,8 @@ export function recipeCard(
       tool,
       mark: lack > 0 ? '✗' : '✓',
       note: lack > 0 ? `need ${lack} more` : 'have enough',
+      sources,
+      found: sources.length > 0 ? `Found: ${joinSources(sources)}` : '',
     }
   }
   const out = nameOf(recipe.output.item)
@@ -76,6 +85,33 @@ export function isDiscovered(recipe: RecipeDef, collected: readonly ItemId[]): b
 /** The title a list row shows: the real name, or "???" until the recipe is discovered. */
 export function displayTitle(recipe: RecipeDef, collected: readonly ItemId[], card: RecipeCard): string {
   return isDiscovered(recipe, collected) ? card.title : '???'
+}
+
+/** The missing ingredient's line while its name is hidden: "??? · dug from grave mounds, found in coffins". */
+export function unknownIngredientText(row: IngredientRow): string {
+  return row.sources.length > 0 ? `??? · ${joinSources(row.sources)}` : '???'
+}
+
+/**
+ * The tooltip of a recipe that is not discovered yet:
+ * "??? Needs 2 ingredients. You have: Cloth. Still to find: something dug from grave mounds or found in coffins."
+ * Ingredients never held stay unnamed; only where they come from is said.
+ */
+export function unknownRecipeTip(card: RecipeCard, collected: readonly ItemId[]): string {
+  const seen = new Set(collected)
+  const n = card.ingredients.length
+  const have = card.ingredients.filter((i) => i.have > 0).map((i) => i.name)
+  const toFind = card.ingredients
+    .filter((i) => !seen.has(i.item) && i.lack > 0)
+    .map((i) => (i.sources.length > 0 ? `something ${orSources(i.sources)}` : 'something unknown'))
+  const parts = [`??? Needs ${n} ingredient${n === 1 ? '' : 's'}.`, `You have: ${have.length > 0 ? have.join(', ') : 'nothing yet'}.`]
+  if (toFind.length > 0) parts.push(`Still to find: ${toFind.join('; ')}.`)
+  return parts.join(' ')
+}
+
+/** The first ingredient with a shortfall, in recipe order: what Mark on map looks for. */
+export function firstMissing(card: RecipeCard): IngredientRow | undefined {
+  return card.ingredients.find((i) => i.lack > 0)
 }
 
 export interface PinCardView {

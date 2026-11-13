@@ -524,3 +524,61 @@
 .recipe-tip .is-missing {
   color: #e08a8a;
 }
+
+/* ── Where to look (spec 09, task 11m) ─────────────────────────────────── */
+.ingredient-found,
+.ingredient-name--unknown {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.25;
+  max-width: 11rem;
+  text-align: center;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.ingredient-found { font-style: italic; color: var(--ink); }
+
+.recipe-entry__mark-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.mark-btn {
+  padding: 0.1rem 0.5rem;
+  font: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.mark-btn kbd {
+  margin-left: 0.25rem;
+  padding: 0 0.3rem;
+  border: 1px solid currentColor;
+  border-radius: 3px;
+  font-size: 0.85rem;
+}
+
+.mark-btn:hover { border-color: var(--ember); }
+.mark-btn:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+
+.recipe-entry__mark-note {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.recipe-tip__found {
+  display: block;
+  margin-left: 1.1rem;
+  font-size: 0.9rem;
+  font-style: italic;
+  opacity: 0.9;
+}
