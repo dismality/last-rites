@@ -15,6 +15,7 @@ import { MODES } from '../../data/modes'
 import { STAGE_COUNT, type StageNumber } from '../../data/stages'
 import { restorePins, serializePins, type Pin } from './mapPins'
 import { freshStageSave, migrateSave, type StageSave } from './stageSave'
+import { freshCaseSave, sanitizeCaseSave, type CaseSave } from './caseSave'
 
 export const SAVE_KEY = 'lastrites:save'
 export const SAVE_VERSION = 1
@@ -38,6 +39,8 @@ export interface SaveState {
   progression?: ProgressionSave
   /** Stage block (spec 10). Optional on input; the loader migrates old night-only saves. */
   stage?: StageSave
+  /** Case block (spec 10 task 2.3). Optional on input; always written, and sanitised on read. */
+  case?: CaseSave
   /** Map pins (spec 09 task 11l). Optional on input and on read; the loader sanitises them. */
   pins?: Pin[]
 }
@@ -96,6 +99,7 @@ export function toSaveFile(state: SaveState): SaveFile {
     stage:
       state.stage ??
       freshStageSave(Math.min(Math.max(Math.floor(state.world.nightNumber) || 1, 1), STAGE_COUNT) as StageNumber),
+    case: state.case ?? freshCaseSave(),
   }
 }
 
@@ -197,6 +201,8 @@ export function fromSaveFile(
   return {
     world: { ...world, nightNumber: migrated.nightNumber },
     stage: migrated.stage,
+    // Old saves have no block: a fresh Stage-1 case state (Req 4.7). Stale ids are dropped.
+    case: sanitizeCaseSave(raw.case),
     player,
     inventory,
     chapel,

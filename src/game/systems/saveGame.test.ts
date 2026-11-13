@@ -15,6 +15,7 @@ import {
 import type { SaveState } from './saveGame'
 import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { PageNumber, RelicId } from '../types'
+import { freshCaseSave } from './caseSave'
 
 function memoryStorage(initial?: string) {
   const data = new Map<string, string>()
@@ -109,6 +110,7 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
       { slot: 3 as const, x: 0, z: 0, name: 'Pin 3' },
     ],
   ),
+  case: fc.constant(freshCaseSave()),
   stage: fc.record({
     stage: fc.constantFrom(1 as const, 2 as const, 3 as const),
     caseSolved: fc.boolean(),

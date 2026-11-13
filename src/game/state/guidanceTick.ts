@@ -40,6 +40,7 @@ import { usePlayerStore } from './playerStore'
 import { useSettingsStore } from './settingsStore'
 import { useSpawnStore } from './spawnStore'
 import { useStageStore } from './stageStore'
+import { selectCorrectLinks, useCaseStore } from './caseStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -122,8 +123,7 @@ const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
   const s = useStageStore.getState()
   return {
     stage: s.stage,
-    // The case board does not exist yet (task 2): no correct links can have been made.
-    curseLinks: 0,
+    curseLinks: selectCorrectLinks(useCaseStore.getState(), s.stage),
     altarLockedS: Math.max(0, Math.ceil(s.altar.lockedUntil - s.nightElapsed)),
   }
 }

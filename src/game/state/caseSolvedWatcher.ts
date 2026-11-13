@@ -2,7 +2,9 @@
 // (with its subtitle), the night-cleared score events, and at dawn the stage's recipe unlocks.
 // The zombies collapsing to dust is scene work (CaseCollapse). Pure wiring: no rules live here.
 
+import { caseOfStage } from '../../data/cases'
 import { MODES } from '../../data/modes'
+import { useCaseStore } from './caseStore'
 import { STAGE_MAP } from '../../data/stages'
 import { emit, subscribeToType } from '../events'
 import { statsAfterClear } from '../systems/waveDirection'
@@ -37,6 +39,8 @@ export function installCaseSolvedWatcher(): () => void {
     const night = world.nightNumber
     updateRunStats((r) => statsAfterClear(r, useProgressionStore.getState().mode, night))
     emit({ type: 'nightCleared', nightNumber: night })
+    // After the score event, which reads this case's hints and wrong answers for Sharp Eye.
+    useCaseStore.getState().closeCase(caseOfStage(stageOfNight(night)).id)
   })
   const offDawn = subscribeToType('dawnStarted', (e) => {
     if (storyRun()) unlockStageRecipes(e.nightNumber)

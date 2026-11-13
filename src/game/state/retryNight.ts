@@ -41,6 +41,8 @@ import { queueTeleportToStore } from './playerTeleport'
 import { useSpawnStore } from './spawnStore'
 import { useUiWorldStore } from './uiWorldStore'
 import { STAGE_PERSISTED, useStageStore } from './stageStore'
+import { CASE_PERSISTED, useCaseStore } from './caseStore'
+import { mergeRetry, sanitizeCaseSave } from '../systems/caseSave'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -80,6 +82,20 @@ export const progressionSnapshot: Snapshotable = {
   setState: (partial) => restoreProgressionSave(partial as unknown as ProgressionSave),
 }
 
+/**
+ * The case store restores by merge (spec 10 F5, Property 10): found clues, links and solved
+ * minigames are the union of the snapshot and now; Doubt, wrong answers and hints come back
+ * from the snapshot.
+ */
+export const caseSnapshot: Snapshotable = {
+  getState: () => fieldsOf(useCaseStore, CASE_PERSISTED).getState(),
+  setState: (partial) => {
+    const cur = useCaseStore.getState()
+    const now = sanitizeCaseSave(Object.fromEntries(CASE_PERSISTED.map((k) => [k, cur[k]])))
+    useCaseStore.setState(mergeRetry(sanitizeCaseSave(partial), now))
+  },
+}
+
 /** Every store except settings. Transient crafting UI state is omitted. */
 export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: readonly string[] }> = {
   // Built from COMBAT_PERSISTED so a field the Save keeps cannot be forgotten here (Req 20.3).
@@ -93,6 +109,7 @@ export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: reado
   world: { store: useWorldStore as unknown as Snapshotable },
   // After the world: a stage restore must win over the world's night-number sync.
   stage: { store: fieldsOf(useStageStore, STAGE_PERSISTED) },
+  case: { store: caseSnapshot },
   player: { store: usePlayerStore as unknown as Snapshotable },
   lantern: { store: useLanternStore as unknown as Snapshotable },
   map: { store: useMapStore as unknown as Snapshotable },
