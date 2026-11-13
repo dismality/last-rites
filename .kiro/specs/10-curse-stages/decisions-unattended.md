@@ -75,3 +75,10 @@ Choices made without asking the user while running sub-tasks unattended. Each ca
 4. **No game bug found**, so no game code changed. The "collapse" is checked by the end state (all zombies removed, wave state `done`), not by the dust puffs, which are not readable from the hook.
 5. **Not covered:** the bell 20 s before waves and the 20 s stuck despawn (still open from 1.4).
 6. Results: the spec passes (2 tests), `npm run lint` clean, `npm run build` passes (chunk-size warning only), `npx vitest run` 2016 tests pass.
+
+## 1.8 Finish
+
+1. **The two items open since 1.4 were already built and committed in da3d609**, so they are closed here, not moved to a later task: the bell rings once, 20 s before each wave, when bell repair stage 3 is built (`bellDue` in `stageWaves.ts`, called from `WaveDirector.tsx`, sound `toll`), and a chasing zombie more than 4 m from the player that stays within 1 m of one spot for 20 s is despawned and counted as banished (`updateStuck` and `shouldDespawnStuck`, with the constants in `stages.ts`). Both have unit tests in `stageWaves.test.ts`. The notes in 1.2 item 10, 1.4 item 9, 1.5 item 8 and 1.7 item 5 that call them open are out of date.
+2. **The bible got one clarification** in §8 (what "stuck" means). No number changed, so nothing else needed fixing.
+3. Doubt in the first wave stays with task 2.3 (`planNight` takes a `doubt` argument that defaults to 0).
+4. Gate: lint, build, 2043 unit tests, and `stage-loop`, `smoke`, `dev-panel` (5 Playwright tests, main project) all pass.
