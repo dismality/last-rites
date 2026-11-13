@@ -21,7 +21,7 @@ inclusion: always
 │   ├── data/               # typed content: items.ts, recipes.ts, enemies.ts, scares.ts, journal.ts, zones.ts
 │   ├── game/
 │   │   ├── state/          # zustand stores
-│   │   ├── systems/        # pure logic: inventory, crafting, combat, waves, scares, dayNight, mystery, lantern
+│   │   ├── systems/        # pure logic: inventory, crafting, combat, waves, scares, dayNight, mystery, lantern, case* (spec 10: stages, case board, minigame rules)
 │   │   └── types.ts        # shared domain types
 │   ├── scene/
 │   │   ├── GameLoop.tsx    # fixed-timestep driver
