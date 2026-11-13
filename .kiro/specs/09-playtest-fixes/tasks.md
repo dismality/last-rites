@@ -143,7 +143,39 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Pure rules in `src/game/systems/mapPins.ts` (add, remove, limit, reach-to-clear, save/restore) with tests. Click-to-world uses the exact inverse of the map draw transform; property test: world → map → world returns the same point at every zoom and pan
   - Browser: press M and click a spot; the compass shows the pin with a distance that drops while walking to it; the minimap shows it; it clears on arrival. M and N work keyboard-only; the overlay does not overlap the HUD at 1920x1080, 1280x720 and 800x600; screenshots
   - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11l)`), never push
-- [ ] 3. A2: Automated playthrough test
+- [ ] 11m. Unknown recipes say where to look; bench stock uses the models
+  - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 11m
+  - Pure `itemSources(itemId)` in `src/game/systems/` from data only (lootTables, zones FIXED_SPAWNS and SPAWN_POINTS, the hut shelf, the merchant's stock); plain-word places, at most two per ingredient, nearest first; unit test that every recipe material has a source
+  - Missing ingredients show "??? · <sources>" (unnamed until held); unknown-recipe tooltip "??? Needs N ingredients. You have: … Still to find: …"; known recipes with a shortfall show "Found: …" under the count; readable at 800x600 with the plain font
+  - "Mark on map" button (M on a focused row) drops an 11l pin on the nearest unlooted source of the first missing ingredient, or shows "None left today. Try again tomorrow"
+  - Bench stock piles (Workbench.tsx boxGeometry Instances) drawn with the item models, keeping the ember glow as emissive (no light); the recipe ghost's missing-ingredient outline becomes the item's silhouette (model in flat dark material); any other box/cylinder standing in for an item gets its model (list them)
+  - Browser: source text on an unknown recipe; Mark on map puts a pin on the compass; bench screenshots at 1280x720 and 800x600
+  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11m)`), never push
+- [ ] 11o. Objective hint fits where you are; clue outline fits the clue
+  - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 11o
+  - Each objective rule has a near hint (key and action) and a far hint (where to go); near only within 6 m and in the same building (hut, chapel, catacombs vs outside), far again past 8 m (hysteresis); reuse objectiveAim and the hut-door logic; pure logic in the objective system, texts in data; unit tests for near, far, inside/outside and hysteresis
+  - Clue highlight hugs the clue model (inverted-hull outline or soft ground ring), sized from model bounds, fades in within about 4 m and out after examining; no box, no wireframe; follows whichever model is shown (11n-d clue GLBs); replace any other wireframe highlight box
+  - Browser: screenshot a clue spot near and far at 1280x720
+  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11o)`), never push
+- [ ] 11n-a. Scenery swap: chapel inside and out
+  - Full brief: `docs/kiro-prompt-playtest-batch.md` Part B ("What's there", 11n-a, Realism, Tests)
+  - Mount `scene/chapel-interior.glb` and `scene/chapel-exterior.glb` (useGLTF with DRACO_PATH, `<Clone>`, preloadModels); old Slabs collider-only; remove the old frames, glass boxes, Kenney pillars, GableRoof, belfry, cross, Kenney altar and candles, visible floor slab
+  - Bell mesh swings at anchor bell-pivot on the dusk bell; door lantern light at door-lantern-light; stair cover hides when the whistle opens the stair
+  - Interior and buttress colliders from the JSON, none in the aisle, doors, altar trigger or congregation points; zombie paths still reach the altar and vestry
+  - Seat fx-page-5, font loot, pew loot and the revolver (cupboard shelf; the revolver Shelf goes); hymn board numbers checked against cases.ts and case-design (report a mismatch, never edit the GLB)
+  - Renderer: AgX tone mapping, low-intensity AO, selective bloom on emissives, moon shadow camera around the player, denser interior fog; anything over budget turns off at "Low"
+  - GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-a)`)
+- [ ] 11n-b. Scenery swap: hut
+  - Mount `scene/hut.glb`; Slabs collider-only; remove floor box, roof, window boxes, table meshes; add hut.json colliders (tables, stove, cot, barrels, log stack, vending machine footprint)
+  - Workbench becomes `props/workbench.glb` (collider and pile placement kept); seat hut-shelf, fx-page-1 on the east table and POWDER_TIN_HUT on the new west table (surfaces 0.78); boots clue uses clue-hut-boots.glb; stove ember light only if the budget allows
+  - GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-b)`)
+- [ ] 11n-c. Scenery swap: catacombs and the gates
+  - Mount `scene/catacombs.glb` untransformed; keep corridor colliders; remove brick-wall instances, hide floor and ceiling Blocks; add portal, ledge, bier and altar colliders; move cat-wall-a/b/c, fx-page-4, fx-shroud, fx-heart onto their surfaces (catacombs.json move-items); at most two dim candle lights if the budget allows
+  - Gates use gate-catacombs.glb and gate-mausoleum-row.glb lifted whole by useLift; ossuary door uses ossuary-door.glb; avenue rails use iron-railing.glb with a closing post
+  - Unit: corridor keeps 1.6 m clear width; GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-c)`)
+- [ ] 11n-d. Scenery swap: props everywhere else
+  - Lamp post, broken coffin, grave mounds (both states), merchant cart, statue, scare door, candle stub, grave hand, woodpile (axe at axe-rest), lodge table, sabre plinth, vending machine (new, placed only), bats (loaded for H4), and the nine `props/clue-<clueId>.glb` in ClueSpots; keep every collider and interactable, add the JSON colliders the game lacks
+  - Unit: every seated spot within 0.03 m of its surface, every JSON loads, no collider in the chapel aisle or the hut spawn-to-bench path; browser screenshots of each swapped prop; GPU perf before and after; list anything that could not be seated; commit locally (`... (spec 09 task 11n-d)`)- [ ] 3. A2: Automated playthrough test
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_
@@ -166,8 +198,15 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 9.3_
 
-- [ ] 17. B11: Movement hint clears
-  - Finish
+- [ ] 17. B11: Controls hint at the bottom left (rewritten 2026-11-14)
+  - Full brief: `docs/kiro-prompt-playtest-batch.md` Part A, 17; read design bible §11 first
+  - Panel above the health bar and oil gauge, parchment on dark: "W A S D Move", "Shift Sprint" (stamina bar named), "Hold V Charge a heavy swing" only while the axe or sabre is in hand; keys read live from the bindings with readable names ("Shift", "Mouse 2")
+  - Shows from the end of the intro; each line fades (steady with Flashing lights off) after its action (about 10 m moved, 2 s sprinted, one charged swing); the charge line returns on the first axe or sabre equip; setting "Show control hints" (On) hides it or brings every line back; hidden in menus, workbench, big map, examine, cutscenes and endings; used lines saved
+  - Stamina bar gets a "Stamina" caption or a run icon with an accessible name
+  - Data in `src/data/controlHints.ts`, pure logic in `src/game/systems/controlHints.ts`; texts fit at 800x600 with the plain font
+  - Compass bug: labels that would overlap (objective distance over "Hut") stack or shift aside, never draw over each other; unit test for the layout and a screenshot with the hut and objective in the same direction
+  - Unit: rebound keys, charge line only with the axe or sabre, each line clears, the setting brings them back, save and restore. Browser: panel after the intro, walk and sprint fade, axe charge line, no overlap at 1920x1080, 1280x720 and 800x600; screenshots
+  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 17)`), never push
   - _Requirements: 10.1_
 
 - [ ] 18. B12: Responsive HUD and 800x600 screenshot test
