@@ -128,6 +128,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_
+  - Moved to spec 10 final task (`.kiro/specs/10-curse-stages/tasks.md` task 12): a full 3-stage run in Short Vigil. Not done here.
 
 - [x] 12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval
   - approved 2026-11-11, applied unattended
