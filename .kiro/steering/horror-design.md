@@ -8,7 +8,11 @@ Apply these to any work on scares, enemies, audio, lighting, level layout or pac
 ## Tension curve
 - Alternate **tension** (dark, quiet, confined) and **release** (lit chapel, workbench, dawn). Never keep the player at maximum tension for more than ~90 seconds.
 - Silence is a tool: drop ambient audio 1–2 seconds before a major scare.
-- The first scare of the game happens within the **first 3 minutes** and is mild (the statue that turned its head). Escalate from there.
+- The first scare of the game happens within the **first 3 minutes** and is mild (the statue that turned its head). Escalate from there. The first puzzle minigame is also reachable within the first 3 minutes (stage 1's ledger cross-check, from the hut).
+- **Endless night waves:** each stage's night has no fixed end, so release cannot come from clearing waves. Release comes from (a) the gap between waves (a wave begins 20 s after the last zombie falls), (b) the lit, barred chapel and the altar, and (c) solving the case, which ends the night. Day has no zombies at all and is the long release; Lurkers and every other zombie are night-only.
+- Waves escalate but are capped (12 / 16 / 20 alive); never let the endless night run at maximum tension past ~90 seconds without a gap.
+- At night the journal does not pause; the screen dims and sound goes on. No scare begins while it is open. A wrong altar answer is a pressure spike (an instant wave and a 30 s lock), never a cheap death.
+- Grab kill-cams (a close-up when a Brute, Lurker or Sprinter seizes the player) happen at most once every 60 s and follow the scare intensity setting.
 
 ## Jumpscare contract
 Every scripted scare MUST:

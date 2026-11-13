@@ -129,7 +129,8 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 3.1-3.3_
 
-- [ ] 12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval
+- [x] 12. Gate: after task 11b, draft E0 (design bible and steering diff for 3 stages) and stop for the user's approval
+  - approved 2026-11-11, applied unattended
 
 - 13. Moved to spec 10 (stages replace them): B10 Short Vigil (now E11), D5 night balance, D7 endings and save/load
 
