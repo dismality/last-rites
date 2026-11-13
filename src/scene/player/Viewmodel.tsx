@@ -14,6 +14,7 @@ import { createPortal, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { useGameStore, useInventoryStore, usePlayerStore, useSettingsStore } from '../../game/state'
 import { useIntroStore } from '../../game/state/introStore'
+import { isSimFrozen } from '../../game/state/menuState'
 import { tickHeadBob, type BobState } from '../../game/systems/movement'
 import { hotbarItem } from '../../game/systems/satchel'
 import {
@@ -290,7 +291,7 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
     syncCamera(camera, settings.fov, aspect)
 
     const gs = useGameStore.getState()
-    const frozen = gs.paused || gs.examining || gs.journalOpen || gs.mapOpen
+    const frozen = isSimFrozen()
     const dt = frozen ? 0 : Math.min(rawDelta, 0.1)
 
     if (dt > 0) {

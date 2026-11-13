@@ -17,8 +17,10 @@ import {
   setChapelLevel,
   setTime,
   skipToNight,
+  giveAllClues,
   skipToStage,
   solveCurrentCase,
+  solveCurrentMinigame,
   spawnCrane,
   spawnOneOfEach,
   spawnWave,
@@ -159,6 +161,14 @@ export function DevPanel() {
             ))}
             <button type="button" onClick={run(solveCurrentCase)}>
               Solve current case
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(giveAllClues)}>
+              Give all clues
+            </button>
+            <button type="button" onClick={run(solveCurrentMinigame)}>
+              Solve current minigame
             </button>
           </Row>
           <Row>

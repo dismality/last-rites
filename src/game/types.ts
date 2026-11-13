@@ -286,6 +286,7 @@ export type GameEvent =
   | { type: 'craftCompleted'; recipeId: RecipeId }
   | { type: 'hotbarBound';    slot: 0 | 1 | 2 | 3 }
   | { type: 'journalOpened' }
+  | { type: 'caseTabOpened' }
   | { type: 'lanternToggled'; on: boolean }
   | { type: 'scareFired';     scareId: string }
   | { type: 'subtitleShown';  text: string; duration: number; force?: boolean }

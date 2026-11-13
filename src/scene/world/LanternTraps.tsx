@@ -11,7 +11,8 @@ import { ITEM_MAP } from '../../data/items'
 import '../assets/preloadModels'
 import { rampIntensity } from '../../game/systems/lightRamp'
 import { TRAP_BURN_RADIUS_M, TRAP_LIGHT_INTENSITY, TRAP_LIGHT_POOL } from '../../data/projectiles'
-import { useEnemyStore, useGameStore, useLanternStore, useProjectileStore } from '../../game/state'
+import { useEnemyStore, useLanternStore, useProjectileStore } from '../../game/state'
+import { isSimFrozen } from '../../game/state/menuState'
 import { tickTrap } from '../../game/systems/projectiles'
 import { emit } from '../../game/events'
 import { killReports } from '../../game/systems/killReports'
@@ -110,8 +111,7 @@ export function LanternTraps() {
   const traps = useProjectileStore((s) => s.traps)
 
   useFrame((_s, rawDelta) => {
-    const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen) return
+    if (isSimFrozen()) return
     const ps = useProjectileStore.getState()
     if (ps.traps.length === 0) return
     const dt = Math.min(rawDelta, MAX_DT)

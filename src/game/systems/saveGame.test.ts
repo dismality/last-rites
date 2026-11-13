@@ -98,7 +98,7 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
     finalRiteActive: fc.boolean(),
   }),
   recipes: fc.subarray(['r-bone-club', 'r-bandage']),
-  tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7] as TutorialStepId[]).map((a) => new Set(a)),
+  tutorial: fc.subarray([1, 2, 3, 4, 5, 6, 7, 8] as TutorialStepId[]).map((a) => new Set(a)),
   introSeen: fc.boolean(),
   progression: fc.constant(defaultProgressionSave()),
   // Map pins (spec 09 task 11l): up to two here, with their own numbers.
@@ -235,7 +235,7 @@ describe('saveGame new fields', () => {
           JSON.parse(JSON.stringify({ ...file, tutorial: t, introSeen: i })),
         )
         expect(loaded).not.toBeNull()
-        for (const step of loaded?.tutorial ?? []) expect([1, 2, 3, 4, 5, 6, 7]).toContain(step)
+        for (const step of loaded?.tutorial ?? []) expect([1, 2, 3, 4, 5, 6, 7, 8]).toContain(step)
         if (typeof i !== 'boolean') expect(loaded?.introSeen).toBe(hasPassedFirstDay(s.world))
       }),
       RUNS,

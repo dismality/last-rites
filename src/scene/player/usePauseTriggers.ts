@@ -1,21 +1,44 @@
 import { useEffect } from 'react'
 import { useGameStore } from '../../game/state'
 import { isOverlayOpen } from '../../game/state/menuState'
+import { useOverlayStore } from '../../game/state/overlayStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
+import { useWorldStore } from '../../game/state/worldStore'
+import { escClosesOverlay } from '../../game/systems/journalPause'
 
 /** True when an overlay that owns Esc (it closes itself on Esc) is open. */
 function escOwnedByOverlay(): boolean {
   const { examining, journalOpen, mapOpen, satchelOpen } = useGameStore.getState()
   const { workbenchOpen, chapelRepairOpen } = useUiWorldStore.getState()
-  return examining || journalOpen || mapOpen || satchelOpen || workbenchOpen || chapelRepairOpen
+  return (
+    examining ||
+    journalOpen ||
+    mapOpen ||
+    satchelOpen ||
+    workbenchOpen ||
+    chapelRepairOpen ||
+    useOverlayStore.getState().altarPanelOpen
+  )
 }
 
 /**
  * Esc key path. The dawn picker, merchant, achievements and mode select do not own Esc, so
- * Esc always pauses over them.
+ * Esc always pauses over them. The journal and big map own Esc only while they pause the world
+ * (by day); once the world runs, Esc pauses at once and the page stays open (Req 10.6).
  */
 export function handlePauseKey(code: string): void {
-  if (code === 'Escape' && !escOwnedByOverlay()) useGameStore.getState().setPaused(true)
+  if (code !== 'Escape') return
+  const { examining, journalOpen, mapOpen, satchelOpen } = useGameStore.getState()
+  const { workbenchOpen, chapelRepairOpen } = useUiWorldStore.getState()
+  const readerOwns = escClosesOverlay(useWorldStore.getState().phase, journalOpen || mapOpen)
+  const owned =
+    examining ||
+    satchelOpen ||
+    workbenchOpen ||
+    chapelRepairOpen ||
+    useOverlayStore.getState().altarPanelOpen ||
+    readerOwns
+  if (!owned) useGameStore.getState().setPaused(true)
 }
 
 /**

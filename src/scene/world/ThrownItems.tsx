@@ -6,7 +6,8 @@ import { useFrame } from '@react-three/fiber'
 import { BallCollider, RigidBody, type RapierRigidBody } from '@react-three/rapier'
 import { playThrowSfx } from '../../audio/AudioManager'
 import { FLASK_MAX_FLIGHT_S, FLASK_STUN_S, NAIL_BOMB_FUSE_S } from '../../data/projectiles'
-import { useEnemyStore, useGameStore, useLanternStore, useProjectileStore } from '../../game/state'
+import { useEnemyStore, useLanternStore, useProjectileStore } from '../../game/state'
+import { isSimFrozen } from '../../game/state/menuState'
 import { spawnDust } from '../../game/systems/melee'
 import { emit } from '../../game/events'
 import { killReports } from '../../game/systems/killReports'
@@ -85,8 +86,7 @@ function Thrown({ item, onBurst }: { item: ThrownItem; onBurst: (flash: Flash) =
   }
 
   useFrame((_s, rawDelta) => {
-    const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen) return
+    if (isSimFrozen()) return
     const dt = Math.min(rawDelta, 0.1)
     age.current += dt
     if (item.kind === 'nail-bomb') {

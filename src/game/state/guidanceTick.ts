@@ -223,6 +223,7 @@ export const installGuidanceWatchers = (): (() => void) => {
     subscribeToType('craftCompleted', () => completeAction('craft')),
     subscribeToType('hotbarBound', () => completeAction('bindHotbar')),
     subscribeToType('journalOpened', () => completeAction('openJournal')),
+    subscribeToType('caseTabOpened', () => completeAction('openCaseTab')),
     useMysteryStore.subscribe((state, prev) => {
       if (state.mystery !== prev.mystery && state.mystery.pages.has(1)) {
         completeAction('readPage')

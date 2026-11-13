@@ -5,7 +5,8 @@ import { Suspense } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { ItemMesh } from './ItemModel'
 import { WEAPON_MAP } from '../../data/weapons'
-import { useEnemyStore, useGameStore, useProjectileStore } from '../../game/state'
+import { useEnemyStore, useProjectileStore } from '../../game/state'
+import { isSimFrozen } from '../../game/state/menuState'
 import { constrainToSalt, tickSaltCircles } from '../../game/systems/projectiles'
 
 const MAX_DT = 0.1
@@ -23,8 +24,7 @@ export function SaltCircles() {
   const salts = useProjectileStore((s) => s.salts)
 
   useFrame((_s, rawDelta) => {
-    const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen) return
+    if (isSimFrozen()) return
     const ps = useProjectileStore.getState()
     if (ps.salts.length === 0) return
     ps.setSalts(tickSaltCircles(ps.salts, Math.min(rawDelta, MAX_DT)))

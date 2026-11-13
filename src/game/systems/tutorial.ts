@@ -77,7 +77,7 @@ export const parseTutorial = (raw: unknown): ReadonlySet<TutorialStepId> => {
   const out = new Set<TutorialStepId>()
   if (!Array.isArray(raw)) return out
   for (const v of raw) {
-    if (typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 7) {
+    if (typeof v === 'number' && Number.isInteger(v) && v >= 1 && v <= 8) {
       out.add(v as TutorialStepId)
     }
   }

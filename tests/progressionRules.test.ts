@@ -178,6 +178,15 @@ describe('structure rule: this spec adds no binary assets', () => {
     'shotgun silver-filings silver-sabre tallow-candle wood-axe wood-plank'
   ).split(' ')
   for (const i of ITEMS) ALLOWED.add(`models/items/${i}.glb`)
+  /** Scene pieces and props from tools/blender (chapel, hut, catacombs, props.py), credited in docs/CREDITS.md. */
+  for (const s of ['catacombs', 'chapel-exterior', 'chapel-interior', 'hut']) ALLOWED.add(`models/scene/${s}.glb`)
+  const PROPS = (
+    'bat-flying bat-perched candle-stub clue-cat-ledger-seal clue-cat-names clue-cat-scratches clue-elias-body ' +
+    'clue-empty-graves clue-hut-boots clue-ledger-week clue-row-statues clue-west-hill-glint coffin-broken ' +
+    'gate-catacombs gate-mausoleum-row grave-dug grave-hand grave-mound iron-railing lamp-post lodge-table ' +
+    'merchant-cart ossuary-door sabre-plinth scare-door statue-mourner vending-machine woodpile workbench'
+  ).split(' ')
+  for (const p of PROPS) ALLOWED.add(`models/props/${p}.glb`)
 
   it('has only the recorded .ogg, .mp3 and .glb files', () => {
     const found = Object.keys(import.meta.glob('../public/assets/**/*.{ogg,mp3,glb}'))
