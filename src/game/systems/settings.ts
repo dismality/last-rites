@@ -30,6 +30,7 @@ type BooleanKey =
   | 'tutorialPrompts'
   | 'damageNumbers'
   | 'showMinimap'
+  | 'showPinsInWorld'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -41,6 +42,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'accessibleHUD',
   'tutorialPrompts',
   'showMinimap',
+  'showPinsInWorld',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -60,6 +62,7 @@ export const DEFAULT_SETTINGS: Settings = {
   tutorialPrompts: true,
   damageNumbers: true,
   showMinimap: true,
+  showPinsInWorld: true,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',
@@ -80,7 +83,8 @@ export const DEFAULT_SETTINGS: Settings = {
     Satchel: 'Tab',
     Journal: 'KeyJ',
     Lantern: 'KeyF',
-    Minimap: 'KeyM',
+    Map: 'KeyM',
+    Minimap: 'KeyN',
     Pause: 'Escape',
     // Skips the intro cutscene; Enter is always accepted too.
     Skip: 'Space',
@@ -143,6 +147,10 @@ function sanitize(raw: unknown, base: Settings): Settings {
     for (const [action, code] of Object.entries(r.bindings as Record<string, unknown>)) {
       if (typeof code === 'string') out.bindings[action] = code
     }
+    // Saves from before the big map bound the minimap to M. M now opens the map, so move the
+    // minimap to N unless the player chose some other key for it.
+    const saved = r.bindings as Record<string, unknown>
+    if (saved.Minimap === 'KeyM' && saved.Map === undefined) out.bindings.Minimap = 'KeyN'
   }
   return out
 }

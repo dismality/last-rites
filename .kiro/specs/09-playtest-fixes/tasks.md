@@ -132,7 +132,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Unit: every item in ITEMS has a model file on disk; every held weapon has a grip transform
   - Browser: screenshots into `e2e/screenshots/items/` of a ground pickup of each material, the journal page in the hut, the oil, each weapon pickup and each held weapon; every model is visible at its spot and targetable
   - Design bible first; log in docs/kiro-log.md with "Decisions made unattended"; lint, build and unit tests pass; commit locally (`... (spec 09 task 11k)`), never push
-- [ ] 11l. Big map on M with clickable pins
+- [x] 11l. Big map on M with clickable pins
   - M opens a full-screen map overlay in the Journal map's pencil style (mapDraw): explored cells, landmarks (`-dark` marks), player arrow, objective. Esc or M closes it; uses the shared cursor-release hook (11h). Pauses by day like the journal; at night follows F8 (dims, sound on) if F8 is in, otherwise pauses
   - Mouse: wheel zooms from the whole grounds to about 30 m across; drag pans; left-click places a pin; clicking a landmark pins it and names the pin after it; clicking or right-clicking a pin removes it; pins may sit on unexplored ground ("?") anywhere inside PLAYABLE_BOUNDS. Keyboard: arrows move a cursor, Enter places, Delete removes, 1–3 select a pin, +/− zoom
   - Pins: up to 3, numbered 1–3 in distinct shapes (not colour only); a 4th replaces the oldest; a legend lists them with distance and "Clear all"

@@ -6,6 +6,7 @@ import { MERCHANT_SPOT } from '../../data/merchant'
 import { isMerchantPresent } from '../../game/state/merchantPresence'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
+import { usePinStore } from '../../game/state/pinStore'
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { buildCompassMarkers, compassTicks, headingDeg } from '../../game/systems/compass'
@@ -35,7 +36,6 @@ function syncMarker(el: HTMLElement, m: CompassMarker): void {
 
 /** The mark image for a marker, with its load state mirrored onto the marker element. */
 function makeMarkImg(el: HTMLElement, id: string): HTMLImageElement {
-  const kind = id.split('-')[0] as CompassMarkerKind
   const img = document.createElement('img')
   img.className = 'compass__mark'
   img.alt = ''
@@ -43,6 +43,13 @@ function makeMarkImg(el: HTMLElement, id: string): HTMLImageElement {
   img.height = HUD_MARK_PX
   img.draggable = false
   img.hidden = true
+  const prefix = id.split('-')[0]
+  if (prefix === 'pin') {
+    // Pins have no mark image: the circled number is the mark.
+    el.dataset.mark = 'glyph'
+    return img
+  }
+  const kind = prefix as CompassMarkerKind
   img.onload = () => {
     img.hidden = false
     el.dataset.mark = 'img'
@@ -103,6 +110,7 @@ export function Compass() {
         phase: useWorldStore.getState().phase,
         bellBuilt: isBellActive(useChapelStore.getState().chapel),
         merchant: isMerchantPresent() ? MERCHANT_SPOT.silas : undefined,
+        pins: usePinStore.getState().pins,
       })
       if (!layer) return
       const seen = new Set<string>()

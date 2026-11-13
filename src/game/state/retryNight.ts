@@ -35,6 +35,7 @@ import { useInventoryStore } from './inventoryStore'
 import { useLanternStore } from './lanternStore'
 import { useMapStore } from './mapStore'
 import { clearNightState } from './nightState'
+import { usePinStore } from './pinStore'
 import { usePlayerStore } from './playerStore'
 import { queueTeleportToStore } from './playerTeleport'
 import { useSpawnStore } from './spawnStore'
@@ -95,6 +96,7 @@ export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: reado
   player: { store: usePlayerStore as unknown as Snapshotable },
   lantern: { store: useLanternStore as unknown as Snapshotable },
   map: { store: useMapStore as unknown as Snapshotable },
+  pins: { store: usePinStore as unknown as Snapshotable },
   spawn: { store: useSpawnStore as unknown as Snapshotable },
   uiWorld: {
     store: useUiWorldStore as unknown as Snapshotable,

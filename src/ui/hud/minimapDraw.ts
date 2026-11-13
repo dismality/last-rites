@@ -10,7 +10,12 @@ import type { Cell } from '../../game/systems/mapReveal'
 import { drawCell, drawIcon } from '../journal/mapDraw'
 import { iconUrl } from '../../data/assets'
 import { drawMarkImage, HUD_MARK_PX } from '../markImages'
+import type { Pin } from '../../game/systems/mapPins'
+import { drawPinGlyph } from '../map/pinDraw'
 
+
+/** Pin size on the minimap (px). */
+const MINIMAP_PIN_PX = 18
 
 const GRAPHITE = '#3a2f22'
 const EMBER = '#e8913a'
@@ -27,6 +32,8 @@ export interface MinimapScene {
   landmarks: readonly Landmark[]
   /** World x, z of the current objective, when it has a place. */
   objective: { x: number; z: number } | null
+  /** Map pins; one off the map is pinned to the border with a chevron, like the objective. */
+  pins?: readonly Pin[]
   reducedMotion: boolean
 }
 
@@ -67,6 +74,10 @@ export function drawMinimap(ctx: CanvasRenderingContext2D, scene: MinimapScene):
     ctx.restore()
   }
 
+  for (const pin of scene.pins ?? []) {
+    const m = placeMarker(g, scene.player, pin, MINIMAP.markerInsetPx)
+    drawPinGlyph(ctx, pin.slot, m.x, m.y, { size: MINIMAP_PIN_PX, chevronAngle: m.pinned ? m.angle : null })
+  }
   if (scene.objective) drawObjective(ctx, scene)
   drawNorth(ctx, g)
   drawPlayer(ctx, g, scene.player.yaw)

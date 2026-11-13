@@ -16,6 +16,7 @@ export const SILENT_CAPTION_EVENTS = [
   'altar-locked',
   'altar-solved',
 ] as const
+// (pin-reached has a synth voice, so it is a SoundId, not a silent event.)
 
 export type SilentCaptionEvent = (typeof SILENT_CAPTION_EVENTS)[number]
 
@@ -49,6 +50,7 @@ export type CaptionId =
   | 'altar-wrong'
   | 'altar-locked'
   | 'altar-solved'
+  | 'pin-reached'
 
 export interface CaptionDef {
   id: CaptionId
@@ -151,6 +153,8 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'altar-wrong', event: 'altar-wrong', text: '[a sour note from the altar]', minSeconds: 2 },
   { id: 'altar-locked', event: 'altar-locked', text: '[the altar is silent]', minSeconds: 2 },
   { id: 'altar-solved', event: 'altar-solved', text: '[a clear note from the altar]', minSeconds: 2.5 },
+  // Spec 09 task 11l: the wording is the task's.
+  { id: 'pin-reached', event: 'pin-reached', text: '[pin reached]', minSeconds: 1.5 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

@@ -116,7 +116,7 @@ export function MeleeAttack() {
     prev.current = { attack: snap.attack, heavy: snap.heavy }
 
     const combat = useCombatStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen || isSimFrozen()) {
+    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen || isSimFrozen()) {
       // Pausing cancels a charge with nothing spent (Req 8.12).
       if (combat.live.charge || combat.live.releaseRequest)
         combat.patchLive({ charge: null, releaseRequest: null })

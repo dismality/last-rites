@@ -49,6 +49,7 @@ import { useChapelStore } from '../game/state/chapelStore'
 import { useSpawnStore } from '../game/state/spawnStore'
 import { usePlayerStore } from '../game/state/playerStore'
 import { useMapStore } from '../game/state/mapStore'
+import { usePinStore } from '../game/state/pinStore'
 import { useMysteryStore } from '../game/state/mysteryStore'
 import { minimapRuntime } from '../ui/hud/minimapRuntime'
 import { useEndingStore } from '../game/state/endingStore'
@@ -559,8 +560,17 @@ const api = {
     boss.setBoss({ ...boss.boss, stage: 'risen' })
   },
   /** Sets one boolean or numeric setting through the real store action (saved like in the Settings menu). */
-  setSetting(key: 'showMinimap' | 'flashingLights' | 'cameraShake', value: boolean): void {
+  setSetting(key: 'showMinimap' | 'showPinsInWorld' | 'flashingLights' | 'cameraShake', value: boolean): void {
     useSettingsStore.getState().setSetting(key, value)
+  },
+  /** The map pins, whether the big map is open, and how many pin beacons are in the scene. */
+  mapPins(): { pins: Array<{ slot: number; x: number; z: number; name: string }>; mapOpen: boolean; beacons: number } {
+    const pins = usePinStore.getState().pins.map((p) => ({ ...p }))
+    return { pins, mapOpen: useGameStore.getState().mapOpen, beacons: [1, 2, 3].filter((s) => api.meshesUnder(`pin-beacon-${s}`) > 0).length }
+  },
+  /** Places a pin through the real store action (the browser spec clicks the map for the main path). */
+  placePin(x: number, z: number, name?: string): void {
+    usePinStore.getState().place({ x, z, name })
   },
   /** Minimap redraw and loop-frame counts since page load (the redraw budget check reads these). */
   minimapStats(): { draws: number; frames: number } {

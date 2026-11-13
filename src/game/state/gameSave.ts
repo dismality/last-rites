@@ -21,6 +21,7 @@ import { useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useIntroStore } from './introStore'
 import { useMysteryStore } from './mysteryStore'
+import { capturePins, usePinStore } from './pinStore'
 import { usePlayerStore } from './playerStore'
 import { queueTeleportToStore } from './playerTeleport'
 import { useUiWorldStore } from './uiWorldStore'
@@ -71,6 +72,7 @@ export function captureSave(): SaveState {
     combat: captureCombatSave(pickDoors()),
     progression: captureProgressionSave(),
     stage: pickStage(),
+    pins: capturePins(),
   }
 }
 
@@ -116,6 +118,7 @@ export function loadGame(): boolean {
   )
   // After the world: moving the night number starts a fresh stage, and the save's block wins.
   if (save.stage) useStageStore.setState(save.stage)
+  usePinStore.setState({ pins: save.pins ?? [] })
   syncDerivedStats()
   return true
 }

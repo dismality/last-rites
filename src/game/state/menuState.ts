@@ -22,7 +22,7 @@ export function isDawnPickPending(): boolean {
 /** The world is stopped: pause, examine, journal or the intro cutscene. One check for every system. */
 export function isSimFrozen(): boolean {
   const g = useGameStore.getState()
-  return g.paused || g.examining || g.journalOpen || useIntroStore.getState().playing
+  return g.paused || g.examining || g.journalOpen || g.mapOpen || useIntroStore.getState().playing
 }
 
 /** Camera hand-off flags owned by scene code (kept as arguments so this module stays scene-free). */

@@ -20,6 +20,8 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'altar-wrong',
   'altar-locked',
   'altar-solved',
+  // Spec 09 task 11l
+  'pin-reached',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

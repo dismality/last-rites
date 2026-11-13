@@ -13,6 +13,12 @@ interface GameStoreState {
   /** Journal (map) is open: the simulation is frozen like examine mode, without the pause menu. */
   journalOpen: boolean
   setJournalOpen: (open: boolean) => void
+  /**
+   * The big map (M) is open. It freezes the simulation like the journal, by day and at night
+   * (the F8 night rule of spec 10 is not built yet, so night pauses too).
+   */
+  mapOpen: boolean
+  setMapOpen: (open: boolean) => void
   /** Satchel overlay is open. Unlike journal/examine this never freezes the simulation (Req 5.5). */
   satchelOpen: boolean
   setSatchelOpen: (open: boolean) => void
@@ -32,6 +38,8 @@ export const useGameStore = create<GameStoreState>((set) => ({
   setExamining: (examining) => set({ examining }),
   journalOpen: false,
   setJournalOpen: (journalOpen) => set({ journalOpen }),
+  mapOpen: false,
+  setMapOpen: (mapOpen) => set({ mapOpen }),
   satchelOpen: false,
   setSatchelOpen: (satchelOpen) => set({ satchelOpen }),
   taken: false,

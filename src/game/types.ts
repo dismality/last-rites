@@ -262,6 +262,8 @@ export interface Settings {
   damageNumbers: boolean
   /** Show the HUD minimap (the Minimap binding toggles it) */
   showMinimap: boolean
+  /** Draw a faint beacon at each map pin in the world */
+  showPinsInWorld: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

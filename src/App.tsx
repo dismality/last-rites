@@ -24,6 +24,7 @@ import { RecipeBook } from './ui/workbench/RecipeBook'
 import { RepairUI } from './ui/chapel/RepairUI'
 import { ExamineOverlay } from './ui/examine/ExamineOverlay'
 import { Journal } from './ui/journal/Journal'
+import { BigMap } from './ui/map/BigMap'
 import { TombstoneOverlay } from './ui/tombstone/TombstoneOverlay'
 import { Satchel } from './ui/satchel/Satchel'
 import { HotbarWheel } from './ui/satchel/HotbarWheel'
@@ -59,6 +60,7 @@ import { LanternTraps } from './scene/world/LanternTraps'
 import { GraveMounds } from './scene/world/GraveMounds'
 import { MaterialPickups } from './scene/world/MaterialPickups'
 import { SaltCircles } from './scene/world/SaltCircles'
+import { PinBeacons } from './scene/world/PinBeacons'
 import { SkyAndFog } from './scene/world/SkyAndFog'
 import { ThrownItems } from './scene/world/ThrownItems'
 import { Workbench } from './scene/world/Workbench'
@@ -111,6 +113,7 @@ function GameScreen() {
           <LanternTraps />
           {/* After EnemyDirector so salt reads this frame's enemy positions. */}
           <SaltCircles />
+          <PinBeacons />
           <DustBurst />
           <CaseCollapse />
           <GraveBurst />
@@ -158,6 +161,7 @@ export default function App() {
       <ExamineOverlay />
       <TombstoneOverlay />
       <Journal />
+      <BigMap />
       <Satchel />
       <HotbarWheel />
       {/* Last, so the item name shows above every overlay that lists items. */}

@@ -5,6 +5,8 @@ import { MAP_EXTENT, MAP_PX, type Landmark, type LandmarkKind } from '../../data
 import { iconUrl, type MarkId } from '../../data/assets'
 import { createRng } from '../../game/rng'
 import { drawMarkImage } from '../markImages'
+import { drawPinGlyph } from '../map/pinDraw'
+import type { Pin } from '../../game/systems/mapPins'
 import { clampToMap, worldToMap } from '../../game/systems/mapProject'
 import type { Cell } from '../../game/systems/mapReveal'
 
@@ -33,6 +35,8 @@ export interface MapScene {
   objective?: { position?: readonly [number, number, number]; marker?: string; main: string } | null
   /** Marks with no landmark entry (hut, merchant, wave graves); the caller decides which show. */
   extraMarks?: readonly ExtraMark[]
+  /** Pins, drawn above the landmarks and under the objective and the quill. */
+  pins?: ReadonlyArray<{ pin: Pin; unexplored: boolean; selected?: boolean }>
   /** Fade cells in instead of drawing strokes (prefers-reduced-motion). */
   reducedMotion: boolean
 }
@@ -82,14 +86,35 @@ export function drawMap(ctx: CanvasRenderingContext2D, scene: MapScene): void {
     if (!drawMarkImage(ctx, iconUrl('mark-dark', m.id), MAP_MARK_PX)) drawGlyphMark(ctx, m.glyph)
     ctx.restore()
   }
+  for (const { pin, unexplored, selected } of scene.pins ?? []) {
+    const [px, pz] = toPx(pin.x, pin.z)
+    drawPinGlyph(ctx, pin.slot, px, pz, { size: PIN_SHEET_PX, unexplored, selected })
+  }
   drawObjective(ctx, scene.objective)
   drawQuill(ctx, scene.player)
 }
 
+/** Pin size on the 1:1 Journal sheet (px). */
+export const PIN_SHEET_PX = 22
+
+/** Where markers go and where they are clamped; the Journal sheet by default, the big map's screen otherwise. */
+export interface MapProjection {
+  toPx: (x: number, z: number) => [number, number]
+  clamp: (px: number, py: number) => [number, number]
+  /** Right edge of the drawing area, so a label flips left near it. */
+  width: number
+}
+
+const SHEET_PROJECTION: MapProjection = { toPx, clamp: clampToMap, width: MAP_WIDTH }
+
 /** Diamond glyph plus a 16 px text label, clamped to the map edge so it is never lost. */
-function drawObjective(ctx: CanvasRenderingContext2D, o: MapScene['objective']): void {
+export function drawObjective(
+  ctx: CanvasRenderingContext2D,
+  o: MapScene['objective'],
+  proj: MapProjection = SHEET_PROJECTION,
+): void {
   if (!o?.position) return
-  const [x, y] = clampToMap(...toPx(o.position[0], o.position[2]))
+  const [x, y] = proj.clamp(...proj.toPx(o.position[0], o.position[2]))
   const label = o.marker ?? o.main
   ctx.save()
   ctx.translate(x, y)
@@ -113,7 +138,7 @@ function drawObjective(ctx: CanvasRenderingContext2D, o: MapScene['objective']):
   const w = ctx.measureText(label).width
   // Flip the label left of the glyph near the right edge so it stays on the sheet.
   const gap = withImage ? MAP_MARK_PX / 2 + 4 : 12
-  const flip = x + gap + w > MAP_WIDTH
+  const flip = x + gap + w > proj.width
   ctx.textAlign = flip ? 'right' : 'left'
   const tx = flip ? x - gap : x + gap
   ctx.lineWidth = 3
@@ -229,8 +254,12 @@ export function drawIcon(ctx: CanvasRenderingContext2D, kind: LandmarkKind, x: n
 }
 
 /** Quill: a feather-shaped pointer aimed along the player's heading. */
-function drawQuill(ctx: CanvasRenderingContext2D, p: { x: number; z: number; yaw: number }): void {
-  const [x, y] = clampToMap(...toPx(p.x, p.z))
+export function drawQuill(
+  ctx: CanvasRenderingContext2D,
+  p: { x: number; z: number; yaw: number },
+  proj: MapProjection = SHEET_PROJECTION,
+): void {
+  const [x, y] = proj.clamp(...proj.toPx(p.x, p.z))
   // Camera yaw 0 looks toward -Z (up the map); positive yaw turns left (counter-clockwise).
   const angle = -p.yaw
   ctx.save()

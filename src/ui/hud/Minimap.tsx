@@ -3,6 +3,7 @@ import { LANDMARKS, MAP_INK } from '../../data/mapLandmarks'
 import { MINIMAP } from '../../data/minimap'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useMapStore } from '../../game/state/mapStore'
+import { usePinStore } from '../../game/state/pinStore'
 import { cinematicActive, isMenuOpen } from '../../game/state/menuState'
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
@@ -84,12 +85,13 @@ function MinimapView() {
       const objective = useGuidanceStore.getState().objective
       const night = useWorldStore.getState().phase === 'night'
       const op = objective?.position
+      const pins = usePinStore.getState().pins
       const sample: RedrawSample = {
         x: player.position[0],
         z: player.position[2],
         yaw: player.yaw,
         mapRef: map,
-        contentKey: `${night ? 'n' : 'd'}|${op ? `${op[0]},${op[2]}` : ''}|${marksVersion()}`,
+        contentKey: `${night ? 'n' : 'd'}|${op ? `${op[0]},${op[2]}` : ''}|${marksVersion()}|${pins.map((p) => `${p.slot}:${p.x},${p.z}`).join(';')}`,
         animating: inkStart.size > 0,
       }
       if (!Number.isFinite(sample.x) || !Number.isFinite(sample.z) || !Number.isFinite(sample.yaw)) return
@@ -115,6 +117,7 @@ function MinimapView() {
         cells,
         landmarks,
         objective: op ? { x: op[0], z: op[2] } : null,
+        pins,
         reducedMotion: reduced,
       })
       minimapRuntime.draws++
@@ -124,6 +127,10 @@ function MinimapView() {
       if (op) {
         const m = placeMarker(GEOMETRY, at, { x: op[0], z: op[2] }, MINIMAP.markerInsetPx)
         next += ` Objective ${Math.round(m.distanceM)} metres ${bearingWord(m.angle)}.`
+      }
+      for (const pin of pins) {
+        const m = placeMarker(GEOMETRY, at, pin, MINIMAP.markerInsetPx)
+        next += ` Pin ${pin.slot} ${Math.round(m.distanceM)} metres ${bearingWord(m.angle)}.`
       }
       if (next !== label) {
         label = next

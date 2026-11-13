@@ -183,11 +183,11 @@ test('hidden during the intro, menus and when switched off; M and the setting to
   await page.keyboard.press('KeyJ')
   await expect(page.locator('.minimap')).toBeVisible()
 
-  // The Minimap key (M) switches it off and on, and the choice is saved like other settings.
-  await page.keyboard.press('KeyM')
+  // The Minimap key (N, moved from M for the big map) switches it off and on, and the choice is saved like other settings.
+  await page.keyboard.press('KeyN')
   await expect(page.locator('.minimap')).toHaveCount(0)
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('last-rites-settings')!).showMinimap)).toBe(false)
-  await page.keyboard.press('KeyM')
+  await page.keyboard.press('KeyN')
   await expect(page.locator('.minimap')).toBeVisible()
   await page.evaluate(() => window.__lastRites!.setSetting('showMinimap', false))
   await expect(page.locator('.minimap')).toHaveCount(0)

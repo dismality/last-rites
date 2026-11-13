@@ -111,7 +111,7 @@ export function LanternTraps() {
 
   useFrame((_s, rawDelta) => {
     const gs = useGameStore.getState()
-    if (gs.paused || gs.examining || gs.journalOpen) return
+    if (gs.paused || gs.examining || gs.journalOpen || gs.mapOpen) return
     const ps = useProjectileStore.getState()
     if (ps.traps.length === 0) return
     const dt = Math.min(rawDelta, MAX_DT)

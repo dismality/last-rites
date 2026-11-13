@@ -36,6 +36,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   tutorialPrompts: fc.boolean(),
   damageNumbers: fc.boolean(),
   showMinimap: fc.boolean(),
+  showPinsInWorld: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -113,9 +114,11 @@ describe('settings persistence', () => {
     })
   })
 
-  it('defaults Show minimap on and binds Minimap to M without clashing with another action', () => {
+  it('defaults Show minimap on, Map to M and Minimap to N without clashing with another action', () => {
     expect(DEFAULT_SETTINGS.showMinimap).toBe(true)
-    expect(DEFAULT_SETTINGS.bindings.Minimap).toBe('KeyM')
+    expect(DEFAULT_SETTINGS.showPinsInWorld).toBe(true)
+    expect(DEFAULT_SETTINGS.bindings.Map).toBe('KeyM')
+    expect(DEFAULT_SETTINGS.bindings.Minimap).toBe('KeyN')
     const codes = Object.values(DEFAULT_SETTINGS.bindings)
     expect(new Set(codes).size).toBe(codes.length)
   })
@@ -128,7 +131,17 @@ describe('settings persistence', () => {
     void _m
     const old = loadSettings(memoryStorage(JSON.stringify({ fov: 80, bindings: oldBindings })))
     expect(old.showMinimap).toBe(true)
-    expect(old.bindings.Minimap).toBe('KeyM')
+    expect(old.bindings.Minimap).toBe('KeyN')
+  })
+
+  it('moves a saved Minimap = M binding to N, but keeps another key the player chose', () => {
+    const { Map: _map, ...rest } = DEFAULT_SETTINGS.bindings
+    void _map
+    const moved = loadSettings(memoryStorage(JSON.stringify({ bindings: { ...rest, Minimap: 'KeyM' } })))
+    expect(moved.bindings.Minimap).toBe('KeyN')
+    expect(moved.bindings.Map).toBe('KeyM')
+    const kept = loadSettings(memoryStorage(JSON.stringify({ bindings: { ...rest, Minimap: 'KeyB' } })))
+    expect(kept.bindings.Minimap).toBe('KeyB')
   })
 
   it('round-trips damageNumbers false', () => {

@@ -27,6 +27,7 @@ export type SoundId =
   | 'thunder-close'
   | 'thunder-far'
   | 'rain-noise'
+  | 'pin-reached'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -277,6 +278,15 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.4,
     decayS: 3.4,
     layers: [noise('lowpass', 500, 70, 0.8, 0.6), tone('sine', 50, 30, 0.5)],
+  },
+  // A soft two-note chime: a map pin was reached (spec 09 task 11l).
+  'pin-reached': {
+    id: 'pin-reached',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.02,
+    decayS: 0.7,
+    layers: [tone('sine', 523, 520, 0.18), tone('sine', 784, 780, 0.1)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {
