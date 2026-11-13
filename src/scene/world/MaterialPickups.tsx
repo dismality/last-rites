@@ -56,7 +56,6 @@ export function MaterialPickups() {
             subject={d.id}
             usedUp={gone}
             id={gone ? `pickup:${d.id}~gone` : `pickup:${d.id}`}
-            size={[0.3, 0.3, 0.3]}
             runeHeight={0.5}
             onInteract={() => collectDrop(d.id)}
           >
@@ -73,7 +72,6 @@ export function MaterialPickups() {
             subject={s.subject}
             usedUp={gone}
             id={gone ? `${s.id}~gone` : s.id}
-            size={[0.3, 0.3, 0.3]}
             runeHeight={0.5}
             onInteract={() => collect(s.spawnId, s.index)}
           >

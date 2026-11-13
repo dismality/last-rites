@@ -542,6 +542,12 @@ By day the second line shows "Dusk in 3:12". A tutorial prompt, when one is show
 
 **Rule 12 (09):** "Craft a weapon at the workbench (0/1)" outranks rules 5–11 when it is day in a story mode, the player owns no weapon but the Rusty Shovel, and dusk is under 2:00 away. The story objective it stands above moves to the second line, and the compass points at the workbench.
 
+### Hints that fit where you are (09, task 11o)
+A hint that names a key and an object only makes sense within reach. Tutorial steps that point at a place (2 oil on the table, 3 the page Elias left, 5 the workbench) have two texts in `src/data/tutorialSteps.ts`: the **near** text (key and action) and a **far** text that says where to go ("Go to the hut: there is oil on the table"). The near text shows within **6 m** of the object **and** in the same building (hut, chapel and catacombs each count as different from the open grounds, so one metre outside the hut door is far). Once near it stays near until the player is past **8 m** or in another building, so the line never flickers on the edge. Steps with no single place (walk, dig, satchel, journal) are unchanged. The rule is the pure `hintNear` in `systems/objectiveHint.ts`; the objective rules' main lines (5-10) already say where to go and keep their text and the dusk countdown.
+
+### Clue and interact outline (09, task 11o)
+The highlight around an interactable is an **inverted hull**: the object's own meshes drawn again slightly larger as flat, unlit pale back faces behind it, sized from the meshes' bounds (thickness 5% of the largest side, 3 to 6 cm). It follows whichever model the object shows. No box, no wireframe, no light. It shows on hover; clue spots also fade it in within **4 m** (over the last metre) while examining would do something, and fade it out after the clue is examined. The fade is steady, never a pulse, so it suits Flashing lights off and reduced motion.
+
 ### Tutorial (first day only)
 One prompt at a time, in this order. Each one finishes as soon as the player does the action, and skips itself if the action was already done. Keys come from the current bindings. A **Tutorial prompts** setting (default On) turns them off.
 

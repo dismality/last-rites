@@ -41,7 +41,6 @@ function AltarStairReveal({ z }: { z: number }) {
       <Interactable
         id="altar-whistle"
         kind="altar-whistle"
-        size={[1.6, 1.1, 0.8]}
         runeHeight={1.6}
         onInteract={() => useMysteryStore.getState().interactGate('catacombs', 'altar')}
       >
@@ -68,7 +67,6 @@ function CaseAltar({ z }: { z: number }) {
       <Interactable
         id="case-altar"
         kind="case-altar"
-        size={[1.6, 1.1, 0.8]}
         runeHeight={1.6}
         onInteract={() => {
           // While the final rite can be held, E at the altar belongs to the rite.

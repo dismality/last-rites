@@ -57,7 +57,6 @@ export function FixedSpawns() {
               subject={s.id}
               usedUp={gone}
               id={gone ? `fixed:${s.id}~gone` : `fixed:${s.id}`}
-              size={[0.4, 0.2, 0.4]}
               runeHeight={0.5}
               onInteract={() => collect(s.id)}
             >

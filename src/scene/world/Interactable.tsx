@@ -23,10 +23,65 @@ import { introCameraRuntime } from '../effects/introCameraRuntime'
 import { interactableRegistry } from './interactableRegistry'
 
 const EMBER = '#e8913a'
-// Hover frame: pale parchment edge lines at low opacity. drei <Outlines> on the transparent
-// proxy box showed its whole back-face hull as solid walls, so plain edges are used instead.
+// Highlight: an inverted hull. The object's own meshes are drawn again, a little larger, as flat
+// unlit pale-parchment back faces behind the object, so the glow hugs its real shape (no box, no
+// wireframe, no light). Sized from the meshes' bounds so it follows whatever model is shown.
 const OUTLINE = '#f5d9a8'
-const OUTLINE_OPACITY = 0.35
+const OUTLINE_OPACITY = 0.6
+/** Hull thickness as a fraction of the object's largest side, kept within a readable range (m). */
+const HULL_FRACTION = 0.05
+const HULL_MIN_M = 0.03
+const HULL_MAX_M = 0.06
+/** Sides shorter than this scale by this much, so a flat sheet does not blow up. */
+const HULL_SIDE_FLOOR_M = 0.15
+/** Proximity outlines reach full strength this far inside their range. */
+const OUTLINE_FADE_BAND_M = 1
+
+/**
+ * Fills `hull` with flat copies of every mesh under `body`, placed so the whole set is scaled
+ * about the bounds centre by (side + 2 t) / side. Positions are in `root`'s space.
+ */
+function buildHull(
+  root: THREE.Object3D,
+  body: THREE.Object3D,
+  hull: THREE.Group,
+  material: THREE.Material,
+): void {
+  hull.clear()
+  hull.position.set(0, 0, 0)
+  hull.scale.set(1, 1, 1)
+  root.updateWorldMatrix(true, false)
+  body.updateWorldMatrix(true, true)
+  const toRoot = new THREE.Matrix4().copy(root.matrixWorld).invert()
+  const bounds = new THREE.Box3()
+  const parts: { mesh: THREE.Mesh; rel: THREE.Matrix4 }[] = []
+  body.traverse((o) => {
+    const mesh = o as THREE.Mesh
+    if (!mesh.isMesh || !mesh.geometry) return
+    if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox()
+    const rel = new THREE.Matrix4().multiplyMatrices(toRoot, mesh.matrixWorld)
+    bounds.union(mesh.geometry.boundingBox!.clone().applyMatrix4(rel))
+    parts.push({ mesh, rel })
+  })
+  if (bounds.isEmpty()) return
+  const size = bounds.getSize(new THREE.Vector3())
+  const centre = bounds.getCenter(new THREE.Vector3())
+  const t = Math.min(HULL_MAX_M, Math.max(HULL_MIN_M, HULL_FRACTION * Math.max(size.x, size.y, size.z)))
+  hull.position.copy(centre)
+  hull.scale.set(
+    1 + (2 * t) / Math.max(size.x, HULL_SIDE_FLOOR_M),
+    1 + (2 * t) / Math.max(size.y, HULL_SIDE_FLOOR_M),
+    1 + (2 * t) / Math.max(size.z, HULL_SIDE_FLOOR_M),
+  )
+  const recentre = new THREE.Matrix4().makeTranslation(-centre.x, -centre.y, -centre.z)
+  for (const { mesh, rel } of parts) {
+    const copy = new THREE.Mesh(mesh.geometry, material)
+    copy.matrixAutoUpdate = false
+    copy.matrix.multiplyMatrices(recentre, rel)
+    copy.raycast = () => null
+    hull.add(copy)
+  }
+}
 /** Beyond this the cue is not computed: runes only show inside lantern or day range. */
 const CUE_RANGE_M = 40
 const runeTextures = new Map<InteractAction, THREE.CanvasTexture>()
@@ -112,8 +167,11 @@ interface Props {
   onUsedUp?: () => void
   /** Unique id; generated if omitted. */
   id?: string
-  /** Local half-size of the highlight box. */
-  size?: [number, number, number]
+  /**
+   * Show the outline (not only on hover) within this many metres while the object can be used,
+   * fading in over the last metre. Clue spots use 4 m.
+   */
+  outlineRange?: number
   /** Height of the rune above the object's origin. */
   runeHeight?: number
   /** Rune scale; large targets seen from afar (grave mounds) use a bigger glyph. */
@@ -130,7 +188,7 @@ export function Interactable({
   onInteract,
   onUsedUp,
   id,
-  size = [0.5, 0.5, 0.5],
+  outlineRange,
   runeHeight = 0.8,
   runeScale = 0.25,
   dayRuneRange,
@@ -143,7 +201,9 @@ export function Interactable({
   const group = useRef<THREE.Group>(null)
   const body = useRef<THREE.Group>(null)
   const rune = useRef<THREE.SpriteMaterial>(null)
-  const outlineMat = useRef<THREE.LineBasicMaterial>(null)
+  const hull = useRef<THREE.Group>(null)
+  // Created with each hull (below) and read per frame; null while no outline is showing.
+  const outlineMat = useRef<THREE.MeshBasicMaterial | null>(null)
   const [outlineOn, setOutlineOn] = useState(false)
   const handler = useRef(onInteract)
   const usedHandler = useRef(onUsedUp)
@@ -159,12 +219,24 @@ export function Interactable({
   }>({ used: null, startedAt: -Infinity, runeFrom: 0, outlineFrom: 0 })
   const world = useMemo(() => new THREE.Vector3(), [])
   const map = useMemo(() => runeTexture(action), [action])
-  const [sx, sy, sz] = size
-  const edges = useMemo(
-    () => new THREE.EdgesGeometry(new THREE.BoxGeometry(sx, sy, sz)),
-    [sx, sy, sz],
-  )
-  useEffect(() => () => edges.dispose(), [edges])
+  // Rebuild the hull each time it appears, so it follows whichever meshes the body holds now.
+  useEffect(() => {
+    if (!outlineOn || !group.current || !body.current || !hull.current) return
+    const material = new THREE.MeshBasicMaterial({
+      color: OUTLINE,
+      side: THREE.BackSide,
+      transparent: true,
+      opacity: 0,
+      depthWrite: false,
+      toneMapped: false,
+    })
+    outlineMat.current = material
+    buildHull(group.current, body.current, hull.current, material)
+    return () => {
+      outlineMat.current = null
+      material.dispose()
+    }
+  }, [outlineOn])
 
   useEffect(() => {
     handler.current = onInteract
@@ -272,9 +344,15 @@ export function Interactable({
       }
     }
 
-    const wantOutline = isHover || (used && f.outlineFrom > 0 && alpha > 0 && !hide)
+    // Proximity outline (clue spots): fades in over the last metre of `outlineRange`, only while
+    // examining would do something. A steady fade, never a pulse, so it suits every comfort setting.
+    const near =
+      outlineRange !== undefined && !used && !hide && cue.targetable
+        ? Math.min(1, Math.max(0, (outlineRange - dist) / OUTLINE_FADE_BAND_M))
+        : 0
+    const wantOutline = isHover || near > 0 || (used && f.outlineFrom > 0 && alpha > 0 && !hide)
     setOutlineOn((o) => (o === wantOutline ? o : wantOutline))
-    if (outlineMat.current) outlineMat.current.opacity = OUTLINE_OPACITY * (used ? alpha : 1)
+    if (outlineMat.current) outlineMat.current.opacity = OUTLINE_OPACITY * (used ? alpha : isHover ? 1 : near)
 
     if (rune.current) {
       rune.current.opacity = used
@@ -292,18 +370,8 @@ export function Interactable({
   return (
     <group ref={group}>
       <group ref={body}>{children}</group>
-      {/* Hover-only edge frame (fades with the object once used up). raycast disabled so it never blocks the crosshair. */}
-      {outlineOn && (
-        <lineSegments name="hover-outline" geometry={edges} position={[0, sy / 2, 0]} raycast={() => null}>
-          <lineBasicMaterial
-            ref={outlineMat}
-            color={OUTLINE}
-            transparent
-            opacity={OUTLINE_OPACITY}
-            depthWrite={false}
-          />
-        </lineSegments>
-      )}
+      {/* Inverted-hull outline of the body's own meshes (fades with the object once used up). Its meshes have raycast disabled so they never block the crosshair. */}
+      {outlineOn && <group ref={hull} name="hover-outline" />}
       <sprite position={[0, runeHeight, 0]} scale={[runeScale, runeScale, runeScale]} raycast={() => null}>
         <spriteMaterial ref={rune} map={map} transparent opacity={0} depthWrite={false} />
       </sprite>

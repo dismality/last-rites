@@ -40,6 +40,8 @@ interface GuidanceData {
   hintProgress: HintProgress
   /** Last ground position the hint tally saw, or null before the first tick. */
   hintLast: readonly [number, number] | null
+  /** Near (key and action) or far (where to go) wording for the tutorial prompt (spec 09 task 11o). */
+  hintNear: boolean
 }
 
 interface GuidanceStoreState extends GuidanceData {
@@ -62,6 +64,7 @@ const fresh = (): GuidanceData => ({
   hintsUsed: new Set(),
   hintProgress: freshHintProgress(),
   hintLast: null,
+  hintNear: true,
 })
 
 export const useGuidanceStore = create<GuidanceStoreState>((set) => ({

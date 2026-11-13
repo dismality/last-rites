@@ -105,7 +105,6 @@ function Door({ id, boards }: DoorProps) {
         kind="barricade-door"
         subject={id}
         id={`nail-${id}`}
-        size={[spec.width, DOOR_HEIGHT, 0.4]}
         runeHeight={DOOR_HEIGHT + 0.2}
         onInteract={onInteract}
       >

@@ -565,7 +565,6 @@ export function Workbench() {
           <Interactable
             id="workbench"
             kind="workbench"
-            size={[1.4, 1.1, 0.8]}
             runeHeight={1.2}
             onInteract={openWorkbench}
           >

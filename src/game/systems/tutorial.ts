@@ -9,6 +9,7 @@ import {
   type TutorialAction,
   type TutorialStepId,
 } from '../../data/tutorialSteps'
+import type { HintPlace } from '../../data/objectiveHints'
 import type { Phase } from '../types'
 import { keyLabel } from './interaction'
 
@@ -45,6 +46,8 @@ export interface TutorialPromptContext {
   phase: Phase
   nightNumber: number
   bindings: Record<string, string>
+  /** Near the step's object (spec 09 task 11o). Absent means near: the key-and-action text. */
+  near?: boolean
 }
 
 export const tutorialPrompt = (c: TutorialPromptContext): string | null => {
@@ -53,7 +56,16 @@ export const tutorialPrompt = (c: TutorialPromptContext): string | null => {
   const id = currentTutorialStep(c.done)
   if (id === null) return null
   const def = TUTORIAL_STEPS.find((s) => s.id === id)
-  return def ? formatPrompt(def.template, c.bindings) : null
+  if (!def) return null
+  const far = c.near === false && def.farTemplate !== undefined
+  return formatPrompt(far ? def.farTemplate! : def.template, c.bindings)
+}
+
+/** The place the current tutorial step points at, when it has one (drives the near/far switch). */
+export const currentTutorialPlace = (done: ReadonlySet<TutorialStepId>): HintPlace | null => {
+  const id = currentTutorialStep(done)
+  const def = TUTORIAL_STEPS.find((s) => s.id === id)
+  return def?.farTemplate !== undefined && def.place ? def.place : null
 }
 
 /** Adds the ground-plane distance from `from` to `to`; bad input leaves the total unchanged. */
