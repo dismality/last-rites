@@ -99,7 +99,7 @@ Common rules for all tasks:
     - Run the Finish steps for task 2; commit `case board and case systems (spec 10 task 2)`
 
 - [ ] 3. Stage 1: Saved by the Bell
-  - [ ] 3.1 Case 1 data
+  - [x] 3.1 Case 1 data
     - Fill `cases.ts` for Case 1: ledger of 8 entries, stones (Marsh, Hale, Ames, Pell and 2 more), 6-8 clues with the red herrings (fresh flowers on Hale, toppled Marsh stone), notes, the Final_Question, hints and the Closed-case page
     - Update `clues.ts`, `journal.ts` and the Pell grave key placement; extend `cases.test.ts`
     - _Requirements: 7.1, 7.2, 12.1, 13.3, 14.1, 14.4_

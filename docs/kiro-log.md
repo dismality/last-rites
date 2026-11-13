@@ -1436,3 +1436,8 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - 2.6: dev actions use only real store actions; no hook opens the Case tab, so tests press J like a player.
   - 2.7: the keyboard test turns the fake pointer lock off because the harness swallows Tab; a `setCoins` debug hook was added for the hint price check; the Closed cases shot is taken by day because the dawn card covers the journal.
   - The asset allowlist in tests/progressionRules.test.ts now includes the user's credited scene pieces and props from the parallel session, so the unit suite passes; the files themselves were left uncommitted for the user.
+
+### 2026-11-14: 10-curse-stages task 3.1: Case 1 data
+- **Kiro feature used:** spec task
+- **What happened:** Filled case 1 in `cases.ts` with an 8-line ledger, 6 stones, 3 bell posts, the key reward and positions reused from `tombstones.ts`; added tests that derive each mismatch from the data.
+- **What Kiro caught or sped up:** Decisions: Pell keeps his 1862 stone date (ledger says the 13th, tag the 12th); Hale's flag is the plot; new stone and bell post positions are guesses for 3.4 and 3.5; the `zones.ts` key spawn is not moved yet.
