@@ -37,6 +37,10 @@ import {
 import { applyBoss, applyKill, nightScore, type KillResult, type ScoreState } from '../systems/score'
 import { rollStorm, stormChance } from '../systems/storm'
 import { nightPlan } from '../systems/waves'
+import { caseOfStage } from '../../data/cases'
+import { sharpEye } from '../systems/caseScore'
+import { useCaseStore } from './caseStore'
+import { stageOfNight } from './stageStore'
 import { useAchievementStore } from './achievementStore'
 import { useChapelStore } from './chapelStore'
 import { useCoinStore } from './coinStore'
@@ -244,13 +248,22 @@ function stageRecipesNamed(night: number): string | null {
   return names.length > 0 ? names.join(', ') : null
 }
 
+function sharpEyeFor(night: number): number {
+  const p = useCaseStore.getState().cases[caseOfStage(stageOfNight(night)).id]
+  return sharpEye({ hintsUsed: p.hints.revealed, wrongAnswers: p.wrongAnswers })
+}
+
 function onNightCleared(night: number): void {
   const pr = useProgressionStore.getState()
   const sc = useScoreStore.getState()
   if (clearedNight?.night === night) return
   const ns = nightScore(readScoreState(), night, sc.nightDamage, scoreMult())
-  clearedNight = { night, clear: ns.clear, noDamage: ns.noDamage }
-  pr.patch({ score: pr.score + ns.clear + ns.noDamage })
+  // Sharp Eye (+300) for a story case solved with no hint and no wrong answer; it rides with the
+  // clear bonus so the dawn card total includes it. Doubt's -50 was already taken when it was earned.
+  const sharp = MODES[pr.mode].story ? sharpEyeFor(night) : 0
+  const clear = ns.clear + Math.round(sharp * scoreMult())
+  clearedNight = { night, clear, noDamage: ns.noDamage }
+  pr.patch({ score: pr.score + clear + ns.noDamage })
   settleContracts(finishNight(pr.contracts, sc.nightDamage))
   // The facts see the HP the night was cleared with, then the flag is dropped again.
   sc.patch({ clearHp: usePlayerStore.getState().health })

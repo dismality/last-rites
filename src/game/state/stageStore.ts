@@ -35,7 +35,8 @@ interface StageStoreState {
   solveCase: (phaseTime?: number) => void
   tick: (dt: number) => void
   /**
-   * Give the altar an answer. `correct` comes from the case data (task 2); here it is injected.
+   * Give the altar an answer. `correct` is the verdict of `caseStore.giveAnswer`, which checks the
+   * filled slots against the case data with `checkFinalAnswer`.
    * A wrong case answer queues an instant wave and locks the altar; a correct one solves the case.
    */
   giveAltarAnswer: (correct: boolean, linksNow: number, kind: 'case' | 'accusation') => AltarVerdict

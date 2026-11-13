@@ -11,6 +11,7 @@ import { setStoryProbe } from './guidanceStore'
 import { MODES } from '../../data/modes'
 import { setDawnPickProbe } from './menuState'
 import { registerStatsPort } from './statsPort'
+import { registerEconomyPort } from './economyPort'
 
 export type Ranks = Partial<Record<DawnUpgradeId, number>>
 
@@ -69,6 +70,15 @@ export const useProgressionStore = create<ProgressionState>((set) => ({
 setDawnPickProbe(() => useProgressionStore.getState().pendingPick !== null)
 
 setStoryProbe(() => MODES[useProgressionStore.getState().mode].story)
+registerEconomyPort({
+  coins: () => useProgressionStore.getState().coins,
+  addCoins: (d) => useProgressionStore.getState().addCoins(d),
+  addScore: (d) => {
+    const pr = useProgressionStore.getState()
+    pr.patch({ score: Math.max(0, pr.score + d) })
+  },
+  story: () => MODES[useProgressionStore.getState().mode].story,
+})
 registerStatsPort({
   get: () => useProgressionStore.getState().stats,
   set: (stats) => useProgressionStore.getState().patch({ stats }),

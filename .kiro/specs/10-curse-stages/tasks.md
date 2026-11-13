@@ -63,21 +63,21 @@ Common rules for all tasks:
     - Run the Finish steps for task 1; commit `stage loop with endless nights (spec 10 task 1)`
 
 - [ ] 2. The case board
-  - [ ] 2.1 Case types and data shells
+  - [x] 2.1 Case types and data shells
     - Create `src/data/cases.ts` with the types of the design and the three Case shells (ids, titles, Stage, curse steps, hint prices); create `src/data/caseText.ts` for Closed-case pages
     - Write `cases.test.ts` (unique ids, notes reference real clues, answer within options, 6-8 clues, 2 red herrings, reachability)
     - **Property 17: Every answer's clues are reachable**; **Property 18: Case data is internally consistent**
     - _Requirements: 7.1, 7.2, 7.4, 7.5, 7.6_
-  - [ ] 2.2 Pure case systems
+  - [x] 2.2 Pure case systems
     - Create `caseBoard.ts`, `caseAnswer.ts`, `caseHints.ts`, `caseScore.ts` (links, deduction notes, curse meter, final-answer check, hint tiers, Doubt, Sharp Eye) with tests
     - **Property 12: Linking is idempotent and note-correct**; **Property 13: Hint tiers reveal in order**; **Property 14: Doubt is capped**; **Property 15: Sharp Eye only for a clean case**; **Property 16: Right answers accepted, wrong answers rejected** (final answers)
     - _Requirements: 8.5-8.7, 9.1-9.6, 9.9_
-  - [ ] 2.3 Case store and persistence
+  - [x] 2.3 Case store and persistence
     - Create `caseStore.ts` and compose it; add its data to `gameSave.ts`, the dusk and morning snapshots (union merge on Retry Night), and `resetRun.ts`; wire Doubt into the first wave and the altar verdict into `stageStore`
     - Write `caseStore.test.ts` and extend the save and retry tests
     - **Property 8: Clue sets swap per stage**; **Property 9: Case store round trip**; **Property 10: Retry keeps knowledge, New Game resets**
     - _Requirements: 4.1-4.6, 7.3, 9.4, 9.5_
-  - [ ] 2.4 Case board UI
+  - [-] 2.4 Case board UI
     - Create `CaseBoard.tsx`, `ClueCard.tsx`, `RedString.tsx` and CSS in `src/ui/journal/`: cork board, pinned cards, mouse drag and keyboard linking, Deduction_Note live region, Final_Question slots, hint buttons with prices, visible focus, plain-font and reduced-motion support
     - Add the "Case" tab to `Journal.tsx`
     - Write `caseBoardView.test.ts` for the pure view model

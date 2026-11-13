@@ -16,6 +16,7 @@ import {
 } from '../../game/state'
 import type { PageNumber } from '../../game/types'
 import { NamedItemIcon } from '../satchel/NamedItemIcon'
+import { CaseBoard } from './CaseBoard'
 import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import './journal.css'
@@ -23,6 +24,7 @@ import './journal.css'
 const TABS = [
   { id: 'pages', label: 'Pages' },
   { id: 'clues', label: 'Clues' },
+  { id: 'case', label: 'Case' },
   { id: 'relics', label: 'Relics' },
   { id: 'contracts', label: 'Contracts' },
   { id: 'map', label: 'Map' },
@@ -157,6 +159,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
   const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({
     pages: null,
     clues: null,
+    case: null,
     relics: null,
     contracts: null,
     map: null,
@@ -211,6 +214,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
         >
           {tab === 'pages' && <PagesTab />}
           {tab === 'clues' && <CluesTab />}
+          {tab === 'case' && <CaseBoard />}
           {tab === 'relics' && <RelicsTab />}
           {tab === 'contracts' && <ContractsTab />}
           {tab === 'map' && <JournalMap />}

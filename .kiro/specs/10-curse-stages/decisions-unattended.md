@@ -82,3 +82,37 @@ Choices made without asking the user while running sub-tasks unattended. Each ca
 2. **The bible got one clarification** in §8 (what "stuck" means). No number changed, so nothing else needed fixing.
 3. Doubt in the first wave stays with task 2.3 (`planNight` takes a `doubt` argument that defaults to 0).
 4. Gate: lint, build, 2043 unit tests, and `stage-loop`, `smoke`, `dev-panel` (5 Playwright tests, main project) all pass.
+
+## 2.1 Case types and data shells
+
+1. **`CaseId` stays defined in `stages.ts`** (avoids an import cycle, since `cases.ts` imports `StageNumber`); `cases.ts` re-exports it.
+2. **Types follow the design's Data Models**, with `ClueId` as a union of three per-case unions (`Case1ClueId` and so on). `ClueDef.icon` is `InteractRuneId | MarkId` (the design's `RuneId` does not exist). `ClueSourceDef` is `minigame | walk | purchase | item`; no clue uses `item` yet.
+3. **Clue counts:** case 1 has 7 clues (2 red herrings), case 2 has 6 (2), case 3 has 8 (2). Case 2's fallback clues for 2a and 2c (design "Cuts are safe") are not added; they belong with the cut plan in tasks 3 to 5.
+4. **The Vane & Sons receipt is a case 3 clue with a `purchase` source**, not a stage 1 clue. The merchant first opens at the dawn ending stage 1, so the reachability test allows purchases from stage 2 on. The bible says the receipt comes with the first purchase in stage 1; the case 3 clue set is what the board shows once stage 3 starts.
+5. **Case 3's `final` is the rite** (five slots of relic names, answer in the bible's relic order as a placeholder); the optional Silas accusation is `accusation` with `optional: true`. Task 4 sets the real rite order from Crane's confession. Case 2's final uses four slots (who, motive, means, opportunity).
+6. **Walk clue positions are first guesses** (grounds, Mausoleum Row, chapel, catacombs); the props in tasks 3 to 5 set the real ones. Minigame internals (ledger rows, bell posts, hymn board and so on) are not in this shell.
+7. **Curse steps** are `DEFAULT_CURSE_STEPS` = 10 per case, matching `CURSE_MAX`; hint prices are 5, 10 and 20 (`HINT_COSTS`).
+8. **Closed-case pages** (4 sentences each) are in `caseText.ts`, one sentence per entry.
+9. **Tests** in `cases.test.ts` cover Property 17 (6 to 8 clues, 2+ red herrings, reachable sources by stage, every needed clue linked, every minigame yields a clue) and Property 18 (unique ids, notes reference clues, answers within options, slot counts). They are plain table checks, not fast-check, because the data is fixed.
+10. Gate: lint clean, build passes (chunk-size warning only), `npx vitest run` 2061 tests pass. Not committed (2.8).
+
+## 2.2 Pure case systems
+
+1. **Four modules, as the design lists:** `caseBoard.ts`, `caseAnswer.ts`, `caseHints.ts`, `caseScore.ts` in `src/game/systems/`, each with a matching test. `checkMinigame` from the design's `caseAnswer.ts` is not built: minigame verdicts belong to `caseMinigames.ts` in tasks 3 to 5.
+2. **Board state is a list of unique sorted `linkKey` strings.** Wrong pairs are kept on the board (the string is drawn, no note, no cost). A self link or an unknown clue id returns the same board object. The Curse meter is `curseSteps` minus the count of links that match a note, so with the current data (3 or 4 notes, 10 steps) it cannot reach 0 by links alone. The altar answer, not the meter, ends the night; changing the step count or adding notes is a data call for a later task.
+3. **Extras beyond the design:** `correctLinkCount`, `earnedNotes`, `visibleClues(stage, found)` (the per-stage clue set), and in `caseAnswer.ts` `checkAccusation`, `fillSlot` and `isAnswerComplete` for the board and altar slots. `checkFinalAnswer` takes `(string | null)[]`; a wrong length or any empty slot is rejected.
+4. **Hints:** `HintState` is `{ revealed: 0..3 }`. `nextHint` returns `revealed` with `tier` and `cost` (the caller subtracts the coins) or `refused` with `no-coins` or `all-revealed`. A free tier 3 (Story, night time at least 180 s, `FREE_TIER3_AFTER_S`) still counts as a hint used for Sharp Eye (Req 9.9). Outside Story it costs 20.
+5. **Doubt:** `DoubtState` is `{ nightId, doubt }`; `applyDoubt` restarts at 1 when the night id changes, otherwise adds 1 up to `DOUBT_MAX`. `doubtForNight` gives the value for the night that starts (0 for another night id), to feed `addDoubt` in 2.3. The 50-point penalty is the constant `DOUBT_SCORE_PENALTY`; applying it to the score is store work (2.3). `Case_Closed` (Req 9.7) is not here.
+6. **Properties 8, 12, 13, 14, 15, 16** (final answer and accusation) are fast-check tests in the four test files. Property 8 is covered at the pure level (`visibleClues`); the store half stays with 2.3.
+7. Gate: lint clean, build passes (chunk-size warning only), `npx vitest run` 2081 tests pass. Not committed (2.8).
+
+## 2.3 Case store and persistence
+
+1. **`caseStore.ts`** holds `cases` (per case: found clues, links, solved minigames, slots, hints, wrong answers), `doubt` and `closed`. Actions: `findClue`, `link` (only found clues of the active case), `fillSlot`, `submitMinigame` (right: solved and yields its clues; wrong: wrong answer, and by day one Doubt and -50 score), `giveAnswer`, `useHint` (coins), `closeCase`, `doubtForStage`. Rules stay in the pure `case*.ts` systems.
+2. **`economyPort.ts`** lets the case store read coins, add coins and score and ask for Story mode without importing `progressionStore` (import cycle). `progressionStore` registers it.
+3. **Altar:** `giveAnswer` runs `checkFinalAnswer` on the filled slots and passes the result to `stageStore.giveAltarAnswer(correct, links, 'case')`. An empty slot returns `incomplete` and changes nothing. Only a `wrong` verdict counts as a wrong answer for Sharp Eye (a locked answer was never judged). The altar UI that calls it is task 2.5.
+4. **Doubt:** `WaveDirector` passes `doubtForStage(night)` to `planNight` in story modes. Doubt applies only to the night id it was earned for. A Doubt at its cap adds no further -50.
+5. **Scoring:** the -50 is taken when Doubt is earned. Sharp Eye (+300, story only, times the mode multiplier) is added to the night's clear bonus in `onNightCleared`, so the dawn card total includes it. `caseSolvedWatcher` closes the case after the score event. The progression checkpoint test now expects 400 clear bonus for night 1.
+6. **Curse meter:** `guidanceTick` feeds `selectCorrectLinks` into the objective, so `CurseMeter` falls one per correct link (it was fixed at 10/10). `CurseMeter.tsx` is unchanged; the max is still `CURSE_MAX` (10), which equals every case's `curseSteps`. If a case's steps ever differ, the objective input must carry the max.
+7. **Persistence:** new `caseSave.ts` (`freshCaseSave`, `sanitizeCaseSave` drops stale ids, `mergeRetry`). `gameSave`/`saveGame` write a `case` block (old saves load a fresh one). Snapshots use `caseSnapshot`: on Retry Night and Retry from morning, found clues, links and solved minigames are the union of the snapshot and now; Doubt, wrong answers, hints, slots and the closed list come from the snapshot. `resetRun` replaces the store (New Game).
+8. **Properties 8, 9, 10** are covered at pure level in `caseSave.test.ts` and `cases`/`caseBoard` tests, and at store level in `caseStore.test.ts` (Property 8 swap, save and Continue round trip, retry union, New Game reset).

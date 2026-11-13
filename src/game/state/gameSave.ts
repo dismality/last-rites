@@ -8,6 +8,8 @@ import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
 import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
 import type { StageSave } from '../systems/stageSave'
+import { freshCaseSave, type CaseSave } from '../systems/caseSave'
+import { CASE_PERSISTED, useCaseStore } from './caseStore'
 import type { RecipeId } from '../types'
 import { useChapelStore } from './chapelStore'
 import { captureCombatSave } from './combatPersistence'
@@ -53,6 +55,11 @@ function pickStage(): StageSave {
   return Object.fromEntries(STAGE_PERSISTED.map((k) => [k, s[k]])) as unknown as StageSave
 }
 
+function pickCase(): CaseSave {
+  const s = useCaseStore.getState()
+  return Object.fromEntries(CASE_PERSISTED.map((k) => [k, s[k]])) as unknown as CaseSave
+}
+
 function pickDoors(): DoorsSave {
   const { built, doors } = useDoorStore.getState()
   return { built, front: [...doors.front], vestry: [...doors.vestry] }
@@ -72,6 +79,7 @@ export function captureSave(): SaveState {
     combat: captureCombatSave(pickDoors()),
     progression: captureProgressionSave(),
     stage: pickStage(),
+    case: pickCase(),
     pins: capturePins(),
   }
 }
@@ -118,6 +126,7 @@ export function loadGame(): boolean {
   )
   // After the world: moving the night number starts a fresh stage, and the save's block wins.
   if (save.stage) useStageStore.setState(save.stage)
+  useCaseStore.setState(save.case ?? freshCaseSave())
   usePinStore.setState({ pins: save.pins ?? [] })
   syncDerivedStats()
   return true

@@ -10,6 +10,7 @@ import { isSimFrozen } from '../../game/state/menuState'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { updateRunStats } from '../../game/state/statsPort'
 import { useStageStore } from '../../game/state/stageStore'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useWaveStore } from '../../game/state/waveStore'
 import { MODES } from '../../data/modes'
 import { createRng } from '../../game/rng'
@@ -42,7 +43,9 @@ export function WaveDirector() {
     () =>
       subscribeToType('nightStarted', (ev) => {
         const { mode, seed } = useProgressionStore.getState()
-        const plan = planNight(mode, ev.nightNumber)
+        // Each Doubt earned by a wrong day answer adds a Shambler to this night's first wave.
+        const doubt = MODES[mode].story ? useCaseStore.getState().doubtForStage(ev.nightNumber) : 0
+        const plan = planNight(mode, ev.nightNumber, doubt)
         const streams = nightRngs(seed, ev.nightNumber)
         rng.current = streams.rng
         eliteRng.current = streams.eliteRng

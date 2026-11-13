@@ -113,11 +113,12 @@ describe('progression checkpoint: night 1 to dawn', () => {
       night: 1,
       zombiesBanished: 4,
       killPoints: kills,
-      clearBonus: 100,
+      // 100 for night 1 plus Sharp Eye (+300): this story case had no hint and no wrong answer.
+      clearBonus: 400,
       noDamageBonus: 200,
-      nightScore: kills + 300,
+      nightScore: kills + 600,
     })
-    expect(pr.score).toBe(kills + 300)
+    expect(pr.score).toBe(kills + 600)
 
     // Dawn waits for a pick; the seeded offer is three different upgrades.
     expect(pr.pendingPick).toHaveLength(3)
