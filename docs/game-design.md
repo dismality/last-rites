@@ -228,6 +228,15 @@ One shared buff system. Each active effect shows an icon with its own glyph, a c
 
 Crafting happens only at the **workbench** (keeper's hut). Crafting takes 1.5 s and the world keeps running, so crafting at night is a risk.
 
+### Where to look (09, task 11m)
+An undiscovered recipe stays "???" but says where its missing ingredients come from. The places come from the data only (the "Found" column of §3 made concrete): loot tables and spawn points, fixed spawns, the merchant's stock and the elite drop table.
+- Each missing ingredient reads "??? · dug from grave mounds, found in coffins" (the ingredient stays unnamed until held). At most two places, nearest to the player first. Places: dug from grave mounds, found in coffins, on the hut shelf, on crypt shelves, at the chapel font, in the catacomb walls, by the oak path, sold by Silas at dawn, dropped by elite zombies.
+- Unknown-recipe tooltip: "??? Needs 2 ingredients. You have: Cloth. Still to find: something dug from grave mounds or found in coffins."
+- A known recipe with a shortfall shows "Found: …" under the count ("Cloth 1/2, need 1 more").
+- **Mark on map** (button, or M on a focused row) pins the nearest source of the first missing ingredient that still has it today (graves not yet dug, shelves and coffins not yet looted, fixed spawns not yet taken). The merchant and elite drops have no fixed place and are never pinned. With nothing left the row says "None left today. Try again tomorrow".
+- The powder tin and woodpile loot tables of §3 are not placed in the world yet, so they are not listed as sources.
+- Bench stock: each pile on the workbench top is the item's Blender model (ember glow stays, as emissive only), and a missing ingredient in the recipe ghost is the item's silhouette in flat dark material.
+
 ### Tiered crafting (10, planned and cuttable: E4)
 If built, recipes are grouped in three tiers tied to the stage that unlocks them, and damage and cost both rise with tier (a property test checks it). Cut order: see §13.
 | Tier | Stage | Rule | Weapons |

@@ -14,9 +14,10 @@
 // Architecture note: state lives in worldStore / inventoryStore / craftingStore.
 // This component is *rendering only* — it reads stores and drives visuals.
 
-import { useRef, useMemo, useEffect } from 'react'
+import { useRef, useMemo, useEffect, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Instances, Instance, Html } from '@react-three/drei'
+import { Html } from '@react-three/drei'
+import { BenchPile, ItemSilhouette } from './BenchItemModels'
 import * as THREE from 'three'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useCinematic } from '../../game/state/menuState'
@@ -81,20 +82,8 @@ const MATERIAL_COLOR: Record<MaterialId, string> = {
   'silver-filings': '#c9ced6',
 }
 
-/** Geometry scale per material type — gives each pile a distinct silhouette. */
-const MATERIAL_SCALE: Record<MaterialId, [number, number, number]> = {
-  bone: [0.04, 0.12, 0.04],
-  'iron-nail': [0.02, 0.06, 0.02],
-  'candle-wax': [0.06, 0.08, 0.06],
-  'holy-water': [0.07, 0.1, 0.07],
-  cloth: [0.1, 0.03, 0.1],
-  'lamp-oil': [0.07, 0.09, 0.07],
-  'grave-salt': [0.08, 0.04, 0.08],
-  'wood-plank': [0.12, 0.02, 0.04],
-  'black-powder': [0.06, 0.05, 0.06],
-  'lead-shot': [0.05, 0.04, 0.05],
-  'silver-filings': [0.05, 0.03, 0.05],
-}
+/** Longest edge of one model in a bench pile: the grid is 0.3 m apart, so a pile stays in its cell. */
+const PILE_MAX_EDGE_M = 0.15
 
 /**
  * Map qty 1–10 to 1–5 pile meshes so piles grow visually with count.
@@ -271,62 +260,27 @@ function MaterialPile({
   highlighted = false,
 }: MaterialPileProps) {
   const count = pileCount(qty)
-  const positions = useMemo(() => pilePositions(position, count), [position, count])
-  const scale = MATERIAL_SCALE[materialId]
-  const color = MATERIAL_COLOR[materialId]
-
-  // Ref to the shared material so we can animate emissiveIntensity each frame.
-  const matRef = useRef<THREE.MeshStandardMaterial>(null)
-  // Phase offset: use a module-level counter so each pile starts at a
-  // different point in the sine wave without calling Math.random() during render.
-  const timeRef = useRef(pilePhaseCounter++ * PILE_PHASE_STEP)
+  const positions = useMemo(
+    () => pilePositions(position, count).map((p) => [p.x, p.y, p.z] as const),
+    [position, count],
+  )
+  // A module-level counter gives each pile its own point in the pulse without Math.random() in render.
+  const [phase] = useState(() => pilePhaseCounter++ * PILE_PHASE_STEP)
   // Craftable glow and rune are interactable cues: off during the intro and endings.
   const cinematic = useCinematic()
   const glowCraftable = craftable && !cinematic
   const glowHighlighted = highlighted && !cinematic
 
-  useFrame((_, delta) => {
-    if (!matRef.current) return
-    timeRef.current += delta
-
-    let intensity = 0.15 // base
-    if (glowCraftable) {
-      // Slow ember pulse: 0.35 → 0.65 at ~0.6 Hz
-      intensity = 0.35 + Math.sin(timeRef.current * 3.8) * 0.15
-    }
-    if (glowHighlighted) {
-      // Faster, stronger pulse when the recipe-book hovers over this item.
-      intensity = 0.6 + Math.sin(timeRef.current * 6.0) * 0.25
-    }
-
-    matRef.current.emissiveIntensity = intensity
-  })
-
-  // Ember colour when glowing; otherwise the pile's own natural colour.
-  const emissiveColor = glowCraftable || glowHighlighted ? '#e8913a' : color
-
   return (
     <group>
-      <Instances limit={5}>
-        <boxGeometry args={[1, 1, 1]} />
-        <meshStandardMaterial
-          ref={matRef}
-          color={color}
-          emissive={emissiveColor}
-          emissiveIntensity={0.15}
-          roughness={0.8}
-          metalness={materialId === 'iron-nail' ? 0.6 : 0.0}
-        />
-        {positions.map((pos, i) => (
-          <Instance
-            key={i}
-            position={[pos.x, pos.y + scale[1] * 0.5, pos.z]}
-            scale={scale}
-            // Slight rotation variation for organic look
-            rotation={[0, (i * Math.PI) / 3, 0]}
-          />
-        ))}
-      </Instances>
+      <BenchPile
+        item={materialId}
+        positions={positions}
+        scale={fitScale(materialId, PILE_MAX_EDGE_M)}
+        craftable={glowCraftable}
+        highlighted={glowHighlighted}
+        phase={phase}
+      />
 
       {/* Rune sprite above craftable pile — floats up slowly */}
       {craftable && (
@@ -475,8 +429,6 @@ function RecipeGhost() {
         />
       </mesh>
       {view.rows.map((row, i) => {
-        const id = row.item as MaterialId
-        const scale = MATERIAL_SCALE[id] ?? [0.06, 0.06, 0.06]
         const x = (i - (view.rows.length - 1) / 2) * 0.22
         // Owned ingredients are their Blender model, fitted to the bench; missing ones stay an outline.
         if (row.solid && ITEM_MAP[row.item as ItemId]?.model) {
@@ -486,11 +438,11 @@ function RecipeGhost() {
             </group>
           )
         }
+        // Missing ones are the same model in a flat dark material: the shape hints at what to find.
         return (
-          <mesh key={row.item} position={[x, BENCH_TOP_Y + scale[1] * 0.5 + 0.02, BENCH_Z + 0.25]} scale={scale}>
-            <boxGeometry args={[1, 1, 1]} />
-            <meshBasicMaterial color="#d8c9a3" wireframe transparent opacity={0.7} />
-          </mesh>
+          <group key={row.item} position={[x, BENCH_TOP_Y + 0.02, BENCH_Z + 0.25]}>
+            <ItemSilhouette item={row.item as ItemId} scale={benchScale(row.item as ItemId)} />
+          </group>
         )
       })}
     </group>

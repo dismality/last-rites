@@ -22,10 +22,25 @@
 import { useCallback, useEffect, useId, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ItemIcon } from '../satchel/ItemIcon'
-import { displayTitle, isDiscovered, recipeCard, recipeItems, tooltipTarget } from './recipeView'
+import {
+  displayTitle,
+  firstMissing,
+  isDiscovered,
+  recipeCard,
+  recipeItems,
+  tooltipTarget,
+  unknownIngredientText,
+  unknownRecipeTip,
+} from './recipeView'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
+import { useDigStore } from '../../game/state/digStore'
+import { usePinStore } from '../../game/state/pinStore'
+import { usePlayerStore } from '../../game/state/playerStore'
+import { useSpawnStore } from '../../game/state/spawnStore'
+import { useWorldStore } from '../../game/state/worldStore'
+import { NONE_LEFT_TEXT, nearestSource } from '../../game/systems/itemSources'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import { ITEM_MAP } from '../../data/items'
@@ -55,6 +70,12 @@ function unlockHint(recipe: RecipeDef): string {
     case 'journal':
       return `Unlocks upon reading Journal Page ${recipe.unlock.page}`
   }
+}
+
+/** The player's ground position, read when a card is drawn so sources are listed nearest first. */
+function playerHere(): { x: number; z: number } {
+  const [x, , z] = usePlayerStore.getState().position
+  return { x, z }
 }
 
 // ---------------------------------------------------------------------------
@@ -141,18 +162,42 @@ function UnlockedEntry({
     onTip(null)
   }, [clearHighlight, selectRecipe, onTip])
 
-  const card = recipeCard(recipe, missing)
+  const card = recipeCard(recipe, missing, playerHere())
   const title = displayTitle(recipe, collected, card)
   const seen = new Set(collected)
+  const target = firstMissing(card)
+  const [markNote, setMarkNote] = useState('')
+
+  // Mark on map: a pin on the nearest source of the first missing ingredient that still has it today.
+  const markOnMap = () => {
+    if (!target) return
+    const from = playerHere()
+    const spawn = useSpawnStore.getState().world
+    const world = useWorldStore.getState()
+    const place = nearestSource(target.item, from, {
+      materials: spawn.materials,
+      collectedFixed: spawn.collectedFixed,
+      dugOnDay: useDigStore.getState().dig.dugOnDay,
+      day: world.nightNumber,
+      phase: world.phase,
+    })
+    if (!place) {
+      setMarkNote(NONE_LEFT_TEXT)
+      return
+    }
+    usePinStore.getState().place(place)
+    setMarkNote(`Pinned: ${place.name}`)
+  }
 
   const ariaLabel = !discovered
-    ? 'Unknown recipe. Collect one of each ingredient to learn it.'
+    ? `Unknown recipe. ${unknownRecipeTip(card, collected)} M to mark the nearest source on the map.`
     : [
         craftable ? 'Craftable.' : 'Cannot craft.',
         `Makes ${card.title}.`,
         card.ingredients.map((i) => `${i.label}, ${i.note}`).join('; '),
         pinned ? 'Pinned.' : '',
         craftable ? 'Enter to craft.' : '',
+        target ? 'M to mark the nearest source on the map.' : '',
         'P to pin.',
       ].filter(Boolean).join(' ')
 
@@ -173,6 +218,9 @@ function UnlockedEntry({
         if (e.code === 'KeyP') {
           e.preventDefault()
           onPin(recipe.id)
+        } else if (e.code === 'KeyM' && target) {
+          e.preventDefault()
+          markOnMap()
         } else if ((e.code === 'Enter' || e.code === 'NumpadEnter') && craftable && discovered && !isCrafting) {
           e.preventDefault()
           onCraft(recipe.id)
@@ -232,14 +280,29 @@ function UnlockedEntry({
                   <span className="ingredient-name">{row.label}</span>
                   <span className="ingredient-mark" aria-hidden="true">{row.mark}</span>
                   {row.lack > 0 && <span className="ingredient-missing-label">{row.note}</span>}
+                  {row.found && <span className="ingredient-found">{row.found}</span>}
                 </>
               ) : (
-                <span className="ingredient-name">???</span>
+                <span className="ingredient-name ingredient-name--unknown">{unknownIngredientText(row)}</span>
               )}
             </li>
           )
         })}
       </ul>
+      {target && (
+        <div className="recipe-entry__mark-row">
+          <button
+            type="button"
+            className="mark-btn"
+            onClick={(e) => { e.stopPropagation(); markOnMap() }}
+            onMouseDown={(e) => e.stopPropagation()}
+            aria-label="Mark the nearest source of the first missing ingredient on the map"
+          >
+            ⌖ Mark on map <kbd>M</kbd>
+          </button>
+          {markNote && <span className="recipe-entry__mark-note" role="status">{markNote}</span>}
+        </div>
+      )}
       {/* Craft button + progress bar (Req 3.1) */}
       {craftable && (
         <div className="recipe-entry__craft-row">
@@ -350,7 +413,7 @@ export function RecipeBook() {
   const tipId = tooltipTarget(workbenchOpen, tip?.id ?? null)
   const tooltipShown = tipId !== null
   const tipRecipe = tipId ? RECIPES.find((r) => r.id === tipId) : undefined
-  const tipCard = tipRecipe ? recipeCard(tipRecipe, craftability.get(tipRecipe.id)?.missing ?? []) : undefined
+  const tipCard = tipRecipe ? recipeCard(tipRecipe, craftability.get(tipRecipe.id)?.missing ?? [], playerHere()) : undefined
 
   return (
     <div
@@ -436,11 +499,12 @@ export function RecipeBook() {
               {tipCard!.ingredients.map((i) => (
                 <li key={i.item} className={i.lack > 0 ? 'is-missing' : ''}>
                   {i.mark} {i.label}{i.lack > 0 ? ` (${i.note})` : ''}
+                  {i.found && <span className="recipe-tip__found">{i.found}</span>}
                 </li>
               ))}
             </ul>
           ) : (
-            <p>Pick up one of each ingredient to learn this recipe.</p>
+            <p>{unknownRecipeTip(tipCard!, collected)}</p>
           )}
         </div>,
         document.body,
