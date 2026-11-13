@@ -655,6 +655,34 @@
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794581220237
       }
+    ],
+    "11m. Unknown recipes say where to look; bench stock uses the models": [
+      {
+        "executionId": "a57e1995-6a6c-4f75-8e05-22e6dde993a2",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794590475852
+      }
+    ],
+    "17. B11: Controls hint at the bottom left (rewritten 2026-11-14)": [
+      {
+        "executionId": "a57e1995-6a6c-4f75-8e05-22e6dde993a2",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794591313874
+      }
+    ],
+    "11o. Objective hint fits where you are; clue outline fits the clue": [
+      {
+        "executionId": "a57e1995-6a6c-4f75-8e05-22e6dde993a2",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794591964385
+      }
+    ],
+    "11n-a. Scenery swap: chapel inside and out": [
+      {
+        "executionId": "a57e1995-6a6c-4f75-8e05-22e6dde993a2",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794592578808
+      }
     ]
   }
 }

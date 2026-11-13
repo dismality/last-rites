@@ -208,6 +208,11 @@
         "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794585866267
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586107077
       }
     ],
     "2.5 Journal pause rule, Closed cases and altar panel": [
@@ -215,6 +220,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703461
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586111500
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586752774
       }
     ],
     "2.6 Dev hooks for the case": [
@@ -222,6 +237,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703494
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586757443
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586920721
       }
     ],
     "2.7 Case board e2e and screenshots": [
@@ -229,6 +254,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703527
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794586926112
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794589706191
       }
     ],
     "2.8 Finish": [
@@ -236,6 +271,11 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703559
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794589710996
       }
     ],
     "3.1 Case 1 data": [
@@ -243,6 +283,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703606
+      },
+      {
+        "executionId": "40278042-36d7-48d4-9fdb-369da871e9a6",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794589906956
+      },
+      {
+        "executionId": "a57e1995-6a6c-4f75-8e05-22e6dde993a2",
+        "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
+        "timestamp": 1794589940340
       }
     ],
     "3.2 Minigame shell": [

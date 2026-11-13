@@ -1,0 +1,153 @@
+{
+ "note": "Chapel-local game coordinates (add CHAPEL_CENTER [10, 0, 5]). Boxes: centre, half extents, rotY.",
+ "surfaces": {
+  "lectern-book-rest-y": 0.97,
+  "font-lid-y": 0.88,
+  "pew-seat-y": 0.4,
+  "cupboard-shelf-y": 0.88,
+  "altar-top-y": 1.0,
+  "stair-cover-mesh": "chapel-stair-cover"
+ },
+ "boxes": [
+  {
+   "center": [
+    1.4,
+    0.5,
+    1.02
+   ],
+   "half": [
+    0.75,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    -1.225,
+    0.5,
+    1.02
+   ],
+   "half": [
+    0.575,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    1.4,
+    0.5,
+    2.02
+   ],
+   "half": [
+    0.75,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    -1.225,
+    0.5,
+    2.02
+   ],
+   "half": [
+    0.575,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    1.4,
+    0.5,
+    3.02
+   ],
+   "half": [
+    0.75,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    -1.225,
+    0.5,
+    3.02
+   ],
+   "half": [
+    0.575,
+    0.5,
+    0.27
+   ],
+   "rotY": 0,
+   "note": "pew"
+  },
+  {
+   "center": [
+    0,
+    0.5,
+    0
+   ],
+   "half": [
+    0.25,
+    0.5,
+    0.22
+   ],
+   "rotY": 0.0,
+   "note": "lectern"
+  },
+  {
+   "center": [
+    1.5,
+    0.45,
+    -2.0
+   ],
+   "half": [
+    0.32,
+    0.45,
+    0.32
+   ],
+   "rotY": 0.0,
+   "note": "font"
+  },
+  {
+   "center": [
+    -2.11,
+    0.925,
+    2.6
+   ],
+   "half": [
+    0.24,
+    0.925,
+    0.505
+   ],
+   "rotY": 0.0,
+   "note": "vestry cupboard"
+  },
+  {
+   "center": [
+    0,
+    0.5,
+    4.8
+   ],
+   "half": [
+    0.95,
+    0.5,
+    0.5
+   ],
+   "rotY": 0.0,
+   "note": "altar"
+  }
+ ]
+}

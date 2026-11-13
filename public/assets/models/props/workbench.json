@@ -1,0 +1,33 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "top-surface": {
+   "position": [
+    0,
+    0.86,
+    0.05
+   ],
+   "surfaceY": 0.86,
+   "clearArea": [
+    1.2999999999999998,
+    0.5
+   ]
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.43,
+    0
+   ],
+   "half": [
+    0.7,
+    0.43,
+    0.4
+   ],
+   "rotY": 0.0,
+   "note": "bench (same as the game collider)"
+  }
+ ]
+}

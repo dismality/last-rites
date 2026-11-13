@@ -1,0 +1,29 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "light": {
+   "position": [
+    0,
+    2.232,
+    0.55
+   ],
+   "note": "the lamp post light goes here"
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    1.35,
+    0
+   ],
+   "half": [
+    0.12,
+    1.35,
+    0.12
+   ],
+   "rotY": 0.0,
+   "note": "post"
+  }
+ ]
+}

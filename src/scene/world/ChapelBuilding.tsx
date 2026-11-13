@@ -1,28 +1,42 @@
-// The chapel's walls, pitched roof, door frame, belfry and altar, built from plain stone boxes.
-// The walls are single boxes (one per face) with stone buttresses from the kit's pillar model,
-// so nothing is stacked or stretched. Mount inside <Physics>. Door and repair logic: Chapel.tsx.
+// The chapel: the Blender scene (chapel-exterior.glb and chapel-interior.glb, spec 09 task 11n-a)
+// over the game's own wall colliders. The old box walls stay as invisible colliders so every door,
+// board and zombie rule is untouched; the models draw everything you see. Colliders for the pews,
+// font, cupboard, altar and the buttresses come from the models' JSON (shortened where they would
+// block the aisle, see systems/chapelColliders.ts). Mount inside <Physics>. Door and repair logic:
+// Chapel.tsx and ChapelDoors.tsx.
 
-import { RigidBody } from '@react-three/rapier'
-import { CHAPEL, CHAPEL_CENTER, CHAPEL_DOORS, type Placement } from '../../data/cemeteryLayout'
-import { GableRoof, Slab } from './buildingParts'
-import { PART_MATERIALS } from './partMaterials'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { Clone, useGLTF } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import type { Group, Object3D } from 'three'
+import {
+  CHAPEL_ANCHORS,
+  CHAPEL_MESH,
+} from '../../data/chapelScenery'
+import {
+  CHAPEL_EXTERIOR_MODEL_URL,
+  CHAPEL_INTERIOR_MODEL_URL,
+  DRACO_PATH,
+} from '../../data/assets'
+import { CHAPEL, CHAPEL_CENTER, CHAPEL_DOORS } from '../../data/cemeteryLayout'
+import { bellAngle } from '../../game/systems/bellSwing'
+import { chapelSceneColliders } from '../../game/systems/chapelColliders'
+import { isBellActive } from '../../game/systems/repairs'
+import { useChapelStore } from '../../game/state/chapelStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { readRiteStatus } from '../../game/state/riteStatus'
 import { useWorldStore } from '../../game/state/worldStore'
-import { InstancedModel } from './InstancedModel'
+import '../assets/preloadModels'
+import { Slab } from './buildingParts'
+import { bellRuntime, ringBell } from './bellRuntime'
 import { Interactable } from './Interactable'
 
 const DOOR_HEIGHT = 2.5
-const ROOF_RISE = 2
-const ROOF_EAGE_M = 0.4
-const FRAME = { post: 0.28, depth: 0.5, lintel: 0.35 } as const
-const BUTTRESS_Z = [-5.9, -3, 0, 3, 5.9] as const
-const WINDOW_Z = [-1.5, 1.5] as const
-
-/** Model height of `pillar-large`; buttresses are stretched to rise just above the eaves. */
-const PILLAR_HEIGHT = 2.7
+/** Warm door lantern: dim enough that the lantern's own light still leads. No shadow. */
+const DOOR_LANTERN = { color: '#e8913a', intensity: 3, distance: 9 } as const
 
 /**
  * The whistle answers at the altar: stone shifts and the catacomb stair opens. The hotspot only
@@ -82,6 +96,69 @@ function CaseAltar({ z }: { z: number }) {
   )
 }
 
+/** True when `o` or one of its parents carries one of `names`. */
+function hasAncestorNamed(o: Object3D, names: readonly string[]): boolean {
+  for (let p: Object3D | null = o; p; p = p.parent) if (names.includes(p.name)) return true
+  return false
+}
+
+/**
+ * The two models, mounted in chapel-local space. The roof, ceiling and walls shade the inside from
+ * the moon; every mesh receives shadow. The bell mesh swings about its own origin (the bell-pivot
+ * anchor); the stair cover hides once the whistle has opened the stair.
+ */
+function ChapelModels() {
+  const interior = useGLTF(CHAPEL_INTERIOR_MODEL_URL, DRACO_PATH).scene
+  const exterior = useGLTF(CHAPEL_EXTERIOR_MODEL_URL, DRACO_PATH).scene
+  const inner = useRef<Group>(null)
+  const outer = useRef<Group>(null)
+  const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
+  const bell = useRef<Object3D | null>(null)
+
+  useLayoutEffect(() => {
+    inner.current?.traverse((o) => {
+      if ('isMesh' in o) o.receiveShadow = true
+    })
+    outer.current?.traverse((o) => {
+      if (!('isMesh' in o)) return
+      o.receiveShadow = true
+      o.castShadow = hasAncestorNamed(o, CHAPEL_MESH.shadowCasters)
+    })
+    bell.current = outer.current?.getObjectByName(CHAPEL_MESH.bell) ?? null
+  }, [interior, exterior])
+
+  useLayoutEffect(() => {
+    const cover = inner.current?.getObjectByName(CHAPEL_MESH.stairCover)
+    if (cover) cover.visible = !stairOpen
+  }, [stairOpen, interior])
+
+  // The dusk bell rings when the bell is repaired (design bible §8); the wave bell rings it in
+  // WaveDirector.
+  useEffect(
+    () =>
+      useWorldStore.subscribe((s, prev) => {
+        if (s.phase === 'dusk' && prev.phase !== 'dusk' && isBellActive(useChapelStore.getState().chapel)) {
+          ringBell()
+        }
+      }),
+    [],
+  )
+
+  useFrame(() => {
+    const b = bell.current
+    if (!b) return
+    const t = bellRuntime.ringAtMs
+    b.rotation.x = t === null ? 0 : bellAngle((performance.now() - t) / 1000)
+  })
+
+  return (
+    <>
+      <Clone ref={inner} object={interior} />
+      <Clone ref={outer} object={exterior} />
+    </>
+  )
+}
+
 export function ChapelBuilding() {
   const { halfX, halfZ, height: h, wallThickness: t, doorWidth } = CHAPEL
   const sideW = halfX - doorWidth / 2
@@ -92,57 +169,44 @@ export function ChapelBuilding() {
   const vestryZ = vestry.point[2] - CHAPEL_CENTER[2]
   const westALen = vestryZ - vestryW / 2 + halfZ
   const westBLen = halfZ - (vestryZ + vestryW / 2)
-  const ridge = h + ROOF_RISE
-  // The belfry sits on the ridge over the door end.
-  const belfryZ = -halfZ + 1.1
-
-  const buttresses: Placement[] = BUTTRESS_Z.flatMap((z) =>
-    ([-1, 1] as const).map<Placement>((side) => ({
-      position: [side * (halfX + 0.1), 0, z],
-      rotationY: 0,
-      scale: [1.2, (h + 0.4) / PILLAR_HEIGHT, 1.2],
-    })),
-  )
   const altarZ = halfZ - 1.2
-  const altar: Placement[] = [{ position: [0, 0, altarZ], rotationY: Math.PI, scale: [1, 1, 1] }]
-  const candles: Placement[] = ([-0.55, 0.55] as const).map((x) => ({
-    position: [x, 0.73, altarZ],
-    rotationY: 0,
-    scale: [1, 1, 1],
-  }))
-  const cross: Placement[] = [
-    { position: [0, ridge + 2.55, belfryZ], rotationY: 0, scale: [0.6, 0.6, 0.6] },
-  ]
+  const sceneColliders = useMemo(() => chapelSceneColliders(), [])
+  const lantern = CHAPEL_ANCHORS.doorLanternLight
 
   return (
     <group position={[...CHAPEL_CENTER]} name="chapel-building">
+      <ChapelModels />
       <RigidBody type="fixed" colliders={false}>
-        {/* Front wall split around the door, with a stone lintel over the opening. */}
-        <Slab position={[-sideX, h / 2, -halfZ]} size={[sideW, h, t]} material="stone" />
-        <Slab position={[sideX, h / 2, -halfZ]} size={[sideW, h, t]} material="stone" />
+        {/* Walls: collider only. The exterior model draws them, with real door and window openings. */}
+        <Slab position={[-sideX, h / 2, -halfZ]} size={[sideW, h, t]} material="stone" visible={false} />
+        <Slab position={[sideX, h / 2, -halfZ]} size={[sideW, h, t]} material="stone" visible={false} />
         <Slab
           position={[0, DOOR_HEIGHT + (h - DOOR_HEIGHT) / 2, -halfZ]}
           size={[doorWidth, h - DOOR_HEIGHT, t]}
           material="stone"
+          visible={false}
         />
-        <Slab position={[0, h / 2, halfZ]} size={[halfX * 2, h, t]} material="stone" />
+        <Slab position={[0, h / 2, halfZ]} size={[halfX * 2, h, t]} material="stone" visible={false} />
         {/* West wall split around the vestry opening, with a lintel over it. */}
         <Slab
           position={[-halfX, h / 2, westALen / 2 - halfZ]}
           size={[t, h, westALen]}
           material="stone"
+          visible={false}
         />
         <Slab
           position={[-halfX, h / 2, halfZ - westBLen / 2]}
           size={[t, h, westBLen]}
           material="stone"
+          visible={false}
         />
         <Slab
           position={[-halfX, DOOR_HEIGHT + (h - DOOR_HEIGHT) / 2, vestryZ]}
           size={[t, h - DOOR_HEIGHT, vestryW]}
           material="stone"
+          visible={false}
         />
-        <Slab position={[halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="stone" />
+        <Slab position={[halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="stone" visible={false} />
         {/* Ceiling: keeps anything from climbing onto the roof. */}
         <Slab
           position={[0, h + t / 2, 0]}
@@ -150,109 +214,28 @@ export function ChapelBuilding() {
           material="slate"
           visible={false}
         />
+        {/* Pews, font, cupboard, altar and buttresses from the models' JSON. */}
+        {sceneColliders.map((b, i) => (
+          <CuboidCollider
+            key={i}
+            args={[b.half[0], b.half[1], b.half[2]]}
+            position={[...b.center]}
+            rotation={[0, b.rotY, 0]}
+          />
+        ))}
       </RigidBody>
 
-      {/* Door frame: two posts and a lintel, proud of the wall so the opening reads from afar. */}
-      {([-1, 1] as const).map((side) => (
-        <mesh
-          key={side}
-          position={[side * (doorWidth / 2 + FRAME.post / 2), DOOR_HEIGHT / 2, -halfZ - 0.05]}
-          material={PART_MATERIALS.trim}
-          castShadow
-        >
-          <boxGeometry args={[FRAME.post, DOOR_HEIGHT, FRAME.depth]} />
-        </mesh>
-      ))}
-      <mesh
-        position={[0, DOOR_HEIGHT + FRAME.lintel / 2, -halfZ - 0.05]}
-        material={PART_MATERIALS.trim}
-        castShadow
-      >
-        <boxGeometry args={[doorWidth + FRAME.post * 2, FRAME.lintel, FRAME.depth]} />
-      </mesh>
-
-      {/* Vestry frame: same posts and lintel as the front, on the west wall. */}
-      {([-1, 1] as const).map((side) => (
-        <mesh
-          key={side}
-          position={[
-            -halfX - 0.05,
-            DOOR_HEIGHT / 2,
-            vestryZ + side * (vestryW / 2 + FRAME.post / 2),
-          ]}
-          material={PART_MATERIALS.trim}
-          castShadow
-        >
-          <boxGeometry args={[FRAME.depth, DOOR_HEIGHT, FRAME.post]} />
-        </mesh>
-      ))}
-      <mesh
-        position={[-halfX - 0.05, DOOR_HEIGHT + FRAME.lintel / 2, vestryZ]}
-        material={PART_MATERIALS.trim}
-        castShadow
-      >
-        <boxGeometry args={[FRAME.depth, FRAME.lintel, vestryW + FRAME.post * 2]} />
-      </mesh>
-
-      <GableRoof
-        position={[0, h, 0]}
-        width={halfX * 2 + ROOF_EAGE_M * 2}
-        length={halfZ * 2 + ROOF_EAGE_M * 2}
-        rise={ROOF_RISE}
-        material="slate"
+      {/* The lantern by the front door, at the model's anchor. Always mounted (constant light count), no shadow. */}
+      <pointLight
+        position={[...lantern]}
+        color={DOOR_LANTERN.color}
+        intensity={DOOR_LANTERN.intensity}
+        distance={DOOR_LANTERN.distance}
+        decay={2}
       />
 
-      {/* Tall candlelit windows between the buttresses. */}
-      {WINDOW_Z.flatMap((z) =>
-        ([-1, 1] as const).map((side) => (
-          <mesh
-            key={`${z}${side}`}
-            position={[side * halfX, 1.7, z]}
-            material={PART_MATERIALS.glass}
-          >
-            <boxGeometry args={[t + 0.04, 1.3, 0.55]} />
-          </mesh>
-        )),
-      )}
-
-      <InstancedModel model="pillar-large" placements={buttresses} />
-
-      {/* Belfry on the ridge: platform, four posts, bell, pyramid cap and a cross. */}
-      <group position={[0, 0, belfryZ]}>
-        <mesh position={[0, ridge - 0.15, 0]} material={PART_MATERIALS.trim} castShadow>
-          <boxGeometry args={[1.7, 0.3, 1.7]} />
-        </mesh>
-        {([-1, 1] as const).flatMap((sx) =>
-          ([-1, 1] as const).map((sz) => (
-            <mesh
-              key={`${sx}${sz}`}
-              position={[sx * 0.7, ridge + 0.7, sz * 0.7]}
-              material={PART_MATERIALS.trim}
-              castShadow
-            >
-              <boxGeometry args={[0.2, 1.4, 0.2]} />
-            </mesh>
-          )),
-        )}
-        <mesh position={[0, ridge + 0.75, 0]} material={PART_MATERIALS.bronze}>
-          <cylinderGeometry args={[0.2, 0.38, 0.55, 12]} />
-        </mesh>
-        <mesh
-          position={[0, ridge + 1.95, 0]}
-          rotation={[0, Math.PI / 4, 0]}
-          material={PART_MATERIALS.slate}
-          castShadow
-        >
-          <coneGeometry args={[1.25, 1.1, 4]} />
-        </mesh>
-      </group>
-      <InstancedModel model="cross" placements={cross} />
-
-      {/* Altar at the far end, with candles. */}
-      <InstancedModel model="altar-stone" placements={altar} />
       <AltarStairReveal z={altarZ} />
       <CaseAltar z={altarZ} />
-      <InstancedModel model="candle-multiple" placements={candles} />
     </group>
   )
 }

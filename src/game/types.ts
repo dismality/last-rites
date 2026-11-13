@@ -266,6 +266,8 @@ export interface Settings {
   showPinsInWorld: boolean
   /** Show the controls hint panel at the bottom left (design bible §11) */
   showControlHints: boolean
+  /** Low graphics: turns off ambient occlusion and the moon's shadows (design bible §12, tech.md budget) */
+  lowGraphics: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

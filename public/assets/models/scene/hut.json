@@ -1,0 +1,152 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "surfaces": {
+  "east-table-y": 0.78,
+  "west-table-y": 0.78
+ },
+ "anchors": {
+  "window-west": {
+   "position": [
+    -2.8,
+    1.45,
+    -0.8
+   ]
+  },
+  "window-east": {
+   "position": [
+    2.8,
+    1.45,
+    -0.8
+   ]
+  },
+  "stove-glow": {
+   "position": [
+    -2.15,
+    0.45,
+    -2.3
+   ]
+  },
+  "hanging-lantern": {
+   "position": [
+    0,
+    1.85,
+    0
+   ],
+   "note": "matches the existing warm pointLight; no new light"
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    -2.5,
+    0.45,
+    -2.3
+   ],
+   "half": [
+    0.3,
+    0.45,
+    0.3
+   ],
+   "rotY": 0.0,
+   "note": "stove"
+  },
+  {
+   "center": [
+    2.1,
+    0.39,
+    -1.1
+   ],
+   "half": [
+    0.8,
+    0.39,
+    0.4
+   ],
+   "rotY": 0.0,
+   "note": "east table (matches the game collider)"
+  },
+  {
+   "center": [
+    -2.05,
+    0.39,
+    -1.0
+   ],
+   "half": [
+    0.6,
+    0.39,
+    0.35
+   ],
+   "rotY": 0.0,
+   "note": "west table (powder tin)"
+  },
+  {
+   "center": [
+    -2.75,
+    0.3,
+    1.3
+   ],
+   "half": [
+    0.33,
+    0.3,
+    1.05
+   ],
+   "rotY": 0.0,
+   "note": "cot"
+  },
+  {
+   "center": [
+    2.05,
+    0.36,
+    2.55
+   ],
+   "half": [
+    0.28,
+    0.36,
+    0.28
+   ],
+   "rotY": 0.0,
+   "note": "barrel"
+  },
+  {
+   "center": [
+    2.83,
+    0.96,
+    1.85
+   ],
+   "half": [
+    0.26,
+    0.96,
+    0.39
+   ],
+   "rotY": 0.0,
+   "note": "vending machine (props/vending-machine.glb, rotationY -PI/2)"
+  },
+  {
+   "center": [
+    3.75,
+    0.45,
+    2.6
+   ],
+   "half": [
+    0.34,
+    0.45,
+    0.34
+   ],
+   "rotY": 0.0,
+   "note": "rain barrel"
+  },
+  {
+   "center": [
+    -0.6,
+    0.42,
+    -3.45
+   ],
+   "half": [
+    1.15,
+    0.42,
+    0.3
+   ],
+   "rotY": 0.0,
+   "note": "log stack"
+  }
+ ]
+}

@@ -1,0 +1,84 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "marquee-light": {
+   "position": [
+    0,
+    1.62,
+    0.38
+   ],
+   "note": "small warm light; the marquee mesh is emissive"
+  },
+  "coin-slot": {
+   "position": [
+    0.22,
+    1.0,
+    0.25
+   ]
+  },
+  "tray": {
+   "position": [
+    0.22,
+    0.62,
+    0.28
+   ],
+   "note": "bought goods drop here"
+  },
+  "handle-0": {
+   "position": [
+    -0.24,
+    0.78,
+    0.29
+   ],
+   "note": "pull along +Z by 0.05 on purchase"
+  },
+  "handle-1": {
+   "position": [
+    -0.14,
+    0.78,
+    0.29
+   ],
+   "note": "pull along +Z by 0.05 on purchase"
+  },
+  "handle-2": {
+   "position": [
+    -0.04,
+    0.78,
+    0.29
+   ],
+   "note": "pull along +Z by 0.05 on purchase"
+  },
+  "handle-3": {
+   "position": [
+    0.06,
+    0.78,
+    0.29
+   ],
+   "note": "pull along +Z by 0.05 on purchase"
+  },
+  "handle-4": {
+   "position": [
+    0.16,
+    0.78,
+    0.29
+   ],
+   "note": "pull along +Z by 0.05 on purchase"
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.96,
+    0
+   ],
+   "half": [
+    0.39,
+    0.96,
+    0.26
+   ],
+   "rotY": 0.0,
+   "note": "machine"
+  }
+ ]
+}

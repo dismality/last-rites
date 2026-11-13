@@ -76,7 +76,7 @@ function GameScreen() {
   const fov = useSettingsStore((s) => s.fov)
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'var(--ink)' }}>
-      <Canvas shadows camera={{ fov, near: 0.1, far: 200 }} dpr={[1, 1.5]}>
+      <Canvas shadows="soft" camera={{ fov, near: 0.1, far: 200 }} dpr={[1, 1.5]}>
         <SkyAndFog />
         {/* After SkyAndFog so rain and lightning adjust the lights and fog it set this frame. */}
         <Weather />

@@ -1,0 +1,29 @@
+{
+ "note": "Game coordinates in this model's own space. Boxes: centre, half extents, rotY.",
+ "anchors": {
+  "top-surface": {
+   "position": [
+    0,
+    0.3,
+    0
+   ],
+   "surfaceY": 0.3
+  }
+ },
+ "boxes": [
+  {
+   "center": [
+    0,
+    0.15,
+    0
+   ],
+   "half": [
+    0.5,
+    0.15,
+    0.3
+   ],
+   "rotY": 0.0,
+   "note": "plinth"
+  }
+ ]
+}

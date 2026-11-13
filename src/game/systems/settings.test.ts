@@ -38,6 +38,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   showMinimap: fc.boolean(),
   showPinsInWorld: fc.boolean(),
   showControlHints: fc.boolean(),
+  lowGraphics: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 

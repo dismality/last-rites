@@ -15,6 +15,7 @@ import { useWaveStore } from '../../game/state/waveStore'
 import { MODES } from '../../data/modes'
 import { createRng } from '../../game/rng'
 import { emitCombatSound } from '../../game/state/combatSounds'
+import { ringBell } from '../world/bellRuntime'
 import { isBellActive } from '../../game/systems/repairs'
 import { bellDue, shouldDespawnStuck, updateStuck, type StuckMark } from '../../game/systems/stageWaves'
 import { tickWaves } from '../../game/systems/waves'
@@ -94,6 +95,7 @@ export function WaveDirector() {
       ) {
         bellRungFor.current = r.state.waveIndex
         emitCombatSound('toll')
+        ringBell()
       }
       // Req 2.7: a chaser that cannot get anywhere for 20 s is despawned as banished.
       const marks = stuckMarks.current

@@ -121,11 +121,12 @@ export interface WeaponPickupPose {
   readonly scale: number
 }
 
-// Each weapon lies on its prop: the revolver on the cupboard top and the shotgun on the lodge table
+// Each weapon lies on its prop: the revolver on the chapel cupboard's shelf and the shotgun on the lodge table
 // (both at y -0.03), the axe across the woodpile (top log at 0.67) and the sabre on the crypt step
 // (top at -0.02). The scene adds groundPose().lift, so a thin model never floats or sinks.
 export const WEAPON_PICKUP_POSES: Readonly<Record<WeaponPickupId, WeaponPickupPose>> = {
-  revolver: { surface: [0, -0.03, 0], yaw: 0.35, scale: 1.5 },
+  // The revolver rests on the cupboard shelf itself (the position is the shelf top), no prop of its own.
+  revolver: { surface: [0, 0, 0], yaw: 0.35, scale: 1.5 },
   shotgun: { surface: [0, -0.03, 0], yaw: 0.3, scale: 0.8 },
   'wood-axe': { surface: [0, 0.67, 0], yaw: 0.5, scale: 1 },
   'silver-sabre': { surface: [0, -0.02, 0], yaw: 0.4, scale: 1 },
