@@ -30,6 +30,17 @@ export const CHAPEL_INTERIOR_BOXES: readonly ChapelBox[] = interiorRaw.boxes.map
 /** The 14 buttress boxes outside the walls. The walls themselves keep the game's own colliders. */
 export const CHAPEL_EXTERIOR_BOXES: readonly ChapelBox[] = exteriorRaw.boxes.map(toBox)
 
+/**
+ * Buttress colliders pulled in toward the wall (chapel-local x of the new outer face). The north
+ * buttress on the west wall stood 0.64 m from the hut-ne -> hut-se leg, and zombies coming round
+ * the chapel's north-west corner flipped between that leg and the direct line every few frames
+ * (tests/zombieNavigation.test.ts, wg-northeast). Trimming its foot by 0.16 m clears it; the mesh
+ * is unchanged and the box still covers the buttress's upper, tapered part.
+ */
+export const CHAPEL_BUTTRESS_TRIMS: readonly { readonly x: number; readonly z: number; readonly outerX: number }[] = [
+  { x: -3, z: -5.9, outerX: -3.2 },
+]
+
 /** Heights things rest on, chapel-local metres (interior JSON "surfaces"). */
 export const CHAPEL_SURFACES = {
   lecternBookRestY: interiorRaw.surfaces['lectern-book-rest-y'],

@@ -69,6 +69,7 @@ import { startEnding } from '../game/state/startEnding'
 import { endingCameraRuntime } from '../scene/effects/endingCameraRuntime'
 import { useGuidanceStore } from '../game/state/guidanceStore'
 import { useSettingsStore } from '../game/state/settingsStore'
+import { bellRuntime } from '../scene/world/bellRuntime'
 import { queueTeleport } from '../game/state/playerTeleport'
 import { deriveTickInput } from '../game/state/progressionTick'
 import { createEnemy } from '../game/systems/enemyAI'
@@ -484,6 +485,13 @@ const api = {
     }
   },
   /** Mesh count under the named scene group (-1 when no such group is mounted). */
+  /** Whether the named object and all its parents are visible; null when no object has the name. */
+  objectVisible(name: string): boolean | null {
+    const o: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
+    if (!o) return null
+    for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false
+    return true
+  },
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
     if (!root) return -1
@@ -612,6 +620,10 @@ const api = {
     value: boolean,
   ): void {
     useSettingsStore.getState().setSetting(key, value)
+  },
+  /** The angle (radians) the chapel bell mesh was last given, or null while the mesh is not found. */
+  bellMeshAngle(): number | null {
+    return bellRuntime.meshAngle
   },
   /** The map pins, whether the big map is open, and how many pin beacons are in the scene. */
   mapPins(): { pins: Array<{ slot: number; x: number; z: number; name: string }>; mapOpen: boolean; beacons: number } {

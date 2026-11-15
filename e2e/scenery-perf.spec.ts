@@ -25,6 +25,8 @@ test('frame cost per scenery stop', async ({ page }) => {
     { timeout: 120_000 },
   )
   await page.waitForFunction(() => window.__lastRites!.body() !== null)
+  // LOW=1 measures the Low graphics setting (no ambient occlusion, no moon shadows).
+  if (process.env.LOW === '1') await page.evaluate(() => window.__lastRites!.setSetting('lowGraphics', true))
   const result: Record<string, { longestMs: number; calls: number; triangles: number }> = {}
   for (const stop of STOPS) {
     await page.evaluate((s) => window.__lastRites!.teleport(s.x, s.z, { yaw: s.yaw }), stop)

@@ -784,6 +784,11 @@ A storm can also roll on a day (15%).
 | Merchant | Leaves with the subtitle "[the hearse cart rolls away]"; compass marker ⚱ "Silas"; prompt "E: Trade" with rune ᛗ |
 | Seeds | One run seed chosen at New Game (1849 for old saves); every random stream derives from it, so Retry Night replays the same offers, stock and storms |
 
+### Rendering and the Low graphics setting (09, task 11n-a)
+- **Look:** AgX tone mapping, low-intensity ambient occlusion (N8AO), bloom only on emissive parts (threshold 1), vignette and a subtle grain. The lantern and the moon cast shadows; the moon's shadow box is 28 m wide around the player with soft PCF. Inside the chapel the fog is 2.4× denser and warmer (`src/data/interiorFog.ts`), eased over about 0.4 s at the door.
+- **Low graphics** (Settings, default Off, saved with the others) turns off the ambient occlusion and the moon's shadows, the two effects that add draw calls. Everything else stays.
+- **Chapel bell:** the belfry bell swings up to 7° and dies away over 7 s each time the bell rings (dusk bell and wave bell).
+
 ---
 
 ## 13. Stages and cases (10)

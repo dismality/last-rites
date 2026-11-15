@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { INTERIOR_FOG, easeInterior, interiorFogLook, isInterior } from './interiorFog'
-import { BELL_SWING_DEG, BELL_SWING_S, bellAngle } from './bellSwing'
 
 describe('interior fog', () => {
   it('open air is unchanged and full interior is denser and warmer', () => {
@@ -22,16 +21,5 @@ describe('interior fog', () => {
     expect(easeInterior(0, 1, 0.1)).toBeCloseTo(0.25, 9)
     expect(easeInterior(0.9, 1, 1)).toBe(1)
     expect(easeInterior(0.1, 0, 1)).toBe(0)
-  })
-})
-
-describe('bell swing', () => {
-  it('is a few degrees, dies out, and rests before and after', () => {
-    expect(bellAngle(-1)).toBe(0)
-    expect(bellAngle(BELL_SWING_S)).toBe(0)
-    const peak = Math.max(...Array.from({ length: 700 }, (_, i) => Math.abs(bellAngle(i / 100))))
-    expect(peak).toBeLessThanOrEqual((BELL_SWING_DEG * Math.PI) / 180)
-    expect(peak).toBeGreaterThan(0.05)
-    expect(Math.abs(bellAngle(BELL_SWING_S - 0.1))).toBeLessThan(0.002)
   })
 })

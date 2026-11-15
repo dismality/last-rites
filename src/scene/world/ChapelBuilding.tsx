@@ -149,6 +149,7 @@ function ChapelModels() {
     if (!b) return
     const t = bellRuntime.ringAtMs
     b.rotation.x = t === null ? 0 : bellAngle((performance.now() - t) / 1000)
+    bellRuntime.meshAngle = b.rotation.x
   })
 
   return (

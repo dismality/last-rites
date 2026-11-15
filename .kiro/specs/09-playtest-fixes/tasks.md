@@ -157,7 +157,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Clue highlight hugs the clue model (inverted-hull outline or soft ground ring), sized from model bounds, fades in within about 4 m and out after examining; no box, no wireframe; follows whichever model is shown (11n-d clue GLBs); replace any other wireframe highlight box
   - Browser: screenshot a clue spot near and far at 1280x720
   - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11o)`), never push
-- [ ] 11n-a. Scenery swap: chapel inside and out
+- [x] 11n-a. Scenery swap: chapel inside and out
   - Full brief: `docs/kiro-prompt-playtest-batch.md` Part B ("What's there", 11n-a, Realism, Tests)
   - Mount `scene/chapel-interior.glb` and `scene/chapel-exterior.glb` (useGLTF with DRACO_PATH, `<Clone>`, preloadModels); old Slabs collider-only; remove the old frames, glass boxes, Kenney pillars, GableRoof, belfry, cross, Kenney altar and candles, visible floor slab
   - Bell mesh swings at anchor bell-pivot on the dusk bell; door lantern light at door-lantern-light; stair cover hides when the whistle opens the stair

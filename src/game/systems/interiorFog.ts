@@ -2,18 +2,10 @@
 // the far end of the room falls into darkness instead of showing the open-air haze. Pure: the
 // scene eases `amount` toward 1 inside and 0 outside, and asks for the look at that amount.
 
+import { INTERIOR_FOG } from '../../data/interiorFog'
 import { ZONE_BOUNDS } from '../../data/zones'
 
-export const INTERIOR_FOG = {
-  /** Fog density multiplier at full effect. */
-  densityScale: 2.4,
-  /** How far the fog colour moves toward the warm tint at full effect (0..1). */
-  tintMix: 0.55,
-  /** Warm, dark candle-smoke brown (sRGB 0..1). */
-  tint: [0.1, 0.06, 0.035] as readonly [number, number, number],
-  /** Easing speed: about 0.4 s to cross a doorway. */
-  easePerS: 2.5,
-} as const
+export { INTERIOR_FOG }
 
 type Rgb = readonly [number, number, number]
 

@@ -4,6 +4,7 @@
 // blocks a path, shorten its collider, don't move the pew."
 
 import {
+  CHAPEL_BUTTRESS_TRIMS,
   CHAPEL_EXTERIOR_BOXES,
   CHAPEL_INTERIOR_BOXES,
   type ChapelBox,
@@ -92,7 +93,24 @@ export function droppedColliders(
   return boxes.filter((b) => crossesAisle(b, aisle) && clearAisle(b, aisle) === null)
 }
 
+/** A buttress with its outer face pulled in to `outerX` (chapel-local); the wall-side face stays. */
+export function trimOuter(b: ChapelBox, outerX: number): ChapelBox {
+  const r = rectOf(b)
+  return b.center[0] < 0 ? withRect(b, { ...r, xMin: Math.max(r.xMin, outerX) }) : withRect(b, { ...r, xMax: Math.min(r.xMax, outerX) })
+}
+
+/** The buttress boxes with the navigation trims of CHAPEL_BUTTRESS_TRIMS applied. */
+export function trimmedButtresses(
+  boxes: readonly ChapelBox[] = CHAPEL_EXTERIOR_BOXES,
+  trims: typeof CHAPEL_BUTTRESS_TRIMS = CHAPEL_BUTTRESS_TRIMS,
+): ChapelBox[] {
+  return boxes.map((b) => {
+    const t = trims.find((tr) => Math.abs(tr.x - b.center[0]) < 1e-6 && Math.abs(tr.z - b.center[2]) < 1e-6)
+    return t ? trimOuter(b, t.outerX) : b
+  })
+}
+
 /** Every collider the chapel scene adds to the walls: cleared interior boxes plus the buttresses. */
 export function chapelSceneColliders(): ChapelBox[] {
-  return [...clearedColliders(CHAPEL_INTERIOR_BOXES), ...CHAPEL_EXTERIOR_BOXES]
+  return [...clearedColliders(CHAPEL_INTERIOR_BOXES), ...trimmedButtresses()]
 }

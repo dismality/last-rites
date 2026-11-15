@@ -58,6 +58,8 @@ function buildHull(
   body.traverse((o) => {
     const mesh = o as THREE.Mesh
     if (!mesh.isMesh || !mesh.geometry) return
+    // Hidden hit proxies (the altar's invisible box) are not the object's shape: no outline for them.
+    if (!mesh.visible) return
     if (!mesh.geometry.boundingBox) mesh.geometry.computeBoundingBox()
     const rel = new THREE.Matrix4().multiplyMatrices(toRoot, mesh.matrixWorld)
     bounds.union(mesh.geometry.boundingBox!.clone().applyMatrix4(rel))
