@@ -4,6 +4,8 @@
 
 import type { ItemId } from '../game/types'
 import type { WeaponPickupId } from './weaponPickups'
+import { CRANE_CRYPT_STEP } from './cemeteryLayout'
+import { AXE_REST, PROP_SURFACES } from './propScenery'
 
 type Vec3 = readonly [number, number, number]
 
@@ -121,15 +123,21 @@ export interface WeaponPickupPose {
   readonly scale: number
 }
 
-// Each weapon lies on its prop: the revolver on the chapel cupboard's shelf and the shotgun on the lodge table
-// (both at y -0.03), the axe across the woodpile (top log at 0.67) and the sabre on the crypt step
-// (top at -0.02). The scene adds groundPose().lift, so a thin model never floats or sinks.
+// Each weapon lies on its prop: the revolver on the chapel cupboard's shelf, the shotgun on the lodge
+// table, the axe on the woodpile's chopping block and the sabre on its plinth. The scene adds
+// groundPose().lift, so a thin model never floats or sinks.
 export const WEAPON_PICKUP_POSES: Readonly<Record<WeaponPickupId, WeaponPickupPose>> = {
   // The revolver rests on the cupboard shelf itself (the position is the shelf top), no prop of its own.
   revolver: { surface: [0, 0, 0], yaw: 0.35, scale: 1.5 },
-  shotgun: { surface: [0, -0.03, 0], yaw: 0.3, scale: 0.8 },
-  'wood-axe': { surface: [0, 0.67, 0], yaw: 0.5, scale: 1 },
-  'silver-sabre': { surface: [0, -0.02, 0], yaw: 0.4, scale: 1 },
+  // Surfaces come from the props' own JSON (lodge table top 0.8, plinth top 0.3 seen from the step
+  // at y 0.35, the woodpile's axe-rest anchor on the chopping block).
+  shotgun: { surface: [0, PROP_SURFACES.lodgeTableTopY, 0], yaw: 0.3, scale: 0.8 },
+  'wood-axe': { surface: AXE_REST, yaw: 0.5, scale: 1 },
+  'silver-sabre': {
+    surface: [0, PROP_SURFACES.sabrePlinthTopY - CRANE_CRYPT_STEP[1], 0],
+    yaw: 0.4,
+    scale: 1,
+  },
 }
 
 // --- In the hand ------------------------------------------------------------

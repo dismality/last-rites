@@ -2,7 +2,10 @@
 // digStore at the fixed step. A mound shows nothing on top: loot appears only after the dig.
 
 import { useEffect } from 'react'
+import { Clone, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
+import { DRACO_PATH, propModelUrl } from '../../data/assets'
+import '../assets/preloadModels'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { MOUND_DAY_RUNE_RANGE_M } from '../../game/systems/digGuidance'
@@ -19,45 +22,9 @@ const GRAVES = diggableGraves()
 
 /** Fresh earth heaped over a grave, or the dark open pit once it has been dug today. */
 function Mound({ dug }: { dug: boolean }) {
-  return dug ? (
-    <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]}>
-        <planeGeometry args={[0.9, 1.7]} />
-        <meshStandardMaterial color="#120e0b" roughness={1} />
-      </mesh>
-      {/* Spoil heaped beside the pit. */}
-      <mesh position={[0.65, 0.1, 0]} scale={[0.35, 0.22, 0.8]}>
-        <sphereGeometry args={[1, 10, 6]} />
-        <meshStandardMaterial color="#3b2f25" roughness={1} />
-      </mesh>
-    </group>
-  ) : (
-    <group>
-      {/* Raised, freshly turned earth: darker than the grass so it reads in daylight. */}
-      <mesh position={[0, 0.05, 0]} scale={[0.8, 0.42, 1.3]}>
-        <sphereGeometry args={[1, 12, 8]} />
-        <meshStandardMaterial color="#2a1d14" roughness={1} />
-      </mesh>
-      {/* Wooden cross at the head: tall enough to spot from across the grounds. */}
-      <mesh position={[0, 0.8, -1.35]}>
-        <boxGeometry args={[0.1, 1.6, 0.1]} />
-        <meshStandardMaterial color="#6b5238" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 1.15, -1.35]}>
-        <boxGeometry args={[0.7, 0.1, 0.1]} />
-        <meshStandardMaterial color="#6b5238" roughness={0.9} />
-      </mesh>
-      {/* Spade stuck in the earth: the shape that says "dig here". */}
-      <mesh position={[0.25, 0.75, 0.2]} rotation={[0.2, 0, -0.15]}>
-        <boxGeometry args={[0.07, 1.0, 0.07]} />
-        <meshStandardMaterial color="#5b4a38" roughness={0.9} />
-      </mesh>
-      <mesh position={[0.3, 0.3, 0.2]} rotation={[0.2, 0, -0.15]}>
-        <boxGeometry args={[0.28, 0.3, 0.04]} />
-        <meshStandardMaterial color="#8a8f94" roughness={0.6} metalness={0.4} />
-      </mesh>
-    </group>
-  )
+  // Mound-local, head (cross) at -Z, like the old primitives. Both models are preloaded.
+  const model = useGLTF(propModelUrl(dug ? 'grave-dug' : 'grave-mound'), DRACO_PATH).scene
+  return <Clone object={model} />
 }
 
 /** Tall thin pillar over a mound while the dig tutorial step is active. */

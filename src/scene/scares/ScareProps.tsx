@@ -1,23 +1,25 @@
 // ScareProps: the meshes the stager animates (statues, crypt doors, candle clusters, the grave
-// hand). Greybox primitives, visual only: no colliders, so a staged prop can never trap the player.
-// Animation state lives in stagedProps; this file only reads it each frame.
+// hand), drawn from the Blender props (spec 09 task 11n-d). Only the statues have colliders (a
+// fixed box each); doors, candles and the hand are visual only, so a staged prop never traps the
+// player. Animation state lives in stagedProps; this file only reads it each frame.
+import { Clone, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import { useRef } from 'react'
 import type { Group, Mesh } from 'three'
+import { DRACO_PATH, propModelUrl } from '../../data/assets'
+import { STATUE_BOXES } from '../../data/propScenery'
+import '../assets/preloadModels'
 import { SCARE_CANDLES, SCARE_DOORS, SCARE_STAGING, SCARE_STATUES } from '../../data/scares'
 import { candleLit, doorAngle, yawToward } from '../../game/systems/scareStaging'
 import { playerPositionRef } from '../world/playerPositionRef'
 import { stagedProps, statueOf } from './stagedProps'
 
-const STONE = '#6f7378'
-const WOOD = '#2b2118'
-const IRON = '#3a3d40'
-const WAX = '#d8c9a3'
 const FLAME = '#e8913a'
-const HAND = '#8c917c'
 
 function Statue({ index }: { index: number }) {
   const anchor = SCARE_STATUES[index]
+  const model = useGLTF(propModelUrl('statue-mourner'), DRACO_PATH).scene
   const group = useRef<Group>(null)
   const wasTurned = useRef(false)
 
@@ -43,29 +45,36 @@ function Statue({ index }: { index: number }) {
       position={anchor.position as [number, number, number]}
       rotation={[0, anchor.awayYaw, 0]}
     >
-      <mesh position={[0, 0.25, 0]}>
-        <boxGeometry args={[0.8, 0.5, 0.8]} />
-        <meshStandardMaterial color={STONE} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, 1.15, 0]}>
-        <cylinderGeometry args={[0.2, 0.32, 1.3, 8]} />
-        <meshStandardMaterial color={STONE} roughness={0.95} />
-      </mesh>
-      <mesh position={[0, 1.95, 0]}>
-        <sphereGeometry args={[0.22, 10, 8]} />
-        <meshStandardMaterial color={STONE} roughness={0.95} />
-      </mesh>
-      {/* The nose marks the front (+Z), so the turn reads even in the dark. */}
-      <mesh position={[0, 1.95, 0.22]}>
-        <boxGeometry args={[0.07, 0.12, 0.1]} />
-        <meshStandardMaterial color={STONE} roughness={0.95} />
-      </mesh>
+      {/* statue-mourner.glb faces +Z, so the head turn reads even in the dark. */}
+      <Clone object={model} />
     </group>
+  )
+}
+
+/**
+ * One static collider per statue (statue-mourner.json). The statue's yaw is a multiple of a quarter
+ * turn when it is away, and the box is square, so it fits either way; the turned pose is a quick
+ * snap of a 0.43 m half-width, which is not enough to trap the player.
+ */
+function StatueColliders() {
+  return (
+    <RigidBody type="fixed" colliders={false}>
+      {SCARE_STATUES.flatMap((s, i) =>
+        STATUE_BOXES.map((b, j) => (
+          <CuboidCollider
+            key={`${i}-${j}`}
+            args={[b.half[0], b.half[1], b.half[2]]}
+            position={[s.position[0] + b.center[0], s.position[1] + b.center[1], s.position[2] + b.center[2]]}
+          />
+        )),
+      )}
+    </RigidBody>
   )
 }
 
 function Door({ index }: { index: number }) {
   const anchor = SCARE_DOORS[index]
+  const model = useGLTF(propModelUrl('scare-door'), DRACO_PATH).scene
   const hinge = useRef<Group>(null)
 
   useFrame(() => {
@@ -81,20 +90,15 @@ function Door({ index }: { index: number }) {
       position={anchor.position as [number, number, number]}
       rotation={[0, anchor.shutYaw, 0]}
     >
-      <mesh position={[0.5, 1.05, 0]}>
-        <boxGeometry args={[1, 2.1, 0.08]} />
-        <meshStandardMaterial color={WOOD} roughness={0.9} />
-      </mesh>
-      <mesh position={[0.5, 1.4, 0.05]}>
-        <boxGeometry args={[1, 0.08, 0.03]} />
-        <meshStandardMaterial color={IRON} roughness={0.6} metalness={0.5} />
-      </mesh>
+      {/* scare-door.glb: hinge at the origin, leaf along +X. */}
+      <Clone object={model} />
     </group>
   )
 }
 
 function CandleCluster({ index }: { index: number }) {
   const cluster = SCARE_CANDLES[index]
+  const model = useGLTF(propModelUrl('candle-stub'), DRACO_PATH).scene
   const flames = useRef<(Mesh | null)[]>([])
 
   useFrame(() => {
@@ -112,10 +116,7 @@ function CandleCluster({ index }: { index: number }) {
     <>
       {cluster.positions.map((p, i) => (
         <group key={i} position={p as [number, number, number]}>
-          <mesh position={[0, 0.12, 0]}>
-            <cylinderGeometry args={[0.04, 0.05, 0.24, 8]} />
-            <meshStandardMaterial color={WAX} roughness={0.8} />
-          </mesh>
+          <Clone object={model} />
           <mesh
             ref={(m) => {
               flames.current[i] = m
@@ -133,6 +134,7 @@ function CandleCluster({ index }: { index: number }) {
 }
 
 function GraveHand() {
+  const model = useGLTF(propModelUrl('grave-hand'), DRACO_PATH).scene
   const group = useRef<Group>(null)
 
   useFrame(() => {
@@ -149,20 +151,8 @@ function GraveHand() {
 
   return (
     <group ref={group} visible={false}>
-      <mesh position={[0, 0.15, 0]}>
-        <cylinderGeometry args={[0.035, 0.045, 0.35, 6]} />
-        <meshStandardMaterial color={HAND} roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.38, 0]}>
-        <boxGeometry args={[0.11, 0.1, 0.04]} />
-        <meshStandardMaterial color={HAND} roughness={0.9} />
-      </mesh>
-      {[-0.04, -0.013, 0.013, 0.04].map((fx) => (
-        <mesh key={fx} position={[fx, 0.47, 0]} rotation={[0, 0, -fx * 3]}>
-          <cylinderGeometry args={[0.01, 0.014, 0.12, 5]} />
-          <meshStandardMaterial color={HAND} roughness={0.9} />
-        </mesh>
-      ))}
+      {/* grave-hand.glb: origin at ground level. */}
+      <Clone object={model} />
     </group>
   )
 }
@@ -180,6 +170,7 @@ export function ScareProps() {
         <CandleCluster key={c.zoneId} index={i} />
       ))}
       <GraveHand />
+      <StatueColliders />
     </>
   )
 }

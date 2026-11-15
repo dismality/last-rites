@@ -210,9 +210,47 @@ export const GATE_ROW_MODEL_URL = '/assets/models/props/gate-mausoleum-row.glb'
 export const OSSUARY_DOOR_MODEL_URL = '/assets/models/props/ossuary-door.glb'
 export const IRON_RAILING_MODEL_URL = '/assets/models/props/iron-railing.glb'
 
+/** The remaining Blender props (spec 09 task 11n-d). All are in prop-local space. */
+const PROP_DIR = '/assets/models/props'
+export const PROP_IDS = [
+  'lamp-post',
+  'coffin-broken',
+  'grave-mound',
+  'grave-dug',
+  'merchant-cart',
+  'statue-mourner',
+  'scare-door',
+  'candle-stub',
+  'grave-hand',
+  'woodpile',
+  'lodge-table',
+  'sabre-plinth',
+  // Loaded for the horror pass (spec 11 H4), not placed yet.
+  'bat-perched',
+  'bat-flying',
+] as const
+export type PropId = (typeof PROP_IDS)[number]
+export const propModelUrl = (id: PropId): string => `${PROP_DIR}/${id}.glb`
+
+/** A clue spot's model is named after its clue id (props/clue-<clueId>.glb); every clue has one. */
+export const clueModelUrl = (clueId: string): string => `${PROP_DIR}/${clueId}.glb`
+export const CLUE_MODEL_IDS = [
+  'clue-hut-boots',
+  'clue-empty-graves',
+  'clue-west-hill-glint',
+  'clue-ledger-week',
+  'clue-row-statues',
+  'clue-elias-body',
+  'clue-cat-scratches',
+  'clue-cat-names',
+  'clue-cat-ledger-seal',
+] as const
+
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {
   return [
+    ...PROP_IDS.map(propModelUrl),
+    ...CLUE_MODEL_IDS.map(clueModelUrl),
     CATACOMBS_MODEL_URL,
     GATE_CATACOMBS_MODEL_URL,
     GATE_ROW_MODEL_URL,
@@ -221,7 +259,6 @@ export function allModelUrls(): string[] {
     HUT_MODEL_URL,
     WORKBENCH_MODEL_URL,
     VENDING_MACHINE_MODEL_URL,
-    CLUE_HUT_BOOTS_MODEL_URL,
     CHAPEL_INTERIOR_MODEL_URL,
     CHAPEL_EXTERIOR_MODEL_URL,
     ...WORLD_MODEL_IDS.map(worldModelUrl),

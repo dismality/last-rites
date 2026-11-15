@@ -1,63 +1,55 @@
 // The four findable weapons as props with an Interactable each (Req 2.1-2.6, 23.8).
-// Each weapon is its Blender model lying on its prop (the chapel cupboard's shelf, a table, woodpile, step).
-// Whether the weapon can be taken (satchel room, already taken) is
+// Each weapon is its Blender model lying on its prop (the chapel cupboard's shelf, the lodge table,
+// the woodpile's chopping block, the sabre plinth; spec 09 task 11n-d). The props stay when the weapon is
+// taken. Whether the weapon can be taken (satchel room, already taken) is
 // decided by the pure pickup rule inside takeWeaponPickup; a refusal leaves the prop in place.
 
-import { useLayoutEffect, useRef } from 'react'
-import * as THREE from 'three'
+import { Clone, useGLTF } from '@react-three/drei'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { DRACO_PATH, propModelUrl } from '../../data/assets'
+import { CRANE_CRYPT_STEP } from '../../data/cemeteryLayout'
 import { WEAPON_PICKUP_POSES } from '../../data/itemModels'
+import { LODGE_TABLE_BOXES, WOODPILE_BOXES, type PropBox } from '../../data/propScenery'
 import { WEAPON_PICKUPS, type WeaponPickupId } from '../../data/weaponPickups'
 import { takeWeaponPickup } from '../../game/state/combatActions'
 import { useCombatStore } from '../../game/state/combatStore'
+import '../assets/preloadModels'
 import { Interactable } from './Interactable'
 import { GroundItem } from './ItemModel'
 import { useLingerAfter } from './useLingering'
 
-const WOOD = '#4a3626'
-const STONE = '#6b6a68'
-
-const LOG_COUNT = 9
-const LOG_LAYOUT: ReadonlyArray<readonly [number, number, number]> = [
-  // x, y, row: three rows stacked in a pyramid.
-  [-0.5, 0.12, 0],
-  [-0.25, 0.12, 0],
-  [0, 0.12, 0],
-  [0.25, 0.12, 0],
-  [-0.38, 0.34, 0],
-  [-0.13, 0.34, 0],
-  [0.12, 0.34, 0],
-  [-0.25, 0.56, 0],
-  [0, 0.56, 0],
-]
-
-/** One draw call for the whole pile of logs. */
-function Woodpile() {
-  const ref = useRef<THREE.InstancedMesh>(null)
-  useLayoutEffect(() => {
-    const mesh = ref.current
-    if (!mesh) return
-    const m = new THREE.Matrix4()
-    LOG_LAYOUT.forEach(([x, y], i) => {
-      m.makeTranslation(x, y, 0)
-      mesh.setMatrixAt(i, m)
-    })
-    mesh.instanceMatrix.needsUpdate = true
-  }, [])
+/** A fixed collider from a prop's JSON, in the prop's own space. */
+function PropColliders({ boxes }: { boxes: readonly PropBox[] }) {
   return (
-    <instancedMesh ref={ref} args={[undefined, undefined, LOG_COUNT]} castShadow>
-      <cylinderGeometry args={[0.11, 0.11, 0.9, 8]} />
-      <meshStandardMaterial color={WOOD} roughness={0.95} />
-    </instancedMesh>
+    <RigidBody type="fixed" colliders={false}>
+      {boxes.map((b) => (
+        <CuboidCollider
+          key={b.note}
+          args={[b.half[0], b.half[1], b.half[2]]}
+          position={[...b.center]}
+          rotation={[0, b.rotY, 0]}
+        />
+      ))}
+    </RigidBody>
   )
 }
 
-/** A low table (shotgun) for the item to rest on. */
-function Shelf({ height, width = 0.6 }: { height: number; width?: number }) {
+/** A static prop model with its colliders. */
+function PropModel({
+  id,
+  boxes,
+  y = 0,
+}: {
+  id: 'woodpile' | 'lodge-table' | 'sabre-plinth'
+  boxes?: readonly PropBox[]
+  y?: number
+}) {
+  const model = useGLTF(propModelUrl(id), DRACO_PATH).scene
   return (
-    <mesh position={[0, -height / 2 - 0.03, 0]}>
-      <boxGeometry args={[width, height, 0.4]} />
-      <meshStandardMaterial color={STONE} roughness={0.9} />
-    </mesh>
+    <group position={[0, y, 0]}>
+      <Clone object={model} />
+      {boxes && <PropColliders boxes={boxes} />}
+    </group>
   )
 }
 
@@ -71,41 +63,17 @@ function Weapon({ id }: { id: WeaponPickupId }) {
   )
 }
 
-function Prop({ id }: { id: WeaponPickupId }) {
-  switch (id) {
-    case 'revolver':
-      // Rests on the chapel scene's own cupboard shelf, so it brings no prop.
-      return <Weapon id={id} />
-    case 'shotgun':
-      return (
-        <>
-          <Shelf height={0.8} width={1} />
-          <Weapon id={id} />
-        </>
-      )
-    case 'wood-axe':
-      // The woodpile is scenery (WeaponPickup draws it); only the axe is taken and fades.
-      return <Weapon id={id} />
-    case 'silver-sabre':
-      return (
-        <>
-          <mesh position={[0, -0.17, 0]}>
-            <boxGeometry args={[0.9, 0.3, 0.5]} />
-            <meshStandardMaterial color={STONE} roughness={0.95} />
-          </mesh>
-          <Weapon id={id} />
-        </>
-      )
-  }
-}
-
-/** One findable weapon. Taken, it fades with its cues for a moment, then the prop is gone. */
+/** One findable weapon. Taken, it fades with its cues for a moment, then the weapon is gone. */
 function WeaponPickup({ id, position }: { id: WeaponPickupId; position: readonly [number, number, number] }) {
   const isTaken = useCombatStore((s) => s.takenPickups.includes(id))
   const shown = useLingerAfter(isTaken)
   return (
     <group name={`weapon-pickup:${id}`} position={[...position]}>
-      {id === 'wood-axe' && <Woodpile />}
+      {/* The revolver rests on the chapel scene's own cupboard shelf, so it brings no prop. */}
+      {id === 'wood-axe' && <PropModel id="woodpile" boxes={WOODPILE_BOXES} />}
+      {id === 'shotgun' && <PropModel id="lodge-table" boxes={LODGE_TABLE_BOXES} />}
+      {/* The pickup stands on the crypt step; the plinth is modelled from the ground. */}
+      {id === 'silver-sabre' && <PropModel id="sabre-plinth" y={-CRANE_CRYPT_STEP[1]} />}
       {shown && (
         <Interactable
           id={`weapon:${id}`}
@@ -116,7 +84,7 @@ function WeaponPickup({ id, position }: { id: WeaponPickupId; position: readonly
             takeWeaponPickup(id)
           }}
         >
-          <Prop id={id} />
+          <Weapon id={id} />
         </Interactable>
       )}
     </group>

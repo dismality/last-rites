@@ -11,7 +11,12 @@ import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
 import { CuboidCollider, CylinderCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
-import { CATACOMBS_MODEL_URL, DRACO_PATH, IRON_RAILING_MODEL_URL } from '../../data/assets'
+import {
+  CATACOMBS_MODEL_URL,
+  DRACO_PATH,
+  IRON_RAILING_MODEL_URL,
+  propModelUrl,
+} from '../../data/assets'
 import { CATACOMB_BOXES } from '../../data/catacombsScenery'
 import '../assets/preloadModels'
 import {
@@ -89,7 +94,9 @@ function Block({
 function LampPosts() {
   return (
     <>
-      <InstancedModel model="lightpost-single" placements={LAMP_PLACEMENTS} />
+      {/* lamp-post.glb: the lamp arm points +Z, so the old rotations keep facing the path. Its glass is
+          emissive (bloom lifts it); no point light is added, as with the old posts. */}
+      <InstancedModel url={propModelUrl('lamp-post')} placements={LAMP_PLACEMENTS} />
       <RigidBody type="fixed" colliders={false}>
         {LAMP_POSTS.map((l, i) => {
           const c = lampCollider(l.position)
@@ -106,7 +113,7 @@ function LampPosts() {
 function SpawnDressing() {
   return (
     <>
-      <InstancedModel model="coffin-old" placements={COFFIN_PLACEMENTS} />
+      <InstancedModel url={propModelUrl('coffin-broken')} placements={COFFIN_PLACEMENTS} />
     </>
   )
 }

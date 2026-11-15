@@ -12,6 +12,7 @@ import {
 } from '../../src/data/cemeteryLayout'
 import { CATACOMB_BOXES } from '../../src/data/catacombsScenery'
 import { HUT_BOXES } from '../../src/data/hutScenery'
+import { PROP_PLACEMENTS } from '../../src/data/propScenery'
 import { headstoneCollider, headstoneScale, lampCollider } from '../../src/data/colliderFootprints'
 import { GRAVEYARD_COLLIDERS } from '../../src/data/graveyardColliders'
 import { TOMBSTONES } from '../../src/data/tombstones'
@@ -119,6 +120,9 @@ export function propBoxes(): Box[] {
     out.push(box(l.position[0], l.position[2], r, r))
   }
   out.push(...graveyardBoxes())
+  // Statues, woodpile, lodge table and the burial-notice post (spec 09 task 11n-d).
+  for (const p of PROP_PLACEMENTS)
+    out.push(turnedBox({ position: p.position, rotationY: p.rotY, half: p.half }))
   return out
 }
 /** Slab test for a segment against one box. */

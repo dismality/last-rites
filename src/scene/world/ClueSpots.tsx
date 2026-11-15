@@ -1,7 +1,9 @@
 // Environmental clues: small props the player can examine to record a clue.
 // Rules (ledger required or not) live in the mystery store; this only draws and wires them.
 import { Clone, useGLTF } from '@react-three/drei'
-import { CLUE_HUT_BOOTS_MODEL_URL, DRACO_PATH } from '../../data/assets'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { DRACO_PATH, clueModelUrl } from '../../data/assets'
+import { NOTICE_POST_BOXES } from '../../data/propScenery'
 import '../assets/preloadModels'
 import { CLUE_SPOTS, type ClueSpot } from '../../data/tombstones'
 import { pushJournalAddedToast } from '../../game/state/journalToast'
@@ -10,7 +12,6 @@ import { useToastStore } from '../../game/state/toastStore'
 import { canDiscoverClue } from '../../game/systems/tombstones'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { Interactable } from './Interactable'
-import { PART_MATERIALS } from './partMaterials'
 
 /** The clue's outline fades in inside this distance (spec 09 task 11o). */
 const CLUE_OUTLINE_RANGE_M = 4
@@ -23,34 +24,13 @@ function examineSpot(spot: ClueSpot): void {
   useMysteryStore.getState().discoverClue(spot.clueId)
 }
 
-/** Elias's boots by the cot (props/clue-hut-boots.glb, clue-local). */
-function HutBoots() {
-  const model = useGLTF(CLUE_HUT_BOOTS_MODEL_URL, DRACO_PATH).scene
+/**
+ * A clue's own model (props/clue-<clueId>.glb, clue-local). All nine clues have one, so the three
+ * generic shapes are gone. The outline hull follows these meshes (Interactable).
+ */
+function Prop({ clueId }: { clueId: ClueSpot['clueId'] }) {
+  const model = useGLTF(clueModelUrl(clueId), DRACO_PATH).scene
   return <Clone object={model} />
-}
-
-function Prop({ kind, clueId }: { kind: ClueSpot['prop']; clueId: ClueSpot['clueId'] }) {
-  if (clueId === 'clue-hut-boots') return <HutBoots />
-  switch (kind) {
-    case 'parchment':
-      return (
-        <mesh position={[0, 0.9, 0]} rotation={[0, 0, 0.05]} material={PART_MATERIALS.floor}>
-          <boxGeometry args={[0.35, 0.45, 0.02]} />
-        </mesh>
-      )
-    case 'coat':
-      return (
-        <mesh position={[0, 0.08, 0]} material={PART_MATERIALS.darkWood} castShadow>
-          <boxGeometry args={[1.5, 0.16, 0.6]} />
-        </mesh>
-      )
-    case 'marks':
-      return (
-        <mesh position={[0, 0.02, 0]} material={PART_MATERIALS.trim}>
-          <boxGeometry args={[0.5, 0.04, 0.35]} />
-        </mesh>
-      )
-  }
 }
 
 export function ClueSpots() {
@@ -67,8 +47,21 @@ export function ClueSpots() {
             runeHeight={0.9}
             onInteract={() => examineSpot(spot)}
           >
-            <Prop kind={spot.prop} clueId={spot.clueId} />
+            <Prop clueId={spot.clueId} />
           </Interactable>
+          {/* The notice post is solid (clue-ledger-week.json); the other clue props are low and walked around. */}
+          {spot.clueId === 'clue-ledger-week' && (
+            <RigidBody type="fixed" colliders={false}>
+              {NOTICE_POST_BOXES.map((b) => (
+                <CuboidCollider
+                  key={b.note}
+                  args={[b.half[0], b.half[1], b.half[2]]}
+                  position={[...b.center]}
+                  rotation={[0, b.rotY, 0]}
+                />
+              ))}
+            </RigidBody>
+          )}
         </group>
       ))}
     </>

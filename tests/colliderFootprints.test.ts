@@ -139,6 +139,9 @@ describe('no collider without a visible owner', () => {
     'world/Tombstones.tsx': 'tombstone models (footprint table)',
     'world/Gates.tsx': 'gate bars (collider removed when the gate opens)',
     'world/Hut.tsx': 'hut table',
+    'scares/ScareProps.tsx': 'statue-mourner.glb (statue-mourner.json); doors, candles and hand stay free',
+    'world/WeaponPickups.tsx': 'woodpile.glb and lodge-table.glb (their JSON boxes)',
+    'world/ClueSpots.tsx': 'the burial-notice post (clue-ledger-week.json)',
     'world/buildingParts.tsx': 'Slab: a box that is both drawn and solid',
     'world/Workbench.tsx': 'bench model',
     'world/ChapelBuilding.tsx': 'uses Slab',
@@ -157,7 +160,7 @@ describe('no collider without a visible owner', () => {
   })
 
   it('walk-over dressing and staged props stay collider-free', () => {
-    for (const f of ['scares/ScareProps.tsx', 'world/GraveMounds.tsx', 'world/MaterialPickups.tsx', 'world/Interactable.tsx']) {
+    for (const f of ['world/GraveMounds.tsx', 'world/MaterialPickups.tsx', 'world/Interactable.tsx']) {
       expect(sources[PREFIX + f], f).toBeDefined()
       expect(sources[PREFIX + f].match(COLLIDER) ?? []).toEqual([])
     }
