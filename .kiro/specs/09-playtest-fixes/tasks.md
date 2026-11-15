@@ -182,7 +182,8 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Graveyard ground: `graveyard.glb` has a hole at world x 9..11, z 9..11; check in the browser that the open grave there shows no grass and nothing relied on the old patch
   - Hut lantern: now smoked glass with low emission; if a lantern point light is added, keep it warm and low (intensity about 1.5, distance 5) and never raise the glass emission
   - Draw calls (230–374 against 150): instance repeated props (headstones, candles, bones, bats, crates), merge static props per area with mergeGeometries where they share a material, and skip rendering areas the player is not in (catacombs while outside, the graveyard while underground). Log draw calls per area before and after, and which areas are still over 150
-  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11n-e)`), never push- [ ] 3. A2: Automated playthrough test
+  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11n-e)`), never push
+- [ ] 3. A2: Automated playthrough test
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_
