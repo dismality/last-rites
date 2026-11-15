@@ -1541,3 +1541,8 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - **Compass:** `CHAPEL_ALTAR` (the objective marker) stays at local z 4.5; 0.6 m does not change a bearing.
   - **Zombies:** they walk the waypoint graph at y 0 and do not use physics, so a zombie can cross the open stair as if the floor were there.
 - **Not done yet (11n-e stays open):** the draw-call reduction.
+
+### 2026-11-15: 09-playtest-fixes task 18: Responsive HUD and 800x600 screenshot test
+- **Kiro feature used:** spec task
+- **What happened:** Continued a cancelled run. The wave tally and rite meter moved into one top-centre column with the boss bar and door status. Under 900 px the compass and that column take 50% of the width, the objective tracker, stamina bar and hotbar narrow, and the Curse bar wraps. New `e2e/hud-800x600.spec.ts` checks bounding boxes for overlap by day and at night (boss bar, doors, effects) at 1920x1080, 1280x720 and 800x600, and saves screenshots. Design bible section 11 updated.
+- **What Kiro caught or sped up:** The overlap check found the old fixed offsets put the boss bar far down at 600 px tall. `bossNameCardLayout.test.ts` was updated for the new stack. Lint, build, 2232 unit tests and 6/6 Playwright tests pass.

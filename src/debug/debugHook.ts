@@ -7,6 +7,7 @@
 // started through `startRun`) makes input.ts and the hotbar wheel act as if the canvas were locked.
 
 import type * as THREE from 'three'
+import { Frustum, Matrix4 } from 'three'
 import { Box3, Raycaster, Vector2, Vector3 } from 'three'
 import { DAY_DURATION_S, DUSK_DURATION_S, INTERACT_RANGE_M } from '../data/balance'
 import { interactableRegistry } from '../scene/world/interactableRegistry'
@@ -29,7 +30,8 @@ import type { WeaponPickupId } from '../data/weaponPickups'
 import { createRng, deriveSeed } from '../game/rng'
 import { emit, subscribeToType } from '../game/events'
 import { beginMode, continueGame } from '../game/state/runFlow'
-import { takeWeaponPickup } from '../game/state/combatActions'
+// Aliased: useHeld is a plain action, not a React hook, and the lint rule goes by the name.
+import { takeWeaponPickup, useHeld as consumeHeldItem } from '../game/state/combatActions'
 import { saveGame } from '../game/state/gameSave'
 import { resetCoinStream } from '../game/state/progressionEvents'
 import { pickUpgrade } from '../game/state/progressionActions'
@@ -492,6 +494,55 @@ const api = {
     for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false
     return true
   },
+  /**
+   * What the camera draws now: every visible mesh inside the view frustum, grouped by its nearest
+   * named ancestor, with how many of them also cast shadows (drawn again per shadow pass). For the
+   * draw-call budget (spec 09 task 11n-e); dev only.
+   */
+  drawCensus(): { total: number; shadowCasters: number; groups: { name: string; meshes: number; casters: number }[] } | null {
+    const root = bodyRuntime.scene
+    const camera = bodyRuntime.camera
+    if (!root || !camera) return null
+    camera.updateMatrixWorld()
+    const frustum = new Frustum().setFromProjectionMatrix(
+      new Matrix4().multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse),
+    )
+    const seen = (o: THREE.Object3D): boolean => {
+      for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false
+      return true
+    }
+    const groups = new Map<string, { meshes: number; casters: number }>()
+    let total = 0
+    let shadowCasters = 0
+    root.updateMatrixWorld()
+    root.traverse((o) => {
+      const m = o as THREE.Mesh
+      if (!m.isMesh || !seen(m)) return
+      if (m.frustumCulled && m.geometry) {
+        if (!m.geometry.boundingSphere) m.geometry.computeBoundingSphere()
+        const s = m.geometry.boundingSphere!.clone().applyMatrix4(m.matrixWorld)
+        if (!frustum.intersectsSphere(s)) return
+      }
+      let owner = '(unnamed)'
+      for (let p: THREE.Object3D | null = m.parent; p; p = p.parent) {
+        if (p.name && p.name !== 'Scene') {
+          owner = p.name
+          break
+        }
+      }
+      const g = groups.get(owner) ?? { meshes: 0, casters: 0 }
+      g.meshes++
+      if (m.castShadow) g.casters++
+      groups.set(owner, g)
+      total++
+      if (m.castShadow) shadowCasters++
+    })
+    return {
+      total,
+      shadowCasters,
+      groups: [...groups].map(([name, g]) => ({ name, ...g })).sort((a, b) => b.meshes - a.meshes),
+    }
+  },
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
     if (!root) return -1
@@ -548,6 +599,10 @@ const api = {
       ...s.world,
       materials: { ...s.world.materials, [spawnId]: items.map((item) => ({ item, qty })) },
     })
+  },
+  /** Uses the consumable in hand through the real action (Kola Tonic and Blessed Rounds apply their effect at once). */
+  consumeHeld(): boolean {
+    return consumeHeldItem().started
   },
   /** One zombie blow on the player through the real damage path. */
   hurt(dmg: number): boolean {

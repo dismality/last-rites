@@ -54,8 +54,11 @@ export function Hud() {
       <ObjectiveTracker />
       <Compass />
       <ZoneCard />
-      {/* Below the compass, wave tally and rite meter so none of them overlap. */}
+      {/* One column under the compass: each block takes only the room it needs, so the boss bar
+          stays near the top at 600 px tall instead of below a fixed gap (B12). */}
       <div className="hud-top-stack">
+        <WaveTally />
+        <RiteMeter />
         <BossBar />
         <DoorStatus />
       </div>
@@ -71,8 +74,6 @@ export function Hud() {
       </div>
       <Hotbar />
       <StaminaBar />
-      <WaveTally />
-      <RiteMeter />
       <DigBar />
       <Subtitles />
       <Toast />

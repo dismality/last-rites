@@ -112,6 +112,22 @@
   border-radius: 4px;
 }
 .hotbar__slot--held { border: 2px solid var(--ember); }
+
+/* Under 900 px wide the hotbar narrows so it stays right of the centred stamina bar (B12). */
+@media (max-width: 900px) {
+  .hotbar {
+    right: 12px;
+    gap: 3px;
+  }
+  .hotbar__slot {
+    width: 62px;
+    padding: 2px;
+  }
+  .hotbar__slot .item-icon {
+    max-width: 100%;
+    height: auto;
+  }
+}
 .hotbar__key {
   position: absolute;
   top: 2px;

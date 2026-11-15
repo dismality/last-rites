@@ -15,6 +15,13 @@
   overflow: hidden;
 }
 
+/* Under 900 px wide the strip narrows to half the screen so the objective tracker beside it has room (B12). */
+@media (max-width: 900px) {
+  .compass {
+    width: 50vw;
+  }
+}
+
 .compass__track {
   position: absolute;
   inset: 0 3.5rem;

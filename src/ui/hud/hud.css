@@ -53,6 +53,12 @@
   text-shadow: 0 1px 2px var(--ink);
 }
 
+@media (max-width: 900px) {
+  .hud-stamina {
+    width: 120px;
+  }
+}
+
 .hud-stamina__fill {
   height: 100%;
   background: var(--parchment);
@@ -217,12 +223,8 @@ img.hud-prompt__rune-img {
 }
 
 /* Wave tally: hand-scratched strokes; cleared waves are inked in, pending ones faint. */
+/* Top centre under the compass, first in .hud-top-stack: the bottom right belongs to the hotbar. */
 .hud-tally {
-  position: absolute;
-  /* Top centre under the compass: the bottom right belongs to the hotbar. */
-  top: var(--hud-below-compass);
-  left: 50%;
-  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -258,16 +260,17 @@ img.hud-prompt__rune-img {
   background: rgba(20, 17, 15, 0.7);
 }
 
-/* Boss bar and door status. Starts below the tally (about 4rem) and the rite meter (4.5rem + about 7rem). */
+/* Wave tally, rite meter, boss bar and door status, stacked under the compass in that order. */
 .hud-top-stack {
   position: absolute;
-  top: calc(var(--hud-below-compass) + 12rem);
+  top: var(--hud-below-compass);
   left: 50%;
   transform: translateX(-50%);
   width: min(640px, 60vw);
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .hud-hit-vignette {
@@ -283,11 +286,8 @@ img.hud-prompt__rune-img {
 
 /* Final rite prompt (Req 5.3) */
 .hud-rite {
-  position: absolute;
-  top: calc(var(--hud-below-compass) + 4.5rem);
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(26rem, 80vw);
+  box-sizing: border-box;
+  width: min(26rem, 100%);
   padding: 0.6rem 1rem;
   text-align: center;
   color: var(--parchment);
@@ -357,4 +357,13 @@ img.hud-prompt__rune-img {
   align-items: flex-end;
   gap: 8px;
   pointer-events: none;
+}
+
+/* Under 900 px the top stack keeps to the compass column (50vw), clear of the objective tracker
+   on the left and the score and minimap on the right (B12). */
+@media (max-width: 900px) {
+  .hud-top-stack,
+  .hud-top-stack .boss-bar {
+    width: 50vw;
+  }
 }

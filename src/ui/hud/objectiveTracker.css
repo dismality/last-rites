@@ -35,6 +35,16 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Under 900 px the compass is 50vw wide (Compass.css), so the tracker gets the rest of the half. */
+@media (max-width: 900px) {
+  .hud-objective {
+    max-width: calc(25vw - 1.75rem);
+  }
+  .hud-objective__main {
+    font-size: 1rem;
+  }
+}
+
 @keyframes hud-objective-fade {
   from {
     opacity: 0;

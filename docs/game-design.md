@@ -577,6 +577,20 @@ A marker behind the player sits at the strip's nearer edge with an arrow. **(09)
 
 **Label overlap rule (09):** two labels never draw over each other. Labels are laid out in priority order (objective, chapel, hut, pins, merchant, skulls) with their real measured widths (mark image, glyph and text) plus a 6 px gap. A label that clashes with the bottom row drops to a second row above it; if that row is also taken it slides sideways to the nearest free spot. Only the spawn skulls are dropped when both rows are full, because the nearer ones already show that direction. This covers the objective distance over "Hut", Chapel and Hut sharing a bearing, and the pin labels. The layout is the pure function `layoutCompassLabels` in `systems/compassLayout.ts`.
 
+### HUD layout and small screens (09, task 18)
+The HUD fits without any two blocks overlapping at 1920x1080, 1280x720 and 800x600 (browser test `e2e/hud-800x600.spec.ts`, by day and at night with the boss bar, door status and effect icons showing).
+
+| Place | Blocks |
+|---|---|
+| Top left | Objective tracker (with the Curse meter), kept beside the compass |
+| Top centre | Compass, then one column under it: wave tally, rite meter, Father Crane's bar, door status. Each takes only its own height, so the boss bar sits just under the compass. |
+| Top right | Score, then the minimap (96 to 168 px, by screen height) |
+| Bottom left | Controls hint panel, health bar, oil gauge |
+| Bottom centre | Stamina bar with its caption |
+| Bottom right | Effect icons above the hotbar |
+
+**Under 900 px wide:** the compass, the top-centre column and the boss bar are 50% of the screen width (60% above 900 px). The objective tracker takes the rest of the left quarter, with its main line at 16 px, and the Curse meter's bar wraps under its number. The stamina bar narrows to 120 px, and the hotbar slots to 62 px, so the hotbar stays clear of the stamina bar.
+
 ### Map
 The journal map shows the player as an arrow at their position, pointing their way, plus the objective marker.
 

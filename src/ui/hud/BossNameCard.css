@@ -1,6 +1,6 @@
 /* Never takes control: no pointer events, no focus, no pause.
-   Sits in the lower-middle band (70% from the top): below the boss bar and door status
-   stack (which start 18.25rem down), the crosshair and the item-name label (about 55%),
+   Sits in the lower-middle band (70% from the top): below the top stack (tally, rite meter,
+   boss bar, door status; it starts 6.25rem down and is at most about 22.5rem tall), the crosshair and the item-name label (about 55%),
    and above the subtitles and health bar. */
 .boss-name-card {
   position: absolute;
