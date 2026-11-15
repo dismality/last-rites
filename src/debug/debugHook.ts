@@ -563,6 +563,27 @@ const api = {
       groups: [...groups].map(([name, g]) => ({ name, ...g })).sort((a, b) => b.meshes - a.meshes),
     }
   },
+  /**
+   * Lights in the scene: every light, those that cast shadows (budget: 4), and those that are
+   * visible with intensity above 0. For the D8 performance pass; dev only.
+   */
+  lightCensus(): { total: number; shadowCasting: number; lit: number } | null {
+    const root = bodyRuntime.scene
+    if (!root) return null
+    let total = 0
+    let shadowCasting = 0
+    let lit = 0
+    root.traverse((o) => {
+      const l = o as THREE.Light
+      if (!l.isLight) return
+      total++
+      if (l.castShadow) shadowCasting++
+      let vis = true
+      for (let p: THREE.Object3D | null = l; p; p = p.parent) if (!p.visible) vis = false
+      if (vis && l.intensity > 0) lit++
+    })
+    return { total, shadowCasting, lit }
+  },
   meshesUnder(name: string): number {
     const root: THREE.Object3D | undefined = bodyRuntime.scene?.getObjectByName(name)
     if (!root) return -1

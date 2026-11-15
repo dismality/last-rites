@@ -1,0 +1,75 @@
+{
+  "note": "SwiftShader (software) numbers, not real GPU fps",
+  "width": 1366,
+  "height": 768,
+  "hut": {
+    "meanFrameMs": 953.1,
+    "longestFrameMs": 1007,
+    "drawCalls": 252,
+    "triangles": 526222,
+    "lights": {
+      "total": 12,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "visibleMeshes": 143,
+    "shadowCasterMeshes": 12,
+    "overDrawCallBudget": true
+  },
+  "mausoleum-row": {
+    "meanFrameMs": 837.5,
+    "longestFrameMs": 909.6,
+    "drawCalls": 322,
+    "triangles": 722420,
+    "lights": {
+      "total": 12,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "visibleMeshes": 210,
+    "shadowCasterMeshes": 20,
+    "overDrawCallBudget": true
+  },
+  "catacombs": {
+    "meanFrameMs": 1092.4,
+    "longestFrameMs": 1131.9,
+    "drawCalls": 380,
+    "triangles": 685988,
+    "lights": {
+      "total": 12,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "visibleMeshes": 248,
+    "shadowCasterMeshes": 20,
+    "overDrawCallBudget": true
+  },
+  "grounds-night-wave": {
+    "meanFrameMs": 995.9,
+    "longestFrameMs": 1076.4,
+    "drawCalls": 336,
+    "triangles": 935000,
+    "lights": {
+      "total": 12,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "visibleMeshes": 216,
+    "shadowCasterMeshes": 20,
+    "overDrawCallBudget": true
+  },
+  "boss-fight": {
+    "meanFrameMs": 1019.1,
+    "longestFrameMs": 1111.1,
+    "drawCalls": 273,
+    "triangles": 889681,
+    "lights": {
+      "total": 12,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "visibleMeshes": 150,
+    "shadowCasterMeshes": 7,
+    "overDrawCallBudget": true
+  }
+}
