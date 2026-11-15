@@ -38,6 +38,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   showMinimap: fc.boolean(),
   showPinsInWorld: fc.boolean(),
   showControlHints: fc.boolean(),
+  plainJournalFont: fc.boolean(),
   lowGraphics: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
@@ -120,6 +121,7 @@ describe('settings persistence', () => {
     expect(DEFAULT_SETTINGS.showMinimap).toBe(true)
     expect(DEFAULT_SETTINGS.showPinsInWorld).toBe(true)
     expect(DEFAULT_SETTINGS.showControlHints).toBe(true)
+    expect(DEFAULT_SETTINGS.plainJournalFont).toBe(false)
     expect(DEFAULT_SETTINGS.bindings.Map).toBe('KeyM')
     expect(DEFAULT_SETTINGS.bindings.Minimap).toBe('KeyN')
     const codes = Object.values(DEFAULT_SETTINGS.bindings)

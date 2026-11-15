@@ -26,12 +26,19 @@
   --font-heading:   'IM Fell English SC', Georgia, serif;
   --font-body:      'IM Fell English', Georgia, serif;
   --font-hand:      'Homemade Apple', cursive;
+  /* Journal reading text: the keeper's hand, or the body font with "Plain font for journal" (see below). */
+  --font-journal:   var(--font-hand);
   --font-num:       'Cormorant Garamond', Georgia, serif;
 
   /* ── Motion ─────────────────────────────────────────────────── */
   --transition-fast:   150ms ease-out;
   --transition-normal: 250ms ease-out;
   --transition-slow:   300ms ease-out;
+}
+
+/* Set on <html> by installPlainJournalFont from the "Plain font for journal" setting. */
+:root[data-plain-journal-font='true'] {
+  --font-journal: var(--font-body);
 }
 
 /* Honour prefers-reduced-motion at token level — components consume this var */

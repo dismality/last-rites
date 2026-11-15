@@ -671,7 +671,7 @@ const api = {
   },
   /** Sets one boolean or numeric setting through the real store action (saved like in the Settings menu). */
   setSetting(
-    key: 'showMinimap' | 'showPinsInWorld' | 'showControlHints' | 'lowGraphics' | 'flashingLights' | 'cameraShake',
+    key: 'showMinimap' | 'showPinsInWorld' | 'showControlHints' | 'plainJournalFont' | 'lowGraphics' | 'flashingLights' | 'cameraShake',
     value: boolean,
   ): void {
     useSettingsStore.getState().setSetting(key, value)

@@ -77,7 +77,7 @@
 .journal__subtitle { margin: 0 0 0.5rem; font-family: var(--font-heading); font-size: 1.25rem; }
 .journal__count { margin: 0 0 0.75rem; font-family: var(--font-num); font-variant-numeric: tabular-nums; }
 .journal__empty { font-style: italic; }
-.journal__hand { font-family: var(--font-hand); font-size: 1rem; line-height: 2; margin: 0; }
+.journal__hand { font-family: var(--font-journal); font-size: 1.25rem; line-height: 2.2; margin: 0; }
 
 .journal-tabs { display: flex; gap: 0.25rem; border-bottom: 2px solid var(--parchment-dark); }
 .journal-tabs__tab {
@@ -157,7 +157,7 @@
   border-bottom: 1px solid var(--parchment-dark);
   font-size: 1rem;
 }
-.journal-contract__text { flex: 1 1 14rem; font-family: var(--font-hand); line-height: 1.8; }
+.journal-contract__text { flex: 1 1 14rem; font-family: var(--font-journal); font-size: 1.2rem; line-height: 2; }
 .journal-contract__progress,
 .journal-contract__reward { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 1rem; }
 .journal-contract__done {

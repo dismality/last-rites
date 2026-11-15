@@ -32,6 +32,7 @@ type BooleanKey =
   | 'showMinimap'
   | 'showPinsInWorld'
   | 'showControlHints'
+  | 'plainJournalFont'
   | 'lowGraphics'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
@@ -46,6 +47,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'showMinimap',
   'showPinsInWorld',
   'showControlHints',
+  'plainJournalFont',
   'lowGraphics',
 ]
 
@@ -68,6 +70,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showMinimap: true,
   showPinsInWorld: true,
   showControlHints: true,
+  plainJournalFont: false,
   lowGraphics: false,
   bindings: {
     MoveForward: 'KeyW',

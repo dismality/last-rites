@@ -160,3 +160,26 @@ for (const size of SIZES) {
     await page.screenshot({ path: `${SHOTS}/control-hints-hut-objective-${size.width}x${size.height}.png` })
   })
 }
+
+test('with the plain journal font on, the panel still fits at 800x600 and the journal font swaps', async ({ page }) => {
+  test.setTimeout(240_000)
+  await page.setViewportSize({ width: 800, height: 600 })
+  await startRun(page)
+  await page.evaluate(() => window.__lastRites!.give('wood-axe', 1, 1))
+  await page.evaluate(() => window.__lastRites!.equip(1))
+  const journalFont = () =>
+    page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-journal').trim())
+  expect(await journalFont()).toContain('Homemade Apple')
+  await page.evaluate(() => window.__lastRites!.setSetting('plainJournalFont', true))
+  expect(await journalFont()).toContain('IM Fell English')
+  await page.waitForTimeout(800)
+
+  const panel = (await boxOf(page.locator('.control-hints')))!
+  expect(panel).not.toBeNull()
+  for (const sel of ['.health-bar', '.lantern-gauge', '.hotbar', '.hud-stamina']) {
+    const other = await boxOf(page.locator(sel))
+    if (other && other.width > 0) expect(hits(panel, other), `${sel} overlaps the panel`).toBe(false)
+  }
+  expect(panel.x + panel.width).toBeLessThanOrEqual(800)
+  await page.screenshot({ path: `${SHOTS}/control-hints-plain-font-800x600.png` })
+})

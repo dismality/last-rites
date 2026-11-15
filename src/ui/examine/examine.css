@@ -55,17 +55,17 @@
 }
 .examine__page-text {
   margin: 0;
-  font-family: var(--font-hand);
-  font-size: 1.15rem;
-  line-height: 1.8;
+  font-family: var(--font-journal);
+  font-size: 1.3rem;
+  line-height: 2;
 }
 /* Fixed height so the panel does not jump when the clue appears. */
 .examine__clue {
   min-height: 3em;
   margin: 0 0 0.75rem;
-  font-family: var(--font-hand);
-  font-size: 1rem;
-  line-height: 1.6;
+  font-family: var(--font-journal);
+  font-size: 1.15rem;
+  line-height: 1.8;
 }
 .examine__actions { display: flex; gap: 0.75rem; justify-content: center; }
 .examine__btn {

@@ -22,6 +22,7 @@ type BooleanSetting =
   | 'showMinimap'
   | 'showPinsInWorld'
   | 'showControlHints'
+  | 'plainJournalFont'
   | 'lowGraphics'
 type RangeSetting = keyof typeof SETTINGS_RANGES
 
@@ -37,6 +38,7 @@ const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
   { key: 'showMinimap', label: 'Show minimap' },
   { key: 'showPinsInWorld', label: 'Show pins in the world' },
   { key: 'showControlHints', label: 'Show control hints' },
+  { key: 'plainJournalFont', label: 'Plain font for journal (easier to read than handwriting)' },
   { key: 'lowGraphics', label: 'Low graphics (no ambient occlusion or moon shadows)' },
 ]
 

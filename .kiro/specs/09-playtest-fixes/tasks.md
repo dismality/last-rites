@@ -217,15 +217,15 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 17)`), never push
   - _Requirements: 10.1_
 
-- [ ] 18. B12: Responsive HUD and 800x600 screenshot test
+- [x] 18. B12: Responsive HUD and 800x600 screenshot test
   - Finish
   - _Requirements: 10.2_
 
-- [ ] 19. B13: Difficulty screen Begin visible
+- [x] 19. B13: Difficulty screen Begin visible
   - Finish
   - _Requirements: 10.3_
 
-- [ ] 20. B14: Journal font size and plain-font setting
+- [x] 20. B14: Journal font size and plain-font setting
   - Finish
   - _Requirements: 10.4_
 

@@ -266,6 +266,8 @@ export interface Settings {
   showPinsInWorld: boolean
   /** Show the controls hint panel at the bottom left (design bible §11) */
   showControlHints: boolean
+  /** Journal reading text in the plain body font instead of the keeper's handwriting (design bible §11) */
+  plainJournalFont: boolean
   /** Low graphics: turns off ambient occlusion and the moon's shadows (design bible §12, tech.md budget) */
   lowGraphics: boolean
   /** Key bindings: action name → KeyboardEvent.code */

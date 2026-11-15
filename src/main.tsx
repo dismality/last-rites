@@ -12,8 +12,10 @@ import { installSpawnRespawn } from './game/state/spawnRespawn'
 import { installDuskSnapshot, installMorningSnapshot } from './game/state/retryNight'
 
 import { registerCombatSounds } from './audio/audioBoot'
+import { installPlainJournalFont } from './ui/theme/plainJournalFont'
 
 registerCombatSounds()
+installPlainJournalFont()
 installDuskSnapshot()
 installCombatWatchers()
 installGuidanceWatchers()

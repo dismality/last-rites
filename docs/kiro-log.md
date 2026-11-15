@@ -1551,3 +1551,9 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task
 - **What happened:** The mode select Begin and Back buttons now sit in a sticky footer row inside the scrolling menu panel, so they stay on screen at 800x600 while the option list scrolls. Keyboard order and focus ring are unchanged. New `e2e/mode-select.spec.ts` checks both buttons are inside the viewport at 800x600 and 1280x720, tabs to Begin, and saves screenshots. `modeSelectLayout.test.ts` guards the CSS.
 - **What Kiro caught or sped up:** The first unit test used `node:fs`, which `tsc -b` rejected; switched to Vite `?raw` imports. Lint, build and 2234 unit tests pass.
+
+### 2026-11-15: 09-playtest-fixes task 20: Journal font size and plain-font setting
+- **Kiro feature used:** spec task
+- **What happened:** Journal, examine page/clue and contract text got larger (journal 1.25 rem, examine 1.3/1.15 rem). New saved setting `plainJournalFont` (default Off, Settings toggle, keyboard-navigable like the other toggles) swaps the new `--font-journal` token from the handwriting to the body font via `installPlainJournalFont`. Design bible §11 updated. Re-checked the Controls hint panel at 800x600 with the plain font on (new Playwright test, screenshot `control-hints-plain-font-800x600.png`).
+- **What Kiro caught or sped up:** Lint, build and 2235 unit tests pass; settings property tests cover the new key.
+- **Decisions made unattended:** Plain font means the body font (IM Fell English), not a sans font, to stay in the theme. The hint panel already uses the body font, so it is unchanged. Only task 20 files were committed; other dirty files in the tree (screenshots, CREDITS, clue icons) were left alone.

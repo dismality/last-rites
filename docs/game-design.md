@@ -508,7 +508,10 @@ A small parchment-on-dark panel at the bottom left, in the same column as the he
 - **Hidden** in menus (pause, journal, satchel, merchant, altar panel, mode select), the workbench view, the big map, examine, cutscenes and endings.
 - **Saved:** the used lines are saved with the run (next to the tutorial steps). Continue restores them, so the panel does not come back unless the setting is turned back on. New Game clears them. Retry Night and Retry from morning leave them alone, like the tutorial.
 - **With the tutorial:** tutorial step 1 ("W A S D to move, mouse to look") stays in the objective tracker's second line. The panel is the permanent reminder and the tutorial is the first-day prompt; both clear on their own actions and neither blocks the other.
-- **Fit:** lines wrap inside the panel (at most 22 rem or 40% of the width). Checked with the body font at 800x600; there is no plain-font setting yet (spec 09 task 20 adds it, and must re-check this panel).
+- **Fit:** lines wrap inside the panel (at most 22 rem or 40% of the width). Checked at 800x600 with the body font and with **Plain font for journal** on (spec 09 task 20; the panel always uses the body font, so the setting does not change its size).
+
+### Journal reading text and the plain font (09, B14)
+The keeper's handwriting (Homemade Apple) is hard to read at small sizes, so journal page text, examine page and clue text and the contract text are larger (journal 1.25 rem, line height 2.2; examine page 1.3 rem; examine clue 1.15 rem; contracts 1.2 rem). The setting **Plain font for journal** (Settings, default Off, saved with the others) shows that reading text in the body font (IM Fell English) instead. Headings, the map and other UI are unchanged. It is keyboard-operable like the other toggles.
 - **Stamina caption:** the stamina bar carries a small "Stamina" caption above it, so the Sprint line's meaning is clear.
 
 ### Objective tracker
