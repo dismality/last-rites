@@ -7,18 +7,18 @@
 // Gates live in Gates.tsx; no rules live here.
 //
 // Draw-call budget: every repeated prop goes through <InstancedModel>, one call per model type.
-import { useMemo } from 'react'
+import { useLayoutEffect, useMemo, useRef } from 'react'
+import { Clone, useGLTF } from '@react-three/drei'
 import { CuboidCollider, CylinderCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
+import { CATACOMBS_MODEL_URL, DRACO_PATH, IRON_RAILING_MODEL_URL } from '../../data/assets'
+import { CATACOMB_BOXES } from '../../data/catacombsScenery'
+import '../assets/preloadModels'
 import {
   CORRIDORS,
-  FENCE_PANEL_WIDTH,
   GROUNDS_HALF,
   LAMP_POSTS,
   PLAYABLE_BOUNDS,
-  WALL_MODEL_HEIGHT,
-  WALL_MODEL_THICKNESS,
-  WALL_PANEL_WIDTH,
   avenueFarZ,
   panelRun,
   type CorridorSpec,
@@ -39,6 +39,16 @@ const MATERIALS = {
   darkStone: new THREE.MeshStandardMaterial({ color: '#3a3733', roughness: 1 }),
 }
 type MaterialKey = keyof typeof MATERIALS
+
+/** iron-railing.glb is one 1.5 m panel, 1.57 m tall, with its post at -X. */
+const RAILING_PANEL_WIDTH = 1.5
+const RAIL_POST_HEIGHT = 1.57
+// The closing post matches the model's rusted iron; it is the only flat-coloured part.
+const RAIL_POST_MATERIAL = new THREE.MeshStandardMaterial({
+  color: '#2b2622',
+  roughness: 0.8,
+  metalness: 0.5,
+})
 
 const unit = (position: Vec3, rotationY = 0, s = 1): Placement => ({
   position,
@@ -76,26 +86,6 @@ function Block({
   )
 }
 
-/** Brick panels stretched to a wall's height and thickness. */
-function wallRun(
-  axis: 'x' | 'z',
-  fixed: number,
-  from: number,
-  to: number,
-  height: number,
-  thickness: number,
-): Placement[] {
-  return panelRun(
-    axis,
-    fixed,
-    from,
-    to,
-    WALL_PANEL_WIDTH,
-    height / WALL_MODEL_HEIGHT,
-    thickness / WALL_MODEL_THICKNESS,
-  )
-}
-
 function LampPosts() {
   return (
     <>
@@ -103,7 +93,9 @@ function LampPosts() {
       <RigidBody type="fixed" colliders={false}>
         {LAMP_POSTS.map((l, i) => {
           const c = lampCollider(l.position)
-          return <CylinderCollider key={i} args={[c.halfHeight, c.radius]} position={[...c.position]} />
+          return (
+            <CylinderCollider key={i} args={[c.halfHeight, c.radius]} position={[...c.position]} />
+          )
         })}
       </RigidBody>
     </>
@@ -124,12 +116,46 @@ function Grounds() {
   return (
     <RigidBody type="fixed" colliders={false}>
       {/* Top face at y = 0. Invisible: the graveyard scene draws the ground. */}
-      <Block position={[0, -0.2, 0]} size={[span, 0.4, GROUNDS_HALF * 2]} material="stone" visible={false} />
+      <Block
+        position={[0, -0.2, 0]}
+        size={[span, 0.4, GROUNDS_HALF * 2]}
+        material="stone"
+        visible={false}
+      />
     </RigidBody>
   )
 }
 
 // --- Corridors -------------------------------------------------------------
+
+/**
+ * catacombs.glb, mounted with no transform, plus the colliders it adds (ledges, bier, reliquary
+ * altar, portal piers, wing walls). No candle lights: see the kiro-log for the budget decision.
+ */
+function CatacombsScene() {
+  const scene = useGLTF(CATACOMBS_MODEL_URL, DRACO_PATH).scene
+  const ref = useRef<THREE.Group>(null)
+  useLayoutEffect(() => {
+    ref.current?.traverse((o) => {
+      if ('isMesh' in o) o.receiveShadow = true
+    })
+  }, [scene])
+  return (
+    <>
+      <Clone ref={ref} object={scene} />
+      <RigidBody type="fixed" colliders={false}>
+        {CATACOMB_BOXES.map((b, i) => (
+          <CuboidCollider
+            key={`${b.note}-${i}`}
+            args={[b.half[0], b.half[1], b.half[2]]}
+            position={[...b.center]}
+            rotation={[0, b.rotY, 0]}
+          />
+        ))}
+      </RigidBody>
+    </>
+  )
+}
 
 function Corridor({ spec }: { spec: CorridorSpec }) {
   const { centerX, entranceZ, dir, length, width, height, wallThickness: t } = spec
@@ -137,47 +163,48 @@ function Corridor({ spec }: { spec: CorridorSpec }) {
   const endZ = entranceZ + dir * (length + t / 2)
   const outerW = width + t * 2
   const wallX = width / 2 + t / 2
-  const walls = useMemo(() => {
-    const z0 = Math.min(entranceZ, entranceZ + dir * length)
-    const z1 = Math.max(entranceZ, entranceZ + dir * length)
-    return [
-      ...wallRun('z', -wallX, z0, z1, height, t),
-      ...wallRun('z', wallX, z0, z1, height, t),
-      ...wallRun('x', endZ, -outerW / 2, outerW / 2, height, t),
-    ]
-  }, [entranceZ, dir, length, wallX, endZ, outerW, height, t])
   return (
-    <group position={[centerX, 0, 0]}>
-      <InstancedModel model="brick-wall" placements={walls} centerXZ />
-      <RigidBody type="fixed" colliders={false}>
-        <Block position={[0, -0.2, midZ]} size={[outerW, 0.4, length]} material="darkStone" />
-        <Block
-          position={[-wallX, height / 2, midZ]}
-          size={[t, height, length]}
-          material="stone"
-          visible={false}
-        />
-        <Block
-          position={[wallX, height / 2, midZ]}
-          size={[t, height, length]}
-          material="stone"
-          visible={false}
-        />
-        <Block
-          position={[0, height / 2, endZ]}
-          size={[outerW, height, t]}
-          material="stone"
-          visible={false}
-        />
-        <Block
-          position={[0, height + t / 2, midZ]}
-          size={[outerW, t, length]}
-          material="darkStone"
-        />
-      </RigidBody>
-      <Gate spec={spec} />
-      {spec.id === 'catacombs' && <OssuaryDoor />}
-    </group>
+    <>
+      {/* The model draws the floor, walls, ceiling, portal and furniture; the Blocks below stay as
+          invisible colliders. */}
+      {spec.id === 'catacombs' && <CatacombsScene />}
+      <group position={[centerX, 0, 0]}>
+        <RigidBody type="fixed" colliders={false}>
+          <Block
+            position={[0, -0.2, midZ]}
+            size={[outerW, 0.4, length]}
+            material="darkStone"
+            visible={false}
+          />
+          <Block
+            position={[-wallX, height / 2, midZ]}
+            size={[t, height, length]}
+            material="stone"
+            visible={false}
+          />
+          <Block
+            position={[wallX, height / 2, midZ]}
+            size={[t, height, length]}
+            material="stone"
+            visible={false}
+          />
+          <Block
+            position={[0, height / 2, endZ]}
+            size={[outerW, height, t]}
+            material="stone"
+            visible={false}
+          />
+          <Block
+            position={[0, height + t / 2, midZ]}
+            size={[outerW, t, length]}
+            material="darkStone"
+            visible={false}
+          />
+        </RigidBody>
+        <Gate spec={spec} />
+        {spec.id === 'catacombs' && <OssuaryDoor />}
+      </group>
+    </>
   )
 }
 
@@ -201,12 +228,22 @@ function Avenue({ spec }: { spec: CorridorSpec }) {
   const rails = useMemo(() => {
     const z0 = Math.min(entranceZ, entranceZ + dir * length)
     const z1 = Math.max(entranceZ, entranceZ + dir * length)
-    return [-railX, railX].flatMap((x) => panelRun('z', x, z0, z1, FENCE_PANEL_WIDTH))
+    return [-railX, railX].flatMap((x) => panelRun('z', x, z0, z1, RAILING_PANEL_WIDTH))
   }, [entranceZ, dir, length, railX])
   return (
     <>
       <group position={[centerX, 0, 0]}>
-        <InstancedModel model="iron-fence" placements={rails} centerXZ />
+        <InstancedModel url={IRON_RAILING_MODEL_URL} placements={rails} centerXZ />
+        {/* Each panel carries its post at its +z end; one post closes the run at its low-z end. */}
+        {[-railX, railX].map((x) => (
+          <mesh
+            key={x}
+            position={[x, RAIL_POST_HEIGHT / 2, Math.min(entranceZ, entranceZ + dir * length)]}
+            material={RAIL_POST_MATERIAL}
+          >
+            <boxGeometry args={[0.1, RAIL_POST_HEIGHT, 0.1]} />
+          </mesh>
+        ))}
         <RigidBody type="fixed" colliders={false}>
           <Block
             position={[0, -0.2, floorMidZ]}

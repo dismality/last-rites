@@ -91,8 +91,18 @@ export interface SpawnPoint {
 export const SPAWN_POINTS: readonly SpawnPoint[] = [
   // Grounds
   { id: 'hut-shelf', zone: 'grounds', position: [1.8, 0.78, -1], lootTable: 'hut-supplies' },
-  { id: 'grounds-coffin-east', zone: 'grounds', position: [28, 0, -12], lootTable: 'broken-coffin' },
-  { id: 'grounds-coffin-south', zone: 'grounds', position: [-8, 0, 30], lootTable: 'broken-coffin' },
+  {
+    id: 'grounds-coffin-east',
+    zone: 'grounds',
+    position: [28, 0, -12],
+    lootTable: 'broken-coffin',
+  },
+  {
+    id: 'grounds-coffin-south',
+    zone: 'grounds',
+    position: [-8, 0, 30],
+    lootTable: 'broken-coffin',
+  },
   { id: 'grounds-fence-west', zone: 'grounds', position: [-38, 0, 5], lootTable: 'broken-coffin' },
   { id: 'grave-oak-hollow', zone: 'grounds', position: [-15, 0, 12], lootTable: 'grave-dig' },
   { id: 'grave-north-row', zone: 'grounds', position: [14, 0, -20], lootTable: 'grave-dig' },
@@ -104,13 +114,34 @@ export const SPAWN_POINTS: readonly SpawnPoint[] = [
   // x 8.5 so up to three stacks (0.35 m apart, to the east) stay on the seat (world x 8.2..9.35).
   { id: 'chapel-pews', zone: 'chapel', position: [8.5, 0.41, 8], lootTable: 'crypt-shelves' },
   // Mausoleum Row
-  { id: 'row-shelf-a', zone: 'mausoleum-row', position: [-21, 0.3, -46], lootTable: 'crypt-shelves' },
-  { id: 'row-shelf-b', zone: 'mausoleum-row', position: [-19, 0.3, -52], lootTable: 'crypt-shelves' },
-  { id: 'row-shelf-c', zone: 'mausoleum-row', position: [-21, 0.3, -58], lootTable: 'crypt-shelves' },
+  {
+    id: 'row-shelf-a',
+    zone: 'mausoleum-row',
+    position: [-21, 0.3, -46],
+    lootTable: 'crypt-shelves',
+  },
+  {
+    id: 'row-shelf-b',
+    zone: 'mausoleum-row',
+    position: [-19, 0.3, -52],
+    lootTable: 'crypt-shelves',
+  },
+  {
+    id: 'row-shelf-c',
+    zone: 'mausoleum-row',
+    position: [-21, 0.3, -58],
+    lootTable: 'crypt-shelves',
+  },
   // Catacombs
-  { id: 'cat-wall-a', zone: 'catacombs', position: [24.5, 1, 45], lootTable: 'catacomb-walls' },
-  { id: 'cat-wall-b', zone: 'catacombs', position: [25.5, 1, 50], lootTable: 'catacomb-walls' },
-  { id: 'cat-wall-c', zone: 'catacombs', position: [24.5, 1, 55], lootTable: 'catacomb-walls' },
+  // On the three bone-wall ledges of catacombs.glb (surface 0.95; catacombs.json move-items).
+  { id: 'cat-wall-a', zone: 'catacombs', position: [23.87, 0.95, 45], lootTable: 'catacomb-walls' },
+  { id: 'cat-wall-b', zone: 'catacombs', position: [26.13, 0.95, 50], lootTable: 'catacomb-walls' },
+  {
+    id: 'cat-wall-c',
+    zone: 'catacombs',
+    position: [23.87, 0.95, 54.9],
+    lootTable: 'catacomb-walls',
+  },
   // Last, so adding it leaves every earlier point's seeded roll unchanged. On the way from the
   // hut to the crypt key (spec 09, B3).
   { id: 'grounds-path-oil', zone: 'grounds', position: [-6, 0, -8], lootTable: 'path-oil' },
@@ -133,15 +164,27 @@ export const FIXED_SPAWNS: readonly FixedSpawn[] = [
   { id: 'fx-crypt-key', zone: 'grounds', position: [-12, 0, -18], item: 'rusted-crypt-key' },
   { id: 'fx-page-2', zone: 'grounds', position: [-12.5, 0, -17], item: 'journal-page-2' },
   { id: 'fx-bell-clapper', zone: 'grounds', position: [30, 0, -25], item: 'sextons-bell-clapper' },
-  { id: 'fx-locket', zone: 'grounds', position: [-30, 0, 10], item: 'childs-locket', nightOnly: true },
+  {
+    id: 'fx-locket',
+    zone: 'grounds',
+    position: [-30, 0, 10],
+    item: 'childs-locket',
+    nightOnly: true,
+  },
   { id: 'fx-bone-whistle', zone: 'mausoleum-row', position: [-21, 0.3, -48], item: 'bone-whistle' },
   { id: 'fx-page-3', zone: 'mausoleum-row', position: [-20, 0.3, -55], item: 'journal-page-3' },
   { id: 'fx-ledger', zone: 'mausoleum-row', position: [-19, 0.3, -54], item: 'parish-ledger' },
   { id: 'fx-rosary', zone: 'mausoleum-row', position: [-20, 0.3, -57], item: 'crane-rosary' },
-  { id: 'fx-ossuary-key', zone: 'mausoleum-row', position: [-20.5, 0.3, -58], item: 'iron-ossuary-key' },
-  { id: 'fx-page-4', zone: 'catacombs', position: [25, 1, 52], item: 'journal-page-4' },
-  { id: 'fx-shroud', zone: 'catacombs', position: [24.5, 0.8, 53], item: 'burial-shroud' },
-  { id: 'fx-heart', zone: 'catacombs', position: [25, 0.8, 58], item: 'reliquary-heart' },
+  {
+    id: 'fx-ossuary-key',
+    zone: 'mausoleum-row',
+    position: [-20.5, 0.3, -58],
+    item: 'iron-ossuary-key',
+  },
+  // Page and shroud lie on the stone bier (top 0.78), the heart on the reliquary altar (0.78).
+  { id: 'fx-page-4', zone: 'catacombs', position: [24.2, 0.78, 52.6], item: 'journal-page-4' },
+  { id: 'fx-shroud', zone: 'catacombs', position: [24.35, 0.78, 53.4], item: 'burial-shroud' },
+  { id: 'fx-heart', zone: 'catacombs', position: [25, 0.78, 58], item: 'reliquary-heart' },
   // On the lectern's book rest (0.97), 1 cm proud, tilted to match its slope toward the door.
   { id: 'fx-page-5', zone: 'chapel', position: [10, 0.98, 5], item: 'journal-page-5', tiltDeg: 14 },
 ]

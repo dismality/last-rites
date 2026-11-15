@@ -10,7 +10,9 @@ import type { Placement } from '../../data/cemeteryLayout'
 import '../assets/preloadModels'
 
 interface Props {
-  model: WorldModelId
+  /** A world-kit model id, or give `url` for any other GLB (the iron railing prop). */
+  model?: WorldModelId
+  url?: string
   placements: readonly Placement[]
   /** Re-centre the model on x/z. Fence and wall kit pieces sit off-centre on their pivot. */
   centerXZ?: boolean
@@ -30,13 +32,14 @@ const _c = new THREE.Vector3()
 
 export function InstancedModel({
   model,
+  url,
   placements,
   centerXZ = false,
   lift = 0,
   castShadow = true,
   receiveShadow = true,
 }: Props) {
-  const { scene } = useGLTF(worldModelUrl(model))
+  const { scene } = useGLTF(url ?? worldModelUrl(model as WorldModelId))
 
   const meshes = useMemo(() => {
     scene.updateMatrixWorld(true)

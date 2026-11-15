@@ -5,22 +5,23 @@
 // Opening removes the collider at once (so the player can walk through as soon as the
 // unlock sequence starts) and then lifts the bars out of the way over GATE_LIFT_SECONDS.
 
-import { useMemo, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { Clone, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type * as THREE from 'three'
 import {
-  CATACOMBS,
-  FENCE_PANEL_WIDTH,
-  panelRun,
-  type CorridorSpec,
-} from '../../data/cemeteryLayout'
+  DRACO_PATH,
+  GATE_CATACOMBS_MODEL_URL,
+  GATE_ROW_MODEL_URL,
+  OSSUARY_DOOR_MODEL_URL,
+} from '../../data/assets'
+import { CATACOMBS, type CorridorSpec } from '../../data/cemeteryLayout'
 import { GATE_LIFT_SECONDS, OSSUARY_DOOR } from '../../data/gateHints'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import type { MysteryGateId } from '../../game/systems/mystery'
-import { InstancedModel } from './InstancedModel'
+import '../assets/preloadModels'
 import { Interactable } from './Interactable'
-import { PART_MATERIALS } from './partMaterials'
 
 /**
  * Raises a group once `open` flips true. Returns [ref to attach, whether the
@@ -52,13 +53,24 @@ function useGateOpen(gate: MysteryGateId): boolean {
   return useMysteryStore((s) => s.mystery.gates[gate])
 }
 
-/** Fence bars across a corridor mouth. Interact tries the key, or shows a hint toward it. */
+/** A gate or door model standing on the floor at world z (corridor-local x 0). */
+function ModelAt({ url, z }: { url: string; z: number }) {
+  const scene = useGLTF(url, DRACO_PATH).scene
+  const ref = useRef<THREE.Group>(null)
+  useLayoutEffect(() => {
+    ref.current?.traverse((o) => {
+      if ('isMesh' in o) o.receiveShadow = true
+    })
+  }, [scene])
+  return <Clone ref={ref} object={scene} position={[0, 0, z]} />
+}
+
+/** The gate across a corridor mouth. Interact tries the key, or shows a hint toward it. */
 export function Gate({ spec }: { spec: CorridorSpec }) {
   const open = useGateOpen(spec.id)
   const { width, wallThickness: t, height } = spec
   const z = spec.entranceZ + spec.dir * (t / 2)
   const w = width + t * 2
-  const bars = useMemo(() => panelRun('x', z, -w / 2, w / 2, FENCE_PANEL_WIDTH), [z, w])
   const [liftRef, barsMounted] = useLift(open, height)
   return (
     <>
@@ -84,7 +96,11 @@ export function Gate({ spec }: { spec: CorridorSpec }) {
       </group>
       {barsMounted && (
         <group ref={liftRef}>
-          <InstancedModel model="iron-fence" placements={bars} centerXZ />
+          {/* One model per gate, lifted whole. Plane z = 0 of the model is the gate's centre. */}
+          <ModelAt
+            url={spec.id === 'catacombs' ? GATE_CATACOMBS_MODEL_URL : GATE_ROW_MODEL_URL}
+            z={z}
+          />
         </group>
       )}
     </>
@@ -122,24 +138,7 @@ export function OssuaryDoor() {
       </group>
       {barsMounted && (
         <group ref={liftRef}>
-          <mesh
-            position={[0, height / 2, z]}
-            material={PART_MATERIALS.slate}
-            castShadow
-            receiveShadow
-          >
-            <boxGeometry args={[width, height, thickness]} />
-          </mesh>
-          {/* Cross-bars so the door reads as ironwork rather than a wall. */}
-          {[0.35, 0.95, 1.55].map((y) => (
-            <mesh
-              key={y}
-              position={[0, y, z - thickness / 2 - 0.03]}
-              material={PART_MATERIALS.trim}
-            >
-              <boxGeometry args={[width, 0.08, 0.06]} />
-            </mesh>
-          ))}
+          <ModelAt url={OSSUARY_DOOR_MODEL_URL} z={z} />
         </group>
       )}
     </>

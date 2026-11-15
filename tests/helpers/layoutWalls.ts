@@ -10,6 +10,7 @@ import {
   HUT,
   LAMP_POSTS,
 } from '../../src/data/cemeteryLayout'
+import { CATACOMB_BOXES } from '../../src/data/catacombsScenery'
 import { HUT_BOXES } from '../../src/data/hutScenery'
 import { headstoneCollider, headstoneScale, lampCollider } from '../../src/data/colliderFootprints'
 import { GRAVEYARD_COLLIDERS } from '../../src/data/graveyardColliders'
@@ -59,35 +60,60 @@ export function structureBoxes(): Box[] {
     box(cx + chx, cz, ct / 2, chz),
   )
   // Pews, font, cupboard, altar and buttresses from the chapel scene's JSON (ChapelBuilding.tsx).
-  for (const b of chapelSceneColliders()) out.push(box(cx + b.center[0], cz + b.center[2], b.half[0], b.half[2]))
+  for (const b of chapelSceneColliders())
+    out.push(box(cx + b.center[0], cz + b.center[2], b.half[0], b.half[2]))
 
   for (const c of CORRIDORS) {
     if (c.open) continue
     const mid = c.entranceZ + (c.dir * c.length) / 2
     for (const side of [-1, 1]) {
-      out.push(box(c.centerX + side * (c.width / 2 + c.wallThickness / 2), mid, c.wallThickness / 2, c.length / 2))
+      out.push(
+        box(
+          c.centerX + side * (c.width / 2 + c.wallThickness / 2),
+          mid,
+          c.wallThickness / 2,
+          c.length / 2,
+        ),
+      )
     }
   }
+  // Ledges, bier, reliquary altar, portal piers and wing walls from catacombs.json (Cemetery.tsx).
+  // Turned boxes (the wing walls) are taken as their axis-aligned envelope, like the probe sees them.
+  for (const b of CATACOMB_BOXES)
+    out.push(turnedBox({ position: b.center, rotationY: b.rotY, half: b.half }))
   return out
 }
 
 /** Axis-aligned box around a (possibly turned) cuboid collider, as the zombies' wall probe sees it. */
-function turnedBox(c: { position: readonly number[]; rotationY: number; half: readonly number[] }): Box {
+function turnedBox(c: {
+  position: readonly number[]
+  rotationY: number
+  half: readonly number[]
+}): Box {
   const cos = Math.abs(Math.cos(c.rotationY))
   const sin = Math.abs(Math.sin(c.rotationY))
-  return box(c.position[0], c.position[2], c.half[0] * cos + c.half[2] * sin, c.half[0] * sin + c.half[2] * cos)
+  return box(
+    c.position[0],
+    c.position[2],
+    c.half[0] * cos + c.half[2] * sin,
+    c.half[0] * sin + c.half[2] * cos,
+  )
 }
 
 /** The graveyard scene's boxes (perimeter fences, oaks, logs, headstones, crypts) seen from above, as the zombies' wall probe sees them. */
 export function graveyardBoxes(): Box[] {
-  return GRAVEYARD_COLLIDERS.map((b) => turnedBox({ position: b.center, rotationY: b.rotY, half: b.half }))
+  return GRAVEYARD_COLLIDERS.map((b) =>
+    turnedBox({ position: b.center, rotationY: b.rotY, half: b.half }),
+  )
 }
 
 /** Tombstones, lamp posts and the graveyard scene's boxes: obstacles a zombie must steer around. */
 export function propBoxes(): Box[] {
   const out: Box[] = []
   for (const t of TOMBSTONES)
-    out.push(turnedBox(headstoneCollider(t.model, headstoneScale(t.height), t.position, t.rotationY)))
+    out.push(
+      turnedBox(headstoneCollider(t.model, headstoneScale(t.height), t.position, t.rotationY)),
+    )
   for (const l of LAMP_POSTS) {
     const r = lampCollider(l.position).radius
     out.push(box(l.position[0], l.position[2], r, r))

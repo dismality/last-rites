@@ -37,7 +37,8 @@ export const WAYPOINT_NODES: readonly WaypointNode[] = [
   { id: 'cat-mouth', x: 25, z: 37 },
   { id: 'cat-1', x: 25, z: 45 },
   { id: 'cat-2', x: 25, z: 52 },
-  { id: 'cat-3', x: 25, z: 58 },
+  // In front of the reliquary altar (a collider at z 57.55..58.45 since 11n-c); was z 58.
+  { id: 'cat-3', x: 25, z: 56.8 },
 ]
 
 export const WAYPOINT_EDGES: ReadonlyArray<readonly [string, string]> = [

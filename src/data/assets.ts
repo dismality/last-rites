@@ -147,15 +147,7 @@ export const ITEM_ICON_URLS: Readonly<Record<ItemId, string>> = {
 
 /** Ids that have a map/compass mark image (`<id>-light.png` and `<id>-dark.png`, 32 px). */
 export type MarkId =
-  | 'hut'
-  | 'chapel'
-  | 'graves'
-  | 'merchant'
-  | 'objective'
-  | 'gate'
-  | 'relic'
-  | 'workbench'
-  | 'player'
+  'hut' | 'chapel' | 'graves' | 'merchant' | 'objective' | 'gate' | 'relic' | 'workbench' | 'player'
 
 /** Verbs that have an interaction rune image (64 px; shown at 32 px). */
 export type InteractRuneId = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail' | 'trade'
@@ -211,9 +203,21 @@ export const WORKBENCH_MODEL_URL = '/assets/models/props/workbench.glb'
 export const VENDING_MACHINE_MODEL_URL = '/assets/models/props/vending-machine.glb'
 export const CLUE_HUT_BOOTS_MODEL_URL = '/assets/models/props/clue-hut-boots.glb'
 
+/** The catacombs (world space) and the gate, door and railing props (spec 09 task 11n-c). */
+export const CATACOMBS_MODEL_URL = '/assets/models/scene/catacombs.glb'
+export const GATE_CATACOMBS_MODEL_URL = '/assets/models/props/gate-catacombs.glb'
+export const GATE_ROW_MODEL_URL = '/assets/models/props/gate-mausoleum-row.glb'
+export const OSSUARY_DOOR_MODEL_URL = '/assets/models/props/ossuary-door.glb'
+export const IRON_RAILING_MODEL_URL = '/assets/models/props/iron-railing.glb'
+
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {
   return [
+    CATACOMBS_MODEL_URL,
+    GATE_CATACOMBS_MODEL_URL,
+    GATE_ROW_MODEL_URL,
+    OSSUARY_DOOR_MODEL_URL,
+    IRON_RAILING_MODEL_URL,
     HUT_MODEL_URL,
     WORKBENCH_MODEL_URL,
     VENDING_MACHINE_MODEL_URL,

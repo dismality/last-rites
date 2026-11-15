@@ -169,7 +169,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Mount `scene/hut.glb`; Slabs collider-only; remove floor box, roof, window boxes, table meshes; add hut.json colliders (tables, stove, cot, barrels, log stack, vending machine footprint)
   - Workbench becomes `props/workbench.glb` (collider and pile placement kept); seat hut-shelf, fx-page-1 on the east table and POWDER_TIN_HUT on the new west table (surfaces 0.78); boots clue uses clue-hut-boots.glb; stove ember light only if the budget allows
   - GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-b)`)
-- [ ] 11n-c. Scenery swap: catacombs and the gates
+- [x] 11n-c. Scenery swap: catacombs and the gates
   - Mount `scene/catacombs.glb` untransformed; keep corridor colliders; remove brick-wall instances, hide floor and ceiling Blocks; add portal, ledge, bier and altar colliders; move cat-wall-a/b/c, fx-page-4, fx-shroud, fx-heart onto their surfaces (catacombs.json move-items); at most two dim candle lights if the budget allows
   - Gates use gate-catacombs.glb and gate-mausoleum-row.glb lifted whole by useLift; ossuary door uses ossuary-door.glb; avenue rails use iron-railing.glb with a closing post
   - Unit: corridor keeps 1.6 m clear width; GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-c)`)
