@@ -47,6 +47,7 @@ import { coinDrop } from '../game/systems/coins'
 import { killReports } from '../game/systems/killReports'
 import { bodyRuntime } from '../scene/player/bodyRuntime'
 import { scareRuntime } from '../scene/scares/scareRuntime'
+import type { ScareEventId } from '../data/scares'
 import { useIntroStore } from '../game/state/introStore'
 import { useGameStore } from '../game/state/gameStore'
 import { useWorldStore } from '../game/state/worldStore'
@@ -369,6 +370,23 @@ const api = {
    */
   scareZones(): { inside: string[]; entered: string[] } {
     return { inside: [...scareRuntime.inside], entered: [...scareRuntime.entered] }
+  },
+  /** Queues a scare by id for the stager (same telegraph then beat as a rolled one, minus the roll). */
+  forceScare(id: ScareEventId): void {
+    scareRuntime.forced.push(id)
+  },
+  /** Sets Scare intensity or Subtitles through the real store action. */
+  setScareSetting(key: 'scareIntensity' | 'subtitles', value: 'full' | 'reduced' | 'off' | boolean): void {
+    useSettingsStore.getState().setSetting(key, value as never)
+  },
+  /** Scare effect values the scene reads: shake clock, lantern flicker, strobe flag and hand slow. */
+  scareFx(): { shakeAge: number | null; flickerLeft: number; flickerStrobe: boolean; slowLeft: number } {
+    return {
+      shakeAge: Number.isFinite(scareRuntime.shakeAge) ? scareRuntime.shakeAge : null,
+      flickerLeft: scareRuntime.flickerLeft,
+      flickerStrobe: scareRuntime.flickerStrobe,
+      slowLeft: scareRuntime.slowLeft,
+    }
   },
   /**
    * Rapier colliders whose centre is within `radius` m of (x, z) on the ground plane, nearest
