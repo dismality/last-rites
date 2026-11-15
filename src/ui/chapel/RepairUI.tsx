@@ -126,7 +126,15 @@ export function RepairUI() {
         ref={panelRef}
         className="repair-ui"
         // Prevent events leaking to the 3D world.
-        onKeyDown={(e) => e.stopPropagation()}
+        onKeyDown={(e) => {
+          // Stopping propagation keeps the key from the world, but it also hides Esc from the
+          // window listener above, and focus always sits inside the panel. Close from here too.
+          if (e.key === 'Escape') {
+            e.preventDefault()
+            closeChapelRepair()
+          }
+          e.stopPropagation()
+        }}
         tabIndex={-1}
       >
         {/* Header */}

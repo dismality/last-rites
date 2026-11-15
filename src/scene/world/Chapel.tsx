@@ -62,7 +62,6 @@ export function Chapel() {
 
   // Track whether E was already handled this "interaction window" to avoid
   // double-firing. Resets when the player moves away.
-  const doorInteractedRef = useRef(false)
   const altarInteractedRef = useRef(false)
 
   // Scratch vectors — avoid allocations inside useFrame.
@@ -81,8 +80,9 @@ export function Chapel() {
 
       // Door/repair-point check
       const distToDoor = playerPos.current.distanceTo(doorPos.current)
-      if (distToDoor <= INTERACT_RANGE && !doorInteractedRef.current) {
-        doorInteractedRef.current = true
+      // A held key repeats keydown; ignore repeats so closing the panel does not reopen it, but a
+      // fresh press reopens it at once (the old "once until you walk away" latch made Cancel a dead end).
+      if (distToDoor <= INTERACT_RANGE && !e.repeat) {
         openChapelRepair()
         return
       }
@@ -123,9 +123,6 @@ export function Chapel() {
   useFrame(() => {
     playerPos.current.copy(playerPositionRef.current)
 
-    if (playerPos.current.distanceTo(doorPos.current) > INTERACT_RANGE) {
-      doorInteractedRef.current = false
-    }
     if (playerPos.current.distanceTo(altarPos.current) > INTERACT_RANGE) {
       altarInteractedRef.current = false
     }

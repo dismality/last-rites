@@ -5,6 +5,7 @@
 import { caseOfStage } from '../../data/cases'
 import { MODES } from '../../data/modes'
 import { useCaseStore } from './caseStore'
+import { useChapelStore } from './chapelStore'
 import { STAGE_MAP } from '../../data/stages'
 import { emit, subscribeToType } from '../events'
 import { statsAfterClear } from '../systems/waveDirection'
@@ -43,6 +44,8 @@ export function installCaseSolvedWatcher(): () => void {
     useCaseStore.getState().closeCase(caseOfStage(stageOfNight(night)).id)
   })
   const offDawn = subscribeToType('dawnStarted', (e) => {
+    // The altar heals once per visit per day (design bible §2); nothing else cleared the flag.
+    useChapelStore.getState().resetDailyState()
     if (storyRun()) unlockStageRecipes(e.nightNumber)
   })
   return () => {

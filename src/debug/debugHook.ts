@@ -130,6 +130,7 @@ export type SnapshotName =
   | 'uiWorld'
   | 'map'
   | 'mystery'
+  | 'chapel'
 
 const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   game: () => useGameStore.getState(),
@@ -157,6 +158,7 @@ const SNAPSHOTS: Record<SnapshotName, () => unknown> = {
   // Explored 8 m cells (the Journal map's data, which the minimap also draws).
   map: () => useMapStore.getState().map,
   mystery: () => useMysteryStore.getState(),
+  chapel: () => useChapelStore.getState().chapel,
 }
 
 let keepAliveTimer: ReturnType<typeof setInterval> | null = null
