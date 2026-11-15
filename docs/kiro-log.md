@@ -1554,12 +1554,18 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 
 ### 2026-11-15: 09-playtest-fixes task 20: Journal font size and plain-font setting
 - **Kiro feature used:** spec task
-- **What happened:** Journal, examine page/clue and contract text got larger (journal 1.25 rem, examine 1.3/1.15 rem). New saved setting `plainJournalFont` (default Off, Settings toggle, keyboard-navigable like the other toggles) swaps the new `--font-journal` token from the handwriting to the body font via `installPlainJournalFont`. Design bible §11 updated. Re-checked the Controls hint panel at 800x600 with the plain font on (new Playwright test, screenshot `control-hints-plain-font-800x600.png`).
+- **What happened:** Journal, examine page/clue and contract text got larger (journal 1.25 rem, examine 1.3/1.15 rem). New saved setting `plainJournalFont` (default Off, Settings toggle, keyboard-navigable like the other toggles) swaps the new `--font-journal` token from the handwriting to the body font via `installPlainJournalFont`. Design bible ï¿½11 updated. Re-checked the Controls hint panel at 800x600 with the plain font on (new Playwright test, screenshot `control-hints-plain-font-800x600.png`).
 - **What Kiro caught or sped up:** Lint, build and 2235 unit tests pass; settings property tests cover the new key.
 - **Decisions made unattended:** Plain font means the body font (IM Fell English), not a sans font, to stay in the theme. The hint panel already uses the body font, so it is unchanged. Only task 20 files were committed; other dirty files in the tree (screenshots, CREDITS, clue icons) were left alone.
 
 ### 2026-11-15: 09-playtest-fixes task 21: Shorter intro (B15)
 - **Kiro feature used:** spec task
-- **What happened:** Intro cut from 35 s to 21 s: shots 4, 5, 4, 4, 4 s (shot 2 keeps 5 s for its long card), card timings and the grave burst moved earlier. Fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible §11 updated first.
+- **What happened:** Intro cut from 35 s to 21 s: shots 4, 5, 4, 4, 4 s (shot 2 keeps 5 s for its long card), card timings and the grave burst moved earlier. Fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible ï¿½11 updated first.
 - **What Kiro caught or sped up:** introTimeline.test.ts still pinned 35 s; updated with the data test (18-22 s). Lint, build and unit tests pass.
 - **Decisions made unattended:** 21 s total counts as "about 20 s" and keeps each card visible 3.4 s or more.
+
+### 2026-11-15: 09-playtest-fixes task 21: Shorter intro (B15)
+- **Kiro feature used:** spec task
+- **What happened:** Intro cut from 35 s to 21 s: shots of 4, 5, 4, 4 and 4 s (shot 2 keeps 5 s for its long card), with card timings and the grave burst moved earlier. The fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible Â§11 updated first.
+- **What Kiro caught or sped up:** `introTimeline.test.ts` still pinned 35 s; updated it along with the data test (18-22 s). Lint, build and 2235 unit tests pass.
+- **Decisions made unattended:** 21 s counts as "about 20 s"; each card stays visible 3.4 s or more.
