@@ -173,7 +173,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Mount `scene/catacombs.glb` untransformed; keep corridor colliders; remove brick-wall instances, hide floor and ceiling Blocks; add portal, ledge, bier and altar colliders; move cat-wall-a/b/c, fx-page-4, fx-shroud, fx-heart onto their surfaces (catacombs.json move-items); at most two dim candle lights if the budget allows
   - Gates use gate-catacombs.glb and gate-mausoleum-row.glb lifted whole by useLift; ossuary door uses ossuary-door.glb; avenue rails use iron-railing.glb with a closing post
   - Unit: corridor keeps 1.6 m clear width; GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-c)`)
-- [ ] 11n-d. Scenery swap: props everywhere else
+- [x] 11n-d. Scenery swap: props everywhere else
   - Lamp post, broken coffin, grave mounds (both states), merchant cart, statue, scare door, candle stub, grave hand, woodpile (axe at axe-rest), lodge table, sabre plinth, vending machine (new, placed only), bats (loaded for H4), and the nine `props/clue-<clueId>.glb` in ClueSpots; keep every collider and interactable, add the JSON colliders the game lacks
   - Unit: every seated spot within 0.03 m of its surface, every JSON loads, no collider in the chapel aisle or the hut spawn-to-bench path; browser screenshots of each swapped prop; GPU perf before and after; list anything that could not be seated; commit locally (`... (spec 09 task 11n-d)`)
 - [ ] 3. A2: Automated playthrough test
