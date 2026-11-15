@@ -14,9 +14,11 @@
 // Architecture note: state lives in worldStore / inventoryStore / craftingStore.
 // This component is *rendering only* — it reads stores and drives visuals.
 
-import { useRef, useMemo, useEffect, useState } from 'react'
+import { useRef, useMemo, useEffect, useLayoutEffect, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
+import { Clone, Html, useGLTF } from '@react-three/drei'
+import { DRACO_PATH, WORKBENCH_MODEL_URL } from '../../data/assets'
+import '../assets/preloadModels'
 import { BenchPile, ItemSilhouette } from './BenchItemModels'
 import * as THREE from 'three'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
@@ -332,17 +334,19 @@ function MaterialPile({
 const BENCH_TOP_Y = 0.86
 const BENCH_W = 1.4
 const BENCH_D = 0.8
-const BENCH_LEG = 0.09
 
 /**
- * The bench: tabletop, four legs, a back splash against the wall, a lower shelf and a front
- * apron, so it reads as a heavy workbench rather than a floating plank. Local origin is the
- * middle of the footprint on the floor. One fixed collider keeps the player out of it.
+ * The bench: props/workbench.glb (bench-local, back toward -Z, top at BENCH_TOP_Y). Local origin
+ * is the middle of the footprint on the floor. One fixed collider keeps the player out of it.
  */
 function BenchModel() {
-  const legH = BENCH_TOP_Y - 0.08
-  const legX = BENCH_W / 2 - BENCH_LEG / 2
-  const legZ = BENCH_D / 2 - BENCH_LEG / 2
+  const model = useGLTF(WORKBENCH_MODEL_URL, DRACO_PATH).scene
+  const ref = useRef<THREE.Group>(null)
+  useLayoutEffect(() => {
+    ref.current?.traverse((o) => {
+      if ('isMesh' in o) o.receiveShadow = true
+    })
+  }, [model])
   return (
     <group>
       <RigidBody type="fixed" colliders={false}>
@@ -351,32 +355,7 @@ function BenchModel() {
           position={[0, BENCH_TOP_Y / 2, 0]}
         />
       </RigidBody>
-      <mesh position={[0, BENCH_TOP_Y - 0.04, 0]} castShadow receiveShadow>
-        <boxGeometry args={[BENCH_W, 0.08, BENCH_D]} />
-        <meshStandardMaterial color="#5c3d1e" roughness={0.9} />
-      </mesh>
-      {([-1, 1] as const).flatMap((sx) =>
-        ([-1, 1] as const).map((sz) => (
-          <mesh key={`${sx}${sz}`} position={[sx * legX, legH / 2, sz * legZ]} castShadow>
-            <boxGeometry args={[BENCH_LEG, legH, BENCH_LEG]} />
-            <meshStandardMaterial color="#3b2713" roughness={1} />
-          </mesh>
-        )),
-      )}
-      {/* Lower shelf and front apron tie the legs together. */}
-      <mesh position={[0, 0.28, 0]} receiveShadow>
-        <boxGeometry args={[BENCH_W - 0.1, 0.05, BENCH_D - 0.1]} />
-        <meshStandardMaterial color="#3b2713" roughness={1} />
-      </mesh>
-      <mesh position={[0, BENCH_TOP_Y - 0.18, BENCH_D / 2 - 0.03]}>
-        <boxGeometry args={[BENCH_W - 0.1, 0.16, 0.05]} />
-        <meshStandardMaterial color="#4a3119" roughness={1} />
-      </mesh>
-      {/* Back splash so tools don't slide off into the wall. */}
-      <mesh position={[0, BENCH_TOP_Y + 0.12, -BENCH_D / 2 + 0.03]} castShadow>
-        <boxGeometry args={[BENCH_W, 0.24, 0.06]} />
-        <meshStandardMaterial color="#4a3119" roughness={1} />
-      </mesh>
+      <Clone ref={ref} object={model} />
     </group>
   )
 }

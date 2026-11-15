@@ -40,7 +40,7 @@ describe('bible placements', () => {
     expect(WOODPILE_POSITION).toEqual([-5, 0, 2])
     expect(CHAPEL_CUPBOARD_POSITION).toEqual([7.9, 0.89, 7.6])
     expect(CRANE_CRYPT_STEP).toEqual([-18.9, 0.35, -59.3])
-    expect(POWDER_TIN_HUT).toEqual([-1.8, 0.8, -1])
+    expect(POWDER_TIN_HUT).toEqual([-1.8, 0.78, -1])
     expect(POWDER_TIN_BELL_TOWER).toEqual([29, 0.4, -24])
     expect(CRANE_SPAWN.stair).toEqual([10, 0, 10.3])
     expect(CRANE_SPAWN.floorBreak).toEqual([11.7, 0, 9.6])

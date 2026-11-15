@@ -205,9 +205,19 @@ export const GRAVEYARD_MODEL_URL = '/assets/models/scene/graveyard.glb'
 export const CHAPEL_INTERIOR_MODEL_URL = '/assets/models/scene/chapel-interior.glb'
 export const CHAPEL_EXTERIOR_MODEL_URL = '/assets/models/scene/chapel-exterior.glb'
 
+/** The keeper's hut (hut-local = world), and the props placed in it (spec 09 task 11n-b). */
+export const HUT_MODEL_URL = '/assets/models/scene/hut.glb'
+export const WORKBENCH_MODEL_URL = '/assets/models/props/workbench.glb'
+export const VENDING_MACHINE_MODEL_URL = '/assets/models/props/vending-machine.glb'
+export const CLUE_HUT_BOOTS_MODEL_URL = '/assets/models/props/clue-hut-boots.glb'
+
 /** Everything the loading screen waits for. */
 export function allModelUrls(): string[] {
   return [
+    HUT_MODEL_URL,
+    WORKBENCH_MODEL_URL,
+    VENDING_MACHINE_MODEL_URL,
+    CLUE_HUT_BOOTS_MODEL_URL,
     CHAPEL_INTERIOR_MODEL_URL,
     CHAPEL_EXTERIOR_MODEL_URL,
     ...WORLD_MODEL_IDS.map(worldModelUrl),

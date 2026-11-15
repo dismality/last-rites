@@ -1,96 +1,86 @@
-// The keeper's hut: a plank cabin around the spawn point with the workbench against its back wall.
-// The door is in the +Z wall, behind the player at the start, so the first view is the bench.
-// Mount inside <Physics>. Walls are solid; windows and furniture are visual (the table has one collider).
+// The keeper's hut: the Blender scene (hut.glb, spec 09 task 11n-b) over the game's own wall
+// colliders, with the workbench against its back wall. The door is in the +Z wall, behind the
+// player at the start, so the first view is the bench. The box walls stay as invisible colliders
+// so every door and zombie rule is untouched; the model draws everything you see. Furniture
+// colliders (tables, stove, cot, barrels, log stack, vending machine) come from hut.json.
+// Mount inside <Physics>.
 
-import { RigidBody, CuboidCollider } from '@react-three/rapier'
+import { useLayoutEffect, useRef } from 'react'
+import { Clone, useGLTF } from '@react-three/drei'
+import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import type { Group } from 'three'
+import { DRACO_PATH, HUT_MODEL_URL, VENDING_MACHINE_MODEL_URL } from '../../data/assets'
 import { HUT } from '../../data/cemeteryLayout'
-import { GableRoof, Slab } from './buildingParts'
-import { PART_MATERIALS } from './partMaterials'
+import { HUT_BOXES, VENDING_MACHINE } from '../../data/hutScenery'
+import '../assets/preloadModels'
+import { Slab } from './buildingParts'
 
-/** Overhang of the roof beyond the walls. */
-const EAGE_M = 0.4
 const DOOR_HEIGHT = 2.1
-const WINDOW = { y: 1.4, z: -0.8, height: 0.7, width: 0.9 } as const
 
-/** Side table that carries the hut's supplies (see `hut-shelf` and journal page 1 in zones.ts). */
-const TABLE = { x: 2.1, z: -1.1, top: 0.75, w: 1.6, d: 0.8 } as const
+/** The hut and the vending machine, both drawn from their models. */
+function HutModels() {
+  const hut = useGLTF(HUT_MODEL_URL, DRACO_PATH).scene
+  const vending = useGLTF(VENDING_MACHINE_MODEL_URL, DRACO_PATH).scene
+  const hutRef = useRef<Group>(null)
+  const vendingRef = useRef<Group>(null)
+
+  useLayoutEffect(() => {
+    for (const g of [hutRef.current, vendingRef.current]) {
+      g?.traverse((o) => {
+        if ('isMesh' in o) o.receiveShadow = true
+      })
+    }
+  }, [hut, vending])
+
+  return (
+    <>
+      <Clone ref={hutRef} object={hut} />
+      {/* Visual and collider only; the vending panel is spec 11 H6. */}
+      <Clone
+        ref={vendingRef}
+        object={vending}
+        position={[...VENDING_MACHINE.position]}
+        rotation={[0, VENDING_MACHINE.rotationY, 0]}
+      />
+    </>
+  )
+}
 
 export function Hut() {
-  const { halfX, halfZ, height: h, wallThickness: t, doorWidth, roofRise } = HUT
+  const { halfX, halfZ, height: h, wallThickness: t, doorWidth } = HUT
   const frontW = halfX - doorWidth / 2
   const frontX = doorWidth / 2 + frontW / 2
-  const legY = (TABLE.top - 0.03) / 2
 
   return (
     <group name="hut">
+      <HutModels />
       <RigidBody type="fixed" colliders={false}>
-        <Slab position={[0, h / 2, -halfZ]} size={[halfX * 2 + t, h, t]} material="wood" />
-        <Slab position={[-halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="wood" />
-        <Slab position={[halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="wood" />
-        <Slab position={[-frontX, h / 2, halfZ]} size={[frontW, h, t]} material="wood" />
-        <Slab position={[frontX, h / 2, halfZ]} size={[frontW, h, t]} material="wood" />
+        {/* Walls: collider only. The model draws them. */}
+        <Slab position={[0, h / 2, -halfZ]} size={[halfX * 2 + t, h, t]} material="wood" visible={false} />
+        <Slab position={[-halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="wood" visible={false} />
+        <Slab position={[halfX, h / 2, 0]} size={[t, h, halfZ * 2]} material="wood" visible={false} />
+        <Slab position={[-frontX, h / 2, halfZ]} size={[frontW, h, t]} material="wood" visible={false} />
+        <Slab position={[frontX, h / 2, halfZ]} size={[frontW, h, t]} material="wood" visible={false} />
         <Slab
           position={[0, DOOR_HEIGHT + (h - DOOR_HEIGHT) / 2, halfZ]}
           size={[doorWidth, h - DOOR_HEIGHT, t]}
           material="darkWood"
+          visible={false}
         />
-        {/* Table: one block under the top so nobody walks through it. */}
-        <CuboidCollider
-          args={[TABLE.w / 2, TABLE.top / 2, TABLE.d / 2]}
-          position={[TABLE.x, TABLE.top / 2, TABLE.z]}
-        />
+        {/* Tables, stove, cot, barrels, log stack and the vending machine, from hut.json. */}
+        {HUT_BOXES.map((b) => (
+          <CuboidCollider
+            key={b.note}
+            args={[b.half[0], b.half[1], b.half[2]]}
+            position={[...b.center]}
+            rotation={[0, b.rotY, 0]}
+          />
+        ))}
       </RigidBody>
 
-      {/* Floorboards, a hair above the grass slab. */}
-      <mesh position={[0, 0.025, 0]} material={PART_MATERIALS.floor} receiveShadow>
-        <boxGeometry args={[halfX * 2, 0.05, halfZ * 2]} />
-      </mesh>
-
-      <GableRoof
-        position={[0, h, 0]}
-        width={halfX * 2 + EAGE_M * 2}
-        length={halfZ * 2 + EAGE_M * 2}
-        rise={roofRise}
-        material="darkWood"
-      />
-
-      {/* Lit windows on both side walls. */}
-      {[-1, 1].map((side) => (
-        <mesh
-          key={side}
-          position={[side * halfX, WINDOW.y, WINDOW.z]}
-          material={PART_MATERIALS.glass}
-        >
-          <boxGeometry args={[t + 0.04, WINDOW.height, WINDOW.width]} />
-        </mesh>
-      ))}
-
-      {/* Table. */}
-      <mesh
-        position={[TABLE.x, TABLE.top, TABLE.z]}
-        material={PART_MATERIALS.wood}
-        castShadow
-        receiveShadow
-      >
-        <boxGeometry args={[TABLE.w, 0.06, TABLE.d]} />
-      </mesh>
-      {([-1, 1] as const).flatMap((sx) =>
-        ([-1, 1] as const).map((sz) => (
-          <mesh
-            key={`${sx}${sz}`}
-            position={[
-              TABLE.x + sx * (TABLE.w / 2 - 0.08),
-              legY,
-              TABLE.z + sz * (TABLE.d / 2 - 0.08),
-            ]}
-            material={PART_MATERIALS.darkWood}
-          >
-            <boxGeometry args={[0.07, TABLE.top - 0.03, 0.07]} />
-          </mesh>
-        )),
-      )}
-
-      {/* A warm fill so the hut reads as lived in even before the lantern is lit. No shadow. */}
+      {/* A warm fill at the model's hanging lantern, so the hut reads as lived in. No shadow.
+          No stove ember light: a light more changes every material's shader cost, and the stove's
+          ember material is emissive. */}
       <pointLight position={[0, h - 0.4, 0]} color="#e8913a" intensity={2} distance={7} decay={2} />
     </group>
   )

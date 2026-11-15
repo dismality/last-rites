@@ -1,5 +1,8 @@
 // Environmental clues: small props the player can examine to record a clue.
 // Rules (ledger required or not) live in the mystery store; this only draws and wires them.
+import { Clone, useGLTF } from '@react-three/drei'
+import { CLUE_HUT_BOOTS_MODEL_URL, DRACO_PATH } from '../../data/assets'
+import '../assets/preloadModels'
 import { CLUE_SPOTS, type ClueSpot } from '../../data/tombstones'
 import { pushJournalAddedToast } from '../../game/state/journalToast'
 import { useMysteryStore } from '../../game/state/mysteryStore'
@@ -20,7 +23,14 @@ function examineSpot(spot: ClueSpot): void {
   useMysteryStore.getState().discoverClue(spot.clueId)
 }
 
-function Prop({ kind }: { kind: ClueSpot['prop'] }) {
+/** Elias's boots by the cot (props/clue-hut-boots.glb, clue-local). */
+function HutBoots() {
+  const model = useGLTF(CLUE_HUT_BOOTS_MODEL_URL, DRACO_PATH).scene
+  return <Clone object={model} />
+}
+
+function Prop({ kind, clueId }: { kind: ClueSpot['prop']; clueId: ClueSpot['clueId'] }) {
+  if (clueId === 'clue-hut-boots') return <HutBoots />
   switch (kind) {
     case 'parchment':
       return (
@@ -57,7 +67,7 @@ export function ClueSpots() {
             runeHeight={0.9}
             onInteract={() => examineSpot(spot)}
           >
-            <Prop kind={spot.prop} />
+            <Prop kind={spot.prop} clueId={spot.clueId} />
           </Interactable>
         </group>
       ))}

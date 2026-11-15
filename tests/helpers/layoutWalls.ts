@@ -10,6 +10,7 @@ import {
   HUT,
   LAMP_POSTS,
 } from '../../src/data/cemeteryLayout'
+import { HUT_BOXES } from '../../src/data/hutScenery'
 import { headstoneCollider, headstoneScale, lampCollider } from '../../src/data/colliderFootprints'
 import { GRAVEYARD_COLLIDERS } from '../../src/data/graveyardColliders'
 import { TOMBSTONES } from '../../src/data/tombstones'
@@ -37,8 +38,9 @@ export function structureBoxes(): Box[] {
     box(halfX, 0, ht / 2, halfZ),
     box(-frontX, halfZ, frontW / 2, ht / 2),
     box(frontX, halfZ, frontW / 2, ht / 2),
-    box(2.1, -1.1, 0.8, 0.4), // table
   )
+  // Tables, stove, cot, barrels, log stack and the vending machine from hut.json (Hut.tsx).
+  for (const b of HUT_BOXES) out.push(box(b.center[0], b.center[2], b.half[0], b.half[2]))
 
   const [cx, , cz] = CHAPEL_CENTER
   const { halfX: chx, halfZ: chz, wallThickness: ct } = CHAPEL

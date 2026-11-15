@@ -90,7 +90,7 @@ export interface SpawnPoint {
 
 export const SPAWN_POINTS: readonly SpawnPoint[] = [
   // Grounds
-  { id: 'hut-shelf', zone: 'grounds', position: [1.8, 0.8, -1], lootTable: 'hut-supplies' },
+  { id: 'hut-shelf', zone: 'grounds', position: [1.8, 0.78, -1], lootTable: 'hut-supplies' },
   { id: 'grounds-coffin-east', zone: 'grounds', position: [28, 0, -12], lootTable: 'broken-coffin' },
   { id: 'grounds-coffin-south', zone: 'grounds', position: [-8, 0, 30], lootTable: 'broken-coffin' },
   { id: 'grounds-fence-west', zone: 'grounds', position: [-38, 0, 5], lootTable: 'broken-coffin' },
@@ -129,7 +129,7 @@ export interface FixedSpawn {
 }
 
 export const FIXED_SPAWNS: readonly FixedSpawn[] = [
-  { id: 'fx-page-1', zone: 'grounds', position: [2.6, 0.8, -1.3], item: 'journal-page-1' },
+  { id: 'fx-page-1', zone: 'grounds', position: [2.6, 0.78, -1.3], item: 'journal-page-1' },
   { id: 'fx-crypt-key', zone: 'grounds', position: [-12, 0, -18], item: 'rusted-crypt-key' },
   { id: 'fx-page-2', zone: 'grounds', position: [-12.5, 0, -17], item: 'journal-page-2' },
   { id: 'fx-bell-clapper', zone: 'grounds', position: [30, 0, -25], item: 'sextons-bell-clapper' },

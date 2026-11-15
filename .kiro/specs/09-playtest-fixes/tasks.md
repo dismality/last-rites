@@ -165,7 +165,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Seat fx-page-5, font loot, pew loot and the revolver (cupboard shelf; the revolver Shelf goes); hymn board numbers checked against cases.ts and case-design (report a mismatch, never edit the GLB)
   - Renderer: AgX tone mapping, low-intensity AO, selective bloom on emissives, moon shadow camera around the player, denser interior fog; anything over budget turns off at "Low"
   - GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-a)`)
-- [ ] 11n-b. Scenery swap: hut
+- [x] 11n-b. Scenery swap: hut
   - Mount `scene/hut.glb`; Slabs collider-only; remove floor box, roof, window boxes, table meshes; add hut.json colliders (tables, stove, cot, barrels, log stack, vending machine footprint)
   - Workbench becomes `props/workbench.glb` (collider and pile placement kept); seat hut-shelf, fx-page-1 on the east table and POWDER_TIN_HUT on the new west table (surfaces 0.78); boots clue uses clue-hut-boots.glb; stove ember light only if the budget allows
   - GPU perf before and after; screenshots; commit locally (`... (spec 09 task 11n-b)`)
