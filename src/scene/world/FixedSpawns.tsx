@@ -26,6 +26,9 @@ const WORLD_DISPLAY_SCALE = 3
 /** Models stand upright in their own space; lay them down so they rest on the ground. */
 const LYING_ROTATION: [number, number, number] = [-Math.PI / 2, 0, 0]
 
+/** Crosshair target for a lying hero item (width, height, depth in m): about the size it looks. */
+const HERO_PROXY_M: [number, number, number] = [0.45, 0.2, 0.45]
+
 function HeroItem({ url }: { url: string }) {
   const { scene } = useGLTF(url)
   // Clone so two spawns of the same model never share a transform.
@@ -68,7 +71,15 @@ export function FixedSpawns() {
                   <GroundItem item={s.item} yaw={pageNo ? Number(pageNo) * 0.9 : 0.5} />
                 </group>
               ) : model ? (
-                <HeroItem url={assetUrl(model)} />
+                <>
+                  <HeroItem url={assetUrl(model)} />
+                  {/* Hidden hit proxy: a key lying on the grass is thin, and seen end-on (or through
+                      its bow) the crosshair slid off it from the side. Raycasts ignore `visible`,
+                      and the outline skips hidden meshes. */}
+                  <mesh position={[0, HERO_PROXY_M[1] / 2, 0]} visible={false}>
+                    <boxGeometry args={HERO_PROXY_M} />
+                  </mesh>
+                </>
               ) : null}
             </Interactable>
           </group>

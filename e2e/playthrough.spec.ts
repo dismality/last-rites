@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { FIXED_SPAWNS } from '../src/data/zones'
+import { CHAPEL_ALTAR } from '../src/data/cemeteryLayout'
 
 // Spec 09, A2: the main story path in real Chrome, from New Game to an ending screen.
 //
@@ -11,8 +12,12 @@ import { FIXED_SPAWNS } from '../src/data/zones'
 // What is not: the long routes between legs are teleports to a start point 4 to 12 m short of
 // each target (listed in LEGS below); the last stretch of every leg is walked. Looking at the
 // item (yaw and pitch) is set with a look-only teleport on the spot, because headless Chrome has
-// no pointer lock to turn the mouse. Night 5 is reached with the Dev_Panel skip, and the waves
-// are cleared with its "Complete objective" button. God mode comes from the Dev_Panel too.
+// no pointer lock to turn the mouse. The last night (stage 3 in the spec 10 design) is reached with
+// the Dev_Panel's "Night 5" skip; its waves never clear, and the rite is offered once the five
+// relics are held. God mode comes from the Dev_Panel too.
+//
+// D1 (spec 09 task 24.1) adds per step: the compass objective aims at the next item, the hover
+// prompt reads "E: ...", and journal pages 1 and 2 reach the journal when picked up.
 
 type Vec3 = readonly [number, number, number]
 
@@ -30,6 +35,23 @@ function spawn(id: string): Vec3 {
 async function expectObjective(page: Page, text: RegExp): Promise<void> {
   await expect(objectiveMain(page)).toHaveText(text, { timeout: 15_000 })
 }
+/**
+ * D1: the objective text, plus the compass: the objective points at `target` (x, z) and the
+ * compass draws its objective marker.
+ */
+async function expectStep(page: Page, text: RegExp, target: { x: number; z: number }): Promise<void> {
+  await expectObjective(page, text)
+  const o = (await page.evaluate(() => window.__lastRites!.snapshot('objective'))) as { position?: Vec3 } | null
+  expect(o?.position, `objective position for ${text}`).toBeDefined()
+  expect(Math.hypot(o!.position![0] - target.x, o!.position![2] - target.z), `objective aim for ${text}`).toBeLessThan(0.5)
+  await expect(page.locator('.compass__marker--objective').first()).toBeAttached()
+}
+/** Journal pages read so far (the journal's own source). */
+const pagesRead = (page: Page) =>
+  page.evaluate(() => {
+    const m = window.__lastRites!.snapshot('mystery') as { mystery: { pages: Set<number> } }
+    return [...m.mystery.pages].sort()
+  })
 
 /** Keeps the day clock early, so dusk never arrives in the middle of a leg. */
 async function keepDay(page: Page): Promise<void> {
@@ -100,6 +122,11 @@ async function leg(
   await walkUntil(page, target, stop)
 }
 
+/** Turns on the spot, level, to face (tx, tz) before a walk. */
+async function faceTowards(page: Page, tx: number, tz: number): Promise<void> {
+  const f = await feet(page)
+  await teleportAndSettle(page, f[0], f[2], yawTo(f[0], f[2], tx, tz))
+}
 /** Turns on the spot (a look-only teleport) to face a point in the world. */
 async function lookAt(page: Page, p: Vec3): Promise<void> {
   const b = (await page.evaluate(() => window.__lastRites!.body()))!
@@ -142,6 +169,10 @@ async function interact(page: Page, hoverId: string, at: Vec3): Promise<void> {
   }
   const f = await feet(page)
   expect(hovered, `hover ${hoverId} from feet ${f.map((v) => v.toFixed(2))}; hovered instead: ${JSON.stringify(seen)}`).toBe(true)
+  // D1: the pickup prompt names the key and the thing it does, and the HUD shows it.
+  const hover = (await page.evaluate(() => window.__lastRites!.snapshot('hover'))) as { prompt: string; actionable: boolean }
+  expect(hover.actionable, `${hoverId} actionable`).toBe(true)
+  expect(hover.prompt).toMatch(/^E: \S/)
   await page.evaluate(() => window.__lastRites!.action('Interact', 400))
   console.log(
     `interact ${hoverId}: hover now ${JSON.stringify(await page.evaluate(() => window.__lastRites!.snapshot('hover')))}, game ${JSON.stringify(await page.evaluate(() => window.__lastRites!.snapshot('game')))}`,
@@ -171,6 +202,14 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   page.on('pageerror', (e) => errors.push(e.message))
 
   // --- New Game, intro skipped with Space ---------------------------------------------------
+  // Setup, not game: on this Windows machine Chrome forwards the desk mouse's raw motion to the
+  // headless page as trusted mousemove events (movementX/Y set, clientX/Y frozen). With the
+  // pointer-lock override on, that motion turned the view mid-walk (yaw 0.04 -> 0.57) and sent
+  // legs off course. Look here comes only from look-only teleports, so mouse motion is dropped
+  // before the game's listeners see it; clicks still work.
+  await page.addInitScript(() => {
+    window.addEventListener('mousemove', (e) => e.stopImmediatePropagation(), true)
+  })
   await page.goto('/?dev=1')
   await page.waitForFunction(() => window.__lastRites !== undefined)
   await page.evaluate(() => window.__lastRites!.newGameWithIntro('normal'))
@@ -196,21 +235,27 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   })
 
   // --- Leg 1: journal page 1 in the hut (walked from the spawn, no teleport) -----------------
-  await expectObjective(page, /^Read the page Elias left in the hut \(0\/1\)$/)
   const p1 = spawn('fx-page-1')
+  await expectStep(page, /^Read the page Elias left in the hut \(0\/1\)$/, { x: p1[0], z: p1[2] })
   await walkUntil(page, { x: p1[0], z: p1[2] }, 1.8)
   await pickUp(page, 'fx-page-1')
-  await expectObjective(page, /^Find the Rusted Crypt Key \(0\/1\)$/)
+  expect(await pagesRead(page)).toEqual([1])
+  const key = spawn('fx-crypt-key')
+  await expectStep(page, /^Find the Rusted Crypt Key \(0\/1\)$/, { x: key[0], z: key[2] })
 
   // --- Leg 2: Rusted Crypt Key on the oak path (start 6 m south, walked north) ---------------
-  const key = spawn('fx-crypt-key')
   const page2 = spawn('fx-page-2')
   await leg(page, { x: -12.3, z: -12 }, { x: page2[0], z: page2[2] }, 1.3)
   await pickUp(page, 'fx-page-2')
+  expect(await pagesRead(page)).toEqual([1, 2])
+  // Turn to face the key on the spot: the view still points wherever the page-2 aim left it.
+  const atPage2 = await feet(page)
+  await teleportAndSettle(page, atPage2[0], atPage2[2], yawTo(atPage2[0], atPage2[2], key[0], key[2]))
   await walkUntil(page, { x: key[0], z: key[2] }, 1.3)
   await pickUp(page, 'fx-crypt-key')
   expect((await inventory(page)).inventory.keyItems).toContain('rusted-crypt-key')
-  await expectObjective(page, /^Search Mausoleum Row for the sexton's whistle \(0\/1\)$/)
+  const whistle = spawn('fx-bone-whistle')
+  await expectStep(page, /^Search Mausoleum Row for the sexton's whistle \(0\/1\)$/, { x: whistle[0], z: whistle[2] })
 
   // --- Leg 3: the Row gate (start 6 m south of it), opened with the key ----------------------
   // The gate bars stand at z = entranceZ + dir * wallThickness / 2 = -40 - 0.2 (cemeteryLayout.ts). The old
@@ -219,22 +264,21 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   await interact(page, 'gate-mausoleum-row', [-20, 1.5, -40.2])
 
   // --- Leg 4: down the alley to the bone whistle: walked through the opened gate -------------
-  const whistle = spawn('fx-bone-whistle')
   await lookAt(page, [whistle[0], 1.0, whistle[2]])
   const here = await feet(page)
   await teleportAndSettle(page, here[0], here[2], yawTo(here[0], here[2], whistle[0], whistle[2]))
   await walkUntil(page, { x: whistle[0], z: whistle[2] }, 1.3)
   await pickUp(page, 'fx-bone-whistle')
   expect((await inventory(page)).inventory.keyItems).toContain('bone-whistle')
-  await expectObjective(page, /^Blow the Bone Whistle at the chapel altar$/)
+  await expectStep(page, /^Blow the Bone Whistle at the chapel altar$/, { x: CHAPEL_ALTAR[0], z: CHAPEL_ALTAR[2] })
 
   // --- Leg 5: the chapel altar. Teleport to the front door, walk the nave -----------------------
   await leg(page, { x: 10, z: -3.5 }, { x: 10, z: 9.8 }, 1.5)
   await interact(page, 'altar-whistle', [10, 0.55, 9.8])
-  await expectObjective(page, /^Find the Iron Ossuary Key in the Crane crypt \(0\/1\)$/)
+  const okey = spawn('fx-ossuary-key')
+  await expectStep(page, /^Find the Iron Ossuary Key in the Crane crypt \(0\/1\)$/, { x: okey[0], z: okey[2] })
 
   // --- Leg 6: Iron Ossuary Key, then the Crane rosary, at the end of the Row --------------------
-  const okey = spawn('fx-ossuary-key')
   await leg(page, { x: -20.5, z: -51 }, { x: okey[0], z: okey[2] }, 1.3)
   await pickUp(page, 'fx-ossuary-key')
   expect((await inventory(page)).inventory.keyItems).toContain('iron-ossuary-key')
@@ -255,13 +299,20 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
 
   // --- Leg 8: Burial Shroud in the catacombs, then the ossuary door and the Reliquary Heart ---
   const shroud = spawn('fx-shroud')
-  await leg(page, { x: 25, z: 46 }, { x: shroud[0], z: shroud[2] }, 1.3)
+  // The shroud lies on the stone bier against the west wall (task 11n-c); walking straight at it
+  // stops on the bier's south end 1.6 m short. Walk north up the open east side of the corridor.
+  await keepDay(page)
+  await teleportAndSettle(page, 25.3, 46, Math.PI)
+  await walkUntil(page, { x: shroud[0], z: shroud[2] }, 1.1)
   await pickUp(page, 'fx-shroud')
   await expectObjective(page, /^Gather the relics of the rite \(3\/5\)$/)
   const heart = spawn('fx-heart')
+  await faceTowards(page, 25, 54)
   await walkUntil(page, { x: 25, z: 54 }, 0.8)
   await interact(page, 'gate-ossuary', [25, 1.1, 55.6])
-  await walkUntil(page, { x: heart[0], z: heart[2] }, 1.3)
+  await faceTowards(page, heart[0], heart[2])
+  // The heart rests on the reliquary altar, so the walk ends at the altar's edge.
+  await walkUntil(page, { x: heart[0], z: heart[2] }, 1.6)
   await pickUp(page, 'fx-heart')
   await expectObjective(page, /^Gather the relics of the rite \(4\/5\)$/)
 
@@ -275,7 +326,8 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
     undefined,
     { timeout: 30_000 },
   )
-  await expectObjective(page, /^Survive: Wave 1 of \d+$/)
+  // Spec 10 stage loop: a story night has no wave count; the curse holds until the case is answered.
+  await expectObjective(page, /^The curse holds\. Solve the case at the altar\.$/)
   const locket = spawn('fx-locket')
   const startZ = locket[2] + 5
   await teleportAndSettle(page, locket[0], startZ, yawTo(locket[0], startZ, locket[0], locket[2]))
@@ -283,7 +335,10 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   await pickUp(page, 'fx-locket')
   expect((await inventory(page)).inventory.relics).toHaveLength(5)
 
-  // --- Night 5, waves cleared, the rite ----------------------------------------------------------
+  // --- The last night (stage 3), the rite ---------------------------------------------------------
+  // In the 3-stage design (spec 10) the dev "Night 5" button lands on the last stage's night, and
+  // its waves never clear. Until spec 10 task 4 builds the ordered relic placement, the rite is the
+  // 45 s hold, offered as soon as the five relics are held: no "Complete objective" is needed.
   await withPanel(page, async () => {
     await section(page, 'Time')
     await panel(page).getByRole('button', { name: 'Night 5', exact: true }).click()
@@ -291,19 +346,17 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   await page.waitForFunction(
     () => {
       const w = window.__lastRites!.snapshot('world') as { phase: string; nightNumber: number }
-      return w.phase === 'night' && w.nightNumber === 5
+      const s = window.__lastRites!.stageState() as { stage: number }
+      return w.phase === 'night' && w.nightNumber === 3 && s.stage === 3
     },
     undefined,
     { timeout: 30_000 },
   )
-  await expectObjective(page, /^Survive: Wave 1 of \d+$/)
+  await expectStep(page, /^Finish the rite at the altar \(5\/5\)$/, { x: CHAPEL_ALTAR[0], z: CHAPEL_ALTAR[2] })
   await withPanel(page, async () => {
-    await section(page, 'Progress')
-    await panel(page).getByRole('button', { name: 'Complete objective' }).click()
     await section(page, 'Time')
     await panel(page).getByRole('button', { name: '5x', exact: true }).click()
   })
-  await expectObjective(page, /^Finish the rite at the altar \(5\/5\)$/)
 
   await leg(page, { x: 10, z: 4 }, { x: 10, z: 9.5 }, 1.2, false)
   await page.evaluate(() => window.__lastRites!.hold('Interact'))
@@ -325,4 +378,40 @@ test('main story path: page 1 to the Rest ending', async ({ page }) => {
   await expect(page.getByRole('region', { name: 'Run statistics' })).toBeVisible({ timeout: 30_000 })
 
   expect(errors).toEqual([])
+})
+
+// D1 found that the Rusted Crypt Key, lying on the grass, took the crosshair only from the north
+// and south: from the east or west the ray at its centre passed through the bow. Lying hero items
+// now carry a hidden hit box (FixedSpawns.tsx). Aimed from 1.3 m on each side, it must hover.
+test('a lying key takes the crosshair from every side', async ({ page }) => {
+  test.setTimeout(180_000)
+  await page.addInitScript(() => {
+    window.addEventListener('mousemove', (e) => e.stopImmediatePropagation(), true)
+  })
+  await page.goto('/?dev=1')
+  await page.waitForFunction(() => window.__lastRites !== undefined)
+  await page.evaluate(() => window.__lastRites!.startRun('normal'))
+  await page.waitForFunction(() => window.__lastRites!.body() !== null, undefined, { timeout: 90_000 })
+  const key = spawn('fx-crypt-key')
+  const failed: string[] = []
+  for (const [dx, dz] of [
+    [0, 1.3],
+    [0, -1.3],
+    [1.3, 0],
+    [-1.3, 0],
+  ]) {
+    const x = key[0] + dx
+    const z = key[2] + dz
+    const yaw = yawTo(x, z, key[0], key[2])
+    await teleportAndSettle(page, x, z, yaw)
+    await lookAt(page, [key[0], 0.03, key[2]])
+    const ok = await page
+      .waitForFunction(() => (window.__lastRites!.snapshot('hover') as { id: string } | null)?.id === 'fixed:fx-crypt-key', undefined, {
+        timeout: 3_000,
+      })
+      .then(() => true)
+      .catch(() => false)
+    if (!ok) failed.push(`${dx},${dz}`)
+  }
+  expect(failed).toEqual([])
 })
