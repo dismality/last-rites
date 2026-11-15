@@ -36,6 +36,10 @@ test('frame cost per scenery stop', async ({ page }) => {
     const info = await page.evaluate(() => window.__lastRites!.renderInfo(20))
     const longestMs = await page.evaluate(() => window.__lastRites!.longestFrameMs())
     result[stop.name] = { longestMs, calls: info?.calls ?? 0, triangles: info?.triangles ?? 0 }
+    if (process.env.CENSUS === '1') {
+      const c = await page.evaluate(() => window.__lastRites!.drawCensus())
+      console.log('census', stop.name, JSON.stringify({ total: c?.total, casters: c?.shadowCasters, top: c?.groups.slice(0, 22) }))
+    }
   }
   mkdirSync('e2e/logs', { recursive: true })
   writeFileSync(`e2e/logs/scenery-perf-${LABEL}.json`, JSON.stringify({ label: LABEL, ...result }, null, 2))

@@ -242,7 +242,7 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 10.7_
 
-- [~] 24. D1 to D9: Browser test passes
+- [x] 24. D1 to D9: Browser test passes
   - [x] 24.1 D1 main story path
   - [x] 24.2 D2 crafting and the workbench
   - [x] 24.3 D3 digging and materials

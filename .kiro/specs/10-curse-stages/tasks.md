@@ -103,12 +103,12 @@ Common rules for all tasks:
     - Fill `cases.ts` for Case 1: ledger of 8 entries, stones (Marsh, Hale, Ames, Pell and 2 more), 6-8 clues with the red herrings (fresh flowers on Hale, toppled Marsh stone), notes, the Final_Question, hints and the Closed-case page
     - Update `clues.ts`, `journal.ts` and the Pell grave key placement; extend `cases.test.ts`
     - _Requirements: 7.1, 7.2, 12.1, 13.3, 14.1, 14.4_
-  - [ ] 3.2 Minigame shell
+  - [-] 3.2 Minigame shell
     - Create `src/ui/minigames/MinigameShell.tsx`: overlay frame counting in `isMenuOpen()` via `overlayStore`, focus trap, Esc to close, captions, no timer, partial progress kept
     - Make the Scare_Director skip scares while a Minigame is open
     - Write `minigameShell.test.ts` for the view model and the scare gate
     - _Requirements: 6.2, 11.1-11.5, 11.7_
-  - [ ] 3.3 Pure rules for 1a and 1b
+  - [~] 3.3 Pure rules for 1a and 1b
     - Add `ledgerFlags` and `bellPosts` verdicts to `caseMinigames.ts` (3 right flags narrow to 3 graves; the cut rope, the rusted bell, the early tag) with tests
     - **Property 16: Right answers accepted, wrong answers rejected** (1a, 1b)
     - _Requirements: 11.6, 11.8, 12.2-12.4, 13.2, 13.4_
