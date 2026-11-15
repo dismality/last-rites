@@ -11,7 +11,7 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type { Group } from 'three'
 import { DRACO_PATH, HUT_MODEL_URL, VENDING_MACHINE_MODEL_URL } from '../../data/assets'
 import { HUT } from '../../data/cemeteryLayout'
-import { HUT_BOXES, VENDING_MACHINE } from '../../data/hutScenery'
+import { HUT_BOXES, HUT_LANTERN_LIGHT, VENDING_MACHINE } from '../../data/hutScenery'
 import '../assets/preloadModels'
 import { Slab } from './buildingParts'
 
@@ -81,7 +81,7 @@ export function Hut() {
       {/* A warm fill at the model's hanging lantern, so the hut reads as lived in. No shadow.
           No stove ember light: a light more changes every material's shader cost, and the stove's
           ember material is emissive. */}
-      <pointLight position={[0, h - 0.4, 0]} color="#e8913a" intensity={2} distance={7} decay={2} />
+      <pointLight position={[...HUT_LANTERN_LIGHT.position]} color={HUT_LANTERN_LIGHT.color} intensity={HUT_LANTERN_LIGHT.intensity} distance={HUT_LANTERN_LIGHT.distance} decay={2} />
     </group>
   )
 }

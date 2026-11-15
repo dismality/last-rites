@@ -53,6 +53,10 @@ export const CHAPEL_SURFACES = {
 /** Names of meshes in the GLBs the scene reacts to. */
 export const CHAPEL_MESH = {
   stairCover: 'chapel-stair-cover',
+  /** Steps, shaft walls, vault and the black end under the cover (spec 09 task 11n-e). */
+  stair: 'chapel-stair',
+  /** Every mesh whose name starts with this slides together when the stair opens. */
+  altarPrefix: 'chapel-altar-',
   bell: 'chapel-ext-bell',
   /** Roof, ceiling and walls: the parts that shade the inside from the moon. */
   shadowCasters: ['chapel-ext-walls', 'chapel-ext-ceiling', 'chapel-ext-roof-timber', 'chapel-ext-slates'],
@@ -80,3 +84,27 @@ export const toWorld = (p: Vec3): Vec3 => [
 export const HYMN_BOARD_POSITION: Vec3 = [12.47, 1.75, 8.7]
 /** The numbers painted on the board, as docs/case-design.md §3 gives them. */
 export const HYMN_BOARD_NUMBERS: readonly number[] = [4, 19, 2, 41, 23]
+
+/**
+ * The catacomb stair under the cover (tools/blender/chapel_interior.py `stair()`), chapel-local.
+ * The opening is x0..x1 and z0..innerBackZ; the steps run on under the end wall into the dark,
+ * where the vault comes down to the steps, so only the part inside the chapel can be walked.
+ */
+export const CHAPEL_STAIR = {
+  x0: -0.65,
+  x1: 0.65,
+  z0: 4.75,
+  /** Inner face of the end wall: the opening in the floor stops here. */
+  innerBackZ: 5.85,
+  rise: 0.19,
+  run: 0.27,
+  steps: 12,
+  /** Shaft wall thickness either side of the opening. */
+  wallThickness: 0.2,
+} as const
+
+/** When the stair opens the altar slides toward the door (-z) so it no longer sits over the opening. */
+export const ALTAR_SLIDE = {
+  distance: 0.6,
+  seconds: 2,
+} as const

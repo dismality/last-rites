@@ -204,8 +204,19 @@ def pointed_arch(w, h_spring, h_top, n=8):
 
 
 # ------------------------------------------------------------------ pieces ---------------------------------------------
+STAIR_X0, STAIR_X1, STAIR_Z0, STAIR_Z1 = -0.65, 0.65, 4.75, IN_Z   # the opening the cover hides
+
+
 def floor():
+    """Flagstones with a clean rectangular opening over the catacomb stair; the opening is tiled by
+    its own slabs ("stair-cover"), hidden when the whistle opens the stair."""
     main, cover = bmesh.new(), bmesh.new()
+
+    def slab(bm, x0, x1, z0, z1):
+        if x1 - x0 > 0.05 and z1 - z0 > 0.05:
+            c = B((x0 + x1) / 2, (z0 + z1) / 2, 0.012 + R.uniform(-0.004, 0.004))
+            box(bm, c.x, c.y, c.z, x1 - x0 - 0.018, z1 - z0 - 0.018, 0.024)
+
     z = -IN_Z
     row = 0
     while z < IN_Z - 0.01:
@@ -213,19 +224,62 @@ def floor():
         x = -IN_X + (0.0 if row % 2 else -0.25)
         while x < IN_X - 0.01:
             w = R.uniform(0.5, 0.75)
-            x0, x1 = max(x, -IN_X), min(x + w, IN_X)
-            if x1 - x0 > 0.05:
-                cx, cz = (x0 + x1) / 2, z + d / 2
-                target = cover if (abs(cx) < 0.65 and 4.75 < cz < 5.85) else main
-                c = B(cx, cz, 0.012 + R.uniform(-0.004, 0.004))
-                box(target, c.x, c.y, c.z, x1 - x0 - 0.018, d - 0.018, 0.024)
+            x0, x1, z0, z1 = max(x, -IN_X), min(x + w, IN_X), z, z + d
+            if x1 > STAIR_X0 and x0 < STAIR_X1 and z1 > STAIR_Z0 and z0 < STAIR_Z1:
+                # Cut the slab around the opening so no flagstone straddles the stair.
+                slab(main, x0, STAIR_X0, z0, z1)
+                slab(main, STAIR_X1, x1, z0, z1)
+                slab(main, max(x0, STAIR_X0), min(x1, STAIR_X1), z0, STAIR_Z0)
+            else:
+                slab(main, x0, x1, z0, z1)
             x += w
         z += d
         row += 1
+    # The cover: three long slabs across the opening, like a lifted floor stone.
+    n = 3
+    for i in range(n):
+        slab(cover, STAIR_X0, STAIR_X1, STAIR_Z0 + (STAIR_Z1 - STAIR_Z0) * i / n, STAIR_Z0 + (STAIR_Z1 - STAIR_Z0) * (i + 1) / n)
     for bm, name in ((main, 'floor'), (cover, 'stair-cover')):
         bevel(bm, 0.006)
         jitter(bm, 0.003, 2)
         add(bm, Matrix.Identity(4), 'stone', stone((112, 106, 98)), 1, name=name)
+
+
+def stair():
+    """The catacomb stair under the cover: worn steps going down toward the end wall (+z) and on under it
+    into the dark, between rough shaft walls. Everything is below the floor, so it only shows once the
+    cover is hidden. The graveyard ground has a matching hole (graveyard_scene.py, chapel stair)."""
+    RISE, RUN, N = 0.19, 0.27, 12
+    W = STAIR_X1 - STAIR_X0
+    steps, walls, dark = bmesh.new(), bmesh.new(), bmesh.new()
+    for i in range(N):
+        top = -RISE * (i + 1)
+        z0 = STAIR_Z0 + RUN * i
+        c = B(0, z0 + RUN / 2, top - 0.1)
+        box(steps, c.x, c.y, c.z, W - 0.04 - R.uniform(0, 0.03), RUN + 0.02, 0.2)
+    bevel(steps, 0.012)
+    jitter(steps, 0.006, 5)
+    zf = STAIR_Z0 + RUN * N
+    depth = RISE * N + 0.6
+    for sx in (-1, 1):
+        x = sx * (W / 2 + 0.1)
+        c = B(x, (STAIR_Z0 + zf) / 2, -depth / 2 + 0.01)
+        box(walls, c.x, c.y, c.z, 0.2, zf - STAIR_Z0 + 0.2, depth)
+    c = B(0, STAIR_Z0 - 0.1, -depth / 2 + 0.01)
+    box(walls, c.x, c.y, c.z, W + 0.4, 0.2, depth)                    # back of the shaft, under the altar side
+    # Low vault over the part of the stair that runs on under the end wall.
+    for i in range(int((zf - STAIR_Z1) / 0.3) + 1):
+        zc = STAIR_Z1 + 0.15 + i * 0.3
+        y = -0.02 - max(0.0, (zc - STAIR_Z1) * (RISE / RUN) - 0.9)
+        c = B(0, zc, y - 0.1)
+        box(walls, c.x, c.y, c.z, W + 0.4, 0.3, 0.2)
+    bevel(walls, 0.01)
+    jitter(walls, 0.02, 6)
+    c = B(0, zf + 0.15, -depth / 2)
+    box(dark, c.x, c.y, c.z, W + 0.4, 0.1, depth + 0.2)                 # black end: the stair turns away into the dark
+    add(steps, Matrix.Identity(4), 'stone', stone((96, 90, 82)), 61, name='stair')
+    add(walls, Matrix.Identity(4), 'stone', stone((70, 66, 60)), 62, name='stair')
+    add(dark, Matrix.Identity(4), 'stone', flat((4, 4, 4), 0.0), 63, name='stair')
 
 
 def pilasters_and_panelling():
@@ -423,26 +477,26 @@ def altar():
         box(bm, s * 0.68, -0.36, 0.55, 0.12, 0.06, 0.78)
     bevel(bm, 0.008)
     jitter(bm, 0.003, 5)
-    add(bm, place(0, z, 0, math.pi), 'stone', stone((150, 144, 132)), 5)
+    add(bm, place(0, z, 0, math.pi), 'stone', stone((150, 144, 132)), 5, name='altar-stone')
     cloth = bmesh.new()
     box(cloth, 0, -0.355, 0.62, 1.5, 0.02, 0.62)
     box(cloth, 0, 0, 1.004, 1.82, 0.88, 0.006)
-    add(cloth, place(0, z, 0, math.pi), 'cloth', RED_CLOTH, 5)
+    add(cloth, place(0, z, 0, math.pi), 'cloth', RED_CLOTH, 5, name='altar-cloth')
     gold = bmesh.new()
     box(gold, 0, -0.368, 0.66, 0.07, 0.01, 0.42)
     box(gold, 0, -0.368, 0.74, 0.28, 0.01, 0.07)
     box(gold, 0, -0.368, 0.33, 1.5, 0.01, 0.04)
-    add(gold, place(0, z, 0, math.pi), 'brass', GOLD, 5)
+    add(gold, place(0, z, 0, math.pi), 'brass', GOLD, 5, name='altar-brass')
     for s in (-1, 1):
         cs = lathe([(0, 0), (0.08, 0), (0.08, 0.02), (0.03, 0.05), (0.02, 0.2), (0.045, 0.24), (0.05, 0.27), (0.02, 0.28), (0, 0.28)], 10)
-        add(cs, place(s * 0.62, z + 0.1, 1.0), 'brass', BRASS, s)
+        add(cs, place(s * 0.62, z + 0.1, 1.0), 'brass', BRASS, s, name='altar-brass')
         cw = lathe([(0, 0.28), (0.022, 0.28), (0.022, 0.52), (0.015, 0.535), (0, 0.53)], 8)
-        add(cw, place(s * 0.62, z + 0.1, 1.0), 'wax', WAX, s)
+        add(cw, place(s * 0.62, z + 0.1, 1.0), 'wax', WAX, s, name='altar-wax')
         fl = lathe([(0, 0.535), (0.009, 0.55), (0.006, 0.58), (0, 0.6)], 6)
-        add(fl, place(s * 0.62, z + 0.1, 1.0), 'flame', FLAME, s, name='flames')
+        add(fl, place(s * 0.62, z + 0.1, 1.0), 'flame', FLAME, s, name='altar-flames')
     cross = extrude([(-0.03, 0), (-0.03, 0.3), (-0.12, 0.3), (-0.12, 0.36), (-0.03, 0.36), (-0.03, 0.46), (0.03, 0.46),
                      (0.03, 0.36), (0.12, 0.36), (0.12, 0.3), (0.03, 0.3), (0.03, 0)], 0.03)
-    add(cross, place(0, z + 0.25, 1.0, math.pi), 'brass', GOLD, 6)
+    add(cross, place(0, z + 0.25, 1.0, math.pi), 'brass', GOLD, 6, name='altar-brass')
     collider(0, z, 0.95, 0.5, 0.5, note='altar')
 
 
@@ -561,6 +615,7 @@ def material(name):
 
 def build():
     floor()
+    stair()
     pilasters_and_panelling()
     windows()
     beams()
@@ -604,7 +659,8 @@ def export(coll):
                               export_draco_mesh_compression_level=6, export_cameras=False, export_lights=False)
     json.dump({'note': 'Chapel-local game coordinates (add CHAPEL_CENTER [10, 0, 5]). Boxes: centre, half extents, rotY.',
                'surfaces': {'lectern-book-rest-y': 0.97, 'font-lid-y': 0.88, 'pew-seat-y': 0.40, 'cupboard-shelf-y': 0.88,
-                            'altar-top-y': 1.0, 'stair-cover-mesh': 'chapel-stair-cover'},
+                            'altar-top-y': 1.0, 'stair-cover-mesh': 'chapel-stair-cover',
+                            'altar-meshes': 'every mesh named chapel-altar-*: slide them together toward -z by 0.6 m when the stair opens'},
                'boxes': COLLIDERS}, open(os.path.join(OUT_DIR, 'chapel-interior-colliders.json'), 'w'), indent=1)
     return os.path.getsize(path)
 

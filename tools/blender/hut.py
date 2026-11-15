@@ -503,7 +503,7 @@ def furniture():
         y = RIDGE - 0.15 - k * 0.12
         append(ch, lathe([(0.02, -0.04), (0.026, -0.04), (0.026, 0.04), (0.02, 0.04)], 6), T(0, y, 0) @ (RX(math.pi / 2) if k % 2 else RZ(math.pi / 2)))
     kit.add(ch, Matrix.Identity(4), 'iron', iron(0.4), 79, name='iron')
-    lantern(kit, (0, RIDGE - 1.6 - 0.4, 0), 80)
+    lantern(kit, (0, RIDGE - 1.6 - 0.4, 0), 80, glass='smoked-glass')
     kit.anchor('hanging-lantern', 0, RIDGE - 1.85, 0, note='matches the existing warm pointLight; no new light')
 
 

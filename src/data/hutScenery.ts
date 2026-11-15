@@ -41,3 +41,19 @@ export const STOVE_GLOW: Vec3 = [
   hutRaw.anchors['stove-glow'].position[1],
   hutRaw.anchors['stove-glow'].position[2],
 ]
+
+/**
+ * The hut's one warm light, at the hanging lantern (hut.json anchor `hanging-lantern`). Claude made
+ * the lantern glass smoked with low emission so bloom no longer blows it out; keep this light warm
+ * and low and never raise the glass emission (spec 09 task 11n-e).
+ */
+export const HUT_LANTERN_LIGHT = {
+  position: [
+    hutRaw.anchors['hanging-lantern'].position[0],
+    hutRaw.anchors['hanging-lantern'].position[1],
+    hutRaw.anchors['hanging-lantern'].position[2],
+  ] as const,
+  color: '#e8913a',
+  intensity: 1.5,
+  distance: 5,
+} as const

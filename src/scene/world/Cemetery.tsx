@@ -20,6 +20,7 @@ import {
 import { CATACOMB_BOXES } from '../../data/catacombsScenery'
 import '../assets/preloadModels'
 import {
+  CHAPEL_CENTER,
   CORRIDORS,
   GROUNDS_HALF,
   LAMP_POSTS,
@@ -37,6 +38,8 @@ import { Gate, OssuaryDoor } from './Gates'
 import { GraveyardScene } from './GraveyardScene'
 import { Hut } from './Hut'
 import { InstancedModel } from './InstancedModel'
+import { useMysteryStore } from '../../game/state/mysteryStore'
+import { splitAroundHole, stairOpeningWorld } from '../../game/systems/chapelStair'
 
 // Shared materials for the primitives that remain (catacomb floors, walls and ceilings).
 const MATERIALS = {
@@ -120,15 +123,24 @@ function SpawnDressing() {
 
 function Grounds() {
   const span = GROUNDS_HALF * 2 + 4
+  // Once the whistle opens the chapel stair, the floor gets a hole over it (spec 09 task 11n-e).
+  const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
+  const rects = useMemo(() => {
+    const outer = { xMin: -span / 2, xMax: span / 2, zMin: -GROUNDS_HALF, zMax: GROUNDS_HALF }
+    return stairOpen ? splitAroundHole(outer, stairOpeningWorld(CHAPEL_CENTER)) : [outer]
+  }, [span, stairOpen])
   return (
-    <RigidBody type="fixed" colliders={false}>
+    <RigidBody key={stairOpen ? 'open' : 'sealed'} type="fixed" colliders={false}>
       {/* Top face at y = 0. Invisible: the graveyard scene draws the ground. */}
-      <Block
-        position={[0, -0.2, 0]}
-        size={[span, 0.4, GROUNDS_HALF * 2]}
-        material="stone"
-        visible={false}
-      />
+      {rects.map((r, i) => (
+        <Block
+          key={i}
+          position={[(r.xMin + r.xMax) / 2, -0.2, (r.zMin + r.zMax) / 2]}
+          size={[r.xMax - r.xMin, 0.4, r.zMax - r.zMin]}
+          material="stone"
+          visible={false}
+        />
+      ))}
     </RigidBody>
   )
 }

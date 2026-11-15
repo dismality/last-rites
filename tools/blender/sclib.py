@@ -420,7 +420,7 @@ MATS = {  # roughness, metallic, emission strength, emission colour
     'stone': (0.93, 0.0, 0, None), 'plaster': (0.95, 0.0, 0, None), 'wood': (0.75, 0.0, 0, None),
     'iron': (0.6, 0.55, 0, None), 'brass': (0.4, 0.65, 0, None), 'slate': (0.7, 0.0, 0, None), 'cloth': (0.97, 0.0, 0, None),
     'wax': (0.5, 0.0, 0, None), 'paper': (0.9, 0.0, 0, None), 'earth': (1.0, 0.0, 0, None), 'bone': (0.8, 0.0, 0, None),
-    'rope': (0.95, 0.0, 0, None), 'glass': (0.2, 0.0, 0.9, (0.95, 0.6, 0.3)), 'flame': (0.6, 0.0, 3.0, (1.0, 0.62, 0.28)),
+    'rope': (0.95, 0.0, 0, None), 'glass': (0.2, 0.0, 0.9, (0.95, 0.6, 0.3)), 'smoked-glass': (0.35, 0.0, 0.35, (0.95, 0.52, 0.2)), 'flame': (0.6, 0.0, 3.0, (1.0, 0.62, 0.28)),
     'ember': (0.8, 0.0, 2.0, (1.0, 0.4, 0.12)), 'water': (0.05, 0.0, 0, None), 'night-glass': (0.15, 0.0, 0, None),
 }
 
@@ -573,8 +573,10 @@ def pane(c, size, normal):
     return bm
 
 
-def lantern(kit, base, seed, scale=1.0, name='iron'):
-    """Caged iron lantern standing on `base` (game coords): base, four posts, cap, ring; glass and flame inside."""
+def lantern(kit, base, seed, scale=1.0, name='iron', glass='glass', flame=False):
+    """Caged iron lantern standing on `base` (game coords): base, four posts, cap, ring; glass and flame inside.
+    glass='smoked-glass' with flame=True gives a dim sooty chimney with a visible flame inside, for lanterns the
+    player sees up close indoors (a bright glass under bloom reads as a window)."""
     x, y, z = base
     s = scale
     bm = new()
@@ -587,5 +589,11 @@ def lantern(kit, base, seed, scale=1.0, name='iron'):
            T(x, y + 0.41 * s, z) @ RX(math.pi / 2))
     kit.add(bm, Matrix.Identity(4), 'iron', iron(0.35), seed, name=name)
     gl = lathe([(0.0, 0.03 * s), (0.062 * s, 0.03 * s), (0.066 * s, 0.14 * s), (0.062 * s, 0.25 * s), (0.0, 0.25 * s)], 10)
-    kit.add(gl, T(x, y, z), 'glass', glass_amber, seed + 1, name='glow', smooth=True)
+    paint = glass_amber if glass == 'glass' else const((84, 46, 20))   # smoked glass: dark sooty amber, lit by its own glow
+    kit.add(gl, T(x, y, z), glass, paint, seed + 1, name='glow' if glass == 'glass' else glass, smooth=True)
+    if flame:
+        fl = lathe([(0.0, 0.07 * s), (0.012 * s, 0.085 * s), (0.016 * s, 0.11 * s), (0.008 * s, 0.14 * s), (0.0, 0.16 * s)], 8)
+        wick = lathe([(0.0, 0.03 * s), (0.02 * s, 0.03 * s), (0.02 * s, 0.07 * s), (0.0, 0.07 * s)], 8)
+        kit.add(fl, T(x, y, z), 'flame', const((255, 190, 110)), seed + 2, name='lantern-flame', smooth=True)
+        kit.add(wick, T(x, y, z), 'brass', flat((120, 90, 50), 0.2), seed + 3, name='brass')
     return (x, y + 0.15 * s, z)

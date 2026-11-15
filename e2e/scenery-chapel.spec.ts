@@ -175,7 +175,70 @@ test.describe('chapel scenery (11n-a)', () => {
       await page.waitForTimeout(800)
     }
     expect((await gates(page)).catacombs, 'whistle opened the stair').toBe(true)
+    // The altar slides 0.6 m toward the door over 2 s (spec 09 task 11n-e).
+    await page.waitForTimeout(2600)
     await shot(page, 'chapel-stair-open', view)
     expect(await page.evaluate(() => window.__lastRites!.objectVisible('chapel-stair-cover'))).toBe(false)
+    expect(await page.evaluate(() => window.__lastRites!.objectVisible('chapel-stair'))).toBe(true)
+    await shot(page, 'chapel-altar-slid', { x: 10, z: 7, yaw: Math.PI, pitch: -0.3 })
+    // Not stuck: the player who blew the whistle can still step back from the altar.
+    await page.evaluate(() => window.__lastRites!.teleport(10, 8.6, { yaw: Math.PI, pitch: 0 }))
+    await page.waitForTimeout(800)
+    const before = await feet(page)
+    await walkFor(page, 'MoveBackward', 1200)
+    expect((await feet(page))[2], 'stepped back from the altar').toBeLessThan(before[2] - 0.5)
+
+    // Walk down the stair and back up with real keys. Come in from the east side of the altar
+    // (the altar's back stands at the top of the steps), go down toward the end wall, come back up.
+    await page.evaluate(() => window.__lastRites!.teleport(11.4, 10.1, { yaw: Math.PI / 2, pitch: -0.2 }))
+    await page.waitForTimeout(1200)
+    await walkFor(page, 'MoveForward', 900) // west, onto the steps
+    await page.evaluate(() => {
+      const h = window.__lastRites!
+      const f = h.body()!.feet
+      h.teleport(f[0], f[2], { y: f[1] + 0.02, yaw: Math.PI, pitch: -0.2 })
+    })
+    let lowest = 0
+    for (let i = 0; i < 8; i++) {
+      await walkFor(page, 'MoveForward', 250) // +z, down the steps
+      lowest = Math.min(lowest, (await feet(page))[1])
+    }
+    await page.waitForTimeout(600)
+    await page.screenshot({ path: `${DIR}/chapel-stair-down.png` })
+    const down = await feet(page)
+    console.log('stair bottom feet', JSON.stringify(down), 'lowest', lowest)
+    // The end wall stops the player at about z 10.5, where the ramp is 0.44 m down; a short walk on a\n    // slow frame stops higher, so the check only asks that the player went down.
+    expect(lowest, 'went down the steps').toBeLessThan(-0.15)
+    expect(down[1], 'did not fall through').toBeGreaterThan(-1.3)
+    expect(down[0], 'stayed in the shaft').toBeGreaterThan(9.3)
+    expect(down[0], 'stayed in the shaft').toBeLessThan(10.7)
+    // Back up: walk toward the door until the altar's back stops you at the top, then step out east.
+    await page.evaluate(() => {
+      const h = window.__lastRites!
+      const f = h.body()!.feet
+      h.teleport(f[0], f[2], { y: f[1] + 0.02, yaw: 0, pitch: 0 })
+    })
+    for (let i = 0; i < 8; i++) await walkFor(page, 'MoveForward', 250)
+    await page.evaluate(() => {
+      const h = window.__lastRites!
+      const f = h.body()!.feet
+      h.teleport(f[0], f[2], { y: f[1] + 0.02, yaw: -Math.PI / 2, pitch: 0 })
+    })
+    await walkFor(page, 'MoveForward', 1500) // east, off the steps
+    const out = await feet(page)
+    console.log('back out feet', JSON.stringify(out))
+    expect(out[1], 'back on the chapel floor').toBeGreaterThan(-0.1)
+    expect(out[0], 'stepped out of the shaft').toBeGreaterThan(10.7)
   })
 })
+
+async function feet(page: Page): Promise<[number, number, number]> {
+  return page.evaluate(() => window.__lastRites!.body()!.feet as [number, number, number])
+}
+
+async function walkFor(page: Page, action: 'MoveForward' | 'MoveBackward', ms: number): Promise<void> {
+  await page.evaluate((a) => window.__lastRites!.hold(a), action)
+  await page.waitForTimeout(ms)
+  await page.evaluate((a) => window.__lastRites!.release(a), action)
+  await page.waitForTimeout(150)
+}

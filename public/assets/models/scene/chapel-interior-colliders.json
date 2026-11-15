@@ -6,7 +6,8 @@
   "pew-seat-y": 0.4,
   "cupboard-shelf-y": 0.88,
   "altar-top-y": 1.0,
-  "stair-cover-mesh": "chapel-stair-cover"
+  "stair-cover-mesh": "chapel-stair-cover",
+  "altar-meshes": "every mesh named chapel-altar-*: slide them together toward -z by 0.6 m when the stair opens"
  },
  "boxes": [
   {

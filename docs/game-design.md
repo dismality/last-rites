@@ -55,6 +55,8 @@ After the stage 3 sunrise, a **15–20 s skippable cutscene** plays: the keeper 
 | **Chapel** | Always (repair to make it a safe zone) | Ruined, candlelit | Altar, bell, repairs, front door and **vestry door (07)**, the vestry cupboard with the **Service Revolver (07)** |
 | **Catacombs** | **Sexton's Bone Whistle** (Mausoleum Row) opens the hidden stair behind the altar | Tight tunnels, bone walls, drips, near-total dark | Ossuary, 2 relics; **Iron Ossuary Key** (on Elias's body in the Crane crypt) opens the deepest chamber |
 
+**The chapel stair (09).** When the whistle opens the stair, the floor slabs over it vanish and the altar slides 0.6 m toward the door over 2 s with a stone grind, uncovering the steps behind it. The altar's collider and its interaction spots move with it. The player can walk down the first steps to the end wall, where a low vault closes over the stair as it turns away into the dark; the stair does not lead anywhere yet, and the catacombs are still entered by their own gate on the grounds. Father Crane climbs from this stair during the stage 3 rite.
+
 ### Chapel repairs (permanent upgrades)
 | Stage | Cost | Effect |
 |---|---|---|

@@ -9,11 +9,8 @@ import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
-import type { Group, Object3D } from 'three'
-import {
-  CHAPEL_ANCHORS,
-  CHAPEL_MESH,
-} from '../../data/chapelScenery'
+import { Matrix4, Vector3, type Group, type Object3D } from 'three'
+import { CHAPEL_ANCHORS, CHAPEL_MESH } from '../../data/chapelScenery'
 import {
   CHAPEL_EXTERIOR_MODEL_URL,
   CHAPEL_INTERIOR_MODEL_URL,
@@ -22,6 +19,8 @@ import {
 import { CHAPEL, CHAPEL_CENTER, CHAPEL_DOORS } from '../../data/cemeteryLayout'
 import { bellAngle } from '../../game/systems/bellSwing'
 import { chapelSceneColliders } from '../../game/systems/chapelColliders'
+import { altarRestOffset, altarSlideOffset, stairColliders } from '../../game/systems/chapelStair'
+import { playScareSound } from '../../audio/AudioManager'
 import { isBellActive } from '../../game/systems/repairs'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -114,6 +113,10 @@ function ChapelModels() {
   const outer = useRef<Group>(null)
   const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
   const bell = useRef<Object3D | null>(null)
+  // Every chapel-altar-* mesh with its resting z and chapel -z expressed in its parent's axes.
+  const altar = useRef<{ o: Object3D; base: Vector3; dir: Vector3 }[]>([])
+  // performance.now() when the stair opened during play; null when sealed or already open on load.
+  const slideStart = useRef<number | null>(null)
 
   useLayoutEffect(() => {
     inner.current?.traverse((o) => {
@@ -125,7 +128,33 @@ function ChapelModels() {
       o.castShadow = hasAncestorNamed(o, CHAPEL_MESH.shadowCasters)
     })
     bell.current = outer.current?.getObjectByName(CHAPEL_MESH.bell) ?? null
+    const root = inner.current
+    altar.current = []
+    if (root) {
+      root.updateMatrixWorld(true)
+      const toParent = new Matrix4()
+      root.traverse((o) => {
+        if (!o.name.startsWith(CHAPEL_MESH.altarPrefix) || !o.parent) return
+        // Skip children of an altar node: the parent carries them.
+        if (o.parent.name.startsWith(CHAPEL_MESH.altarPrefix)) return
+        toParent.copy(o.parent.matrixWorld).invert().multiply(root.matrixWorld)
+        const dir = new Vector3(0, 0, -1).transformDirection(toParent)
+        altar.current.push({ o, base: o.position.clone(), dir })
+      })
+    }
   }, [interior, exterior])
+
+  // Sealed or open on load: rest at once. Opening during play: slide over ALTAR_SLIDE.seconds.
+  const opened = useRef(stairOpen)
+  useLayoutEffect(() => {
+    if (stairOpen && !opened.current) {
+      slideStart.current = performance.now()
+      const [x, y, z] = CHAPEL_CENTER
+      playScareSound('stone-grind', x, y + 1, z + CHAPEL.halfZ - 1.2, 1)
+    }
+    if (!stairOpen) slideStart.current = null
+    opened.current = stairOpen
+  }, [stairOpen])
 
   useLayoutEffect(() => {
     const cover = inner.current?.getObjectByName(CHAPEL_MESH.stairCover)
@@ -145,6 +174,10 @@ function ChapelModels() {
   )
 
   useFrame(() => {
+    const start = slideStart.current
+    const off =
+      start === null ? altarRestOffset(stairOpen) : altarSlideOffset((performance.now() - start) / 1000)
+    for (const a of altar.current) a.o.position.copy(a.base).addScaledVector(a.dir, -off)
     const b = bell.current
     if (!b) return
     const t = bellRuntime.ringAtMs
@@ -170,8 +203,11 @@ export function ChapelBuilding() {
   const vestryZ = vestry.point[2] - CHAPEL_CENTER[2]
   const westALen = vestryZ - vestryW / 2 + halfZ
   const westBLen = halfZ - (vestryZ + vestryW / 2)
-  const altarZ = halfZ - 1.2
-  const sceneColliders = useMemo(() => chapelSceneColliders(), [])
+  const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
+  const altarDz = altarRestOffset(stairOpen)
+  const altarZ = halfZ - 1.2 + altarDz
+  const sceneColliders = useMemo(() => chapelSceneColliders(altarDz), [altarDz])
+  const stair = useMemo(() => stairColliders(), [])
   const lantern = CHAPEL_ANCHORS.doorLanternLight
 
   return (
@@ -218,13 +254,26 @@ export function ChapelBuilding() {
         {/* Pews, font, cupboard, altar and buttresses from the models' JSON. */}
         {sceneColliders.map((b, i) => (
           <CuboidCollider
-            key={i}
+            key={`${altarDz}-${i}`}
             args={[b.half[0], b.half[1], b.half[2]]}
             position={[...b.center]}
             rotation={[0, b.rotY, 0]}
           />
         ))}
       </RigidBody>
+      {/* The open stair: a ramp along the step nosings and the shaft walls (spec 09 task 11n-e). */}
+      {stairOpen && (
+        <RigidBody type="fixed" colliders={false}>
+          <CuboidCollider
+            args={[...stair.ramp.half]}
+            position={[...stair.ramp.center]}
+            rotation={[stair.ramp.rotX, 0, 0]}
+          />
+          {stair.walls.map((w, i) => (
+            <CuboidCollider key={i} args={[...w.half]} position={[...w.center]} />
+          ))}
+        </RigidBody>
+      )}
 
       {/* The lantern by the front door, at the model's anchor. Always mounted (constant light count), no shadow. */}
       <pointLight

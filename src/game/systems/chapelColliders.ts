@@ -110,7 +110,19 @@ export function trimmedButtresses(
   })
 }
 
-/** Every collider the chapel scene adds to the walls: cleared interior boxes plus the buttresses. */
-export function chapelSceneColliders(): ChapelBox[] {
-  return [...clearedColliders(CHAPEL_INTERIOR_BOXES), ...trimmedButtresses()]
+/** The altar box moved along z by `dz` (the slide when the stair opens); other boxes unchanged. */
+export function shiftAltar(boxes: readonly ChapelBox[], dz: number): ChapelBox[] {
+  return boxes.map((b) =>
+    b.note === 'altar' ? { ...b, center: [b.center[0], b.center[1], b.center[2] + dz] } : b,
+  )
+}
+
+/**
+ * Every collider the chapel scene adds to the walls: cleared interior boxes plus the buttresses.
+ * `altarDz` is the altar's slide (0 while the stair is sealed); the aisle then ends that much
+ * nearer the door too, because the altar trigger moves with the altar.
+ */
+export function chapelSceneColliders(altarDz = 0): ChapelBox[] {
+  const aisle: Aisle = { ...CHAPEL_AISLE, zMax: CHAPEL_AISLE.zMax + altarDz }
+  return [...clearedColliders(shiftAltar(CHAPEL_INTERIOR_BOXES, altarDz), aisle), ...trimmedButtresses()]
 }
