@@ -31,6 +31,14 @@ export function MenuDialog({ titleId, onEscape, children, variant = 'overlay' }:
     return () => previous?.focus?.()
   }, [])
 
+  // A parent can swap one menu for another inside this same dialog instance (title to Credits,
+  // pause to its settings). The focused button is removed, focus falls to <body>, and Esc and Tab
+  // would go nowhere. After every render, pull focus back in if it left the panel.
+  useEffect(() => {
+    const panel = panelRef.current
+    if (panel && !panel.contains(document.activeElement)) pickInitialFocus(panel, FOCUSABLE).focus()
+  })
+
   function onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     if (e.key === 'Escape' && onEscape) {
       e.stopPropagation()

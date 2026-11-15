@@ -229,33 +229,33 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Finish
   - _Requirements: 10.4_
 
-- [ ] 21. B15: Shorter intro
+- [x] 21. B15: Shorter intro
   - Finish
   - _Requirements: 10.5_
 
-- [ ] 22. B16: Quit confirmation and Continue on title, with F5
+- [x] 22. B16: Quit confirmation and Continue on title, with F5
   - F5: autosave at every dawn and at the start of each dusk, separate from the altar save; on Retry, clues and journal pages found after the retry point stay found
   - Finish
   - _Requirements: 10.6_
 
-- [ ] 23. B17: Remove dead useWorkbench.ts
+- [x] 23. B17: Remove dead useWorkbench.ts
   - Finish
   - _Requirements: 10.7_
 
-- [ ] 24. D1 to D9: Browser test passes
-  - [ ] 24.1 D1 main story path
-  - [ ] 24.2 D2 crafting and the workbench
-  - [ ] 24.3 D3 digging and materials
-  - [ ] 24.4 D4 chapel repairs
+- [~] 24. D1 to D9: Browser test passes
+  - [x] 24.1 D1 main story path
+  - [x] 24.2 D2 crafting and the workbench
+  - [x] 24.3 D3 digging and materials
+  - [x] 24.4 D4 chapel repairs
   - 24.5 D5: moved to spec 10
-  - [ ] 24.6 D6 scares and comfort settings
+  - [x] 24.6 D6 scares and comfort settings
   - 24.7 D7: moved to spec 10
-  - [ ] 24.8 D8 performance (SwiftShader numbers only; real GPU fps not verifiable here)
+  - [x] 24.8 D8 performance (SwiftShader numbers only; real GPU fps not verifiable here)
     - Also measure these performance-review items; fix one only if D8 shows a real cost:
       - `LanternTraps.tsx` 44-55: the always-mounted pool of trap point lights (cost even at intensity 0)
       - `Cemetery.tsx` 123 and the chapel, gate and workbench meshes: non-instanced shadow casters; `InstancedModel` casts by default
       - `ThrowControls.tsx` ~101: `setArc` every frame while aiming (a React re-render per frame)
       - `Interactable.tsx` 98-110: one `useFrame` and one sprite material per interactable
-  - [ ] 24.9 D9 screens and settings
+  - [x] 24.9 D9 screens and settings
   - Each pass reports what it could not verify
   - _Requirements: 11.1-11.2_
