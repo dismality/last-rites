@@ -379,7 +379,12 @@ Zombies flinch away from tallow candles for 1 s. **(09)** Darkness (lantern fuel
 | Dawn | 10 s | **(10)** One dawn screen: the sunrise shot (3 s), then one panel with the summary on the left and the 3 upgrade choices on the right, then a "Visit the merchant" button (hidden when the player has no coins). Summary card: zombies banished, items found, recipe unlocked, journal page available. From spec 08 the card also shows the night score and the upgrade choice, and dawn waits until an upgrade is picked. |
 
 ### Retrying after death (09)
-In story modes the death screen offers **Retry Night** (back to the start of that dusk) and **Retry from morning** (back to the start of that day, shown when the day's start was recorded). Either way the player starts at full health with at least **60%** lantern oil; more oil is kept. Everything else is as it was at that dusk or morning. Endless Survival has neither.
+In story modes the death screen offers **Retry Night** (back to the start of that dusk) and **Retry from morning** (back to the start of that day, shown when the day's start was recorded). Either way the player starts at full health with at least **60%** lantern oil; more oil is kept. Everything else is as it was at that dusk or morning. Endless Survival has neither. **(09, F5)** A Retry never un-finds anything: clues, journal pages and the recipes those pages taught stay found, as do solved minigames and case-board links.
+
+### Saving, Continue and quitting (09, B16 and F5)
+- The game **autosaves at every dawn and at the start of each dusk**, into its own slot (`lastrites:autosave`). The altar save keeps its own slot and is never overwritten by an autosave.
+- **Continue** on the title screen shows when either slot holds a valid save, and loads the newer one (the altar save on a tie).
+- **Quit to Title** (pause menu and death screen) asks "Quit to Title?" first. The safe choice, Stay, has focus; Esc cancels; both buttons are keyboard-reachable with visible focus.
 
 ### Waves
 | Night | Waves | Composition per wave | Added in spec 07 | Fog density |

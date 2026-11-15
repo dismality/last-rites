@@ -4,7 +4,7 @@
 import { subscribeToType } from '../events'
 import { sanitizeCombat } from '../systems/combatSave'
 import { sanitizeProgression } from '../systems/progressionSave'
-import { hasValidSave, readSave, writeSave } from '../systems/saveGame'
+import { AUTOSAVE_KEY, hasValidSave, readLatestSave, writeSave } from '../systems/saveGame'
 import { serializeHintsUsed } from '../systems/controlHints'
 import { serializeTutorial } from '../systems/tutorial'
 import type { SaveState } from '../systems/saveGame'
@@ -96,9 +96,14 @@ export function canContinue(): boolean {
   return hasValidSave(storage())
 }
 
+/** Autosave slot write (dawn, dusk). Never touches the altar save. */
+export function autosaveGame(): boolean {
+  return writeSave(storage(), captureSave(), AUTOSAVE_KEY)
+}
+
 /** Restores the latest save into the stores. Returns false (touching nothing) if there is none. */
 export function loadGame(): boolean {
-  const save = readSave(storage())
+  const save = readLatestSave(storage())
   if (!save) return false
   useWorldStore.getState().applyWorldState(save.world)
   usePlayerStore.getState().applyPlayerState(save.player) // includes health
@@ -135,6 +140,13 @@ export function loadGame(): boolean {
   usePinStore.setState({ pins: save.pins ?? [] })
   syncDerivedStats()
   return true
+}
+
+/** Autosave slot: at every dawn and at the start of each dusk (spec 09 F5). */
+export function installAutosave(): () => void {
+  return subscribeToType('phaseChanged', (e) => {
+    if (e.phase === 'dawn' || e.phase === 'dusk') autosaveGame()
+  })
 }
 
 /** Autosave when a new day starts (dawn ends). Altar saves call saveGame() directly. */

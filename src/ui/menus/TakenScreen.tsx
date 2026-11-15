@@ -1,4 +1,5 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
+import { QuitConfirm } from './QuitConfirm'
 import { useGameStore } from '../../game/state/gameStore'
 import { hasMorningSnapshot, retryFromMorning, retryNight } from '../../game/state/retryNight'
 import { requestLock } from '../../scene/player/input'
@@ -19,6 +20,7 @@ export function TakenScreen() {
   const setTaken = useGameStore((s) => s.setTaken)
   const mode = useProgressionStore((s) => s.mode)
   const view = takenModel(mode)
+  const [confirming, setConfirming] = useState(false)
 
   // The pointer lock is released while `taken` is set by cursorRelease.ts (isMenuOpen).
 
@@ -43,7 +45,16 @@ export function TakenScreen() {
   }
 
   return (
-    <MenuDialog titleId={titleId}>
+    <MenuDialog titleId={titleId} onEscape={confirming ? () => setConfirming(false) : undefined}>
+      {confirming ? (
+        <QuitConfirm
+          titleId={titleId}
+          detail="This vigil ends here. Continue on the title screen resumes the latest dawn, dusk or altar save."
+          onConfirm={quit}
+          onCancel={() => setConfirming(false)}
+        />
+      ) : (
+        <>
       <h2 id={titleId} className="menu__title">
         You were taken
       </h2>
@@ -65,10 +76,12 @@ export function TakenScreen() {
               Retry from morning
             </button>
           )}
-          <button type="button" className="menu__button" onClick={quit}>
+          <button type="button" className="menu__button" onClick={() => setConfirming(true)}>
             Quit to Title
           </button>
         </div>
+      )}
+        </>
       )}
     </MenuDialog>
   )

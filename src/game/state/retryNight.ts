@@ -15,6 +15,8 @@ import {
   saveSnapshot,
   type SnapshotData,
 } from '../systems/duskSnapshot'
+import { isJournalPage, mergeKept } from '../systems/retryKeep'
+import type { Inventory, RecipeId } from '../types'
 import { retryLoadout } from '../systems/retryLoadout'
 import { isInvulnerable } from '../systems/dodge'
 import { damagePlayer } from '../systems/playerHealth'
@@ -96,6 +98,38 @@ export const caseSnapshot: Snapshotable = {
   },
 }
 
+/**
+ * Recipes restore by union (spec 09 F5): a page read after the retry point keeps the recipe it
+ * taught, like the clues and pages themselves (the mystery store is not snapshotted at all).
+ */
+export const craftingSnapshot: Snapshotable = {
+  getState: () => useCraftingStore.getState(),
+  setState: (partial) => {
+    const snap = partial as { unlockedRecipes?: RecipeId[] }
+    const now = useCraftingStore.getState().unlockedRecipes
+    useCraftingStore.setState({
+      ...(partial as object),
+      unlockedRecipes: mergeKept(snap.unlockedRecipes ?? [], now),
+    } as never)
+  },
+}
+
+/** Inventory restores with the journal pages held now kept, so a found page is never un-found. */
+export const inventorySnapshot: Snapshotable = {
+  getState: () => useInventoryStore.getState(),
+  setState: (partial) => {
+    const snap = partial as { inventory?: Inventory }
+    const now = useInventoryStore.getState().inventory
+    if (!snap.inventory) return useInventoryStore.setState(partial)
+    useInventoryStore.setState({
+      inventory: {
+        ...snap.inventory,
+        keyItems: mergeKept(snap.inventory.keyItems, now.keyItems.filter(isJournalPage)),
+      },
+    } as never)
+  },
+}
+
 /** Every store except settings. Transient crafting UI state is omitted. */
 export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: readonly string[] }> = {
   // Built from COMBAT_PERSISTED so a field the Save keeps cannot be forgotten here (Req 20.3).
@@ -103,8 +137,8 @@ export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: reado
   doors: { store: fieldsOf(useDoorStore, COMBAT_PERSISTED.doors) },
   riteProgress: { store: riteProgress },
   progression: { store: progressionSnapshot },
-  inventory: { store: useInventoryStore as unknown as Snapshotable },
-  crafting: { store: useCraftingStore as unknown as Snapshotable, omit: ['craftingProgress'] },
+  inventory: { store: inventorySnapshot },
+  crafting: { store: craftingSnapshot, omit: ['craftingProgress'] },
   chapel: { store: useChapelStore as unknown as Snapshotable },
   world: { store: useWorldStore as unknown as Snapshotable },
   // After the world: a stage restore must win over the world's night-number sync.

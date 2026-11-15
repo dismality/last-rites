@@ -6,6 +6,7 @@ import { useOverlayStore } from '../../game/state/overlayStore'
 import { closeAchievements, openAchievements } from '../../game/state/runFlow'
 import { AchievementsMenu } from './AchievementsMenu'
 import { MenuDialog } from './MenuDialog'
+import { QuitConfirm } from './QuitConfirm'
 import { Settings } from './Settings'
 
 /**
@@ -19,6 +20,7 @@ export function PauseMenu() {
   const setPaused = useGameStore((s) => s.setPaused)
   const setScreen = useGameStore((s) => s.setScreen)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [confirming, setConfirming] = useState(false)
   const achievementsOpen = useOverlayStore((s) => s.achievementsOpen)
 
   if (!paused || screen !== 'game') return null
@@ -33,13 +35,24 @@ export function PauseMenu() {
   }
 
   function quit() {
+    setConfirming(false)
     setPaused(false)
     setScreen('title')
   }
 
   return (
-    <MenuDialog titleId={titleId} onEscape={settingsOpen ? () => setSettingsOpen(false) : resume}>
-      {settingsOpen ? (
+    <MenuDialog
+      titleId={titleId}
+      onEscape={confirming ? () => setConfirming(false) : settingsOpen ? () => setSettingsOpen(false) : resume}
+    >
+      {confirming ? (
+        <QuitConfirm
+          titleId={titleId}
+          detail="Progress since your last save is lost. Continue on the title screen resumes the latest dawn, dusk or altar save."
+          onConfirm={quit}
+          onCancel={() => setConfirming(false)}
+        />
+      ) : settingsOpen ? (
         <Settings inline titleId={titleId} onClose={() => setSettingsOpen(false)} />
       ) : (
         <>
@@ -56,7 +69,7 @@ export function PauseMenu() {
             <button type="button" className="menu__button" onClick={openAchievements}>
               Achievements
             </button>
-            <button type="button" className="menu__button" onClick={quit}>
+            <button type="button" className="menu__button" onClick={() => setConfirming(true)}>
               Quit to Title
             </button>
           </div>

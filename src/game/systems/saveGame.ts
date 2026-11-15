@@ -20,6 +20,8 @@ import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 import { freshCaseSave, sanitizeCaseSave, type CaseSave } from './caseSave'
 
 export const SAVE_KEY = 'lastrites:save'
+/** Dawn and dusk autosaves live here, so they never overwrite an altar save (spec 09 F5). */
+export const AUTOSAVE_KEY = 'lastrites:autosave'
 export const SAVE_VERSION = 1
 
 /** In-memory shape of everything a save captures. */
@@ -238,10 +240,13 @@ export function fromSaveFile(
 export function writeSave(
   storage: Pick<Storage, 'setItem'> | undefined,
   state: SaveState,
+  key: string = SAVE_KEY,
+  now: number = Date.now(),
 ): boolean {
   try {
     if (!storage) return false
-    storage.setItem(SAVE_KEY, JSON.stringify(toSaveFile(state)))
+    // savedAt lives beside the save file shape, so fromSaveFile and round trips are unchanged.
+    storage.setItem(key, JSON.stringify({ ...toSaveFile(state), savedAt: now }))
     return true
   } catch {
     return false
@@ -249,9 +254,12 @@ export function writeSave(
 }
 
 /** Returns null when the save is missing, unparsable, or fails validation. Never throws. */
-export function readSave(storage: Pick<Storage, 'getItem'> | undefined): SaveState | null {
+export function readSave(
+  storage: Pick<Storage, 'getItem'> | undefined,
+  key: string = SAVE_KEY,
+): SaveState | null {
   try {
-    const raw = storage?.getItem(SAVE_KEY)
+    const raw = storage?.getItem(key)
     if (!raw) return null
     return fromSaveFile(JSON.parse(raw))
   } catch {
@@ -259,7 +267,31 @@ export function readSave(storage: Pick<Storage, 'getItem'> | undefined): SaveSta
   }
 }
 
-/** Continue is shown only for a save that would actually load. */
+/** Continue is shown only for a save that would actually load (altar save or autosave). */
 export function hasValidSave(storage: Pick<Storage, 'getItem'> | undefined): boolean {
-  return readSave(storage) !== null
+  return readSave(storage) !== null || readSave(storage, AUTOSAVE_KEY) !== null
+}
+
+function savedAt(storage: Pick<Storage, 'getItem'>, key: string): number {
+  try {
+    const raw = storage.getItem(key)
+    const at = raw ? (JSON.parse(raw) as { savedAt?: unknown }).savedAt : 0
+    return typeof at === 'number' && Number.isFinite(at) ? at : 0
+  } catch {
+    return 0
+  }
+}
+
+/**
+ * The save Continue loads: whichever of the altar save and the autosave is valid and newer.
+ * A tie goes to the altar save, since the player made it on purpose.
+ */
+export function readLatestSave(storage: Pick<Storage, 'getItem'> | undefined): SaveState | null {
+  if (!storage) return null
+  const manual = readSave(storage)
+  const auto = readSave(storage, AUTOSAVE_KEY)
+  if (manual && auto) {
+    return savedAt(storage, AUTOSAVE_KEY) > savedAt(storage, SAVE_KEY) ? auto : manual
+  }
+  return manual ?? auto
 }

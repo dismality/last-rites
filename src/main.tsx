@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './ui/theme/tokens.css'
 import App from './App'
-import { installNewDaySave } from './game/state/gameSave'
+import { installAutosave, installNewDaySave } from './game/state/gameSave'
 import { installRunStats } from './game/state/endingStore'
 import { installCaseSolvedWatcher } from './game/state/caseSolvedWatcher'
 import { installCombatWatchers } from './game/state/combatWatchers'
@@ -23,6 +23,7 @@ installGuidanceWatchers()
 installProgressionWatchers()
 installCaseSolvedWatcher()
 installNewDaySave()
+installAutosave()
 // After the progression watchers, like the new-day save, so the morning holds the dealt stock.
 installMorningSnapshot()
 installRunStats()

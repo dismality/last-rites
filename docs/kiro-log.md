@@ -1569,3 +1569,9 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Intro cut from 35 s to 21 s: shots of 4, 5, 4, 4 and 4 s (shot 2 keeps 5 s for its long card), with card timings and the grave burst moved earlier. The fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible §11 updated first.
 - **What Kiro caught or sped up:** `introTimeline.test.ts` still pinned 35 s; updated it along with the data test (18-22 s). Lint, build and 2235 unit tests pass.
 - **Decisions made unattended:** 21 s counts as "about 20 s"; each card stays visible 3.4 s or more.
+
+### 2026-11-15: 09-playtest-fixes task 22: Quit confirmation, Continue and autosave (B16, F5)
+- **Kiro feature used:** spec task, PBT
+- **What happened:** Quit to Title now asks first on the pause menu and the death screen (new `QuitConfirm`: focus on Stay, Esc cancels). Autosave writes to its own slot `lastrites:autosave` at every dawn and dusk; Continue shows for either slot and loads the newer. Retry already kept clues, pages and case progress (mystery store is not snapshotted, case merge exists); recipes and journal-page key items are now merged back too. Design bible §8 updated first.
+- **What Kiro caught or sped up:** Found that a Retry would have rolled back the recipe taught by a page read after the retry point, since crafting and inventory are snapshotted. Added `systems/retryKeep.ts` with a property test, plus `autosave.test.ts`. Lint, build and 2242 tests pass.
+- **Decisions made unattended:** Kept the existing new-day save into the altar slot unchanged. Timestamps sit beside the save file as `savedAt`, so the save format and its round-trip tests are untouched. Not verified in a browser (focus feel, e2e not run).
