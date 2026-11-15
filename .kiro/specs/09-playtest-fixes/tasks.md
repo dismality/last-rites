@@ -176,7 +176,13 @@ Tasks run in the order the user set. Every task ends with **Finish**:
 - [x] 11n-d. Scenery swap: props everywhere else
   - Lamp post, broken coffin, grave mounds (both states), merchant cart, statue, scare door, candle stub, grave hand, woodpile (axe at axe-rest), lodge table, sabre plinth, vending machine (new, placed only), bats (loaded for H4), and the nine `props/clue-<clueId>.glb` in ClueSpots; keep every collider and interactable, add the JSON colliders the game lacks
   - Unit: every seated spot within 0.03 m of its surface, every JSON loads, no collider in the chapel aisle or the hut spawn-to-bench path; browser screenshots of each swapped prop; GPU perf before and after; list anything that could not be seated; commit locally (`... (spec 09 task 11n-d)`)
-- [ ] 3. A2: Automated playthrough test
+- [ ] 11n-e. Art fixes: chapel stair, ground hole, hut lantern, draw calls
+  - Full brief: `docs/kiro-prompt-next.md` Part 0
+  - Chapel stair: `chapel-interior.glb` now has the `chapel-stair` mesh (12 steps toward +z, shaft walls, vault, black end block) and a floor cut at x −0.65..0.65, z 4.75 to the back wall. Hide `chapel-stair-cover` when `mystery.gates.catacombs` opens (as now). When it opens, slide every `chapel-altar-*` mesh 0.6 m toward −z over about 2 s with a stone-grind sound and caption; move the altar collider and its interaction spots by the same amount. Add a ramp collider along the steps (rise 0.19, run 0.27) and the shaft-wall colliders so the player can walk down to the catacombs entry. Browser: walk down and back up with no snag and no fall-through
+  - Graveyard ground: `graveyard.glb` has a hole at world x 9..11, z 9..11; check in the browser that the open grave there shows no grass and nothing relied on the old patch
+  - Hut lantern: now smoked glass with low emission; if a lantern point light is added, keep it warm and low (intensity about 1.5, distance 5) and never raise the glass emission
+  - Draw calls (230–374 against 150): instance repeated props (headstones, candles, bones, bats, crates), merge static props per area with mergeGeometries where they share a material, and skip rendering areas the player is not in (catacombs while outside, the graveyard while underground). Log draw calls per area before and after, and which areas are still over 150
+  - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11n-e)`), never push- [ ] 3. A2: Automated playthrough test
   - `e2e/playthrough.spec.ts` following the main story with objective text checks and an ending screen
   - Finish
   - _Requirements: 3.1-3.3_
