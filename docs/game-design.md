@@ -630,7 +630,7 @@ Entering a zone shows its name for 2.5 s in IM Fell English SC, with a short lin
 | `catacombs` | The Catacombs | "They were not dead when they came down." |
 
 ### Intro cutscene
-Plays once on New Game: about 35 s in-engine, five camera shots, with text cards in the keeper's hand. Space or Enter skips it, and Esc opens pause. It never plays on Continue.
+Plays once on New Game: about 20 s in-engine **(09, B15)** (was about 35 s), five camera shots, the fog flyover and the hut card kept, with text cards in the keeper's hand. Space or Enter skips it, and Esc opens pause. It never plays on Continue.
 
 | Shot | Camera | Card |
 |---|---|---|

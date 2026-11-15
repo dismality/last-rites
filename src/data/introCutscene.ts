@@ -33,7 +33,7 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
   {
     // Outside the south fence (z = 40), drifting north toward the gate line.
     id: 1,
-    duration: 7,
+    duration: 4,
     camera: {
       position: [
         [0, 2.5, 62],
@@ -48,12 +48,12 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
         [0, 2.2, 30],
       ],
     },
-    card: { text: 'Hollowmere, October 1891.', at: 0.8, hold: 5 },
+    card: { text: 'Hollowmere, October 1891.', at: 0.4, hold: 3.4 },
   },
   {
     // Inside the fence, above the headstones, over the gate toward the hut.
     id: 2,
-    duration: 7,
+    duration: 5,
     camera: {
       position: [
         [-4, 2.6, 38],
@@ -70,14 +70,14 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
     },
     card: {
       text: 'The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks.',
-      at: 0.8,
-      hold: 5.5,
+      at: 0.4,
+      hold: 4.4,
     },
   },
   {
     // Sweeps past the chapel (x 7.5..12.5, z -1..11) on its open east and south sides.
     id: 3,
-    duration: 7,
+    duration: 4,
     camera: {
       position: [
         [4, 2.2, 15],
@@ -92,12 +92,12 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
         [CHAPEL_X, 2.5, CHAPEL_Z],
       ],
     },
-    card: { text: 'They need someone to tend the dead.', at: 0.8, hold: 5 },
+    card: { text: 'They need someone to tend the dead.', at: 0.4, hold: 3.4 },
   },
   {
     // Looks down onto the oak-hollow grave; the camera is offset in z so the look is never vertical.
     id: 4,
-    duration: 7,
+    duration: 4,
     camera: {
       position: [
         [-15, 4.5, 17],
@@ -112,13 +112,13 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
         [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z],
       ],
     },
-    card: { text: 'The graves here are opening. From the inside.', at: 1, hold: 5 },
-    burst: { x: OAK_HOLLOW_GRAVE.x, z: OAK_HOLLOW_GRAVE.z, at: 2.5 },
+    card: { text: 'The graves here are opening. From the inside.', at: 0.4, hold: 3.4 },
+    burst: { x: OAK_HOLLOW_GRAVE.x, z: OAK_HOLLOW_GRAVE.z, at: 1.5 },
   },
   {
     // Through the hut door (+Z wall, z = 3, 1.4 m wide, centred on x = 0) to the player's view of the bench.
     id: 5,
-    duration: 7,
+    duration: 4,
     camera: {
       position: [
         [0, 1.7, 9],
@@ -134,7 +134,7 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
         END_TARGET,
       ],
     },
-    card: { text: 'Elias left a page on the table.', at: 0.8, hold: 5 },
+    card: { text: 'Elias left a page on the table.', at: 0.4, hold: 3.4 },
   },
 ]
 

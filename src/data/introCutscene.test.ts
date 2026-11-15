@@ -7,11 +7,11 @@ import { resetRun } from '../game/state/resetRun'
 import { usePlayerStore } from '../game/state/playerStore'
 
 describe('introCutscene data', () => {
-  it('has 5 shots in order totalling 32-38 s', () => {
+  it('has 5 shots in order totalling about 20 s (spec 09, B15)', () => {
     expect(INTRO_SHOTS.map((s) => s.id)).toEqual([1, 2, 3, 4, 5])
     const total = INTRO_SHOTS.reduce((t, s) => t + s.duration, 0)
-    expect(total).toBeGreaterThanOrEqual(32)
-    expect(total).toBeLessThanOrEqual(38)
+    expect(total).toBeGreaterThanOrEqual(18)
+    expect(total).toBeLessThanOrEqual(22)
   })
 
   it('gives every shot >= 4 s, a card held >= 3 s inside the shot, and matched control points', () => {
