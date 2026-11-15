@@ -421,7 +421,15 @@ export function RecipeBook() {
       role="complementary"
       aria-labelledby={titleId}
       // Prevent keyboard events from leaking to the game world
-      onKeyDown={(e) => e.stopPropagation()}
+      onKeyDown={(e) => {
+        e.stopPropagation()
+        // stopPropagation also hides the key from Workbench's window listener, so with focus
+        // inside the book (after any click or Tab) Esc and E would never close the bench.
+        if (e.code === 'Escape' || e.code === 'KeyE') {
+          e.preventDefault()
+          useUiWorldStore.getState().closeWorkbench()
+        }
+      }}
     >
       {/* Parchment paper edge decoration */}
       <div className="recipe-book__spine" aria-hidden="true" />

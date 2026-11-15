@@ -25,6 +25,7 @@ import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useCinematic } from '../../game/state/menuState'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
+import { useToastStore } from '../../game/state/toastStore'
 import { emit } from '../../game/events'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES, RECIPE_MAP } from '../../data/recipes'
@@ -489,9 +490,8 @@ export function Workbench() {
         emit({ type: 'craftCompleted', recipeId })
         playCraftingComplete()
       } else if (result.error === 'no-capacity') {
-        // TODO(ui): surface a "satchel full" toast message to the player.
-        // For now a console warning keeps the information accessible during dev.
-        console.warn('[Workbench] craft failed: satchel full')
+        // The craft finished but nothing was consumed; without a message the player would think it broke.
+        useToastStore.getState().push('Satchel full: make room to craft')
       }
     }
   })
