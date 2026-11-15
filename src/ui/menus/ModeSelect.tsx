@@ -42,7 +42,7 @@ export function ModeSelect({ onBegin, onBack }: ModeSelectProps) {
           </label>
         ))}
       </fieldset>
-      <div className="menu__actions">
+      <div className="menu__actions menu__actions--sticky">
         <button type="button" className="menu__button" onClick={() => beginMode(choice, onBegin)}>
           Begin
         </button>

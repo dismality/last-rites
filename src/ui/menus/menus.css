@@ -318,6 +318,19 @@
   padding: 0;
   border: 0;
 }
+/* Pinned footer: on short screens the option list scrolls and Begin/Back stay visible (B13). */
+.menu__actions--sticky {
+  position: sticky;
+  bottom: -1.5rem;
+  flex-direction: row;
+  margin: 0 -1.75rem -1.5rem;
+  padding: 0.75rem 1.75rem 1.5rem;
+  background: #cfc0a8;
+  border-top: 1px solid var(--parchment-dark);
+}
+.menu__actions--sticky .menu__button {
+  flex: 1;
+}
 .mode__legend {
   position: absolute;
   width: 1px;
