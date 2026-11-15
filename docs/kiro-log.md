@@ -1575,3 +1575,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Quit to Title now asks first on the pause menu and the death screen (new `QuitConfirm`: focus on Stay, Esc cancels). Autosave writes to its own slot `lastrites:autosave` at every dawn and dusk; Continue shows for either slot and loads the newer. Retry already kept clues, pages and case progress (mystery store is not snapshotted, case merge exists); recipes and journal-page key items are now merged back too. Design bible §8 updated first.
 - **What Kiro caught or sped up:** Found that a Retry would have rolled back the recipe taught by a page read after the retry point, since crafting and inventory are snapshotted. Added `systems/retryKeep.ts` with a property test, plus `autosave.test.ts`. Lint, build and 2242 tests pass.
 - **Decisions made unattended:** Kept the existing new-day save into the altar slot unchanged. Timestamps sit beside the save file as `savedAt`, so the save format and its round-trip tests are untouched. Not verified in a browser (focus feel, e2e not run).
+### 2026-11-15: 09-playtest-fixes task 23: Remove dead useWorkbench.ts (B17)
+- **Kiro feature used:** spec task
+- **What happened:** Grep showed `useWorkbench` was only referenced by its own file (no imports, no tests); the workbench opens through the Interactable. Deleted `src/scene/world/useWorkbench.ts` instead of wiring it up.
+- **What Kiro caught or sped up:** Grep confirmed nothing else used it, so the deletion needed no other edits. Lint, build and 2242 tests pass.
