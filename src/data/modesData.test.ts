@@ -18,6 +18,22 @@ describe('mode values (design bible §12)', () => {
     for (const id of MODE_IDS) expect(MODES[id].id).toBe(id)
   })
 
+  it('Short Vigil is a Story option: Normal modifiers, 2-minute days, full oil (spec 10, Req 24.4)', () => {
+    const { hpMult, damageMult, lanternDrainMult, eliteChance, scoreMult } = MODES.normal
+    expect(MODES['short-vigil']).toMatchObject({
+      hpMult,
+      damageMult,
+      lanternDrainMult,
+      eliteChance,
+      scoreMult,
+      story: true,
+      dayLengthS: 120,
+      retryNight: true,
+      startOilPct: 100,
+    })
+    expect(MODE_IDS).toContain('short-vigil')
+  })
+
   it('story modes keep Retry Night and the normal day', () => {
     for (const id of ['easy', 'normal', 'hard'] as const) {
       expect(MODES[id].story).toBe(true)

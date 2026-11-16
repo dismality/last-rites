@@ -7,8 +7,11 @@ describe('modeSelect', () => {
     expect(initialChoice()).toBe('normal')
   })
 
-  it('offers four options in order', () => {
-    expect(modeOptions().map((o) => o.id)).toEqual(['easy', 'normal', 'hard', 'endless'])
+  it('offers five options in order, Short Vigil with the story modes', () => {
+    expect(modeOptions().map((o) => o.id)).toEqual(['easy', 'normal', 'hard', 'short-vigil', 'endless'])
+    expect(modeOptions().find((o) => o.id === 'short-vigil')!.lines).toContain(
+      '3 stages, 2-minute days, 100% oil: about 15 minutes',
+    )
   })
 
   it('arrows move the choice and wrap', () => {

@@ -7,7 +7,7 @@ import type { DealtContract } from '../systems/contracts'
 import type { Stock } from '../systems/merchant'
 import { DEFAULT_SEED, type NightSummary } from '../systems/progressionSave'
 import { createRunStats, type RunStats } from '../systems/runStats'
-import { setStoryProbe } from './guidanceStore'
+import { setDayLengthProbe, setStoryProbe } from './guidanceStore'
 import { MODES } from '../../data/modes'
 import { setDawnPickProbe } from './menuState'
 import { registerStatsPort } from './statsPort'
@@ -70,6 +70,7 @@ export const useProgressionStore = create<ProgressionState>((set) => ({
 setDawnPickProbe(() => useProgressionStore.getState().pendingPick !== null)
 
 setStoryProbe(() => MODES[useProgressionStore.getState().mode].story)
+setDayLengthProbe(() => MODES[useProgressionStore.getState().mode].dayLengthS)
 registerEconomyPort({
   coins: () => useProgressionStore.getState().coins,
   addCoins: (d) => useProgressionStore.getState().addCoins(d),

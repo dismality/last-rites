@@ -1,4 +1,5 @@
-import { DEFAULT_MODE, ENDLESS, MODE_IDS, MODES } from '../../data/modes'
+import { DEFAULT_MODE, ENDLESS, MODE_IDS, MODES, SHORT_VIGIL } from '../../data/modes'
+import { STAGE_COUNT } from '../../data/stages'
 import type { ModeId } from '../../game/types'
 
 export interface ModeOption {
@@ -23,6 +24,8 @@ export function modeOptions(): ModeOption[] {
       `Score ${mult(m.scoreMult)}`,
     ]
     if (!m.story) lines.push(`${ENDLESS.dayS} s day, no relics or rite, no Retry Night`)
+    else if (m.dayLengthS !== null)
+      lines.push(`${STAGE_COUNT} stages, ${m.dayLengthS / 60}-minute days, ${SHORT_VIGIL.startOilPct}% oil: about 15 minutes`)
     return { id, label: m.label, lines }
   })
 }

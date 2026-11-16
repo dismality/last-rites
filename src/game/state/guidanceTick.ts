@@ -2,7 +2,8 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
-import { caseOfStage, type MinigameId } from '../../data/cases'
+import { caseOfStage, CASE_1_BELLS, type MinigameId } from '../../data/cases'
+import { STAGE_DAY_RULES } from '../../data/objectiveRules'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
@@ -37,7 +38,7 @@ import { useBossStore } from './bossStore'
 import { riteFinalNight } from './riteStatus'
 import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
-import { isStoryRun, useGuidanceStore } from './guidanceStore'
+import { isStoryRun, modeDayLengthS, useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMapStore } from './mapStore'
 import { useMysteryStore } from './mysteryStore'
@@ -45,6 +46,8 @@ import { usePlayerStore } from './playerStore'
 import { useSettingsStore } from './settingsStore'
 import { useSpawnStore } from './spawnStore'
 import { useStageStore } from './stageStore'
+import { useHunchStore } from './hunchStore'
+import { hunchTarget, tickHunchClock, type HunchCandidate } from '../systems/keeperHunch'
 import { selectCorrectLinks, useCaseStore } from './caseStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
@@ -81,7 +84,9 @@ export const readObjectiveInput = (): ObjectiveInput => {
   })
   const story = isStoryRun()
   const phaseLength =
-    world.phase === 'dusk' ? DUSK_DURATION_S : story ? DAY_DURATION_S : ENDLESS.dayS
+    world.phase === 'dusk'
+      ? DUSK_DURATION_S
+      : (modeDayLengthS() ?? (story ? DAY_DURATION_S : ENDLESS.dayS))
   const living = useEnemyStore
     .getState()
     .enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length
@@ -131,6 +136,43 @@ const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
     altarLockedS: Math.max(0, Math.ceil(s.altar.lockedUntil - s.nightElapsed)),
     day: readStageDaySteps(s.stage),
   }
+}
+
+/**
+ * Where the stage's unfound clues are (spec 10, keeper's hunch): its walk clues not yet picked up,
+ * and the station of each unsolved minigame (its stage day step's place, same order as the case's
+ * minigames). The bells count once each until 1b is solved. The relics are not clues.
+ */
+const readHunchCandidates = (stage: 1 | 2 | 3): HunchCandidate[] => {
+  const def = caseOfStage(stage)
+  const progress = useCaseStore.getState().cases[def.id]
+  const out: HunchCandidate[] = []
+  for (const c of def.clues) {
+    if (c.found.kind === 'walk' && !progress.found.includes(c.id)) out.push({ id: c.id, position: c.found.position })
+  }
+  const rules = STAGE_DAY_RULES[stage]
+  def.minigames.forEach((m, k) => {
+    if (progress.minigames.includes(m)) return
+    const place = rules[k]?.place
+    if (place?.kind === 'point') out.push({ id: m, position: place.at })
+    else if (place?.kind === 'nearest') {
+      const bells = m === '1b' ? CASE_1_BELLS.filter((b) => !progress.bellsExamined.includes(b.id)) : []
+      const at = bells.length > 0 ? bells.map((b) => b.position) : place.at
+      at.forEach((p, i) => out.push({ id: `${m}-${i}`, position: p }))
+    }
+  })
+  return out
+}
+
+/** One step of the keeper's hunch: day play since the last clue, and the clue the flame leans to. */
+const tickHunch = (dt: number): void => {
+  const h = useHunchStore.getState()
+  const phase = useWorldStore.getState().phase
+  const found = Object.values(useCaseStore.getState().cases).reduce((n, p) => n + p.found.length, 0)
+  const clock = tickHunchClock(h.clock, dt, phase, found)
+  const story = isStoryRun()
+  const cands = story ? readHunchCandidates(useStageStore.getState().stage) : []
+  h.set(clock, hunchTarget(clock, phase, cands, usePlayerStore.getState().position))
 }
 
 /** Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). */
@@ -242,6 +284,7 @@ export const tickGuidance = (dt: number): void => {
   useGuidanceStore.setState(patch)
 
   if (isWalkComplete(walk)) completeAction('walk')
+  tickHunch(step)
   refreshGuidance()
 }
 

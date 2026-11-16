@@ -336,3 +336,8 @@ img.hud-prompt__rune-img {
     width: 50vw;
   }
 }
+
+/* Keeper's hunch help (spec 10, Req 24.3): the next case's clue count, set apart in weight, not colour. */
+.hud-dawn__clues {
+  font-weight: 700;
+}

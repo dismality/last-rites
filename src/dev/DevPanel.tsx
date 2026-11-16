@@ -29,6 +29,8 @@ import {
   teleportTo,
   teleportToObjective,
   triggerEnding,
+  startShortVigil,
+  skipHunchTime,
   playWinCutscene,
   triggerScare,
   unlockAllRecipes,
@@ -164,6 +166,14 @@ export function DevPanel() {
             ))}
             <button type="button" onClick={run(solveCurrentCase)}>
               Solve current case
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(startShortVigil)}>
+              Start Short Vigil
+            </button>
+            <button type="button" onClick={run(skipHunchTime)}>
+              Skip 2 minutes without a clue
             </button>
           </Row>
           <Row>

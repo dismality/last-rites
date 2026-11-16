@@ -547,6 +547,7 @@ Always visible at the top left: one main goal with a progress count, plus a smal
 - **Keeper's hunch (E11):** if no new clue has been found for 2 minutes of play by day, the lantern flame leans toward the nearest unfound clue. It is a lean in shape, not a flash, and obeys head bob and reduced motion.
 - **Dawn card:** shows "Clues found N/M" for the next case.
 - **Short Vigil (E11):** a Story option with 3 stages and 2-minute days, so a full run fits in about 15 minutes for judges. Minigame rules, hints and the case are unchanged; only the day length is.
+- **As built (spec 10 task 7):** the flame that leans is the lantern flame on the HUD oil gauge (the lantern itself is only light, with no flame in view). It skews about its base toward the clue's bearing (up to 22°), fully to one side when the clue is behind; the clock counts day play only and restarts on any new clue. The clues it points at are the stage's walk clues not yet picked up and the station of each unsolved minigame (the bells one by one). The dawn card's first line is "Clues found (next case): N/M". Short Vigil sits between Hard and Endless on the difficulty screen with Normal's modifiers. The Case-tab tutorial step was already step 8.
 - **Tutorial (10):** tutorial step 7 is followed on the first day by step 8, "Open the Case tab in the journal to pin clues together", done when the Case tab has been opened.
 
 By day the second line shows "Dusk in 3:12". A tutorial prompt, when one is showing, takes the second line's place.

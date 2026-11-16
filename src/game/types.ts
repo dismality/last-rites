@@ -312,7 +312,7 @@ export type GameEvent =
 // Progression and atmosphere ids (spec 08)
 // ---------------------------------------------------------------------------
 
-export type ModeId = 'easy' | 'normal' | 'hard' | 'endless'
+export type ModeId = 'easy' | 'normal' | 'hard' | 'short-vigil' | 'endless'
 export type DawnUpgradeId =
   | 'iron-constitution' | 'steady-hands' | 'long-wick' | 'deep-pockets' | 'second-wind'
   | 'gravedigger' | 'hardened-boards' | 'grim-harvest' | 'marksman' | 'blessed-reach'

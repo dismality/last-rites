@@ -84,3 +84,11 @@ export const setStoryProbe = (probe: () => boolean): void => {
   storyProbe = probe
 }
 export const isStoryRun = (): boolean => storyProbe()
+
+// The mode's day-length override (Endless and Short Vigil), registered the same way. Null keeps
+// the normal day.
+let dayLengthProbe: () => number | null = () => null
+export const setDayLengthProbe = (probe: () => number | null): void => {
+  dayLengthProbe = probe
+}
+export const modeDayLengthS = (): number | null => dayLengthProbe()

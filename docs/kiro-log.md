@@ -1784,3 +1784,16 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Order: epilogue, sunrise, walk, card. Req 23.7 asks for the epilogue before the walk, and the epilogue already came before the sunrise.
   - Only the bell has a sound; the other captions stand in until the audio task, like the stair footsteps.
   - Reduced motion and Camera shake off share one variant: same path, 2.5 s fades, no bob or sway.
+
+### 2026-11-16: Outside Kiro: 10-curse-stages task 7: E11 keeper's hunch and Short Vigil
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
+- **What happened:** Short Vigil is a new Story mode (`short-vigil`): Normal's modifiers, the 3 stages with 120 s days and a full lantern. It is on the difficulty screen between Hard and Endless, and the objective clock reads its day length. The keeper's hunch (`systems/keeperHunch.ts`, Property 20 with fast-check; `state/hunchStore.ts`, ticked in `guidanceTick`): after 120 s of day play with no new clue, the HUD lantern flame leans toward the nearest unfound clue of the stage. The dawn card opens with "Clues found (next case): N/M". Dev buttons "Start Short Vigil" and "Skip 2 minutes without a clue"; hook calls `hunch()` and `skipHunch()`. `e2e/help.spec.ts` passes in Chrome: Short Vigil from the real mode select by keyboard, first Minigame 2.4 s after Begin plus a 0.6 s estimated walk (logged), dusk at 120 s, the flame leaning right then left with the clue's side, the dawn card screenshot pair.
+- **Found on the way:**
+  - There is no flame in view on the lantern (it is only lights), so the hunch leans the flame on the HUD oil gauge, the one flame the player sees.
+  - The Case-tab tutorial step (Req 24.6) was already in place as step 8.
+  - `guidanceTick` cannot import `progressionStore` (import cycle); the mode's day length reaches it through a probe like `isStoryRun`.
+- **Decisions made unattended:**
+  - The hunch points at the stage's walk clues not yet picked up and at the station of each unsolved minigame (the bells one by one). Relics are not clues.
+  - Behind the player the flame leans fully to the nearer way round; within 2 m of the clue it stands straight.
+  - Reduced motion sets the lean at once with no sway; with Head bob off there is no sway either. The lean never changes brightness.
+  - The dawn card names the case next to the count, so 0/6 is not read as the case just closed.

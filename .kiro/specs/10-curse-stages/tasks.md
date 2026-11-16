@@ -237,18 +237,23 @@ Common rules for all tasks:
     - Done outside Kiro by Claude
     - Run the Finish steps for task 6; commit `win cutscene (spec 10 task 6)`
 
-- [ ] 7. E11: Help and Short Vigil
-  - [ ] 7.1 Pure hunch and Short Vigil data
+- [x] 7. E11: Help and Short Vigil
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 7.1 Pure hunch and Short Vigil data
+    - Done outside Kiro by Claude. Data in `src/data/keeperHunch.ts`; Short Vigil also adds `startOilPct` to every mode (100 for all)
     - Create `keeperHunch.ts` and its test; add Short Vigil (3 Stages, 2-minute days, 100% oil) to `src/data/modes.ts`
     - **Property 20: Keeper's hunch**
     - _Requirements: 24.1, 24.4_
-  - [ ] 7.2 Hunch, dawn card, difficulty screen and tutorial
+  - [x] 7.2 Hunch, dawn card, difficulty screen and tutorial
+    - Done outside Kiro by Claude. The flame is the HUD oil-gauge flame (the lantern has no flame in view). The Case-tab tutorial step already existed as step 8 (`openCaseTab`), so no change
     - Lean the lantern flame toward the nearest unfound clue (shape change, obeys head bob and reduced motion); show "Clues found N/M" on the dawn card; add the Short Vigil option to the difficulty screen; add the Case-tab tutorial step
     - _Requirements: 24.2, 24.3, 24.5, 24.6_
-  - [ ] 7.3 Dev hooks, e2e and screenshots
+  - [x] 7.3 Dev hooks, e2e and screenshots
+    - Done outside Kiro by Claude. Screenshot pair `dawn-card-clues-1280x720` and `-800x600`, plus `hunch-flame-right.png`; the first-Minigame time is logged to `e2e/logs/short-vigil-first-minigame.json`
     - Add "Start Short Vigil" and "Skip 2 minutes without a clue" to the Dev_Panel; create `e2e/help.spec.ts` (first Minigame within 3 minutes, logged; hunch lean after 2 minutes; the Short Vigil day length); save the dawn-card screenshot pair
     - _Requirements: 24.7, 24.8_
-  - [ ] 7.4 Finish
+  - [x] 7.4 Finish
+    - Done outside Kiro by Claude
     - Run the Finish steps for task 7; commit `keeper's hunch and short vigil (spec 10 task 7)`
 
 - [ ] 8. E7: Grab kill-cam

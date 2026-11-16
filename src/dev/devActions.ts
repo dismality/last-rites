@@ -14,6 +14,10 @@ import { FIXED_SPAWNS } from '../data/zones'
 import type { EnemyId } from '../data/enemies'
 import { emit } from '../game/events'
 import { startEnding } from '../game/state/startEnding'
+import { beginMode } from '../game/state/runFlow'
+import { useHunchStore } from '../game/state/hunchStore'
+import { useIntroStore } from '../game/state/introStore'
+import { KEEPER_HUNCH } from '../data/keeperHunch'
 import { craneSpawnPoint } from '../game/state/combatTick'
 import { takeWeaponPickup } from '../game/state/combatActions'
 import { useBossStore } from '../game/state/bossStore'
@@ -485,6 +489,19 @@ export function setChapelLevel(level: 0 | 1 | 2 | 3): string {
 export function triggerScare(id: ScareEventId): string {
   scareRuntime.forced.push(id)
   return `Scare queued: ${id}`
+}
+
+/** A new Short Vigil run as from the mode select, intro skipped (spec 10 task 7.3). */
+export function startShortVigil(): string {
+  beginMode('short-vigil')
+  useIntroStore.getState().skip()
+  return 'Short Vigil started'
+}
+
+/** As if two minutes of day play had passed without a clue: the keeper's hunch comes on by day. */
+export function skipHunchTime(): string {
+  useHunchStore.getState().skip(KEEPER_HUNCH.afterS)
+  return 'Two minutes without a clue'
 }
 
 export function triggerEnding(id: EndingId): string {

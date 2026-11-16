@@ -51,6 +51,16 @@ export function pickCard(id: DawnUpgradeId, pick: (id: DawnUpgradeId) => boolean
   return pick(id)
 }
 
+/**
+ * The next case's clue count for the dawn card (spec 10, Req 24.3): "Clues found N/M", with the
+ * case named so the count is never read as the case just closed. Junk counts read as 0.
+ */
+export function dawnClueRow(caseTitle: string, found: number, total: number): DawnRow {
+  const t = Number.isFinite(total) ? Math.max(0, Math.floor(total)) : 0
+  const n = Number.isFinite(found) ? Math.min(Math.max(0, Math.floor(found)), t) : 0
+  return { label: `Clues found (${caseTitle})`, value: `${n}/${t}` }
+}
+
 export interface DawnRow {
   label: string
   value: string

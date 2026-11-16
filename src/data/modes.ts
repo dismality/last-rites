@@ -15,7 +15,18 @@ export interface ModeDef {
   /** Day length override in seconds; null keeps the normal day. */
   dayLengthS: number | null
   retryNight: boolean
+  /** Lantern oil at the start of the run, in percent. */
+  startOilPct: number
 }
+
+/**
+ * Short Vigil (spec 10, Req 24.4): a Story option for judges. The 3 stages with 2-minute days and
+ * a full lantern, so a run fits in about 15 minutes. Minigames, hints and cases are unchanged.
+ */
+export const SHORT_VIGIL = {
+  dayS: 120,
+  startOilPct: 100,
+} as const
 
 export const ENDLESS = {
   dayS: 120,
@@ -37,7 +48,7 @@ const NORMAL_MODIFIERS = {
   scoreMult: 1,
 } as const
 
-export const MODE_IDS: readonly ModeId[] = ['easy', 'normal', 'hard', 'endless']
+export const MODE_IDS: readonly ModeId[] = ['easy', 'normal', 'hard', 'short-vigil', 'endless']
 
 export const MODES: Readonly<Record<ModeId, ModeDef>> = {
   easy: {
@@ -51,6 +62,7 @@ export const MODES: Readonly<Record<ModeId, ModeDef>> = {
     story: true,
     dayLengthS: null,
     retryNight: true,
+    startOilPct: 100,
   },
   normal: {
     id: 'normal',
@@ -59,6 +71,7 @@ export const MODES: Readonly<Record<ModeId, ModeDef>> = {
     story: true,
     dayLengthS: null,
     retryNight: true,
+    startOilPct: 100,
   },
   hard: {
     id: 'hard',
@@ -71,6 +84,16 @@ export const MODES: Readonly<Record<ModeId, ModeDef>> = {
     story: true,
     dayLengthS: null,
     retryNight: true,
+    startOilPct: 100,
+  },
+  'short-vigil': {
+    id: 'short-vigil',
+    label: 'Short Vigil',
+    ...NORMAL_MODIFIERS,
+    story: true,
+    dayLengthS: SHORT_VIGIL.dayS,
+    retryNight: true,
+    startOilPct: SHORT_VIGIL.startOilPct,
   },
   endless: {
     id: 'endless',
@@ -79,6 +102,7 @@ export const MODES: Readonly<Record<ModeId, ModeDef>> = {
     story: false,
     dayLengthS: ENDLESS.dayS,
     retryNight: false,
+    startOilPct: 100,
   },
 }
 

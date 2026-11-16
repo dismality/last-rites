@@ -1,6 +1,10 @@
+import { caseOfStage } from '../../data/cases'
+import { MODES } from '../../data/modes'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useProgressionStore } from '../../game/state/progressionStore'
+import { stageOfNight } from '../../game/state/stageStore'
 import { useWorldStore } from '../../game/state/worldStore'
-import { dawnCardView } from './dawnView'
+import { dawnCardView, dawnClueRow } from './dawnView'
 import { DawnPicker } from './DawnPicker'
 
 /**
@@ -10,7 +14,14 @@ import { DawnPicker } from './DawnPicker'
 export function DawnCard() {
   const phase = useWorldStore((s) => s.phase)
   const summary = useProgressionStore((s) => s.dawnSummary)
+  const story = useProgressionStore((s) => MODES[s.mode].story)
+  // The day after this dawn plays the next stage's case (Req 24.3).
+  const nextNight = useWorldStore((s) => s.nightNumber + 1)
+  const cases = useCaseStore((s) => s.cases)
   if (phase !== 'dawn') return null
+
+  const next = caseOfStage(stageOfNight(nextNight))
+  const clues = story ? dawnClueRow(next.title, cases[next.id].found.length, next.clues.length) : null
 
   const view = summary ? dawnCardView(summary) : null
   return (
@@ -20,6 +31,12 @@ export function DawnCard() {
         {view && (
           <div className="hud-dawn__body">
             <ul className="hud-dawn__list">
+              {/* First, so it is above the fold of the card's short scroll box (the picker sits below). */}
+              {clues && (
+                <li className="hud-dawn__clues" data-testid="dawn-clues">
+                  {clues.label}: {clues.value}
+                </li>
+              )}
               {view.rows.map((r) => (
                 <li key={r.label}>
                   {r.label}: {r.value}

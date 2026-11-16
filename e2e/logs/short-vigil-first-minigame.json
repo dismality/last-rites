@@ -1,0 +1,8 @@
+{
+  "mode": "short-vigil",
+  "wallSecondsFromBegin": 2.386,
+  "gameSecondsIntoDay": 1.183333333333334,
+  "spawnToShelfMetres": 1.7613914953808538,
+  "walkSeconds": 0.5871304984602846,
+  "limitSeconds": 180
+}

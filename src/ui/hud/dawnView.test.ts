@@ -86,3 +86,13 @@ describe('dawnCardView', () => {
     expect(v.scoreParts[3]).toEqual({ label: 'Night score', value: '180' })
   })
 })
+
+describe('dawn clue row (spec 10, Req 24.3)', () => {
+  it('reads "Clues found N/M" for the named case and clamps junk', async () => {
+    const { dawnClueRow } = await import('./dawnView')
+    expect(dawnClueRow('The Resurrection Men', 2, 9)).toEqual({ label: 'Clues found (The Resurrection Men)', value: '2/9' })
+    expect(dawnClueRow('X', 12, 9).value).toBe('9/9')
+    expect(dawnClueRow('X', Number.NaN, 9).value).toBe('0/9')
+    expect(dawnClueRow('X', 3, Number.NaN).value).toBe('0/0')
+  })
+})

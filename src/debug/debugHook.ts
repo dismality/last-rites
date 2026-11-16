@@ -73,6 +73,7 @@ import { minimapRuntime } from '../ui/hud/minimapRuntime'
 import { useEndingStore } from '../game/state/endingStore'
 import { useBossStore } from '../game/state/bossStore'
 import { startEnding } from '../game/state/startEnding'
+import { useHunchStore } from '../game/state/hunchStore'
 import { winRuntime } from '../scene/effects/winRuntime'
 import { endingCameraRuntime } from '../scene/effects/endingCameraRuntime'
 import { useGuidanceStore } from '../game/state/guidanceStore'
@@ -199,6 +200,15 @@ const api = {
   /** The function the final rite and the death check call to start an ending. */
   startEnding(id: 'rest' | 'taken'): void {
     startEnding(id)
+  },
+  /** Keeper's hunch: seconds of day play since the last clue and the clue the flame leans to. */
+  hunch(): { sinceClueS: number; found: number; target: string | null; at: number[] | null } {
+    const h = useHunchStore.getState()
+    return { ...h.clock, target: h.target?.id ?? null, at: h.target ? [...h.target.position] : null }
+  },
+  /** As if `seconds` of day play had passed without a clue. */
+  skipHunch(seconds: number): void {
+    useHunchStore.getState().skip(seconds)
   },
   /** The Rest ending straight into the win walk-out, past the sunrise (spec 10 task 6). */
   playWinCutscene(): void {

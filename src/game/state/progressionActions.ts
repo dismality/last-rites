@@ -14,6 +14,7 @@ import type { DawnUpgradeId, ModeId, MerchantRowId } from '../types'
 import { useCaseStore } from './caseStore'
 import { currentModifiers, syncDerivedStats } from './derivedStats'
 import { useInventoryStore } from './inventoryStore'
+import { useLanternStore } from './lanternStore'
 import { useOverlayStore } from './overlayStore'
 import { usePlayerStore } from './playerStore'
 import { initialProgression, useProgressionStore } from './progressionStore'
@@ -41,6 +42,7 @@ export function startRun(mode: ModeId): void {
   useOverlayStore.getState().setMerchantOpen(false)
   syncDerivedStats()
   usePlayerStore.getState().setHealth(usePlayerStore.getState().maxHealth)
+  useLanternStore.getState().setFuel(MODES[mode].startOilPct)
 }
 
 /** Ignored unless the id is on the open offer. Returns whether the pick was applied. */
