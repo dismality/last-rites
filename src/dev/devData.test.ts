@@ -16,7 +16,7 @@ describe('Dev_Panel teleports', () => {
     const key = story.find((p) => p.id === 'fx-crypt-key')!
     const whistle = story.find((p) => p.id === 'fx-bone-whistle')!
     expect([key.x, key.z, key.yaw]).toEqual([-8.4, -20.6, 0])
-    expect([whistle.x, whistle.z, whistle.yaw]).toEqual([-21, -47, 0])
+    expect([whistle.x, whistle.z, whistle.yaw]).toEqual([-20.7, -51.5, 0])
     expect(story.some((p) => p.id === 'catacomb-stair')).toBe(true)
   })
 

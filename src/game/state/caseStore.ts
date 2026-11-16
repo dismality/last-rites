@@ -4,7 +4,18 @@
 // Pure zustand: no React / three.js imports.
 
 import { create } from 'zustand'
-import { CASES, caseOfStage, type BellPostId, type CaseDef, type CaseId, type DeductionNote, type EvidenceCardId, type MinigameId } from '../../data/cases'
+import {
+  CASES,
+  caseOfStage,
+  type BellPostId,
+  type CaseDef,
+  type CaseId,
+  type CrestId,
+  type DeductionNote,
+  type EvidenceCardId,
+  type MinigameId,
+  type WatchEntryId,
+} from '../../data/cases'
 import type { AltarVerdict } from '../systems/altarAnswer'
 import { addLink, correctLinkCount, curseMeter, EMPTY_BOARD, visibleClues } from '../systems/caseBoard'
 import { checkFinalAnswer, fillSlot as fillSlotRule, isAnswerComplete } from '../systems/caseAnswer'
@@ -15,7 +26,9 @@ import {
   freshCaseSave,
   type CaseProgress,
   sanitizeCardIds,
+  sanitizeCrestDials,
   sanitizeHymnTiles,
+  sanitizeWatchLog,
   type LedgerLine,
   type CaseSave,
 } from '../systems/caseSave'
@@ -45,6 +58,10 @@ interface CaseStoreState extends CaseSave {
   submitMinigame: (id: MinigameId, correct: boolean) => void
   /** Replace the minigame 1a draft lines (kept when the overlay closes). */
   setLedgerLines: (lines: LedgerLine[]) => void
+  /** Minigame 2a: keep the four dials as turned (kept when the overlay closes). */
+  setCrestDials: (dials: readonly (CrestId | null)[]) => void
+  /** Minigame 2b: keep the arrangement of torn log pages (kept when the overlay closes). */
+  setWatchLog: (order: readonly WatchEntryId[]) => void
   /** Minigame 3a: keep the five tiles as set (kept when the overlay closes). */
   setHymnTiles: (tiles: readonly (string | null)[]) => void
   /** Minigame 3b: record an evidence card as examined in the world. False for a card already held. */
@@ -131,6 +148,12 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     // Each Doubt costs 50; a Doubt already at its cap adds nothing and costs nothing.
     if (grew) addScore(-DOUBT_SCORE_PENALTY)
   },
+
+  setCrestDials: (dials) =>
+    patchProgress(set, 'resurrection-men', (p) => ({ ...p, crestDials: sanitizeCrestDials(dials) })),
+
+  setWatchLog: (order) =>
+    patchProgress(set, 'resurrection-men', (p) => ({ ...p, watchLog: sanitizeWatchLog(order) })),
 
   setHymnTiles: (tiles) =>
     patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, hymnTiles: sanitizeHymnTiles(tiles) })),

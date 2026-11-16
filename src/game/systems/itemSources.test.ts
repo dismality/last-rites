@@ -83,8 +83,11 @@ describe('nearestSource (Mark on map)', () => {
   })
 
   it('does not mark a taken fixed spawn, and hides the night-only locket by day', () => {
-    expect(nearestSource('bone-whistle', { x: 0, z: 0 }, world())).toMatchObject({ x: -21, z: -48 })
-    expect(nearestSource('bone-whistle', { x: 0, z: 0 }, world({ collectedFixed: ['fx-bone-whistle'] }))).toBeNull()
+    // The whistle waits in the sexton's niche until the crest lock (2a) is solved.
+    expect(nearestSource('bone-whistle', { x: 0, z: 0 }, world())).toBeNull()
+    const solved = world({ closedCases: ['2a'] })
+    expect(nearestSource('bone-whistle', { x: 0, z: 0 }, solved)).toMatchObject({ x: -20.7, z: -52.5 })
+    expect(nearestSource('bone-whistle', { x: 0, z: 0 }, { ...solved, collectedFixed: ['fx-bone-whistle'] })).toBeNull()
     expect(nearestSource('childs-locket', { x: 0, z: 0 }, world())).toBeNull()
     expect(nearestSource('childs-locket', { x: 0, z: 0 }, world({ phase: 'night' }))).not.toBeNull()
   })

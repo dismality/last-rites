@@ -6,12 +6,16 @@ import {
   CASE_1_BELLS,
   CASE_1_LEDGER,
   CASE_1_STONES,
+  CASE_2_CREST_LOCK,
+  CASE_2_WATCH_ORDER,
   CASE_3_EVIDENCE,
   type BellPostId,
   type CaseId,
+  type CrestId,
   type EvidenceCardId,
   type LedgerFlagKind,
   type MinigameId,
+  type WatchEntryId,
 } from '../../data/cases'
 import type { Revealed } from '../../data/zones'
 import { DOUBT_MAX } from '../../data/stages'
@@ -44,6 +48,10 @@ export interface CaseProgress {
   ledgerLines: LedgerLine[]
   /** Minigame 1b: bell posts fully examined (bell, rope and tag). Kept when the overlay closes. */
   bellsExamined: BellPostId[]
+  /** Minigame 2a: the crest each of the four dials shows (null: not yet turned). Kept when the overlay closes. */
+  crestDials: (CrestId | null)[]
+  /** Minigame 2b: the torn log pages as arranged, earliest first. Kept when the overlay closes. */
+  watchLog: WatchEntryId[]
   /** Minigame 3a: the five brass tiles as set so far (an A-Z letter or null). Kept when the overlay closes. */
   hymnTiles: (string | null)[]
   /** Minigame 3b: evidence cards examined in the world (the dry boots count through their hut clue). */
@@ -53,6 +61,27 @@ export interface CaseProgress {
 }
 
 export const HYMN_TILE_COUNT = 5
+export const CREST_DIAL_COUNT = 4
+
+export function emptyCrestDials(): (CrestId | null)[] {
+  return Array.from({ length: CREST_DIAL_COUNT }, () => null)
+}
+
+/** Four dials, each a crest the dials carry or null. */
+export function sanitizeCrestDials(raw: unknown): (CrestId | null)[] {
+  const list = Array.isArray(raw) ? raw : []
+  return emptyCrestDials().map((_, i) => {
+    const v = list[i]
+    return typeof v === 'string' && (CASE_2_CREST_LOCK.dialCrests as readonly string[]).includes(v) ? (v as CrestId) : null
+  })
+}
+
+/** Watch-log page ids from a save: known pages only, no repeats. */
+export function sanitizeWatchLog(raw: unknown): WatchEntryId[] {
+  const ids: readonly string[] = CASE_2_WATCH_ORDER
+  const list = Array.isArray(raw) ? raw : []
+  return Array.from(new Set(list.filter((x): x is WatchEntryId => typeof x === 'string' && ids.includes(x))))
+}
 
 export interface CaseSave {
   cases: Record<CaseId, CaseProgress>
@@ -74,6 +103,8 @@ export function freshProgress(id: CaseId): CaseProgress {
     hints: { revealed: 0 },
     ledgerLines: [],
     bellsExamined: [],
+    crestDials: emptyCrestDials(),
+    watchLog: [],
     hymnTiles: emptyHymnTiles(),
     evidenceFound: [],
     timeline: [],
@@ -158,6 +189,8 @@ function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
       id === 'saved-by-the-bell'
         ? (uniq(strings(raw.bellsExamined).filter((x) => CASE_1_BELLS.some((b) => b.id === x))) as BellPostId[])
         : [],
+    crestDials: id === 'resurrection-men' ? sanitizeCrestDials(raw.crestDials) : emptyCrestDials(),
+    watchLog: id === 'resurrection-men' ? sanitizeWatchLog(raw.watchLog) : [],
     hymnTiles: id === 'sealed-catacombs' ? sanitizeHymnTiles(raw.hymnTiles) : emptyHymnTiles(),
     evidenceFound: id === 'sealed-catacombs' ? sanitizeCardIds(raw.evidenceFound) : [],
     timeline: id === 'sealed-catacombs' ? sanitizeCardIds(raw.timeline) : [],
@@ -201,6 +234,9 @@ export function mergeRetry(snapshot: CaseSave, current: CaseSave): CaseSave {
       ledgerLines: c.ledgerLines.length >= s.ledgerLines.length ? c.ledgerLines : s.ledgerLines,
       // A post already examined stays examined, like a found clue.
       bellsExamined: union(s.bellsExamined, c.bellsExamined),
+      // Dials and pages: the draft the player touched most recently is never older than the snapshot's.
+      crestDials: c.crestDials.filter(Boolean).length >= s.crestDials.filter(Boolean).length ? c.crestDials : s.crestDials,
+      watchLog: c.watchLog.length >= s.watchLog.length ? c.watchLog : s.watchLog,
       // Tiles already set stay set: the one with more letters is the newer draft.
       hymnTiles: c.hymnTiles.filter(Boolean).length >= s.hymnTiles.filter(Boolean).length ? c.hymnTiles : s.hymnTiles,
       // A card already examined stays found, like a clue; the draft with more cards is the newer one.

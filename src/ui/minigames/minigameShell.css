@@ -268,3 +268,38 @@
 .timeline__act:last-child { margin-left: auto; }
 .timeline__replay { margin-top: 0.75rem; }
 .timeline__heading { margin: 0 0 0.25rem; font-family: var(--font-heading); font-size: 1.1rem; }
+
+/* Minigame 2b: the watch log reuses the timeline cards; the gap after one o'clock is marked ⌛ in words. */
+.watchlog__track { grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); }
+.watchlog__gap { font-style: italic; }
+.watchlog__verdict { margin: 0.75rem 0 0; line-height: 1.4; }
+
+/* Minigame 2a: the crest lock. The chosen dial carries ▸ and a thick border, not colour alone. */
+.crest__intro { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.crest__note { margin: 0 0 0.75rem; padding: 0.4rem 0.75rem; font-style: italic; border-left: 3px solid var(--ink); }
+.crest__note-from { font-style: normal; font-family: var(--font-heading); }
+.crest__dials { display: flex; flex-wrap: wrap; gap: 0.75rem; margin: 0 0 0.75rem; padding: 0.5rem; border: 2px double var(--parchment-dark); border-radius: 3px; }
+.crest__dial { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.25rem; border: 2px solid transparent; border-radius: 4px; }
+.crest__dial[data-chosen='true'] { border: 4px solid var(--ink); }
+.crest__face { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 6rem; height: 6rem; background: radial-gradient(circle, #b9ad98, #7d7262); border: 2px solid var(--ink); border-radius: 50%; color: var(--ink); }
+.crest__glyph { font-size: 2.4rem; line-height: 1; }
+.crest__name { font-size: 1rem; font-family: var(--font-heading); }
+.crest__turn { min-width: 3rem; padding: 0.15rem 0.6rem; font: inherit; font-size: 1rem; color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 3px; cursor: pointer; }
+.crest__turn:disabled { opacity: 0.5; cursor: default; }
+.crest__tablets { margin-top: 0.75rem; }
+.crest__tablets ul { margin: 0; padding-left: 1.2rem; line-height: 1.5; }
+.crest__tablet-glyph { display: inline-block; width: 1.4rem; text-align: center; font-size: 1.2rem; }
+
+/* Minigame 2c: boot prints. The chosen cast and boots carry ▸ and a thick border, not colour alone. */
+.boots__intro { margin: 0 0 0.5rem; font-size: 1.05rem; }
+.boots__spread { display: grid; grid-template-columns: minmax(12rem, 1fr) minmax(18rem, 2fr); gap: 0.75rem; margin: 0 0 0.75rem; }
+.boots__column { display: flex; flex-direction: column; gap: 0.4rem; }
+.boots__row { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.4rem; }
+.boots__card { display: flex; flex-direction: column; gap: 0.15rem; padding: 0.35rem 0.5rem; font: inherit; text-align: left; color: var(--ink); background: var(--parchment); border: 2px solid var(--ink); border-radius: 3px; cursor: pointer; }
+.boots__card[aria-pressed='true'] { border-width: 5px; }
+.boots__title { font-family: var(--font-heading); font-size: 1.05rem; }
+.boots__label { font-style: italic; font-size: 1rem; }
+.boots__details { display: grid; grid-template-columns: auto 1fr; gap: 0 0.5rem; margin: 0; font-size: 1rem; }
+.boots__details dt { font-weight: 700; }
+.boots__details dd { margin: 0; }
+@media (max-width: 760px) { .boots__spread { grid-template-columns: 1fr; } }

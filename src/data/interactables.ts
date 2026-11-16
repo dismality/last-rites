@@ -34,6 +34,11 @@ export type InteractableKind =
   | 'psalter'
   | 'evidence-card'
   | 'timeline-slate'
+  | 'case-clue'
+  | 'watch-logbook'
+  | 'crest-lock'
+  | 'crest-tablet'
+  | 'boot-cast'
 
 /** Things that react to Interact by proximity and draw no prompt, rune or outline of their own. */
 export type ProximityKind = 'chapel-repair-point' | 'chapel-altar-heal'
@@ -268,6 +273,65 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     endsWhen: "Elias's night is in order (minigame 3b solved), or the story is not in stage 3",
     resetsOn: 'New Game',
     idlePrompt: "Elias's night is in order",
+  },
+  // Spec 10 task 5: a case clue found by walking to it (the cases' `found: { kind: 'walk' }`).
+  'case-clue': {
+    kind: 'case-clue',
+    action: 'examine',
+    category: 'used-up',
+    hold: false,
+    fadesBody: true,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the clue is on the case board',
+    resetsOn: 'New Game',
+  },
+  // Spec 10 task 5.3: the watch-house logbook on the lodge table opens minigame 2b.
+  'watch-logbook': {
+    kind: 'watch-logbook',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the watch log is in order (minigame 2b solved), or the story is not in stage 2',
+    resetsOn: 'New Game',
+    idlePrompt: 'The watch log is in order',
+  },
+  // Spec 10 task 5.4: the crest dials in the sexton's niche open minigame 2a.
+  'crest-lock': {
+    kind: 'crest-lock',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: "the niche is open (minigame 2a solved), or the story is not in stage 2",
+    resetsOn: 'New Game',
+    idlePrompt: 'The niche is open',
+  },
+  // Spec 10 task 5.4: a crypt name tablet on Mausoleum Row; reading it says the family, crest and year.
+  'crest-tablet': {
+    kind: 'crest-tablet',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: "the niche is open (minigame 2a solved), or the story is not in stage 2",
+    resetsOn: 'New Game',
+    idlePrompt: 'A crypt name tablet',
+  },
+  // Spec 10 task 5.5: a plaster cast at the Ames grave opens minigame 2c.
+  'boot-cast': {
+    kind: 'boot-cast',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the boots are matched (minigame 2c solved), or the story is not in stage 2',
+    resetsOn: 'New Game',
+    idlePrompt: 'The boots are matched',
   },
   workbench: {
     kind: 'workbench',

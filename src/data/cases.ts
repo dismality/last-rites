@@ -343,6 +343,230 @@ export const CASE_1_REWARD = {
   position: [-8.4, 0, -21.6],
 } as const satisfies { item: ItemId; stone: string; position: readonly [number, number, number] }
 
+// ---- Case 2 minigame data (spec 10 task 5.1) ----
+
+export type Case2SuspectId = 'sexton' | 'doctor' | 'lodge-keeper' | 'gravedigger'
+
+export const CASE_2_SUSPECTS: Readonly<Record<Case2SuspectId, string>> = {
+  sexton: 'the sexton',
+  doctor: 'the doctor',
+  'lodge-keeper': 'the lodge keeper',
+  gravedigger: 'the gravedigger',
+}
+
+export type CrestId = 'tower' | 'leaf' | 'star' | 'moon' | 'cross' | 'swords'
+
+/** A crypt name tablet on Mausoleum Row: family, crest and the year the founder was laid down. */
+export interface CrestTabletDef {
+  family: string
+  crest: CrestId
+  year: number
+  /** The avenue crypt it hangs on, as an index into `avenueCrypts()` (two per row, west first). */
+  crypt: number
+}
+
+/** Crest glyphs, drawn as text so they read on any screen (text presentation, never emoji). */
+export const CREST_GLYPHS: Readonly<Record<CrestId, string>> = {
+  tower: '♜︎',
+  leaf: '❦︎',
+  star: '✦︎',
+  moon: '☾︎',
+  cross: '✠︎',
+  swords: '⚔︎',
+}
+
+export const CREST_NAMES: Readonly<Record<CrestId, string>> = {
+  tower: 'Tower',
+  leaf: 'Leaf',
+  star: 'Star',
+  moon: 'Moon',
+  cross: 'Cross',
+  swords: 'Swords',
+}
+
+export interface CrestLockDef {
+  /** The sexton's niche on the west side of the avenue. */
+  niche: readonly [number, number, number]
+  note: string
+  tablets: readonly CrestTabletDef[]
+  /** What each dial can be turned to, in turning order. */
+  dialCrests: readonly CrestId[]
+  wrongMessage: string
+}
+
+/**
+ * Minigame 2a, The Crest Lock (Req 19). Six tablets on the six avenue crypts; the four founding
+ * families' crests are on the dials. The two later families are only there to be read past.
+ */
+export const CASE_2_CREST_LOCK: CrestLockDef = {
+  niche: [-21.2, 0, -52.5],
+  note: 'Turn them in the order the founders were laid down',
+  tablets: [
+    { family: 'Ashby', crest: 'moon', year: 1767, crypt: 0 },
+    { family: 'Whitlock', crest: 'cross', year: 1803, crypt: 1 },
+    { family: 'Marlowe', crest: 'tower', year: 1752, crypt: 2 },
+    { family: 'Penrose', crest: 'swords', year: 1811, crypt: 3 },
+    { family: 'Kestrel', crest: 'star', year: 1761, crypt: 4 },
+    { family: 'Thorne', crest: 'leaf', year: 1758, crypt: 5 },
+  ],
+  dialCrests: ['moon', 'tower', 'star', 'leaf'],
+  wrongMessage: 'The lock does not give',
+}
+
+/** The four dials, left to right: the founders' crests by the year each was laid down. */
+export const CASE_2_CREST_ORDER: readonly CrestId[] = CASE_2_CREST_LOCK.dialCrests
+  .map((c) => CASE_2_CREST_LOCK.tablets.find((t) => t.crest === c)!)
+  .sort((a, b) => a.year - b.year)
+  .map((t) => t.crest)
+
+export type WatchEntryId =
+  | 'w-nine'
+  | 'w-ten'
+  | 'w-eleven'
+  | 'w-midnight'
+  | 'w-one'
+  | 'w-three'
+  | 'w-four'
+  | 'w-five'
+
+/** A torn page of the watch-house log (minigame 2b). Times are in words, as a watchman wrote them. */
+export interface WatchEntryDef {
+  id: WatchEntryId
+  text: string
+  /** Who held the watch when it was written. */
+  watchman: Case2SuspectId
+}
+
+/** The night of 9 November 1849, two nights after Esther Ames was buried. */
+export const CASE_2_WATCH_LOG: readonly WatchEntryDef[] = [
+  {
+    id: 'w-nine',
+    text: 'The church strikes nine. Gate locked, lantern trimmed. The sexton gives the watch to the gravedigger.',
+    watchman: 'gravedigger',
+  },
+  { id: 'w-ten', text: 'Ten bells. Rain on the north path. Nothing stirring.', watchman: 'gravedigger' },
+  { id: 'w-eleven', text: 'Eleven. A fox at the new graves on the east rows, chased off.', watchman: 'gravedigger' },
+  {
+    id: 'w-midnight',
+    text: 'Midnight. The gravedigger goes to his bed. The lodge keeper takes the watch.',
+    watchman: 'lodge-keeper',
+  },
+  { id: 'w-one', text: 'One bell past midnight. Round of the walls walked. All quiet.', watchman: 'lodge-keeper' },
+  { id: 'w-three', text: 'Three of the morning. All quiet. Lantern refilled.', watchman: 'lodge-keeper' },
+  { id: 'w-four', text: 'The fourth hour. The lodge keeper gives the watch to the sexton.', watchman: 'sexton' },
+  {
+    id: 'w-five',
+    text: 'Five, first grey light. The Ames grave is found opened and empty. Sent for the constable.',
+    watchman: 'sexton',
+  },
+]
+
+/** Earliest first. The gap is between one and three, on the lodge keeper's watch. */
+export const CASE_2_WATCH_ORDER: readonly WatchEntryId[] = [
+  'w-nine',
+  'w-ten',
+  'w-eleven',
+  'w-midnight',
+  'w-one',
+  'w-three',
+  'w-four',
+  'w-five',
+]
+
+export const CASE_2_WATCH_GAP: { after: WatchEntryId; before: WatchEntryId; keeper: Case2SuspectId; text: string } = {
+  after: 'w-one',
+  before: 'w-three',
+  keeper: 'lodge-keeper',
+  text: "Nothing was written between one and three: two hours on the lodge keeper's watch, the night the Ames grave was robbed.",
+}
+
+/** How the torn pages lie on the lodge table before the player moves any. Not the right order. */
+export const CASE_2_WATCH_SHELF: readonly WatchEntryId[] = [
+  'w-three',
+  'w-ten',
+  'w-five',
+  'w-midnight',
+  'w-nine',
+  'w-four',
+  'w-one',
+  'w-eleven',
+]
+
+/** The logbook on the lodge table (top 0.8) opens minigame 2b; the shotgun lies at the table's centre. */
+export const CASE_2_LOGBOOK_POSITION = [-23.45, 0.81, -41.45] as const
+
+/** What a print or a boot shows: tread, size and hobnails (minigame 2c). `null` size: too worn to tell. */
+export interface PrintDetails {
+  tread: string
+  size: number | null
+  hobnails: string
+}
+
+export type CastId = 'cast-heel' | 'cast-full' | 'cast-narrow'
+
+export interface CastDef extends PrintDetails {
+  id: CastId
+  title: string
+  /** Where it was poured, as the plaster label says. */
+  label: string
+  position: readonly [number, number, number]
+}
+
+export interface BootDef extends PrintDetails {
+  owner: Case2SuspectId
+  title: string
+  size: number
+}
+
+/** Three casts in front of the Ames stone (16.4, -22.6). Flat props with no collider. */
+export const CASE_2_CASTS: readonly CastDef[] = [
+  {
+    id: 'cast-heel',
+    title: 'A heel, smudged',
+    label: 'By the headstone',
+    tread: 'worn smooth',
+    size: null,
+    hobnails: 'none to see',
+    position: [15.7, 0.01, -21.5],
+  },
+  {
+    id: 'cast-full',
+    title: 'A full print',
+    label: 'On the opened grave',
+    tread: 'cross-cut',
+    size: 11,
+    hobnails: 'a ring of nine, one missing at the heel',
+    position: [16.4, 0.01, -21.2],
+  },
+  {
+    id: 'cast-narrow',
+    title: 'A narrow print',
+    label: 'By the path',
+    tread: 'fine, a town heel',
+    size: 7,
+    hobnails: 'none',
+    position: [17.1, 0.01, -21.5],
+  },
+]
+
+export const CASE_2_BOOTS: readonly BootDef[] = [
+  { owner: 'sexton', title: "The sexton's boots", tread: 'worn smooth', size: 9, hobnails: 'none' },
+  { owner: 'doctor', title: "The doctor's shoes", tread: 'fine, a town heel', size: 8, hobnails: 'none' },
+  {
+    owner: 'lodge-keeper',
+    title: "The lodge keeper's boots",
+    tread: 'cross-cut',
+    size: 11,
+    hobnails: 'a ring of nine, one missing at the heel',
+  },
+  { owner: 'gravedigger', title: "The gravedigger's boots", tread: 'cross-cut', size: 11, hobnails: 'a full ring of ten' },
+]
+
+/** The one cast that matches one pair of boots. */
+export const CASE_2_BOOT_MATCH: { cast: CastId; boot: Case2SuspectId } = { cast: 'cast-full', boot: 'lodge-keeper' }
+
+export const CAST_TOO_WORN_MESSAGE = 'This cast is too worn to match anything.'
+
 // Walk clue positions stand beside their real stones (tombstones.ts).
 const CASE_1: CaseDef = {
   id: 'saved-by-the-bell',
@@ -506,7 +730,8 @@ const CASE_2: CaseDef = {
       line: 'A receipt for "subjects", in the lodge keeper\'s hand.',
       icon: 'read',
       redHerring: false,
-      found: { kind: 'walk', spot: 'mausoleum-row', position: [-24, 0, -44] },
+      // On the lodge table (top 0.8), at the end away from the logbook.
+      found: { kind: 'walk', spot: 'mausoleum-row', position: [-24.2, 0.81, -41.55] },
     },
     {
       id: 'spade-fresh-clay',

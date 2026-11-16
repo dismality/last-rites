@@ -1,6 +1,6 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { CASES, type CaseId } from '../../data/cases'
+import { CASES, CASE_2_CREST_LOCK, CASE_2_WATCH_ORDER, type CaseId, type CrestId } from '../../data/cases'
 import { fromSaveFile, toSaveFile, type SaveState } from './saveGame'
 import { freshCaseSave, mergeRetry, sanitizeCaseSave, type CaseSave } from './caseSave'
 import { linkKey } from './caseBoard'
@@ -21,6 +21,11 @@ const caseSaveArb: fc.Arbitrary<CaseSave> = fc
         hints: fc.record({ revealed: fc.constantFrom(0, 1, 2, 3) as fc.Arbitrary<0 | 1 | 2 | 3> }),
         ledgerLines: fc.constant([]),
         bellsExamined: fc.constant([]),
+        crestDials:
+          c.id === 'resurrection-men'
+            ? fc.array(fc.constantFrom<CrestId | null>(null, ...CASE_2_CREST_LOCK.dialCrests), { minLength: 4, maxLength: 4 })
+            : fc.constant([null, null, null, null]),
+        watchLog: c.id === 'resurrection-men' ? fc.shuffledSubarray([...CASE_2_WATCH_ORDER]) : fc.constant([]),
         hymnTiles: fc.constant([null, null, null, null, null]),
         evidenceFound: fc.constant([]),
         timeline: fc.constant([]),
@@ -95,6 +100,20 @@ describe('caseSave', () => {
       }),
       { numRuns: 100 },
     )
+  })
+
+  it('keeps the 2a dials and 2b pages, drops junk, and Retry keeps the fuller draft', () => {
+    const raw = freshCaseSave() as unknown as { cases: Record<string, Record<string, unknown>> }
+    raw.cases['resurrection-men'].crestDials = ['tower', 'nope', 7, 'swords', 'moon']
+    raw.cases['resurrection-men'].watchLog = ['w-ten', 'w-ten', 'x', 'w-nine']
+    raw.cases['saved-by-the-bell'].watchLog = ['w-ten']
+    const s = sanitizeCaseSave(JSON.parse(JSON.stringify(raw)))
+    expect(s.cases['resurrection-men'].crestDials).toEqual(['tower', null, null, null])
+    expect(s.cases['resurrection-men'].watchLog).toEqual(['w-ten', 'w-nine'])
+    expect(s.cases['saved-by-the-bell'].watchLog).toEqual([])
+    const merged = mergeRetry(freshCaseSave(), s)
+    expect(merged.cases['resurrection-men'].crestDials).toEqual(['tower', null, null, null])
+    expect(merged.cases['resurrection-men'].watchLog).toEqual(['w-ten', 'w-nine'])
   })
 })
 

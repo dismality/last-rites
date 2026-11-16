@@ -1,7 +1,8 @@
 // Pure view rules for minigame 3b, Elias's Last Night (spec 10 task 4.4, Req 16). The verdict
 // itself is `evidenceTimeline` in caseMinigames.ts; this file decides which cards the player holds,
 // how the arrangement on the slate changes, and what the keyboard does: arrows choose a card,
-// Space lifts it, arrows move it, Enter confirms. No React, three.js or Howler imports.
+// Space lifts it, arrows move it, Enter confirms. Minigame 2b's watch log reuses `moveCard` and
+// `timelineKey`. No React, three.js or Howler imports.
 
 import { CASE_3_CARD_SHELF, CASE_3_EVIDENCE, CASE_3_TIMELINE_ORDER, type EvidenceCardId } from '../../data/cases'
 
@@ -28,7 +29,7 @@ export function syncTimeline(order: CardOrder, held: readonly EvidenceCardId[]):
 }
 
 /** Moves the card at `from` so it sits at `to` (a copy; out of range leaves the order alone). */
-export function moveCard(order: CardOrder, from: number, to: number): EvidenceCardId[] {
+export function moveCard<T extends string = EvidenceCardId>(order: readonly T[], from: number, to: number): T[] {
   const next = [...order]
   if (from < 0 || from >= next.length || to < 0 || to >= next.length || from === to) return next
   const [card] = next.splice(from, 1)
@@ -36,19 +37,19 @@ export function moveCard(order: CardOrder, from: number, to: number): EvidenceCa
   return next
 }
 
-export interface TimelineKeyState {
+export interface TimelineKeyState<T extends string = EvidenceCardId> {
   cursor: number
   lifted: boolean
-  order: EvidenceCardId[]
+  order: T[]
 }
 
-export type TimelineKeyResult = TimelineKeyState & { confirm: boolean }
+export type TimelineKeyResult<T extends string = EvidenceCardId> = TimelineKeyState<T> & { confirm: boolean }
 
 /**
  * One key press. Left and Right choose a card, or carry the lifted card one place; Space lifts and
  * puts down; Enter asks to confirm. A carried card stops at the ends of the slate.
  */
-export function timelineKey(state: TimelineKeyState, code: string): TimelineKeyResult {
+export function timelineKey<T extends string = EvidenceCardId>(state: TimelineKeyState<T>, code: string): TimelineKeyResult<T> {
   const last = state.order.length - 1
   if (code === 'Enter') return { ...state, confirm: true }
   if (code === 'Space') return { ...state, lifted: state.order.length > 0 ? !state.lifted : false, confirm: false }

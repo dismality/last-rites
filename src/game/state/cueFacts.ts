@@ -150,6 +150,18 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
       const p = useCaseStore.getState().cases['sealed-catacombs']
       return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3b') }
     }
+    case 'case-clue': {
+      const found = Object.values(useCaseStore.getState().cases).some((p) => p.found.includes(subject))
+      return { usedUp: found }
+    }
+    case 'watch-logbook':
+    case 'crest-lock':
+    case 'crest-tablet':
+    case 'boot-cast': {
+      const p = useCaseStore.getState().cases['resurrection-men']
+      const id = kind === 'watch-logbook' ? '2b' : kind === 'boot-cast' ? '2c' : '2a'
+      return { usedUp: false, idle: useStageStore.getState().stage !== 2 || p.minigames.includes(id) }
+    }
     case 'workbench':
       return OPEN
   }

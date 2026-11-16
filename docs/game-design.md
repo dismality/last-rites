@@ -861,6 +861,11 @@ Graves were robbed for anatomy schools; iron mortsafes and watch-houses were bui
 - **Other clues:** a surgeon's receipt for "subjects" (Mausoleum Row); a spade with fresh clay (gravedigger's shed, a **red herring**: he dug a legal grave that day); a doctor's anatomy school letter (a **red herring**: he bought legally, with a licence).
 - **Final answer (red-thread accusation):** "The bodies were sold by **the lodge keeper**. Motive: the surgeon's receipt in his hand. Means: the matching boots. Opportunity: the gap on his watch."
 - **Reward:** sunrise; the whistle and the hidden stair lead into stage 3.
+- **As built (spec 10 task 5):**
+  - **Crest Lock (2a):** six crypt name tablets hang on the avenue railing in front of their crypts (family, crest, "laid down" year; reading one says it aloud). Ashby (moon) 1767, Whitlock (cross) 1803, Marlowe (tower) 1752, Penrose (swords) 1811, Kestrel (star) 1761, Thorne (leaf) 1758. The dials carry the four founders' crests (moon, tower, star, leaf); the answer is tower, leaf, star, moon. The overlay shows the lodge note and the tablets as read. A wrong setting never says which dial is wrong. Solving reveals the whistle in the niche (a reward spawn at (−20.7, 0.3, −52.5), `revealedBy: '2a'`) and pins the sexton's watch ledger.
+  - **Watch Log (2b):** eight torn pages on the lodge table, the night of 9 November 1849, hours in words (nine to first light). The gap is one to three, on the lodge keeper's watch; the solved log marks it ⌛ and names him. The pages start in a fixed scrambled order.
+  - **Boot Prints (2c):** a smudged heel (too worn to match), a full print (cross-cut, size 11, a ring of nine hobnails with one missing at the heel) and a narrow town print. The gravedigger's boots differ from the lodge keeper's only in a full ring of ten, so the hobnails decide it. A wrong pair names the first feature that disagrees.
+  - **Walk clues:** the surgeon's receipt lies on the lodge table, the spade at (−4, 8) and the school letter in the avenue. Walk clues of stages 1 and 2 are props by day until found (stage 3's positions are still to be checked).
 
 ### Case 3: "The Sealed Catacombs" (Father Crane), stage 3, with the Silas reveal
 The existing story stands: Crane sealed 31 living people in the catacombs in 1849.

@@ -172,37 +172,47 @@ Common rules for all tasks:
   - [x] 4.10 Finish
     - Run the Finish steps for task 4; commit `stage 3 case, rite and Silas (spec 10 task 4)`
 
-- [ ] 5. Stage 2: The Resurrection Men
-  - [ ] 5.1 Case 2 data
+- [x] 5. Stage 2: The Resurrection Men
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 5.1 Case 2 data
+    - Done outside Kiro by Claude. Fallback clues for cut 2a/2c were not added: neither task was cut
     - Fill `cases.ts` for Case 2: four suspects, crest years on 6 tablets, 8 watch-log entries with the 2-hour gap, 3 casts and 4 boots, surgeon's receipt, red herrings (spade with fresh clay, doctor's letter), Final_Question, Closed-case page; fallback clues for 2a and 2c
     - Extend `cases.test.ts` (also with 2a and 2c cut)
     - _Requirements: 7.1, 7.2, 19.1, 19.5, 20.1, 21.1, 21.5, 22.1, 22.4_
-  - [ ] 5.2 Pure rules for 2a, 2b and 2c
+  - [x] 5.2 Pure rules for 2a, 2b and 2c
+    - Done outside Kiro by Claude
     - Add `crestDials`, `watchOrder`, `bootMatch` to `caseMinigames.ts` with tests
     - **Property 16: Right answers accepted, wrong answers rejected** (2a, 2b, 2c)
     - _Requirements: 19.2, 19.3, 20.2, 20.3, 21.2, 21.3_
-  - [ ] 5.3 Minigame 2b overlay and lodge props
+  - [x] 5.3 Minigame 2b overlay and lodge props
+    - Done outside Kiro by Claude
     - Create `WatchLogMinigame.tsx` (8 entries, drag and keyboard lift/move, first-wrong marker with glyph and text) and the lodge logbook prop
     - _Requirements: 20.1-20.4, 11.9_
-  - [ ] 5.4 Minigame 2a overlay and crest lock (cuttable, cut order 4)
+  - [x] 5.4 Minigame 2a overlay and crest lock (cuttable, cut order 4)
+    - Done outside Kiro by Claude. Tablets hang on the avenue railing, since a plate on the crypt front sits inside the door frame
     - Create `CrestLockMinigame.tsx`, the sexton's niche dials at (−21.2, −52.5), the lodge note and the crypt name tablets on the existing tablet faces; solving gives the whistle and the sexton's ledger
     - If cut: keep the whistle where it is and make the sexton's ledger a found item
     - _Requirements: 19.1-19.5, 11.9_
-  - [ ] 5.5 Minigame 2c overlay and plaster casts (cuttable, cut order 3)
+  - [x] 5.5 Minigame 2c overlay and plaster casts (cuttable, cut order 3)
+    - Done outside Kiro by Claude
     - Create `BootPrintsMinigame.tsx` and the three plaster casts at the Ames grave; boots examine views
     - If cut: the boots clue becomes a found item
     - _Requirements: 21.1-21.5, 11.9_
-  - [ ] 5.6 Final answer and hand-off to Stage 3
+  - [x] 5.6 Final answer and hand-off to Stage 3
+    - Done outside Kiro by Claude. No new code: the altar and case close were already generic
     - Wire the Case 2 Final_Question at the altar; on solve carry the whistle and stair into Stage 3 and move Case 2 to Closed cases
     - _Requirements: 22.1-22.5_
-  - [ ] 5.7 Dev hooks for Stage 2
+  - [x] 5.7 Dev hooks for Stage 2
+    - Done outside Kiro by Claude
     - Add "Solve 2a/2b/2c" to the Dev_Panel
     - _Requirements: 5.3_
-  - [ ] 5.8 Stage 2 e2e and screenshots
+  - [x] 5.8 Stage 2 e2e and screenshots
+    - Done outside Kiro by Claude. Screenshot pairs case2-2a, case2-2b, case2-2c (and their -wrong) and case2-board
     - Create `e2e/case2.spec.ts`: solve 2a, 2b, 2c with mouse and keyboard (wrong and right), then the right and a wrong altar answer; a keyboard-only run; skip the 2a and 2c cases when those tasks are cut
     - Save the screenshot pairs for 2a, 2b, 2c and the Case 2 board
     - _Requirements: 19.6, 19.7, 20.5, 20.6, 21.6, 21.7, 22.6, 22.7_
-  - [ ] 5.9 Finish
+  - [x] 5.9 Finish
+    - Done outside Kiro by Claude
     - Run the Finish steps for task 5; commit `stage 2 case and minigames (spec 10 task 5)`
 
 - [ ] 6. E5: Win cutscene

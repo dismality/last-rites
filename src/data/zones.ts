@@ -185,7 +185,14 @@ export const FIXED_SPAWNS: readonly FixedSpawn[] = [
     item: 'childs-locket',
     nightOnly: true,
   },
-  { id: 'fx-bone-whistle', zone: 'mausoleum-row', position: [-21, 0.3, -48], item: 'bone-whistle' },
+  {
+    id: 'fx-bone-whistle',
+    zone: 'mausoleum-row',
+    position: [-20.7, 0.3, -52.5],
+    item: 'bone-whistle',
+    // In the sexton's niche, which opens when the crest lock is solved (spec 10 task 5.4).
+    revealedBy: '2a',
+  },
   { id: 'fx-page-3', zone: 'mausoleum-row', position: [-20, 0.3, -55], item: 'journal-page-3' },
   { id: 'fx-ledger', zone: 'mausoleum-row', position: [-19, 0.3, -54], item: 'parish-ledger' },
   { id: 'fx-rosary', zone: 'mausoleum-row', position: [-20, 0.3, -57], item: 'crane-rosary' },

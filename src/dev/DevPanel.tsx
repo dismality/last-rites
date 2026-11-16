@@ -178,6 +178,15 @@ export function DevPanel() {
             <button type="button" onClick={run(() => solveMinigame('1b'))}>
               Solve 1b
             </button>
+            <button type="button" onClick={run(() => solveMinigame('2a'))}>
+              Solve 2a
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('2b'))}>
+              Solve 2b
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('2c'))}>
+              Solve 2c
+            </button>
             <button type="button" onClick={run(() => solveMinigame('3a'))}>
               Solve 3a
             </button>

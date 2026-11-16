@@ -19,6 +19,16 @@ import {
   type LedgerFlagInput,
 } from './caseMinigames'
 import { CASE_3_EVIDENCE, CASE_3_TIMELINE_ORDER, type EvidenceCardId } from '../../data/cases'
+import {
+  CASE_2_BOOTS,
+  CASE_2_CASTS,
+  CASE_2_CREST_LOCK,
+  CASE_2_CREST_ORDER,
+  CASE_2_WATCH_ORDER,
+  CASE_2_WATCH_SHELF,
+  type CrestId,
+} from '../../data/cases'
+import { bootMatch, crestDials, watchOrder } from './caseMinigames'
 
 const rightFlags = (): LedgerFlagInput[] =>
   CASE_1_RIGHT_FLAGS.map((r) => ({
@@ -192,5 +202,67 @@ describe('evidenceTimeline (3b)', () => {
       ),
       { numRuns: 200 },
     )
+  })
+})
+
+describe('crestDials (2a)', () => {
+  it('opens for the founders by year: tower, leaf, star, moon', () => {
+    expect(CASE_2_CREST_ORDER).toEqual(['tower', 'leaf', 'star', 'moon'])
+    expect(crestDials(['tower', 'leaf', 'star', 'moon'])).toEqual({ ok: true })
+  })
+
+  it('rejects a wrong or unfinished setting with "The lock does not give"', () => {
+    const r = crestDials(['tower', 'star', 'leaf', 'moon'])
+    expect(r).toMatchObject({ ok: false, firstWrong: 1, message: 'The lock does not give' })
+    expect(crestDials(['tower', 'leaf', null, null])).toMatchObject({ ok: false, firstWrong: 2 })
+  })
+
+  it('Property 16 (2a): only the founders order is accepted', () => {
+    const dial = fc.option(fc.constantFrom<CrestId>(...CASE_2_CREST_LOCK.dialCrests), { nil: null })
+    fc.assert(
+      fc.property(fc.array(dial, { minLength: 4, maxLength: 4 }), (dials) => {
+        const right = dials.every((d, i) => d === CASE_2_CREST_ORDER[i])
+        expect(crestDials(dials).ok).toBe(right)
+      }),
+    )
+  })
+})
+
+describe('watchOrder (2b)', () => {
+  it('accepts the night in order and rejects the shelf order', () => {
+    expect(watchOrder(CASE_2_WATCH_ORDER)).toEqual({ ok: true })
+    expect(watchOrder(CASE_2_WATCH_SHELF)).toMatchObject({ ok: false, firstWrong: 0 })
+  })
+
+  it('Property 16 (2b): only the right order; first-wrong is the first difference', () => {
+    fc.assert(
+      fc.property(fc.shuffledSubarray([...CASE_2_WATCH_ORDER], { minLength: 8, maxLength: 8 }), (order) => {
+        const v = watchOrder(order)
+        const diff = order.findIndex((id, i) => id !== CASE_2_WATCH_ORDER[i])
+        expect(v.ok).toBe(diff < 0)
+        if (diff >= 0) expect(v.firstWrong).toBe(diff)
+      }),
+    )
+  })
+})
+
+describe('bootMatch (2c)', () => {
+  it('matches the full print to the lodge keeper only', () => {
+    expect(bootMatch('cast-full', 'lodge-keeper')).toEqual({ ok: true })
+    expect(bootMatch('cast-full', 'gravedigger')).toMatchObject({ ok: false, message: 'The hobnails do not agree.' })
+  })
+
+  it('names the first feature that disagrees, or says the cast is too worn', () => {
+    expect(bootMatch('cast-full', 'sexton').message).toBe('The tread does not agree.')
+    expect(bootMatch('cast-narrow', 'doctor').message).toBe('The size does not agree.')
+    expect(bootMatch('cast-heel', 'sexton').message).toBe('This cast is too worn to match anything.')
+  })
+
+  it('Property 16 (2c): exactly one pair of the 12 is accepted', () => {
+    const ok = CASE_2_CASTS.flatMap((c) => CASE_2_BOOTS.map((b) => [c.id, b.owner] as const)).filter(
+      ([c, b]) => bootMatch(c, b).ok,
+    )
+    expect(ok).toEqual([['cast-full', 'lodge-keeper']])
+    for (const c of CASE_2_CASTS) for (const b of CASE_2_BOOTS) if (!bootMatch(c.id, b.owner).ok) expect(bootMatch(c.id, b.owner).message).toBeTruthy()
   })
 })

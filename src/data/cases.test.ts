@@ -6,6 +6,15 @@ import {
   CASE_1_REWARD,
   CASE_1_RIGHT_FLAGS,
   CASE_1_STONES,
+  CASE_2_BOOTS,
+  CASE_2_BOOT_MATCH,
+  CASE_2_CASTS,
+  CASE_2_CREST_LOCK,
+  CASE_2_SUSPECTS,
+  CASE_2_WATCH_GAP,
+  CASE_2_WATCH_LOG,
+  CASE_2_WATCH_ORDER,
+  CASE_2_WATCH_SHELF,
   CASE_3_EVIDENCE,
   CASE_3_HYMN_BOARD,
   CASE_3_TIMELINE_ORDER,
@@ -24,7 +33,8 @@ import { RELIC_MAP, RITE_ORDER, RITE_STEP_LINES } from './relics'
 import { TOMBSTONE_MAP, type TombstoneId } from './tombstones'
 import { CLOSED_CASE_PAGES } from './caseText'
 import { STAGES, type StageNumber } from './stages'
-import type { ZoneId } from './zones'
+import { FIXED_SPAWNS, type ZoneId } from './zones'
+import { avenueCrypts } from './cemeteryLayout'
 
 /** Zones a player can walk in by stage (Mausoleum Row needs the key from case 1, the
  *  catacombs the whistle from case 2). The chapel is always open. */
@@ -238,6 +248,54 @@ describe('case 3 data', () => {
     for (const id of ['hymn-tiles-wrong', 'hymn-stair-open', 'crypt-pin-pulled', 'relic-placed']) {
       expect(CAPTIONS.some((c) => c.id === id)).toBe(true)
     }
+  })
+})
+
+describe('case 2 data', () => {
+  const c = CASE_MAP['resurrection-men']
+
+  it('has four suspects, and the Who options are exactly them', () => {
+    expect(Object.values(CASE_2_SUSPECTS)).toEqual(c.final.slots[0].options)
+  })
+
+  it('puts six tablets on the six avenue crypts, with four founders on the dials', () => {
+    const t = CASE_2_CREST_LOCK.tablets
+    expect(t).toHaveLength(6)
+    expect(new Set(t.map((x) => x.crypt)).size).toBe(6)
+    expect(Math.max(...t.map((x) => x.crypt))).toBeLessThan(avenueCrypts().length)
+    expect(new Set(t.map((x) => x.crest)).size).toBe(6)
+    expect(new Set(t.map((x) => x.year)).size).toBe(6)
+    expect(CASE_2_CREST_LOCK.dialCrests).toHaveLength(4)
+    for (const d of CASE_2_CREST_LOCK.dialCrests) expect(t.some((x) => x.crest === d)).toBe(true)
+    expect(CASE_2_CREST_LOCK.note).toBe('Turn them in the order the founders were laid down')
+  })
+
+  it('has 8 watch entries, one right order, a scrambled shelf and the gap on the lodge keeper', () => {
+    expect(CASE_2_WATCH_LOG).toHaveLength(8)
+    expect([...CASE_2_WATCH_ORDER].sort()).toEqual(CASE_2_WATCH_LOG.map((e) => e.id).sort())
+    expect([...CASE_2_WATCH_SHELF].sort()).toEqual([...CASE_2_WATCH_ORDER].sort())
+    expect(CASE_2_WATCH_SHELF).not.toEqual(CASE_2_WATCH_ORDER)
+    const at = (id: string) => CASE_2_WATCH_ORDER.indexOf(id as never)
+    expect(at(CASE_2_WATCH_GAP.before)).toBe(at(CASE_2_WATCH_GAP.after) + 1)
+    expect(CASE_2_WATCH_LOG.find((e) => e.id === CASE_2_WATCH_GAP.after)!.watchman).toBe(CASE_2_WATCH_GAP.keeper)
+    expect(CASE_2_SUSPECTS[CASE_2_WATCH_GAP.keeper]).toBe(c.final.answer[0])
+  })
+
+  it('has 3 casts and 4 boots; the one match is the answer and its twin differs only in hobnails', () => {
+    expect(CASE_2_CASTS).toHaveLength(3)
+    expect(CASE_2_BOOTS).toHaveLength(4)
+    expect(CASE_2_SUSPECTS[CASE_2_BOOT_MATCH.boot]).toBe(c.final.answer[0])
+    const cast = CASE_2_CASTS.find((x) => x.id === CASE_2_BOOT_MATCH.cast)!
+    const boot = CASE_2_BOOTS.find((x) => x.owner === CASE_2_BOOT_MATCH.boot)!
+    expect([cast.tread, cast.size, cast.hobnails]).toEqual([boot.tread, boot.size, boot.hobnails])
+  })
+
+  it('gives the whistle at the niche once 2a is solved, and keeps the spade and school letter as red herrings', () => {
+    const w = FIXED_SPAWNS.find((s) => s.item === 'bone-whistle')!
+    expect(w.revealedBy).toBe('2a')
+    expect(Math.hypot(w.position[0] - CASE_2_CREST_LOCK.niche[0], w.position[2] - CASE_2_CREST_LOCK.niche[2])).toBeLessThan(1)
+    const rh = c.clues.filter((k) => k.redHerring).map((k) => k.id)
+    expect(rh).toEqual(['spade-fresh-clay', 'doctor-school-letter'])
   })
 })
 

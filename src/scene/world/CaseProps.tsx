@@ -3,18 +3,30 @@
 // they add a few draw calls and no shader cost. Using a post opens the 1b overlay on that post.
 // Mount inside <Physics> (no colliders: a 6 cm post must never trap or snag the player).
 
+import { useMemo } from 'react'
+import { CanvasTexture, SRGBColorSpace } from 'three'
 import {
   CASE_1_BELLS,
+  CASE_2_CASTS,
+  CASE_2_CREST_LOCK,
+  CASE_2_LOGBOOK_POSITION,
+  CREST_GLYPHS,
+  CREST_NAMES,
+  caseOfStage,
+  type CastDef,
+  type ClueDef,
+  type CrestTabletDef,
   CASE_3_CRYPT_PROPS,
   CASE_3_EVIDENCE,
   CASE_3_EVIDENCE_SPOTS,
   type BellPostDef,
   type EvidenceCardId,
 } from '../../data/cases'
-import { CHAPEL_CENTER } from '../../data/cemeteryLayout'
+import { CHAPEL_CENTER, MAUSOLEUM_ROW, avenueCrypts } from '../../data/cemeteryLayout'
 import { HYMN_BOARD_POSITION, HYMN_TILE_ROW, PSALTER_POSITION } from '../../data/chapelScenery'
 import { ALTAR_WHISTLE_OFFSET } from '../../data/gateHints'
 import { useCaseStore } from '../../game/state/caseStore'
+import { useClueRevealStore } from '../../game/state/clueRevealStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { useStageStore } from '../../game/state/stageStore'
@@ -278,6 +290,280 @@ function CryptProps() {
     </>
   )
 }
+
+// ---- Walk clues ----
+
+/** A walk clue's look. PLACEHOLDER shapes: a paper, a spade, a posy or a small bundle. */
+function WalkClueShape({ clue }: { clue: ClueDef }) {
+  if (clue.id === 'spade-fresh-clay') {
+    return (
+      <group rotation={[0, 0, 0.35]}>
+        <mesh position={[0, 0.55, 0]}>
+          <cylinderGeometry args={[0.02, 0.02, 0.9, 6]} />
+          <meshStandardMaterial color="#5a4632" roughness={0.9} />
+        </mesh>
+        <mesh position={[0, 0.08, 0]}>
+          <boxGeometry args={[0.18, 0.24, 0.02]} />
+          <meshStandardMaterial color="#6b4a2e" roughness={1} metalness={0.3} />
+        </mesh>
+      </group>
+    )
+  }
+  if (clue.id === 'hale-fresh-flowers') {
+    const buds: readonly (readonly [number, number])[] = [
+      [-0.06, 0],
+      [0.05, 0.04],
+      [0.01, -0.06],
+    ]
+    return (
+      <group>
+        {buds.map(([x, z], i) => (
+          <mesh key={i} position={[x, 0.05, z]}>
+            <sphereGeometry args={[0.045, 6, 5]} />
+            <meshStandardMaterial color={i === 1 ? '#c9c2a8' : '#8a3a3a'} roughness={1} />
+          </mesh>
+        ))}
+      </group>
+    )
+  }
+  if (clue.icon === 'read') {
+    return (
+      <mesh position={[0, 0.005, 0]} rotation={[0, 0.4, 0]}>
+        <boxGeometry args={[0.2, 0.01, 0.15]} />
+        <meshStandardMaterial color="#d8c9a3" roughness={1} />
+      </mesh>
+    )
+  }
+  return (
+    <mesh position={[0, 0.06, 0]}>
+      <boxGeometry args={[0.22, 0.12, 0.16]} />
+      <meshStandardMaterial color="#4a4036" roughness={1} />
+    </mesh>
+  )
+}
+
+type WalkClueDef = ClueDef & { found: { kind: 'walk' } }
+
+const isWalkClue = (c: ClueDef): c is WalkClueDef => c.found.kind === 'walk'
+
+function WalkClue({ clue }: { clue: WalkClueDef }) {
+  return (
+    <group position={[...clue.found.position]}>
+      <Interactable
+        id={`case-clue-${clue.id}`}
+        kind="case-clue"
+        subject={clue.id}
+        runeHeight={0.6}
+        outlineRange={4}
+        onInteract={() => {
+          useCaseStore.getState().findClue(clue.id)
+        }}
+      >
+        <WalkClueShape clue={clue} />
+        {/* A flat prop is thin, so a hidden box gives the crosshair something to land on. */}
+        <mesh visible={false} position={[0, 0.12, 0]}>
+          <boxGeometry args={[0.45, 0.3, 0.45]} />
+        </mesh>
+      </Interactable>
+    </group>
+  )
+}
+
+/**
+ * Clues found by walking to them (the cases' walk sources): the active stage's case only, by day,
+ * until found. Stage 3's walk positions are not yet checked against the world (the flyleaf's lies
+ * outside the map), so only stages 1 and 2 mount theirs for now.
+ */
+function WalkClues({ stage }: { stage: 1 | 2 | 3 }) {
+  const c = caseOfStage(stage)
+  const found = useCaseStore((s) => s.cases[c.id].found)
+  const day = useWorldStore((s) => s.phase === 'day')
+  if (!day || stage === 3) return null
+  return (
+    <>
+      {c.clues
+        .filter(isWalkClue)
+        .filter((k) => !found.includes(k.id))
+        .map((k) => (
+          <WalkClue key={k.id} clue={k} />
+        ))}
+    </>
+  )
+}
+
+// ---- Stage 2: The Resurrection Men (spec 10 task 5) ----
+
+const openWatchLog = () => useOverlayStore.getState().setMinigameOpen('2b')
+const openCrestLock = () => useOverlayStore.getState().setMinigameOpen('2a')
+
+const LOOSE_PAGES: readonly (readonly [number, number, number])[] = [
+  [0.2, -0.12, 0.5],
+  [0.17, 0.02, -0.4],
+  [-0.03, 0.22, 0.9],
+]
+
+/** The watch-house logbook on the lodge table, with torn pages loose beside it. PLACEHOLDER boxes. */
+function WatchLogbook() {
+  return (
+    <group position={[...CASE_2_LOGBOOK_POSITION]} rotation={[0, 0.25, 0]}>
+      <Interactable id="watch-logbook" kind="watch-logbook" runeHeight={0.4} outlineRange={4} onInteract={openWatchLog}>
+        <mesh position={[0, 0.025, 0]}>
+          <boxGeometry args={[0.24, 0.05, 0.32]} />
+          <meshStandardMaterial color="#2e231c" roughness={0.9} />
+        </mesh>
+        {LOOSE_PAGES.map(([x, z, r], i) => (
+          <mesh key={i} position={[x * 0.5, 0.003, z]} rotation={[0, r, 0]}>
+            <boxGeometry args={[0.12, 0.004, 0.16]} />
+            <meshStandardMaterial color="#d8c9a3" roughness={1} />
+          </mesh>
+        ))}
+      </Interactable>
+    </group>
+  )
+}
+
+/** A canvas texture with a tablet's crest, family and year; made once per tablet. */
+function useTabletTexture(t: CrestTabletDef): CanvasTexture | null {
+  return useMemo(() => {
+    if (typeof document === 'undefined') return null
+    const canvas = document.createElement('canvas')
+    canvas.width = 256
+    canvas.height = 160
+    const g = canvas.getContext('2d')
+    if (!g) return null
+    g.fillStyle = '#6e675c'
+    g.fillRect(0, 0, 256, 160)
+    g.strokeStyle = '#2a2623'
+    g.lineWidth = 6
+    g.strokeRect(6, 6, 244, 148)
+    g.fillStyle = '#1c1a17'
+    g.textAlign = 'center'
+    g.font = '48px "Segoe UI Symbol", serif'
+    g.fillText(CREST_GLYPHS[t.crest], 128, 58)
+    g.font = 'bold 34px Georgia, serif'
+    g.fillText(t.family.toUpperCase(), 128, 104)
+    g.font = '26px Georgia, serif'
+    g.fillText('LAID DOWN ' + t.year, 128, 140)
+    const tex = new CanvasTexture(canvas)
+    tex.colorSpace = SRGBColorSpace
+    return tex
+  }, [t])
+}
+
+/**
+ * A crypt name tablet: an iron-framed plate on the avenue railing in front of its crypt, facing the
+ * path at chest height. (The crypt fronts' own panel sits inside the door frame, where a plate is
+ * hidden, so the name hangs on the railing gate instead.) Reading it says the year too.
+ */
+function CrestTablet({ t }: { t: CrestTabletDef }) {
+  const crypt = avenueCrypts()[t.crypt]
+  const tex = useTabletTexture(t)
+  if (!crypt) return null
+  const west = crypt.position[0] < MAUSOLEUM_ROW.centerX
+  const x = MAUSOLEUM_ROW.centerX + (west ? -1 : 1) * (MAUSOLEUM_ROW.width / 2 - 0.06)
+  const line = t.family + '. The ' + CREST_NAMES[t.crest].toLowerCase() + ' crest. The founder laid down in ' + t.year + '.'
+  return (
+    <group position={[x, 1.15, crypt.position[2]]} rotation={[0, west ? Math.PI / 2 : -Math.PI / 2, 0]}>
+      <Interactable
+        id={'crest-tablet-' + t.family}
+        kind="crest-tablet"
+        subject={t.family}
+        runeHeight={0.4}
+        outlineRange={6}
+        onInteract={() => useClueRevealStore.getState().revealPlain(line)}
+      >
+        <mesh position={[0, 0, -0.012]}>
+          <boxGeometry args={[0.6, 0.38, 0.02]} />
+          <meshStandardMaterial color="#2a2623" roughness={0.8} metalness={0.5} />
+        </mesh>
+        <mesh>
+          <planeGeometry args={[0.56, 0.35]} />
+          <meshStandardMaterial map={tex ?? undefined} roughness={0.95} />
+        </mesh>
+      </Interactable>
+    </group>
+  )
+}
+
+/** The sexton's niche: a stone pier with four crest dials facing the avenue. Dark inside once solved. */
+function CrestNiche() {
+  const solved = useCaseStore((s) => s.cases['resurrection-men'].minigames.includes('2a'))
+  const dials = useCaseStore((s) => s.cases['resurrection-men'].crestDials)
+  const [x, , z] = CASE_2_CREST_LOCK.niche
+  return (
+    <group position={[x, 0, z]} rotation={[0, Math.PI / 2, 0]}>
+      <Interactable id="crest-lock" kind="crest-lock" runeHeight={1.5} outlineRange={4} onInteract={openCrestLock}>
+        <mesh position={[0, 0.6, -0.1]}>
+          <boxGeometry args={[0.7, 1.2, 0.3]} />
+          <meshStandardMaterial color="#6e675c" roughness={0.95} />
+        </mesh>
+        <mesh position={[0, 0.45, 0.06]}>
+          <boxGeometry args={[0.4, 0.3, 0.02]} />
+          <meshStandardMaterial color={solved ? '#050505' : '#5d574d'} roughness={1} />
+        </mesh>
+        {dials.map((d, i) => (
+          <mesh key={i} position={[-0.24 + i * 0.16, 0.95, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
+            <cylinderGeometry args={[0.06, 0.06, 0.03, 12]} />
+            <meshStandardMaterial
+              color="#8a8170"
+              roughness={0.8}
+              emissive="#e8913a"
+              emissiveIntensity={solved ? 0.5 : d ? 0.15 : 0}
+            />
+          </mesh>
+        ))}
+      </Interactable>
+    </group>
+  )
+}
+
+/** One plaster cast in front of the Ames stone. PLACEHOLDER: a pale slab with a dark print. */
+function BootCast({ cast }: { cast: CastDef }) {
+  const worn = cast.size === null
+  return (
+    <group position={[...cast.position]} rotation={[0, 0.2, 0]}>
+      <Interactable
+        id={'boot-cast-' + cast.id}
+        kind="boot-cast"
+        subject={cast.id}
+        runeHeight={0.5}
+        outlineRange={4}
+        onInteract={() => {
+          useOverlayStore.getState().setCastFocus(cast.id)
+          useOverlayStore.getState().setMinigameOpen('2c')
+        }}
+      >
+        <mesh position={[0, 0.025, 0]}>
+          <boxGeometry args={[0.22, 0.05, 0.36]} />
+          <meshStandardMaterial color="#e2ddd0" roughness={1} />
+        </mesh>
+        <mesh position={[0, 0.051, worn ? 0.08 : 0]}>
+          <boxGeometry args={[0.1, 0.002, worn ? 0.1 : 0.27]} />
+          <meshStandardMaterial color="#8d8576" roughness={1} />
+        </mesh>
+        <mesh visible={false} position={[0, 0.12, 0]}>
+          <boxGeometry args={[0.35, 0.25, 0.45]} />
+        </mesh>
+      </Interactable>
+    </group>
+  )
+}
+
+/** Stage 2 props: the logbook and casts by day; the niche and the crypt tablets always (the niche stays open). */
+function ResurrectionProps() {
+  const day = useWorldStore((s) => s.phase === 'day')
+  return (
+    <>
+      {day && <WatchLogbook />}
+      <CrestNiche />
+      {CASE_2_CREST_LOCK.tablets.map((t) => (
+        <CrestTablet key={t.family} t={t} />
+      ))}
+      {day && CASE_2_CASTS.map((c) => <BootCast key={c.id} cast={c} />)}
+    </>
+  )
+}
+
 /** The bell posts stand only after the ledger is cross-checked (1a), so day 1 starts uncluttered. */
 export function CaseProps() {
   const ledgerSolved = useCaseStore((s) => s.cases['saved-by-the-bell'].minigames.includes('1a'))
@@ -285,6 +571,8 @@ export function CaseProps() {
   return (
     <group name="case-props">
       {ledgerSolved && CASE_1_BELLS.map((p) => <BellPost key={p.id} post={p} />)}
+      <WalkClues stage={stage} />
+      {stage === 2 && <ResurrectionProps />}
       {stage === 3 && <HymnProps />}
       {stage === 3 && <CryptProps />}
     </group>

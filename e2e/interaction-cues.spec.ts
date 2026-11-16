@@ -200,7 +200,8 @@ test.describe('interaction cues never mislead', () => {
     await page.evaluate(() => window.__lastRites!.hold('Interact'))
     await page.waitForTimeout(600)
     await page.evaluate(() => window.__lastRites!.release('Interact'))
-    await expect(page.locator('.hud-toast')).toContainText('Added to your journal (J)', { timeout: 10_000 })
+    // The clue reveal (spec 09 task 11q) replaced the old toast.
+    await expect(page.locator('.clue-reveal')).toContainText('Noted in your journal (J)', { timeout: 10_000 })
     await page.waitForFunction((i) => window.__lastRites!.interactableCue(i)?.targetable === false, id)
     await page.waitForFunction((i) => (window.__lastRites!.interactableCue(i)?.runeOpacity ?? 1) < 0.01, id, {
       timeout: 10_000,
