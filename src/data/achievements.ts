@@ -20,6 +20,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
   { id: 'a-rest', name: 'Rest', goal: 'Reach the Rest ending' },
   { id: 'a-endless-10', name: 'Long Night', goal: 'Reach night 10 in Endless Survival' },
   { id: 'a-patron', name: 'Valued Custom', goal: 'Spend 100 Grave Coins in one run' },
+  { id: 'a-justice', name: 'Justice for Elias', goal: 'Name Silas Vane at the altar, with the right motive, means and opportunity' },
 ]
 
 export const ACHIEVEMENTS_KEY = 'lastrites:achievements'
@@ -39,3 +40,4 @@ export const ACHIEVEMENT_THRESHOLDS = {
   endlessNight: 10,
   coinsSpent: 100,
 } as const
+

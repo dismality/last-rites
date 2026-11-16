@@ -171,3 +171,36 @@ Choices made without asking the user while running sub-tasks unattended. Each ca
 5. One extra deduction note (Ames certificate to rusted bell). Clues stay at 7 (2 red herrings).
 6. **Not done, left for 3.4 and later:** no changes to `clues.ts`, `journal.ts`, `tombstones.ts` and the `fx-crypt-key` spawn in `zones.ts` (still the Marsh grave at (-12, 0, -18)); moving the key to Pell's grave touches the old key tests and e2e and belongs with the solved-case reward wiring.
 7. Gate: lint clean, build passes, `npx vitest run` 2137 pass. Committed on its own at the user's request.
+
+## 4.2
+1. `hymnTiles` takes `(string | null)[]` and compares case-insensitively with the first letters of the hymns at the board numbers; `evidenceTimeline` takes card ids earliest first.
+2. `rite.ts`: `placeRelic` returns `placed`, `wrong` (relic returned, state unchanged) or `refused` (taken slot, bad slot, relic already placed). The rising clock starts with the first relic that stays.
+3. `checkAccusation` from task 2.2 already meets 18.3, so `caseAnswer.ts` is unchanged; Property 16 for it is in `caseAnswer.test.ts`.
+4. Not done here: the lock and the wave on a wrong placement, and the Crane rising, belong to the store and scene tasks.
+## 4.4
+1. **Cards are found by examining props, kept in the Case_Store.** `CaseProgress` gained `evidenceFound` and `timeline` (case 3 only, sanitised on load, union / longer draft on retry). The dry boots are the existing hut clue spot (`clue-hut-boots`): the card counts as held once that clue is in the journal, so no second boots prop was added.
+2. **Positions (guessed, checked only against the graveyard collision boxes):** letter on the hut west table (-2.35, 0.79, -1.15); cart ruts just inside the Row gate (-20.6, 0, -38.6); spilled oil (-18.6, 0.01, -57.2); pin and nail marks on the Crane crypt door face at z -60 (x -19.3 and -20.7); the slate (-21.3, 0, -58.6); Elias's body (-20.0, 0.02, -59.0). The crypt is a backdrop (no interior), so the nail marks are on the door face, not inside it.
+3. **The crypt "opens" as set dressing.** Solving 3b removes the pin prop, shows a dark doorway, a swung-back door leaf and Elias's body, plays the caption "[an iron pin slides free]" and replays the six beats as captions. There is no collider, so nothing can trap the player.
+4. **The Iron Ossuary Key waits for 3b.** `FixedSpawn.revealedBy` now accepts a minigame id as well as a case id (`Revealed` type), fed by `revealedIds(caseSave)` (closed cases plus solved minigames) in `FixedSpawns.tsx`, `spawnStore.collectFixed` and the recipe book's map pin. The old always-on key at (-20.5, 0.3, -58) is unchanged otherwise. Old e2e specs that walk to this key in stage 1 or 2 will need the dev "give key" path (task 4.9 milestone).
+5. **Slate opens 3b.** A new `timeline-slate` interactable (stage 3, by day) opens the overlay; the cards are not shown in order of discovery. New cards join the front of the arrangement in a fixed shelf order (`CASE_3_CARD_SHELF`, a test checks it is not the right order), so walking the evidence in order does not give the answer.
+6. **Card times are not displayed.** The timeline has only "Midnight" and "Dawn" at its ends; the deduction is from the card texts.
+7. **Judging needs all six cards.** With fewer, the overlay says how many are held and adds no Doubt. A wrong order adds Doubt, marks the first wrong card with "✕ Out of place" and a dashed border, and moves the cursor to it. No new caption for the wrong order (no sound happens).
+8. **Input:** mouse drag (HTML5 drag and drop), Earlier / Later buttons, and keyboard (Left/Right choose, Space lifts and sets down, Left/Right move, Enter judges), all in the pure `timelineKey`.
+9. **Not done here:** objective and compass pointing at the slate or the cards, the dev "Solve 3b" hook (task 4.7), the e2e and screenshots (4.8), and the "walk" Case 3 clue spots (flyleaf, red herrings), which are other tasks.
+
+**Art still waiting (all PLACEHOLDER meshes, no files added):** letter (flat paper box), cart ruts (two dark planes), spilled oil (dark disc), iron hearse-pin (cylinder), nail marks (three scratches), the timeline slate (post and board), the opened crypt door, doorway and Elias's body (boxes and a sphere). The modelled versions, and a pin-pull and door sound, are art and audio still to come.
+
+## 4.6
+1. **Where it is given:** inside the stage 3 rite panel (AltarPanel.tsx shows RitePanelBody, which now holds AccusationSection). Open at stage 3 night while the case is unsolved.
+2. **Judging:** ccusationStore.give -> stageStore.giveAltarAnswer(correct, links, 'accusation'). stageStore now solves the case only for kind 'case'; a right accusation is just recorded.
+3. **Not saved:** the record lives only in the run; it clears on 
+esetRun and survives Retry Night.
+4. **Epilogue:** EndingStage gained 'epilogue', set by startEnding for Rest with a right accusation. Space or Enter continue; Esc is left to pause. EndingCamera holds the first pose during it. The text is mine from the bible's beats.
+5. **Uneasy Peace:** removed from types, data, dev list and tests; migrateEnding maps old saves by relic count (design decision 12).
+6. **Default line:** shown on the Rest summary when the accusation was wrong or absent.
+7. **Merchant:** unchanged; no reveal logic exists yet, so Silas trades as normal everywhere.
+**Art still waiting (PLACEHOLDER):** the epilogue is a text card; an illustrated plate of the empty cart, and an accusation sound, are still to come.
+## 4.7
+1. **Relics button:** "Give all relics (in order)" gives all five and places them in rite order only while the rite is open (stage 3 night); by day it only gives them.
+2. **Crane:** not removed; the rite still waits for him to fall.
+3. **Solve 3a / 3b:** reuse `solveMinigame`, which refuses them outside stage 3.

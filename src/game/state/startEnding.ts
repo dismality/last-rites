@@ -3,6 +3,8 @@
 
 import { ENDING_MAP } from '../../data/endings'
 import type { EndingId } from '../types'
+import { epilogueLines } from '../systems/accusation'
+import { useAccusationStore } from './accusationStore'
 import { useEndingStore } from './endingStore'
 import { settleEndless } from './endlessBest'
 import { useGameStore } from './gameStore'
@@ -21,7 +23,9 @@ export function settleEndlessDeath(): void {
 }
 
 export function startEnding(id: EndingId): void {
-  useEndingStore.getState().beginEnding(id)
+  // A right accusation adds the Justice for Elias epilogue before the walk-out (Req 18.3); only a won run has one.
+  const epilogue = id === 'rest' && epilogueLines(useAccusationStore.getState().record).length > 0
+  useEndingStore.getState().beginEnding(id, epilogue)
   clearNightState()
   settleEndlessDeath()
   useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, ending: id } }))

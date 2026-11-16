@@ -33,11 +33,12 @@ import {
 import { playerPositionRef } from './playerPositionRef'
 import { StairDescent } from './StairDescent'
 import { isBellActive } from '../../game/systems/repairs'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useChapelStore } from '../../game/state/chapelStore'
+import { useStageStore } from '../../game/state/stageStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
-import { readRiteStatus } from '../../game/state/riteStatus'
 import { useWorldStore } from '../../game/state/worldStore'
 import '../assets/preloadModels'
 import { Slab } from './buildingParts'
@@ -72,7 +73,14 @@ function AltarStairReveal({ z }: { z: number }) {
         id="altar-whistle"
         kind="altar-whistle"
         runeHeight={1.6}
-        onInteract={() => useMysteryStore.getState().interactGate('catacombs', 'altar')}
+        onInteract={() => {
+          // Stage 3: the tiles must sit true first, so the whistle opens the hymn board overlay.
+          const unsolved3a =
+            useStageStore.getState().stage === 3 &&
+            !useCaseStore.getState().cases['sealed-catacombs'].minigames.includes('3a')
+          if (unsolved3a) useOverlayStore.getState().setMinigameOpen('3a')
+          else useMysteryStore.getState().interactGate('catacombs', 'altar')
+        }}
       >
         <mesh visible={false} position={[0, 0.55, 0]}>
           <boxGeometry args={[1.6, 1.1, 0.8]} />
@@ -83,9 +91,9 @@ function AltarStairReveal({ z }: { z: number }) {
 }
 
 /**
- * The altar takes the case's answer (spec 10, Req 3). E opens the answer panel. Two other altar
- * uses keep the spot: the whistle (by day, while the stair is sealed) and the stage 3 rite hold
- * (while it is ready), so this hotspot steps aside for both. The rite goes in task 4.
+ * The altar takes the case's answer (spec 10, Req 3). E opens the answer panel, which is the rite
+ * panel in stage 3 (relic placement). The whistle (by day, while the stair is sealed) keeps the
+ * spot, so this hotspot steps aside for it.
  */
 function CaseAltar({ z }: { z: number }) {
   const whistleTurn = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
@@ -99,8 +107,6 @@ function CaseAltar({ z }: { z: number }) {
         kind="case-altar"
         runeHeight={1.6}
         onInteract={() => {
-          // While the final rite can be held, E at the altar belongs to the rite.
-          if (readRiteStatus().availability === 'ready') return
           useOverlayStore.getState().setAltarPanelOpen(true)
         }}
       >

@@ -1,10 +1,8 @@
-// Reads the stores and answers "what is the final rite doing right now?".
+// Reads the stores and answers "can the rite be worked on right now?".
 // One place, so the scene, the chapel altar and the HUD cannot disagree.
 
 import { countRelics, riteAvailability, type RiteAvailability } from '../systems/finalRite'
-import { RITE_DURATION } from '../systems/mystery'
 import { STAGE_COUNT } from '../../data/stages'
-import { useEndingStore } from './endingStore'
 import { isStoryRun } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMysteryStore } from './mysteryStore'
@@ -17,9 +15,8 @@ export function riteFinalNight(): number {
 
 export interface RiteStatus {
   availability: RiteAvailability
+  /** Relics held (the objective shows R/5). */
   relicCount: number
-  /** Seconds completed, 0..RITE_DURATION */
-  progress: number
 }
 
 export function readRiteStatus(): RiteStatus {
@@ -29,9 +26,7 @@ export function readRiteStatus(): RiteStatus {
   const availability = riteAvailability({
     nightNumber: world.nightNumber,
     phase: world.phase,
-    wavesCleared: useEndingStore.getState().nightFiveCleared,
-    relicCount,
     finalNight: riteFinalNight(),
   })
-  return { availability, relicCount, progress: Math.min(mystery.riteProgress, RITE_DURATION) }
+  return { availability, relicCount }
 }

@@ -14,7 +14,6 @@ import { Subtitles } from './Subtitles'
 import { Toast } from './Toast'
 import { DuskHint } from './DuskHint'
 import { WaveTally } from './WaveTally'
-import { RiteMeter } from './RiteMeter'
 import { DigBar } from './DigBar'
 import { AmmoReadout } from './AmmoReadout'
 import { EffectIcons } from './EffectIcons'
@@ -59,7 +58,6 @@ export function Hud() {
           stays near the top at 600 px tall instead of below a fixed gap (B12). */}
       <div className="hud-top-stack">
         <WaveTally />
-        <RiteMeter />
         <BossBar />
         <DoorStatus />
       </div>

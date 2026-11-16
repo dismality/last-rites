@@ -1,7 +1,19 @@
 // Save shape, sanitising and retry merge for the case store (spec 10 task 2.3, Req 4.1-4.6).
 // Pure: no stores, no React. Everything is JSON-safe arrays, so save -> load is the identity.
 
-import { CASES, CASE_1_BELLS, CASE_1_LEDGER, CASE_1_STONES, type BellPostId, type CaseId, type LedgerFlagKind, type MinigameId } from '../../data/cases'
+import {
+  CASES,
+  CASE_1_BELLS,
+  CASE_1_LEDGER,
+  CASE_1_STONES,
+  CASE_3_EVIDENCE,
+  type BellPostId,
+  type CaseId,
+  type EvidenceCardId,
+  type LedgerFlagKind,
+  type MinigameId,
+} from '../../data/cases'
+import type { Revealed } from '../../data/zones'
 import { DOUBT_MAX } from '../../data/stages'
 import type { HintState } from './caseHints'
 import type { DoubtState } from './caseScore'
@@ -32,7 +44,15 @@ export interface CaseProgress {
   ledgerLines: LedgerLine[]
   /** Minigame 1b: bell posts fully examined (bell, rope and tag). Kept when the overlay closes. */
   bellsExamined: BellPostId[]
+  /** Minigame 3a: the five brass tiles as set so far (an A-Z letter or null). Kept when the overlay closes. */
+  hymnTiles: (string | null)[]
+  /** Minigame 3b: evidence cards examined in the world (the dry boots count through their hut clue). */
+  evidenceFound: EvidenceCardId[]
+  /** Minigame 3b: the arrangement of held cards on the slate, earliest first. Kept when the overlay closes. */
+  timeline: EvidenceCardId[]
 }
+
+export const HYMN_TILE_COUNT = 5
 
 export interface CaseSave {
   cases: Record<CaseId, CaseProgress>
@@ -54,7 +74,35 @@ export function freshProgress(id: CaseId): CaseProgress {
     hints: { revealed: 0 },
     ledgerLines: [],
     bellsExamined: [],
+    hymnTiles: emptyHymnTiles(),
+    evidenceFound: [],
+    timeline: [],
   }
+}
+
+/** Card ids from a save: known cards only, no repeats. */
+export function sanitizeCardIds(raw: unknown): EvidenceCardId[] {
+  const ids: readonly string[] = CASE_3_EVIDENCE.map((e) => e.id)
+  const list = Array.isArray(raw) ? raw : []
+  return Array.from(new Set(list.filter((x): x is EvidenceCardId => typeof x === 'string' && ids.includes(x))))
+}
+
+export function emptyHymnTiles(): (string | null)[] {
+  return Array.from({ length: HYMN_TILE_COUNT }, () => null)
+}
+
+/** Five slots, each a single A-Z letter or null; anything else becomes an empty tile. */
+export function sanitizeHymnTiles(raw: unknown): (string | null)[] {
+  const list = Array.isArray(raw) ? raw : []
+  return emptyHymnTiles().map((_, i) => {
+    const v = list[i]
+    return typeof v === 'string' && /^[A-Z]$/.test(v) ? v : null
+  })
+}
+
+/** Solved cases and solved minigames: what a reward spawn waits for (`FixedSpawn.revealedBy`). */
+export function revealedIds(save: Pick<CaseSave, 'cases' | 'closed'>): Revealed[] {
+  return [...save.closed, ...Object.values(save.cases).flatMap((p) => p.minigames)]
 }
 
 export function freshCaseSave(): CaseSave {
@@ -110,6 +158,9 @@ function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
       id === 'saved-by-the-bell'
         ? (uniq(strings(raw.bellsExamined).filter((x) => CASE_1_BELLS.some((b) => b.id === x))) as BellPostId[])
         : [],
+    hymnTiles: id === 'sealed-catacombs' ? sanitizeHymnTiles(raw.hymnTiles) : emptyHymnTiles(),
+    evidenceFound: id === 'sealed-catacombs' ? sanitizeCardIds(raw.evidenceFound) : [],
+    timeline: id === 'sealed-catacombs' ? sanitizeCardIds(raw.timeline) : [],
   }
 }
 
@@ -150,6 +201,11 @@ export function mergeRetry(snapshot: CaseSave, current: CaseSave): CaseSave {
       ledgerLines: c.ledgerLines.length >= s.ledgerLines.length ? c.ledgerLines : s.ledgerLines,
       // A post already examined stays examined, like a found clue.
       bellsExamined: union(s.bellsExamined, c.bellsExamined),
+      // Tiles already set stay set: the one with more letters is the newer draft.
+      hymnTiles: c.hymnTiles.filter(Boolean).length >= s.hymnTiles.filter(Boolean).length ? c.hymnTiles : s.hymnTiles,
+      // A card already examined stays found, like a clue; the draft with more cards is the newer one.
+      evidenceFound: union(s.evidenceFound, c.evidenceFound),
+      timeline: c.timeline.length >= s.timeline.length ? c.timeline : s.timeline,
     }
   }
   return { cases, closed: [...snapshot.closed], doubt: { ...snapshot.doubt } }

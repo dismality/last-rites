@@ -6,7 +6,6 @@
 // check rendering, audio or feel; task 8 covers those in a real browser.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DOORS } from '../src/data/barricades'
-import { BOSS } from '../src/data/boss'
 import { CHAPEL_DOORS } from '../src/data/cemeteryLayout'
 import { ELITE } from '../src/data/elites'
 import { ENEMY_MAP } from '../src/data/enemies'
@@ -24,12 +23,13 @@ import type { DoorId, Inventory, RelicId } from '../src/game/types'
 import { capsuleFor, resolveShot } from '../src/game/systems/ballistics'
 import { boardDamageFor, damageDoor, nailBoard, tickNailing } from '../src/game/systems/barricade'
 import type { BarricadeState } from '../src/game/systems/barricade'
-import { initialBoss, riteCapS, tickBoss, type BossEvent, type BossState } from '../src/game/systems/bossDirector'
+import { initialBoss, riteBlocked, tickBoss, type BossEvent, type BossState } from '../src/game/systems/bossDirector'
 import { resolveBurst } from '../src/game/systems/bloater'
 import { applyDamage } from '../src/game/systems/combat'
 import { placeEliteDrop, rollElite, rollEliteDrop } from '../src/game/systems/elites'
 import { createEnemy, tickEnemies, type AIEnemy } from '../src/game/systems/enemyAI'
-import { stepRite } from '../src/game/systems/finalRite'
+import { EMPTY_RITE, isRiteDone, placeRelic } from '../src/game/systems/rite'
+import { RITE_ORDER } from '../src/data/relics'
 import {
   completeReload,
   pullTrigger,
@@ -94,7 +94,7 @@ interface FlowSummary {
   boards: { nailed: number[]; afterBreak: number[]; brokenAtS: number }
   bloater: { killed: string[]; hp: Record<string, number>; playerNear: number; playerFar: number }
   elite: { isElite: boolean; second: boolean; drop: string; qty: number; owned: number }
-  boss: { events: string[]; progressWhileAlive: number; completedAtKill: boolean; ending: string | null } | null
+  boss: { events: string[]; completedWhileAlive: boolean; completedAtKill: boolean; ending: string | null } | null
 }
 
 /** Types that a night's waves spawn when nothing is ever killed, so every wave comes out. */
@@ -237,15 +237,19 @@ function runFlow(night: 3 | 5, seed: number): FlowSummary {
   const owned =
     countItem(placed.inv, drop.item) + (placed.ground ? placed.ground.qty : 0)
 
-  // 6. Night 5 only: the rite until Father Crane rises and falls, then it finishes.
+  // 6. Night 5 only: the five relics are laid at once, which starts Crane's clock; the rite waits until he rises and falls, then it finishes.
   let boss: FlowSummary['boss'] = null
   if (night === 5) {
     let mystery = createMysteryState()
     for (const r of ALL_RELICS) mystery = collectRelic(mystery, r)
+    let rite = EMPTY_RITE
+    RITE_ORDER.forEach((relic, slot) => {
+      rite = placeRelic(rite, slot, relic, RITE_ORDER, true).state
+    })
     let state: BossState = initialBoss()
     const events: string[] = []
     let craneHp: number | null = null
-    let progressWhileAlive = 0
+    let completedWhileAlive = false
     let completed = false
     let completedAtKill = false
     const killAtS = 50
@@ -265,18 +269,18 @@ function runFlow(night: 3 | 5, seed: number): FlowSummary {
         if (e.type === 'spawn') craneHp = BOSS_HP()
       }
       if (craneHp !== null && craneHp > 0 && t > 30) craneHp = Math.max(1, craneHp - BOSS_HP() / (20 / DT))
-      const step = stepRite(mystery, DT, true, 5, riteCapS(state))
-      mystery = step.mystery
-      if (craneHp !== null && craneHp > 0) progressWhileAlive = Math.max(progressWhileAlive, mystery.riteProgress)
-      if (step.completed) {
+      const done = isRiteDone(rite, RITE_ORDER, riteBlocked(state))
+      if (craneHp !== null && craneHp > 0 && done) completedWhileAlive = true
+      if (done) {
         completed = true
         completedAtKill = state.stage === 'dead'
+        mystery = { ...mystery, ending: 'rest' }
       }
     }
     useMysteryStore.setState({ mystery })
     boss = {
       events: [...new Set(events)],
-      progressWhileAlive,
+      completedWhileAlive,
       completedAtKill,
       ending: mystery.ending ?? null,
     }
@@ -338,7 +342,7 @@ describe('combat checkpoint: night 3', () => {
 })
 
 describe('combat checkpoint: night 5', () => {
-  it('holds the rite at the cap until Father Crane falls, then finishes it', () => {
+  it('holds the placed relics until Father Crane falls, then finishes the rite', () => {
     const s = runFlow(5, 505)
     expect(s.spawnTypes).toEqual(expect.arrayContaining(['bloater', 'brute']))
     expect(s.boss).not.toBeNull()
@@ -346,7 +350,7 @@ describe('combat checkpoint: night 5', () => {
     expect(boss.events).toEqual(
       expect.arrayContaining(['riseTelegraph', 'spawn', 'phase-2', 'phase-3', 'deathStart', 'quietEnded']),
     )
-    expect(boss.progressWhileAlive).toBeLessThanOrEqual(BOSS.riteCapS)
+    expect(boss.completedWhileAlive).toBe(false)
     expect(boss.completedAtKill).toBe(true)
     expect(boss.ending).toBe('rest')
   })

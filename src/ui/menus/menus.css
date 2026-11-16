@@ -423,3 +423,54 @@
   border: 1px solid var(--parchment-dark);
   font-size: 1.1rem;
 }
+
+/* Justice for Elias epilogue (spec 10 task 4.6): a dark card over the chapel, read before the walk-out.
+   Opacity fade only, so it suits reduced motion; the fade is dropped entirely when asked for. */
+.ending__epilogue {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(80vw, 40rem);
+  padding: 1.5rem 2rem;
+  display: grid;
+  gap: 0.9rem;
+  justify-items: center;
+  text-align: center;
+  pointer-events: auto;
+  color: var(--parchment);
+  background: rgb(20 17 15 / 92%);
+  border: 1px solid var(--parchment-dark);
+  animation: ending-epilogue-in 0.6s ease-out;
+}
+.ending__epilogue-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+}
+.ending__epilogue-line {
+  margin: 0;
+  font-family: var(--font-hand);
+  font-size: 1.25rem;
+  line-height: 1.7;
+}
+.ending__silas {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 1.1rem;
+  color: var(--parchment-dark);
+}
+@keyframes ending-epilogue-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ending__epilogue {
+    animation-duration: 1.2s; /* a slow fade, never a movement */
+  }
+}

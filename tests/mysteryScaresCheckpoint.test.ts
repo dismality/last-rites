@@ -11,11 +11,13 @@ import { tickDayNight } from '../src/game/systems/dayNight'
 import {
   collectPage,
   collectRelic,
+  chooseEnding,
   createMysteryState,
-  RITE_DURATION,
   type MysteryState,
 } from '../src/game/systems/mystery'
-import { countRelics, riteAvailability, stepRite } from '../src/game/systems/finalRite'
+import { countRelics, riteAvailability } from '../src/game/systems/finalRite'
+import { EMPTY_RITE, isRiteDone, placeRelic } from '../src/game/systems/rite'
+import { RITE_ORDER } from '../src/data/relics'
 import {
   capScareDamage,
   createScareDirectorState,
@@ -30,7 +32,6 @@ import { ENDINGS, MAX_ENDING_SECONDS } from '../src/data/endings'
 import { LAST_NIGHT } from '../src/data/balance'
 import type { EndingId, PageNumber, RelicId, WorldState } from '../src/game/types'
 
-const DT = 1 / 60
 const ALL_RELICS: readonly RelicId[] = [
   'crane-rosary',
   'sextons-bell-clapper',
@@ -75,27 +76,25 @@ function playCampaign(relics: readonly RelicId[]): { mystery: MysteryState; nigh
   return { mystery, nights }
 }
 
-/** Night 5, waves done or relics >= 3: hold the altar for the full rite and return the ending. */
+/**
+ * The last night: lay the relics held on the altar in rite order (spec 10 task 4.5) with Father
+ * Crane fallen, and return the ending the finished rite gives. Fewer than five relics never
+ * finish it (Req 17.6), so there is no ending to return.
+ */
 function performRite(mystery: MysteryState): EndingId | undefined {
-  const relicCount = countRelics([], mystery.relics)
   const availability = riteAvailability({
     nightNumber: LAST_NIGHT,
     phase: 'night',
-    wavesCleared: true,
-    relicCount,
     // This checkpoint drives the legacy five-night day/night path, whose rite night is the fifth.
     finalNight: LAST_NIGHT,
   })
-  // Fewer than 3 relics: the rite is never offered; night 5 ending is 'taken'.
-  if (availability === 'taken') return 'taken'
   if (availability !== 'ready') return undefined
-  let m = mystery
-  for (let t = 0; t < RITE_DURATION + 1 && !m.ending; t += DT) {
-    m = stepRite(m, DT, true, relicCount).mystery
-  }
-  return m.ending
+  let rite = EMPTY_RITE
+  RITE_ORDER.forEach((relic, slot) => {
+    if (mystery.relics.has(relic)) rite = placeRelic(rite, slot, relic, RITE_ORDER, false).state
+  })
+  return isRiteDone(rite, RITE_ORDER, false) ? chooseEnding(countRelics([], mystery.relics)) : undefined
 }
-
 describe('mystery checkpoint — nights 1-5 reach each ending', () => {
   it('runs all five nights in order and collects all five pages', () => {
     const { mystery, nights } = playCampaign(ALL_RELICS)
@@ -105,11 +104,11 @@ describe('mystery checkpoint — nights 1-5 reach each ending', () => {
 
   it.each([
     [5, 'rest'],
-    [4, 'uneasy-peace'],
-    [3, 'uneasy-peace'],
-    [2, 'taken'],
-    [1, 'taken'],
-    [0, 'taken'],
+    [4, undefined],
+    [3, undefined],
+    [2, undefined],
+    [1, undefined],
+    [0, undefined],
   ] as const)('%i relics -> %s ending', (count, expected) => {
     const { mystery } = playCampaign(ALL_RELICS.slice(0, count))
     expect(countRelics([], mystery.relics)).toBe(count)
@@ -117,21 +116,22 @@ describe('mystery checkpoint — nights 1-5 reach each ending', () => {
   })
 
   it('has a defined sequence for every ending, within the length cap', () => {
-    for (const id of ['rest', 'uneasy-peace', 'taken'] as const) {
+    for (const id of ['rest', 'taken'] as const) {
       const def = ENDINGS.find((e) => e.id === id)
       expect(def).toBeDefined()
       expect(def!.duration).toBeLessThanOrEqual(MAX_ENDING_SECONDS)
     }
   })
 
-  it('pauses rather than resets when the player stops holding', () => {
+  it('keeps the placed relics when the player steps away, and finishes only with Crane fallen', () => {
     const { mystery } = playCampaign(ALL_RELICS)
-    let m = stepRite(mystery, 20, true, 5).mystery
-    m = stepRite(m, 10, false, 5).mystery
-    expect(m.riteProgress).toBe(20)
-    expect(m.ending).toBeUndefined()
-    m = stepRite(m, 25, true, 5).mystery
-    expect(m.ending).toBe('rest')
+    let rite = EMPTY_RITE
+    RITE_ORDER.forEach((relic, slot) => {
+      rite = placeRelic(rite, slot, relic, RITE_ORDER, true).state
+    })
+    expect(isRiteDone(rite, RITE_ORDER, true)).toBe(false)
+    expect(isRiteDone(rite, RITE_ORDER, false)).toBe(true)
+    expect(mystery.ending).toBeUndefined()
   })
 })
 

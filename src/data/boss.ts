@@ -2,12 +2,10 @@
 // Pure data: no logic, no side effects.
 
 export const BOSS = {
-  /** Sim seconds after the final rite starts before he rises. */
+  /** Sim seconds after the first relic is placed before he rises. */
   riseAfterS: 10,
   riseTelegraphS: 1.5,
   nameCardS: 3,
-  /** Rite progress stops here (of 45 s) while he lives. */
-  riteCapS: 44,
   /** Quiet after he crumbles, before the closing line. */
   deathQuietS: 4,
   /** HP fractions at which the next phase begins. */

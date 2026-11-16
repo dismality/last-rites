@@ -2,10 +2,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { CASE_MAP } from '../data/cases'
 import { useCaseStore } from '../game/state/caseStore'
+import { RITE_ORDER } from '../data/relics'
+import { useInventoryStore } from '../game/state/inventoryStore'
 import { useOverlayStore } from '../game/state/overlayStore'
+import { useRiteStore } from '../game/state/riteStore'
 import { useStageStore } from '../game/state/stageStore'
+import { useWorldStore } from '../game/state/worldStore'
 import { freshCaseSave } from '../game/systems/caseSave'
-import { giveAllClues, giveClue, linkClues, setAltarPanel, solveCurrentMinigame, solveMinigame, unsolvedMinigames } from './devActions'
+import { giveAllClues, giveClue, linkClues, placeAllRelics, setAltarPanel, solveCurrentMinigame, solveMinigame, unsolvedMinigames } from './devActions'
 
 const case1 = CASE_MAP['saved-by-the-bell']
 
@@ -75,5 +79,35 @@ describe('setAltarPanel', () => {
     expect(useOverlayStore.getState().altarPanelOpen).toBe(true)
     setAltarPanel(false)
     expect(useOverlayStore.getState().altarPanelOpen).toBe(false)
+  })
+})
+
+describe('Stage 3 helpers', () => {
+  beforeEach(() => {
+    useWorldStore.setState({ nightNumber: 3, phase: 'day' })
+    useStageStore.getState().startStage(3)
+    useRiteStore.getState().reset()
+    useInventoryStore.setState((s) => ({ inventory: { ...s.inventory, relics: [] } }))
+  })
+
+  it('solves 3a and 3b through the real store, and refuses them in stage 1', () => {
+    expect(solveMinigame('3a')).toContain('Solved')
+    expect(solveMinigame('3b')).toContain('Solved')
+    expect(solveMinigame('3a')).toContain('already')
+    useStageStore.getState().startStage(1)
+    expect(solveMinigame('3a')).toContain('not part')
+  })
+
+  it('gives the relics by day without placing them', () => {
+    expect(placeAllRelics()).toContain('Gave all')
+    expect(useInventoryStore.getState().inventory.relics).toHaveLength(RITE_ORDER.length)
+    expect(useRiteStore.getState().rite.placed).toEqual({})
+  })
+
+  it('lays the relics on the altar in rite order at the stage 3 night', () => {
+    useWorldStore.setState({ phase: 'night' })
+    expect(placeAllRelics()).toContain(`placed ${RITE_ORDER.length}`)
+    const placed = useRiteStore.getState().rite.placed
+    RITE_ORDER.forEach((r, i) => expect(placed[i]).toBe(r))
   })
 })

@@ -44,6 +44,7 @@ import { stageOfNight } from './stageStore'
 import { useAchievementStore } from './achievementStore'
 import { useChapelStore } from './chapelStore'
 import { useCoinStore } from './coinStore'
+import { useAccusationStore } from './accusationStore'
 import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
 import { useGameStore } from './gameStore'
@@ -208,6 +209,7 @@ function achievementFacts(clearHp: number | null): AchievementFacts {
     relics: Math.max(my.relics.size, inv.relics.length),
     craneRested: my.craneRested === true || pr.bossScored,
     ending: useEndingStore.getState().ending,
+    justice: useAccusationStore.getState().record.correct,
     endlessNight: endless ? world.nightNumber : 0,
     coinsSpent: pr.stats.coinsSpent,
   }
@@ -402,6 +404,9 @@ export function installProgressionWatchers(): () => void {
 
     // Pages, relics, Crane and spent coins can meet a goal with no event of their own; stats
     // changes also cover digs, boards and combos.
+    useAccusationStore.subscribe((s, prev) => {
+      if (s.record !== prev.record) checkAchievements()
+    }),
     useMysteryStore.subscribe((s, prev) => {
       if (s.mystery !== prev.mystery) checkAchievements()
     }),

@@ -7,8 +7,11 @@ import type { EndingId } from '../types'
 import { finalizeStats, recordNightSurvived } from '../systems/runStats'
 import { updateRunStats } from './statsPort'
 
-/** sequence = camera path playing; summary = stats, credits and the exit buttons. */
-export type EndingStage = 'sequence' | 'summary'
+/**
+ * epilogue = the Justice for Elias card, shown before the walk-out (spec 10, Req 18.3);
+ * sequence = camera path playing; summary = stats, credits and the exit buttons.
+ */
+export type EndingStage = 'epilogue' | 'sequence' | 'summary'
 
 interface EndingStoreState {
   /** Bumped on every reset; the scene is keyed on it so the player body returns to spawn. */
@@ -23,7 +26,9 @@ interface EndingStoreState {
   setNightFiveCleared: (v: boolean) => void
   setRiteStarted: (v: boolean) => void
   /** Locks in the ending; stats are finalised so the summary matches it. */
-  beginEnding: (ending: EndingId) => void
+  beginEnding: (ending: EndingId, epilogue?: boolean) => void
+  /** The epilogue card is read (or skipped): the sequence begins. */
+  endEpilogue: () => void
   showSummary: () => void
   reset: () => void
 }
@@ -49,10 +54,11 @@ export const useEndingStore = create<EndingStoreState>((set, get) => ({
   surviveNight: (night) => writeStats((s) => recordNightSurvived(s, night)),
   setNightFiveCleared: (nightFiveCleared) => set({ nightFiveCleared }),
   setRiteStarted: (riteStarted) => set({ riteStarted }),
-  beginEnding: (ending) => {
+  beginEnding: (ending, epilogue = false) => {
     writeStats((s) => finalizeStats(s, ending))
-    set({ ending, stage: 'sequence' })
+    set({ ending, stage: epilogue ? 'epilogue' : 'sequence' })
   },
+  endEpilogue: () => set((s) => (s.stage === 'epilogue' ? { stage: 'sequence' } : s)),
   showSummary: () => set({ stage: 'summary' }),
   reset: () => set({ ...INITIAL, runId: get().runId + 1 }),
 }))

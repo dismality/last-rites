@@ -1,14 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
 import {
-  RITE_DURATION,
   chooseEnding,
   collectPage,
   collectRelic,
+  migrateEnding,
   createMysteryState,
   discoverClue,
   openGate,
-  tickRite,
 } from './mystery'
 
 describe('mystery state', () => {
@@ -30,26 +29,22 @@ describe('mystery state', () => {
     expect(openGate(s0, 'ossuary', { keyItems: ['iron-ossuary-key'] }).gates.ossuary).toBe(true)
   })
 
-  it('rite progress pauses on release and clamps at 45 s', () => {
-    let s = tickRite(createMysteryState(), 10, true)
-    expect(s.riteProgress).toBe(10)
-    s = tickRite(s, 5, false)
-    expect(s.riteProgress).toBe(10)
-    s = tickRite(s, 100, true)
-    expect(s.riteProgress).toBe(RITE_DURATION)
+  it('starts with the retired hold progress at 0 (the field only keeps old saves loading)', () => {
+    expect(createMysteryState().riteProgress).toBe(0)
   })
 
   it('maps relic counts to endings', () => {
     expect(chooseEnding(5)).toBe('rest')
-    expect(chooseEnding(4)).toBe('uneasy-peace')
-    expect(chooseEnding(3)).toBe('uneasy-peace')
+    // Uneasy Peace is retired: fewer than five relics is Taken.
+    expect(chooseEnding(4)).toBe('taken')
+    expect(chooseEnding(3)).toBe('taken')
     expect(chooseEnding(2)).toBe('taken')
     expect(chooseEnding(0)).toBe('taken')
   })
 })
 
 describe('chooseEnding properties', () => {
-  const rank = { taken: 0, 'uneasy-peace': 1, rest: 2 } as const
+  const rank = { taken: 0, rest: 1 } as const
 
   // **Validates: Requirements 5.3, 5.4, 5.5**
   it('is total: always returns a valid ending', () => {
@@ -68,5 +63,15 @@ describe('chooseEnding properties', () => {
         expect(rank[chooseEnding(lo)]).toBeLessThanOrEqual(rank[chooseEnding(hi)])
       }),
     )
+  })
+})
+
+describe('migrateEnding', () => {
+  it('maps the retired Uneasy Peace by relic count and keeps the others', () => {
+    expect(migrateEnding(undefined, 5)).toBeUndefined()
+    expect(migrateEnding('rest', 5)).toBe('rest')
+    expect(migrateEnding('taken', 0)).toBe('taken')
+    expect(migrateEnding('uneasy-peace', 4)).toBe('taken')
+    expect(migrateEnding('uneasy-peace', 5)).toBe('rest')
   })
 })

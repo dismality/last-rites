@@ -3,9 +3,10 @@
 // internals (ledger rows, bell posts, hymn board and so on) join this file in tasks 3 to 5.
 // Pure data: no logic, no side effects.
 
-import type { ItemId, RelicId } from '../game/types'
+import type { ItemId } from '../game/types'
 import type { InteractRuneId, MarkId } from './assets'
 import { CLOSED_CASE_PAGES } from './caseText'
+import { RELIC_MAP, RITE_ORDER } from './relics'
 import type { CaseId, StageNumber } from './stages'
 import type { ZoneId } from './zones'
 
@@ -36,8 +37,8 @@ export type Case3ClueId =
   | 'hearse-pin-hasp'
   | 'vane-ledger-flyleaf'
   | 'vane-receipt'
-  | 'censer-chain-marks'
-  | 'cold-hearth-hut'
+  | 'oil-other-crypt'
+  | 'old-bishops-seal'
 export type ClueId = Case1ClueId | Case2ClueId | Case3ClueId
 
 export type ClueIcon = InteractRuneId | MarkId
@@ -597,22 +598,257 @@ const CASE_2: CaseDef = {
   curseSteps: DEFAULT_CURSE_STEPS,
 }
 
-/** The five relics in the order Crane's confession gives; task 4 can move the rite order here. */
-const RITE_ORDER: readonly RelicId[] = [
-  'crane-rosary',
-  'sextons-bell-clapper',
-  'childs-locket',
-  'burial-shroud',
-  'reliquary-heart',
+// ---- Case 3 minigame data (spec 10 task 4.1) ----
+
+export type EvidenceCardId =
+  'dry-boots' | 'unsent-letter' | 'cart-ruts' | 'spilled-oil' | 'nail-marks' | 'hearse-pin'
+
+/** The hymn board in the chapel (minigame 3a). The board numbers are also painted in the chapel model. */
+export interface HymnBoardDef {
+  /** The five numbers painted on the board, left to right. */
+  numbers: readonly [number, number, number, number, number]
+  /** The word the first letters of those hymns spell. */
+  letters: 'BELOW'
+  /** The psalter on the vestry shelf: hymn N is `index[N - 1]`. Always 60 titles. */
+  index: readonly string[]
+  /** Crane's line that points at the Word, shown with his confession (journal page 3). */
+  confession: string
+  /** Shown on a wrong tile setting (requirement 15.3). */
+  wrongMessage: string
+}
+
+/** One evidence card of minigame 3b. */
+export interface EvidenceCardDef {
+  id: EvidenceCardId
+  title: string
+  /** What the player reads on the card. */
+  text: string
+  zone: ZoneId
+  /** Where it lies, in words; the props are placed in task 4.4. */
+  place: string
+  /** The time of night this card belongs to, on the midnight-to-dawn timeline. */
+  time: string
+  /** Caption shown when the right order replays the night (one beat per card). */
+  beat: string
+  /** The clue this card gives when it is also a clue on the board. */
+  clueId?: Case3ClueId
+}
+
+/** Texts of the three papers that tie the Vanes to the ledger (requirement 18.1). */
+export interface VanePapersDef {
+  letter: string
+  flyleaf: string
+  receipt: string
+}
+
+const HYMN_NUMBERS = [4, 19, 2, 41, 23] as const
+
+/**
+ * 60 hymn titles. The first letters of hymns 4, 19, 2, 41 and 23 spell BELOW; every other title
+ * is free. Titles are invented in the period's style so no real hymn text is copied.
+ */
+const HYMN_INDEX: readonly string[] = [
+  'All Creatures of the Field', // 1
+  'Lord, Hear the Sleepers', // 2 L
+  'Come, Ye Weary Travellers', // 3
+  'Behold the Lamp Is Lit', // 4 B
+  'Day Is Dying in the West', // 5
+  'Father of Our Fathers', // 6
+  'God Keep the Parish Fold', // 7
+  'Hark, the Bell Across the Moor', // 8
+  'In the Cold of Winter Dark', // 9
+  'Jesus, Shepherd of the Lost', // 10
+  'Kindly Light, Lead Thou Me On', // 11
+  'Let the Lowly Voices Rise', // 12
+  'My Soul Doth Wait Upon the Lord', // 13
+  'Not by Might and Not by Power', // 14
+  'Our Help in Ages Gone', // 15
+  'Praise to the Keeper of the Gate', // 16
+  'Rock of the Faithful Dead', // 17
+  'Sing to the Morning Star', // 18
+  'Early, Before the Cock Crows', // 19 E
+  'The Church Is One Foundation', // 20
+  'Unto the Hills Do I Lift Mine Eyes', // 21
+  'Vesper Song for the Weary', // 22
+  'Watchman, Tell Us of the Night', // 23 W
+  'Ye Servants of the Light', // 24
+  'Abide with the Dying', // 25
+  'Come, Thou Fount of Mercy', // 26
+  'Dear Lord, the Harvest Fails', // 27
+  'Eternal Rest Grant Them', // 28
+  'Faith of Our Mothers', // 29
+  'Gentle Jesus, Mild and Meek', // 30
+  'Holy, Holy, Holy', // 31
+  'I Heard the Voice of Thunder', // 32
+  'Judge Us Not in Anger', // 33
+  'King of the Silent Hours', // 34
+  'Lead On, O Patient Sexton', // 35
+  'Mercy for the Parish Poor', // 36
+  'Now the Labourer Is Home', // 37
+  'On the Shore of the Last River', // 38
+  'Peace in the Narrow House', // 39
+  'Rest, Weary Pilgrim, Rest', // 40
+  'Oh, Sleep Beneath the Yew', // 41 O
+  'Saviour, Breathe an Evening Blessing', // 42
+  'Thy Word Is a Lamp Unto My Feet', // 43
+  'Under the Wings of Mercy', // 44
+  'Visit Us, O Morning Light', // 45
+  'When Shadows Gather Deep', // 46
+  'Yet Shall the Faithful Rise', // 47
+  'Zion, Fair City of God', // 48
+  'Angels, Roll the Stone Away', // 49
+  'Bless the Hands That Bury Us', // 50
+  'Christ Is Risen from the Grave', // 51
+  'Deep Is the Well of Sorrow', // 52
+  'Each Little Flower That Opens', // 53
+  'For All the Saints Who Sleep', // 54
+  'Grant Us, Lord, a Quiet End', // 55
+  'He Leadeth Me by Still Waters', // 56
+  'It Is Well with My Soul', // 57
+  'Just as I Am, Without One Plea', // 58
+  'Keep Us Near the Cross', // 59
+  'Lo, the Dawn Is Breaking', // 60
 ]
 
-const RELIC_NAMES = [
-  "Crane's Rosary",
-  "Sexton's Bell Clapper",
-  "Child's Locket",
-  'Burial Shroud',
-  'Reliquary Heart',
-] as const
+export const CASE_3_HYMN_BOARD: HymnBoardDef = {
+  numbers: HYMN_NUMBERS,
+  letters: 'BELOW',
+  index: HYMN_INDEX,
+  confession: 'What I hid, I hid beneath the Word.',
+  wrongMessage: 'The tiles do not sit true',
+}
+
+/** The six cards in the right order, midnight to dawn. The pin goes in before the nails scratch. */
+export const CASE_3_TIMELINE_ORDER: readonly EvidenceCardId[] = [
+  'dry-boots',
+  'unsent-letter',
+  'cart-ruts',
+  'spilled-oil',
+  'hearse-pin',
+  'nail-marks',
+]
+
+export const CASE_3_EVIDENCE: readonly EvidenceCardDef[] = [
+  {
+    id: 'dry-boots',
+    title: "Elias's dry boots",
+    text: 'His boots stand by the hut hearth, dry. He had not yet been out in the wet grass.',
+    zone: 'grounds',
+    place: "the keeper's hut",
+    time: 'Midnight',
+    beat: '[midnight: Elias sits in the hut, his boots dry]',
+  },
+  {
+    id: 'unsent-letter',
+    title: 'The unsent letter',
+    text: 'A letter to the Bishop, folded and hidden in the hut bench. It speaks of "the undertaker\'s family".',
+    zone: 'grounds',
+    place: 'the hut bench',
+    time: 'Past midnight',
+    beat: '[he writes to the Bishop, and hides the letter]',
+    clueId: 'elias-unsent-letter',
+  },
+  {
+    id: 'cart-ruts',
+    title: 'Hearse-cart ruts',
+    text: 'Deep wheel ruts in the soft ground at the Row gate, where no cart should come at night.',
+    zone: 'mausoleum-row',
+    place: 'the Row gate',
+    time: 'One in the morning',
+    beat: '[a hearse cart creaks to the Row gate]',
+    clueId: 'hearse-cart-ruts',
+  },
+  {
+    id: 'spilled-oil',
+    title: 'Spilled lantern oil',
+    text: 'Lamp oil dark on the Crane crypt step. A lantern was dropped in a struggle.',
+    zone: 'mausoleum-row',
+    place: 'the Crane crypt step',
+    time: 'Two in the morning',
+    beat: '[a lantern falls on the crypt step]',
+  },
+  {
+    id: 'hearse-pin',
+    title: 'The iron hearse-pin',
+    text: "An iron hearse-pin pushed through the crypt door's outer hasp. It came off a hearse cart.",
+    zone: 'mausoleum-row',
+    place: 'the crypt door hasp',
+    time: 'Three in the morning',
+    beat: '[an iron pin is driven into the hasp]',
+    clueId: 'hearse-pin-hasp',
+  },
+  {
+    id: 'nail-marks',
+    title: 'Fingernail marks',
+    text: 'Long scratches low on the inside of the crypt door. Someone inside tried to open it, and could not.',
+    zone: 'mausoleum-row',
+    place: 'inside the crypt door',
+    time: 'Before dawn',
+    beat: '[scratching, then silence, until the dawn]',
+  },
+]
+
+/**
+ * Where the evidence cards lie in the world (spec 10 task 4.4, Req 16.1). The dry boots are the
+ * existing hut clue spot, so the card counts as found once that clue is in the journal. The rest
+ * are props mounted by CaseProps. The Mausoleum Row avenue is 3.5 m wide (x -21.75 to -18.25) and
+ * ends at the Crane crypt's front face at z -60.
+ */
+export const CASE_3_BOOTS_CLUE = 'clue-hut-boots'
+
+export const CASE_3_EVIDENCE_SPOTS: Readonly<
+  Record<Exclude<EvidenceCardId, 'dry-boots'>, { position: readonly [number, number, number]; label: string }>
+> = {
+  // Hut west table (top 0.78), beside the powder tin at x -1.8.
+  'unsent-letter': { position: [-2.35, 0.79, -1.15], label: 'Folded letter' },
+  // Two wheel ruts just inside the Row gate (z -40).
+  'cart-ruts': { position: [-20.6, 0, -38.6], label: 'Cart ruts' },
+  // The east edge of the avenue end, in front of the crypt step.
+  'spilled-oil': { position: [-18.6, 0.01, -57.2], label: 'Spilled oil' },
+  // On the crypt door's face, about hasp height.
+  'hearse-pin': { position: [-19.3, 1.0, -59.95], label: 'Iron pin in the hasp' },
+  // Low on the same door face.
+  'nail-marks': { position: [-20.7, 0.5, -59.95], label: 'Scratches on the door' },
+}
+
+/** The slate that opens minigame 3b, and where Elias lies once the pin is pulled. */
+export const CASE_3_CRYPT_PROPS = {
+  slate: [-21.3, 0, -58.6] as const,
+  body: [-20.0, 0.02, -59.0] as const,
+  /** The crypt door is 1.77 m wide, centred on the avenue. */
+  doorX: -20,
+  doorFaceZ: -60,
+} as const
+
+/**
+ * The order cards first lie on the slate, before the player moves any. It is not the right order
+ * (a property test checks), so a card found in walking order still has to be thought about.
+ */
+export const CASE_3_CARD_SHELF: readonly EvidenceCardId[] = [
+  'hearse-pin',
+  'dry-boots',
+  'nail-marks',
+  'cart-ruts',
+  'unsent-letter',
+  'spilled-oil',
+]
+
+/** What the vane papers say. The hand is the same careful hand in all three. */
+export const CASE_3_VANE_PAPERS: VanePapersDef = {
+  letter:
+    'My lord Bishop. The ledger of 1849 is false. Thirty-one were buried that week who were not yet dead, ' +
+    "and the one who was paid for it was the undertaker's family. I am going to the Crane crypt to find proof. " +
+    'If I do not return, look to them.',
+  flyleaf:
+    'Josiah Vane, parish undertaker. Paid in full for thirty-one funerals, 1849. ' +
+    'Written in the careful hand that also keeps the parish ledger.',
+  receipt:
+    'Vane & Sons, undertakers. Received of the keeper, one purchase, with thanks. ' +
+    'Written in the careful hand that also keeps the parish ledger.',
+}
+
+/** The rite's relic names in rite order, taken from the relic data so the two cannot drift apart. */
+const RELIC_NAMES = RITE_ORDER.map((id) => RELIC_MAP[id].name)
 
 const CASE_3: CaseDef = {
   id: 'sealed-catacombs',
@@ -668,20 +904,20 @@ const CASE_3: CaseDef = {
       found: { kind: 'purchase' },
     },
     {
-      id: 'censer-chain-marks',
-      title: 'Censer marks',
-      line: 'Chain scratches on the chapel floor, left by Crane long ago.',
+      id: 'oil-other-crypt',
+      title: 'Oil at another crypt',
+      line: 'Lamp oil is spilled on the step of a different crypt. The sexton filled his lamps here.',
       icon: 'examine',
       redHerring: true,
-      found: { kind: 'walk', spot: 'chapel', position: [10, 0, 6] },
+      found: { kind: 'walk', spot: 'mausoleum-row', position: [-24, 0, -50] },
     },
     {
-      id: 'cold-hearth-hut',
-      title: 'Cold hearth',
-      line: 'The hut hearth has not been lit in weeks.',
-      icon: 'examine',
+      id: 'old-bishops-seal',
+      title: "The old bishop's seal",
+      line: 'A wax seal on a parish paper. The bishop who pressed it died years before Elias came.',
+      icon: 'read',
       redHerring: true,
-      found: { kind: 'walk', spot: 'grounds', position: [-2, 0, -2] },
+      found: { kind: 'walk', spot: 'chapel', position: [8, 0, 9] },
     },
   ],
   notes: [
@@ -719,7 +955,12 @@ const CASE_3: CaseDef = {
       { label: 'Who', options: ['Silas Vane', 'Father Crane', 'the sexton', 'the lodge keeper'] },
       {
         label: 'Motive',
-        options: ['the handwriting', 'the cold hearth', 'the censer marks', 'a licence'],
+        options: [
+          'the handwriting',
+          "the old bishop's seal",
+          'the oil at the other crypt',
+          'a licence',
+        ],
       },
       {
         label: 'Means',
@@ -736,7 +977,7 @@ const CASE_3: CaseDef = {
   hints: [
     {
       cost: 5,
-      text: 'The hymn letters, the letter, the ruts, the pin and the Vane hands matter. The hearth and chains do not.',
+      text: "The hymn letters, the letter, the ruts, the pin and the Vane hands matter. The seal and the other crypt's oil do not.",
     },
     {
       cost: 10,

@@ -70,7 +70,6 @@ describe('boss (§7)', () => {
       riseAfterS: 10,
       riseTelegraphS: 1.5,
       nameCardS: 3,
-      riteCapS: 44,
       deathQuietS: 4,
       phaseAt: { two: 0.6, three: 0.25 },
       speed: { 1: 1.2, 2: 1.5, 3: 1.7 },

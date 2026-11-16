@@ -44,7 +44,10 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
       'God forgive me, they were not yet dead, and I could not bear the fever to spread." ' +
       'He sealed them below the chapel and wrote them into the ledger as buried. ' +
       'At the foot of the page is a ring of salt and a note: grave salt and holy water, ' +
-      'drawn as a circle, and nothing foul will cross it. I have copied it out.',
+      'drawn as a circle, and nothing foul will cross it. I have copied it out. ' +
+      'Further down, smudged: "What I hid, I hid beneath the Word." ' +
+      'He prayed first, then rang the bell, then named the smallest of them, ' +
+      'then covered the rest, and last he sealed the heart away.',
     unlocks: 'r-salt-circle',
   },
   {
@@ -54,8 +57,9 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
     text:
       'Scratches on every stone, low down, where a seated man could reach. Names, hundreds of ' +
       'small marks, and the same names again and again. Beside the sealed door, five relics are ' +
-      'listed for the Rite of Rest: the rosary, the clapper, the locket, the shroud, the heart. ' +
-      'Crane meant to lay them on the altar and finish what guilt began. ' +
+      'listed for the Rite of Rest, in the order Crane confessed it: the rosary, the clapper, ' +
+      'the locket, the shroud, the heart. ' +
+      'Crane meant to lay them on the altar in that order and finish what guilt began. ' +
       'He died with the words half said. I mean to say the rest.',
   },
   {

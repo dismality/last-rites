@@ -25,6 +25,8 @@ import { useEndingStore } from '../game/state/endingStore'
 import { useEnemyStore } from '../game/state/enemyStore'
 import { useGuidanceStore } from '../game/state/guidanceStore'
 import { useInventoryStore } from '../game/state/inventoryStore'
+import { RITE_ORDER } from '../data/relics'
+import { useRiteStore } from '../game/state/riteStore'
 import { useLanternStore } from '../game/state/lanternStore'
 import { useMysteryStore } from '../game/state/mysteryStore'
 import { clearNightState } from '../game/state/nightState'
@@ -40,7 +42,6 @@ import { applyDamage } from '../game/systems/combat'
 import { killReports } from '../game/systems/killReports'
 import { addItem } from '../game/systems/inventory'
 import { initialBoss } from '../game/systems/bossDirector'
-import { RITE_DURATION } from '../game/systems/mystery'
 import { spawnMultipliers } from '../game/systems/modes'
 import { clearedRoute } from '../game/systems/waveDirection'
 import { expandWave, nightPlan } from '../game/systems/waves'
@@ -407,6 +408,23 @@ function nextMissingRelic(): RelicId | undefined {
   return RELIC_IDS.find((r) => !have.includes(r))
 }
 
+/**
+ * "Give all relics" in the correct order (Stage 3 helper): puts all five in the satchel and, when
+ * the rite is open (stage 3 night, case unsolved), lays them on the altar in rite order through
+ * the real store. Crane still has to fall for the rite to complete. By day the relics are only
+ * given, so the report says why nothing was placed.
+ */
+export function placeAllRelics(): string {
+  RITE_ORDER.forEach(giveRelic)
+  let placed = 0
+  RITE_ORDER.forEach((relic, slot) => {
+    if (useRiteStore.getState().place(slot, relic).kind === 'placed') placed += 1
+  })
+  return placed > 0
+    ? `Gave all relics and placed ${placed} on the altar`
+    : `Gave all ${RITE_ORDER.length} relics (the altar takes them at the stage 3 night)`
+}
+
 /** Does what the current objective asks, by the rule that picked it. */
 export function completeObjective(): string {
   const o = useGuidanceStore.getState().objective
@@ -424,8 +442,7 @@ export function completeObjective(): string {
       return 'Night cleared'
     }
     case 2:
-      useMysteryStore.setState((s) => ({ mystery: { ...s.mystery, riteProgress: RITE_DURATION } }))
-      return 'Rite progress set to full'
+      return placeAllRelics()
     case 3:
       return killAll()
     case 4:

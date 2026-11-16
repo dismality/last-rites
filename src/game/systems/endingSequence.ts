@@ -65,3 +65,14 @@ export function handleSkipKey(e: { key: string; preventDefault: () => void }, sk
   skip()
   return true
 }
+
+/**
+ * The epilogue card is read at the player's pace: Space or Enter go on. Escape is left alone so it
+ * still pauses (accessibility rules: cutscenes skip with Space or Enter, Esc pauses).
+ */
+export function handleEpilogueKey(e: { key: string; preventDefault: () => void }, next: () => void): boolean {
+  if (e.key !== ' ' && e.key !== 'Enter') return false
+  e.preventDefault()
+  next()
+  return true
+}

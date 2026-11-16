@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useState } from 'react'
 import creditsMarkdown from '../../../docs/CREDITS.md?raw'
-import { ENDING_MAP } from '../../data/endings'
+import { ENDING_MAP, JUSTICE_EPILOGUE } from '../../data/endings'
+import { useAccusationStore } from '../../game/state/accusationStore'
 import { useEndingStore } from '../../game/state/endingStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useIntroStore } from '../../game/state/introStore'
@@ -9,7 +10,8 @@ import { startRun } from '../../game/state/progressionActions'
 import { useGameStore } from '../../game/state/gameStore'
 import { resetRun } from '../../game/state/resetRun'
 import { parseCredits } from '../../game/systems/credits'
-import { activeLine, fadeAlpha, handleSkipKey } from '../../game/systems/endingSequence'
+import { defaultLine } from '../../game/systems/accusation'
+import { activeLine, fadeAlpha, handleEpilogueKey, handleSkipKey } from '../../game/systems/endingSequence'
 import { endingCameraRuntime } from '../../scene/effects/endingCameraRuntime'
 import { MODES } from '../../data/modes'
 import type { ModeId } from '../../game/types'
@@ -63,6 +65,34 @@ function Sequence() {
   )
 }
 
+/** Justice for Elias: read before the walk-out. Space or Enter go on; Esc still pauses. */
+function Epilogue() {
+  const endEpilogue = useEndingStore((s) => s.endEpilogue)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      handleEpilogueKey(e, endEpilogue)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [endEpilogue])
+
+  return (
+    <div className="ending ending--epilogue" data-ending="rest">
+      <section className="ending__epilogue" role="status" aria-live="polite" aria-label="Justice for Elias">
+        <h2 className="ending__epilogue-title">Justice for Elias</h2>
+        {JUSTICE_EPILOGUE.map((line) => (
+          <p key={line} className="ending__epilogue-line">
+            {line}
+          </p>
+        ))}
+        <button type="button" className="menu__button" autoFocus onClick={endEpilogue}>
+          Walk out (Space)
+        </button>
+      </section>
+    </div>
+  )
+}
+
 function Summary() {
   const titleId = useId()
   const ending = useEndingStore((s) => s.ending)
@@ -70,6 +100,7 @@ function Summary() {
   const setModeSelectOpen = useOverlayStore((s) => s.setModeSelectOpen)
   const setScreen = useGameStore((s) => s.setScreen)
   const credits = useMemo(() => parseCredits(creditsMarkdown), [])
+  const accusation = useAccusationStore((s) => s.record)
 
   if (!ending) return null
   const def = ENDING_MAP[ending]
@@ -99,6 +130,8 @@ function Summary() {
         {def.title}
       </h2>
       <p className="ending__closing">{def.closingLine}</p>
+      {/* Only a won run has the Silas line: the accusation never changes whether it is won (Req 18.5). */}
+      {ending === 'rest' && defaultLine(accusation) && <p className="ending__silas">{defaultLine(accusation)}</p>}
       <StatsPanel onClose={toTitle} />
       <section className="ending__credits" aria-label="Credits" tabIndex={0}>
         <h3 className="ending__credits-title">Credits</h3>
@@ -127,5 +160,6 @@ export function EndingScreen() {
   const screen = useGameStore((s) => s.screen)
   const stage = useEndingStore((s) => s.stage)
   if (screen !== 'ending') return null
+  if (stage === 'epilogue') return <Epilogue />
   return stage === 'sequence' ? <Sequence /> : <Summary />
 }

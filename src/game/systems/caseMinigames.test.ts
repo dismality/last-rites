@@ -12,9 +12,13 @@ import {
   bellClues,
   bellPosts,
   candidateGraves,
+  evidenceTimeline,
+  hymnAnswer,
+  hymnTiles,
   ledgerFlags,
   type LedgerFlagInput,
 } from './caseMinigames'
+import { CASE_3_EVIDENCE, CASE_3_TIMELINE_ORDER, type EvidenceCardId } from '../../data/cases'
 
 const rightFlags = (): LedgerFlagInput[] =>
   CASE_1_RIGHT_FLAGS.map((r) => ({
@@ -106,6 +110,84 @@ describe('bellPosts (1b)', () => {
             !wrongAnswer && cutAnswer === cutId && examined.length === postIds.length,
           )
           if (wrongAnswer) expect(v.firstWrong).toBe(0)
+        },
+      ),
+      { numRuns: 200 },
+    )
+  })
+})
+
+describe('hymnTiles (3a)', () => {
+  it('reads B, E, L, O, W from the psalter and accepts them', () => {
+    expect(hymnAnswer().join('')).toBe('BELOW')
+    expect(hymnTiles(['B', 'E', 'L', 'O', 'W'])).toEqual({ ok: true })
+    expect(hymnTiles(['b', 'e', 'l', 'o', 'w'])).toEqual({ ok: true })
+  })
+
+  it('rejects other letters, reporting the first wrong tile and the message', () => {
+    expect(hymnTiles(['B', 'E', 'X', 'O', 'W'])).toEqual({
+      ok: false,
+      firstWrong: 2,
+      message: 'The tiles do not sit true',
+    })
+    expect(hymnTiles([null, null, null, null, null]).firstWrong).toBe(0)
+  })
+
+  // Feature: 10-curse-stages, Property 16: Right answers accepted, wrong answers rejected
+  it('Property 16 (3a): accepted only for the right five letters', () => {
+    // Validates: Requirements 15.2, 15.3
+    const tile = fc.option(fc.constantFrom(...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')), {
+      nil: null,
+    })
+    const want = hymnAnswer()
+    fc.assert(
+      fc.property(fc.array(tile, { maxLength: 7 }), (tiles) => {
+        const v = hymnTiles(tiles)
+        const right = tiles.length === 5 && want.every((w, i) => tiles[i] === w)
+        expect(v.ok).toBe(right)
+        if (!right) {
+          const first = want.findIndex((w, i) => tiles[i] !== w)
+          expect(v.firstWrong).toBe(first >= 0 ? first : 5)
+        }
+      }),
+      { numRuns: 200 },
+    )
+  })
+})
+
+describe('evidenceTimeline (3b)', () => {
+  it('accepts the right order of the six cards', () => {
+    expect(CASE_3_EVIDENCE).toHaveLength(6)
+    expect(evidenceTimeline(CASE_3_TIMELINE_ORDER)).toEqual({ ok: true })
+  })
+
+  it('reports the first card out of place', () => {
+    const swapped = [...CASE_3_TIMELINE_ORDER]
+    ;[swapped[3], swapped[4]] = [swapped[4], swapped[3]]
+    expect(evidenceTimeline(swapped)).toEqual({ ok: false, firstWrong: 3 })
+  })
+
+  // Feature: 10-curse-stages, Property 16: Right answers accepted, wrong answers rejected
+  it('Property 16 (3b): only the right order is accepted; first-wrong is the first difference', () => {
+    // Validates: Requirements 16.2, 16.4
+    const ids = CASE_3_EVIDENCE.map((c) => c.id)
+    fc.assert(
+      fc.property(
+        fc.oneof(
+          fc.shuffledSubarray(ids, { minLength: 0, maxLength: 6 }),
+          fc.array(fc.constantFrom<EvidenceCardId>(...ids), { maxLength: 8 }),
+        ),
+        (order) => {
+          const v = evidenceTimeline(order)
+          const same =
+            order.length === CASE_3_TIMELINE_ORDER.length &&
+            order.every((c, i) => c === CASE_3_TIMELINE_ORDER[i])
+          expect(v.ok).toBe(same)
+          if (!same) {
+            let first = 0
+            while (order[first] === CASE_3_TIMELINE_ORDER[first]) first++
+            expect(v.firstWrong).toBe(first)
+          }
         },
       ),
       { numRuns: 200 },

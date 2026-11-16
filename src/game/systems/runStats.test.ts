@@ -1,4 +1,4 @@
-﻿import fc from 'fast-check'
+import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { STAGE_COUNT as LAST_NIGHT } from '../../data/stages'
 import {
@@ -46,7 +46,6 @@ describe('runStats', () => {
 
   it('finalizes every ending except taken as having survived the last night', () => {
     expect(finalizeStats(createRunStats(), 'rest').nightsSurvived).toBe(LAST_NIGHT)
-    expect(finalizeStats(createRunStats(), 'uneasy-peace').nightsSurvived).toBe(LAST_NIGHT)
     expect(finalizeStats(createRunStats(), 'taken').nightsSurvived).toBe(0)
   })
 

@@ -78,8 +78,10 @@ export const useStageStore = create<StageStoreState>((set, get) => ({
     const s = get()
     const phase = useWorldStore.getState().phase
     const verdict = giveAnswer(s.altar, s.nightElapsed, phase, linksNow, correct, kind)
-    if (verdict.kind === 'solved') get().solveCase()
-    else if (verdict.kind === 'wrong') {
+    // A right accusation never ends the night: it does not change whether the run is won (Req 18.5).
+    if (verdict.kind === 'solved') {
+      if (kind === 'case') get().solveCase()
+    } else if (verdict.kind === 'wrong') {
       set({ altar: verdict.state })
       const waves = useWaveStore.getState()
       waves.setWaves(queueWaveNow(waves.waves))

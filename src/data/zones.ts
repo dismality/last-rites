@@ -14,7 +14,11 @@ import {
   type Vec3,
 } from './cemeteryLayout'
 import type { LootTableId } from './lootTables'
+import type { MinigameId } from './cases'
 import type { CaseId } from './stages'
+
+/** What can reveal a fixed spawn: a solved case or a solved minigame. The ids never overlap. */
+export type Revealed = CaseId | MinigameId
 
 export type ZoneId = 'grounds' | 'mausoleum-row' | 'chapel' | 'catacombs'
 
@@ -159,7 +163,7 @@ export interface FixedSpawn {
   /** A flat item resting on a slope: degrees its surface leans toward -Z (the chapel door). */
   tiltDeg?: number
   /** Lies in the world only once this case is solved (spec 10, Req 14.4). */
-  revealedBy?: CaseId
+  revealedBy?: Revealed
 }
 
 export const FIXED_SPAWNS: readonly FixedSpawn[] = [
@@ -190,6 +194,8 @@ export const FIXED_SPAWNS: readonly FixedSpawn[] = [
     zone: 'mausoleum-row',
     position: [-20.5, 0.3, -58],
     item: 'iron-ossuary-key',
+    // Elias lies in the opened Crane crypt with it once the evidence is in order (spec 10 task 4.4).
+    revealedBy: '3b',
   },
   // Page and shroud lie on the stone bier (top 0.78), the heart on the reliquary altar (0.78).
   { id: 'fx-page-4', zone: 'catacombs', position: [24.2, 0.78, 52.6], item: 'journal-page-4' },

@@ -446,6 +446,11 @@
         "executionId": "803aeb59-775e-4382-b1b9-fcdd91b528a9",
         "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
         "timestamp": 1794805149305
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818252213
       }
     ],
     "4.1 Case 3 data": [
@@ -453,6 +458,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703931
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818257740
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818492190
       }
     ],
     "4.2 Pure rules for 3a, 3b, the Rite and the Accusation": [
@@ -460,6 +475,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703980
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818495661
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818654417
       }
     ],
     "4.3 Minigame 3a overlay and hymn board props": [
@@ -467,6 +492,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704008
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818658239
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818963487
       }
     ],
     "4.4 Minigame 3b overlay and crypt props": [
@@ -474,6 +509,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704037
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818967210
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794819510532
       }
     ],
     "4.5 The Rite: relic placement": [
@@ -481,6 +526,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704067
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794819513832
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820180580
       }
     ],
     "4.6 Silas reveal, Accusation, epilogue and endings": [
@@ -488,6 +543,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704096
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820185313
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820685152
       }
     ],
     "4.7 Dev hooks for Stage 3": [
@@ -495,6 +560,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704130
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820688816
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820799961
       }
     ],
     "4.8 Stage 3 e2e and screenshots": [
@@ -502,6 +577,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704162
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794820803599
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794821470665
       }
     ],
     "4.9 Milestone: run the full e2e suite and fix what broke": [
@@ -509,6 +594,11 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704193
+      },
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794821474471
       }
     ],
     "4.10 Finish": [
@@ -516,6 +606,11 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564704225
+      },
+      {
+        "executionId": "41c63c16-c42f-4d60-b445-8d896fafa295",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794823727432
       }
     ],
     "5.1 Case 2 data": [
@@ -782,6 +877,13 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564705537
+      }
+    ],
+    "3. Stage 1: Saved by the Bell": [
+      {
+        "executionId": "c7610dbc-b1a3-4318-8806-2b5d451d4257",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794818252265
       }
     ]
   }

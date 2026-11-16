@@ -21,6 +21,9 @@ const caseSaveArb: fc.Arbitrary<CaseSave> = fc
         hints: fc.record({ revealed: fc.constantFrom(0, 1, 2, 3) as fc.Arbitrary<0 | 1 | 2 | 3> }),
         ledgerLines: fc.constant([]),
         bellsExamined: fc.constant([]),
+        hymnTiles: fc.constant([null, null, null, null, null]),
+        evidenceFound: fc.constant([]),
+        timeline: fc.constant([]),
       }),
     ),
   )

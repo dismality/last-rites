@@ -12,7 +12,7 @@ beforeEach(() => {
     modeSelectOpen: false,
     altarPanelOpen: false,
   })
-  useGameStore.setState({ journalOpen: false, mapOpen: false })
+  useGameStore.setState({ journalOpen: false, mapOpen: false, screen: 'game' })
   useWorldStore.getState().setPhase('day')
   setDawnPickProbe(() => false)
 })
@@ -37,6 +37,16 @@ describe('pause triggers with 08 overlays', () => {
     useOverlayStore.setState({ merchantOpen: false })
     handlePointerLockLost()
     expect(useGameStore.getState().paused).toBe(true)
+  })
+
+  it('pointer-lock loss on the ending screen does not pause (startEnding frees the cursor)', () => {
+    useGameStore.getState().setScreen('ending')
+    handlePointerLockLost()
+    expect(useGameStore.getState().paused).toBe(false)
+    // Esc still pauses there.
+    handlePauseKey('Escape')
+    expect(useGameStore.getState().paused).toBe(true)
+    useGameStore.getState().setScreen('game')
   })
 
   it('isMenuOpen counts every new overlay', () => {

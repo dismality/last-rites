@@ -7,9 +7,12 @@ import {
   CASE_1_BELLS,
   CASE_1_RIGHT_FLAGS,
   CASE_1_STONES,
+  CASE_3_HYMN_BOARD,
+  CASE_3_TIMELINE_ORDER,
   LEDGER_WRONG_FLAG_MESSAGE,
   type BellPostId,
   type Case1ClueId,
+  type EvidenceCardId,
   type LedgerFlagKind,
 } from '../../data/cases'
 
@@ -84,4 +87,43 @@ export function bellPosts(input: BellPostsInput): MinigameVerdict {
   }
   const allExamined = CASE_1_BELLS.every((p) => input.examined.includes(p.id))
   return { ok: allExamined && input.cutAnswer !== undefined }
+}
+
+/** The letters the five tiles must show: the first letter of each hymn the board names. */
+export function hymnAnswer(): string[] {
+  const { numbers, index } = CASE_3_HYMN_BOARD
+  return numbers.map((n) => (index[n - 1] ?? '').charAt(0).toUpperCase())
+}
+
+/**
+ * Minigame 3a. `tiles` holds one letter per tile (null for a tile not yet set), left to right.
+ * Letters compare case-insensitively. A wrong or unset tile is rejected with `firstWrong` at the
+ * first such tile and the message "The tiles do not sit true".
+ */
+export function hymnTiles(tiles: readonly (string | null)[]): MinigameVerdict {
+  const want = hymnAnswer()
+  const firstWrong = want.findIndex((w, i) => (tiles[i] ?? '').toUpperCase() !== w)
+  if (firstWrong >= 0 || tiles.length !== want.length) {
+    return {
+      ok: false,
+      firstWrong: firstWrong >= 0 ? firstWrong : want.length,
+      message: CASE_3_HYMN_BOARD.wrongMessage,
+    }
+  }
+  return { ok: true }
+}
+
+/**
+ * Minigame 3b. `order` lists the card ids on the timeline, earliest first. Only the full right
+ * order is accepted. `firstWrong` is the first position that differs from the right order; a
+ * correct but short prefix reports the first empty position, and a repeated or extra card
+ * differs at its own position.
+ */
+export function evidenceTimeline(order: readonly EvidenceCardId[]): MinigameVerdict {
+  const want = CASE_3_TIMELINE_ORDER
+  const len = Math.max(want.length, order.length)
+  for (let i = 0; i < len; i++) {
+    if (order[i] !== want[i]) return { ok: false, firstWrong: i }
+  }
+  return { ok: true }
 }

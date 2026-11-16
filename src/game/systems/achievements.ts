@@ -18,6 +18,8 @@ export interface AchievementFacts {
   relics: number
   craneRested: boolean
   ending: EndingId | null
+  /** The Stage 3 accusation was given and was right. */
+  justice: boolean
   endlessNight: number
   coinsSpent: number
 }
@@ -55,6 +57,8 @@ function isMet(id: AchievementId, f: AchievementFacts): boolean {
       return f.endlessNight >= T.endlessNight
     case 'a-patron':
       return f.coinsSpent >= T.coinsSpent
+    case 'a-justice':
+      return f.justice
   }
 }
 

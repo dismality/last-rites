@@ -49,6 +49,9 @@ export function EndingCamera() {
       const step = advanceSequence(def, rt.time, rawDelta, useGameStore.getState().paused)
       rt.time = step.time
       if (step.done) store.showSummary()
+    } else if (store.stage === 'epilogue') {
+      // The epilogue card reads over the chapel at the start of the walk-out.
+      rt.time = 0
     } else {
       rt.time = def.duration
     }

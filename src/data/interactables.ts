@@ -30,9 +30,13 @@ export type InteractableKind =
   | 'workbench'
   | 'ledger-shelf'
   | 'bell-post'
+  | 'hymn-board'
+  | 'psalter'
+  | 'evidence-card'
+  | 'timeline-slate'
 
 /** Things that react to Interact by proximity and draw no prompt, rune or outline of their own. */
-export type ProximityKind = 'chapel-repair-point' | 'chapel-altar-heal' | 'final-rite'
+export type ProximityKind = 'chapel-repair-point' | 'chapel-altar-heal'
 
 export interface NeedDef {
   /** What the player lacks, in words. */
@@ -219,6 +223,52 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     resetsOn: 'New Game',
     idlePrompt: 'The bells are examined',
   },
+  // Spec 10 task 4.3: the chapel hymn board and the vestry psalter both open minigame 3a, by day in stage 3.
+  'hymn-board': {
+    kind: 'hymn-board',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the hymn tiles are solved (minigame 3a solved), or the story is not in stage 3',
+    resetsOn: 'New Game',
+    idlePrompt: 'The hymn board is read',
+  },
+  psalter: {
+    kind: 'psalter',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the hymn tiles are solved (minigame 3a solved), or the story is not in stage 3',
+    resetsOn: 'New Game',
+    idlePrompt: 'The psalter is read',
+  },
+  // Spec 10 task 4.4: a piece of Elias's last night. Examining it takes the card; it is used up once held.
+  'evidence-card': {
+    kind: 'evidence-card',
+    action: 'examine',
+    category: 'used-up',
+    hold: false,
+    fadesBody: true,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the evidence card is in hand',
+    resetsOn: 'New Game',
+  },
+  // Spec 10 task 4.4: the slate at the Crane crypt opens minigame 3b, the timeline of Elias's last night.
+  'timeline-slate': {
+    kind: 'timeline-slate',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: "Elias's night is in order (minigame 3b solved), or the story is not in stage 3",
+    resetsOn: 'New Game',
+    idlePrompt: "Elias's night is in order",
+  },
   workbench: {
     kind: 'workbench',
     action: 'open',
@@ -252,12 +302,7 @@ export const PROXIMITY_TRIGGERS: Readonly<Record<ProximityKind, ProximityDef>> =
     file: 'Chapel.tsx',
     note: 'E at the lit altar heals once a day; no prompt, rune or outline',
   },
-  'final-rite': {
-    kind: 'final-rite',
-    category: 'repeatable',
-    file: 'FinalRite.tsx',
-    note: 'Hold E at the altar on night 5; progress is shown by the rite bar, not a prompt',
-  },
+
 }
 
 export const INTERACTABLE_KINDS = Object.keys(INTERACTABLES) as InteractableKind[]

@@ -142,7 +142,7 @@ export const CRAFTED_GIVE_IDS: readonly ItemId[] = [
 
 export const SCARE_IDS = SCARE_EVENTS.map((e) => e.id)
 
-export const ENDING_IDS: readonly EndingId[] = ['rest', 'uneasy-peace', 'taken']
+export const ENDING_IDS: readonly EndingId[] = ['rest', 'taken']
 
 /**
  * What a player holds when stage N begins (spec 10 Req 5.4). Key items come from the story beats

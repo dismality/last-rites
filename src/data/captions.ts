@@ -15,6 +15,11 @@ export const SILENT_CAPTION_EVENTS = [
   'altar-wrong',
   'altar-locked',
   'altar-solved',
+  // Spec 10 stage 3: the hymn board, the crypt pin and the rite.
+  'hymn-tiles-wrong',
+  'hymn-stair-open',
+  'crypt-pin-pulled',
+  'relic-placed',
 ] as const
 // (pin-reached has a synth voice, so it is a SoundId, not a silent event.)
 
@@ -50,6 +55,10 @@ export type CaptionId =
   | 'altar-wrong'
   | 'altar-locked'
   | 'altar-solved'
+  | 'hymn-tiles-wrong'
+  | 'hymn-stair-open'
+  | 'crypt-pin-pulled'
+  | 'relic-placed'
   | 'pin-reached'
 
 export interface CaptionDef {
@@ -152,7 +161,32 @@ export const CAPTIONS: readonly CaptionDef[] = [
   // Spec 10. The wrong note is the bible's wording; the other two are chosen unattended.
   { id: 'altar-wrong', event: 'altar-wrong', text: '[a sour note from the altar]', minSeconds: 2 },
   { id: 'altar-locked', event: 'altar-locked', text: '[the altar is silent]', minSeconds: 2 },
-  { id: 'altar-solved', event: 'altar-solved', text: '[a clear note from the altar]', minSeconds: 2.5 },
+  {
+    id: 'altar-solved',
+    event: 'altar-solved',
+    text: '[a clear note from the altar]',
+    minSeconds: 2.5,
+  },
+  // Spec 10 task 4.1: wording chosen unattended; the sour note above is the bible's.
+  {
+    id: 'hymn-tiles-wrong',
+    event: 'hymn-tiles-wrong',
+    text: '[brass tiles clatter]',
+    minSeconds: 2,
+  },
+  {
+    id: 'hymn-stair-open',
+    event: 'hymn-stair-open',
+    text: '[stone grinds behind the altar]',
+    minSeconds: 3,
+  },
+  {
+    id: 'crypt-pin-pulled',
+    event: 'crypt-pin-pulled',
+    text: '[an iron pin slides free]',
+    minSeconds: 2.5,
+  },
+  { id: 'relic-placed', event: 'relic-placed', text: '[a low note from the altar]', minSeconds: 2 },
   // Spec 09 task 11l: the wording is the task's.
   { id: 'pin-reached', event: 'pin-reached', text: '[pin reached]', minSeconds: 1.5 },
 ]

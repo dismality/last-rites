@@ -3,118 +3,37 @@ import { describe, expect, it } from 'vitest'
 import { ENDINGS, ENDING_MAP, MAX_ENDING_SECONDS } from '../../data/endings'
 import { parseCredits } from './credits'
 import { activeLine, cameraProgress, fadeAlpha } from './endingSequence'
-import { isHoldingRite, riteAvailability, stepRite, type RiteContext } from './finalRite'
-import { createMysteryState, RITE_DURATION } from './mystery'
+import { countRelics, riteAvailability, type RiteContext } from './finalRite'
 import { createRunStats, finalizeStats, recordBanished, recordNightSurvived } from './runStats'
 import { startRiteAssault } from './waves'
 
-const night5 = (over: Partial<RiteContext> = {}): RiteContext => ({
+const stage3 = (over: Partial<RiteContext> = {}): RiteContext => ({
   nightNumber: 3,
   phase: 'night',
-  wavesCleared: false,
-  relicCount: 0,
   ...over,
 })
 
 describe('riteAvailability', () => {
   it('needs the last stage at night', () => {
-    expect(riteAvailability(night5({ relicCount: 5, nightNumber: 2 }))).toBe('unavailable')
-    expect(riteAvailability(night5({ relicCount: 5, phase: 'day' }))).toBe('unavailable')
+    expect(riteAvailability(stage3({ nightNumber: 2 }))).toBe('unavailable')
+    expect(riteAvailability(stage3({ phase: 'day' }))).toBe('unavailable')
+    expect(riteAvailability(stage3({ phase: 'dusk' }))).toBe('unavailable')
   })
 
-  it('is ready with 3+ relics, even before the waves are cleared (Req 5.2)', () => {
-    expect(riteAvailability(night5({ relicCount: 3 }))).toBe('ready')
-    expect(riteAvailability(night5({ relicCount: 3, wavesCleared: true }))).toBe('ready')
+  it('is ready on the last stage at night, whatever the relic count (placement is by relic)', () => {
+    expect(riteAvailability(stage3())).toBe('ready')
   })
 
-  it('is taken only once waves clear with fewer than 3 relics (Req 5.5)', () => {
-    expect(riteAvailability(night5({ relicCount: 2 }))).toBe('unavailable')
-    expect(riteAvailability(night5({ relicCount: 2, wavesCleared: true }))).toBe('taken')
-  })
-})
-
-describe('isHoldingRite', () => {
-  const base = { availability: 'ready', nearAltar: true, interactHeld: true, blocked: false } as const
-  it('holds only when every condition is met', () => {
-    expect(isHoldingRite(base)).toBe(true)
-    expect(isHoldingRite({ ...base, nearAltar: false })).toBe(false)
-    expect(isHoldingRite({ ...base, interactHeld: false })).toBe(false)
-    expect(isHoldingRite({ ...base, blocked: true })).toBe(false)
-    expect(isHoldingRite({ ...base, availability: 'unavailable' })).toBe(false)
+  it('is never ready when the final night is Infinity (Endless)', () => {
+    expect(riteAvailability(stage3({ finalNight: Infinity }))).toBe('unavailable')
   })
 })
 
-describe('stepRite', () => {
-  it('pauses on release without resetting (Req 5.3)', () => {
-    let m = stepRite(createMysteryState(), 20, true, 5).mystery
-    m = stepRite(m, 10, false, 5).mystery
-    expect(m.riteProgress).toBe(20)
-  })
-
-  it('completes at 45 s of holding with the ending for the relic count (Req 5.4)', () => {
-    const r = stepRite(createMysteryState(), RITE_DURATION, true, 5)
-    expect(r.completed).toBe(true)
-    expect(r.mystery.ending).toBe('rest')
-    expect(stepRite(createMysteryState(), RITE_DURATION, true, 4).mystery.ending).toBe('uneasy-peace')
-  })
-
-  // **Validates: Requirements 5.3, 5.4**
-  it('property: the ending always follows chooseEnding and never changes once set', () => {
-    fc.assert(
-      fc.property(fc.integer({ min: 3, max: 5 }), fc.array(fc.double({ min: 0, max: 20, noNaN: true }), { maxLength: 12 }), (relics, dts) => {
-        let m = createMysteryState()
-        let ended = m.ending
-        for (const dt of dts) {
-          m = stepRite(m, dt, true, relics).mystery
-          if (ended) expect(m.ending).toBe(ended)
-          ended = m.ending
-        }
-        if (ended) expect(ended).toBe(relics === 5 ? 'rest' : 'uneasy-peace')
-      }),
-    )
+describe('countRelics', () => {
+  it('counts the satchel and the mystery record once each', () => {
+    expect(countRelics(['crane-rosary', 'childs-locket'], new Set(['crane-rosary', 'burial-shroud']))).toBe(3)
   })
 })
-
-describe('stepRite cap', () => {
-  it('stops at the cap and does not complete', () => {
-    const r = stepRite(createMysteryState(), 60, true, 5, 44)
-    expect(r.mystery.riteProgress).toBe(44)
-    expect(r.completed).toBe(false)
-    expect(r.mystery.ending).toBeUndefined()
-  })
-
-  it('completes once the cap lifts to 45', () => {
-    const held = stepRite(createMysteryState(), 60, true, 5, 44).mystery
-    expect(stepRite(held, 1, true, 5, 45).completed).toBe(true)
-  })
-
-  // **Validates: Requirements 17.5, 17.18**
-  it('property 28: capped progress stays at most the cap, never drops, and finishes only uncapped', () => {
-    fc.assert(
-      fc.property(
-        fc.double({ min: 0, max: 45, noNaN: true }),
-        fc.array(fc.tuple(fc.double({ min: 0, max: 10, noNaN: true }), fc.boolean()), { maxLength: 20 }),
-        (start, steps) => {
-          let m = { ...createMysteryState(), riteProgress: Math.min(start, 44) }
-          for (const [dt, hold] of steps) {
-            const before = m.riteProgress
-            const r = stepRite(m, dt, hold, 5, 44)
-            expect(r.mystery.riteProgress).toBeLessThanOrEqual(44)
-            expect(r.mystery.riteProgress).toBeGreaterThanOrEqual(before)
-            expect(r.completed).toBe(false)
-            m = r.mystery
-          }
-        },
-      ),
-    )
-  })
-
-  it('never lowers progress already above the cap', () => {
-    const above = { ...createMysteryState(), riteProgress: 45 - 0.5 }
-    expect(stepRite(above, 1, true, 5, 44).mystery.riteProgress).toBe(44.5)
-  })
-})
-
 describe('run stats', () => {
   it('counts banished zombies and never lowers nights survived', () => {
     let s = recordBanished(recordBanished(createRunStats()))
@@ -131,7 +50,7 @@ describe('run stats', () => {
 
 describe('ending sequences', () => {
   it('each ending is at most 45 s with lines inside its duration (Req 6.1)', () => {
-    expect(ENDINGS).toHaveLength(3)
+    expect(ENDINGS).toHaveLength(2)
     for (const e of ENDINGS) {
       expect(e.duration).toBeLessThanOrEqual(MAX_ENDING_SECONDS)
       expect(e.camera.position.length).toBe(e.camera.target.length)

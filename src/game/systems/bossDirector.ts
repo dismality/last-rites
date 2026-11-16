@@ -2,7 +2,6 @@
 // Attacks (2.21) and death (2.22) extend the same state and event types below.
 import { BOSS } from '../../data/boss'
 import type { Vec2 } from './combat'
-import { RITE_DURATION } from './mystery'
 
 /** Pause between the two swings of phase 3, and the rest after a swing (bible placements). */
 const SWING_GAP_S = 0.3
@@ -17,7 +16,7 @@ export type BossAttack =
 
 export interface BossState {
   stage: BossStage
-  /** Sim seconds since the rite started, whether or not Interact is held. */
+  /** Sim seconds since the first relic was placed. */
   riteClock: number
   /** Seconds spent in the current stage. */
   stageClock: number
@@ -84,10 +83,11 @@ export const bossSpeed = (phase: BossPhase, inSalt: boolean): number =>
 /** Stage 'risen': HP above 0, drives the tracker and the boss bar. */
 export const craneFighting = (s: BossState): boolean => s.stage === 'risen'
 
-/** The rite cannot finish until the 4 s of quiet after his death has passed. */
+/**
+ * The rite cannot finish until the 4 s of quiet after his death has passed. True before he has
+ * risen too, so the placed relics wait for him (spec 10 Req 17.4).
+ */
 export const riteBlocked = (s: BossState): boolean => s.stage !== 'dead'
-
-export const riteCapS = (s: BossState): number => (riteBlocked(s) ? BOSS.riteCapS : RITE_DURATION)
 
 export function tickBoss(s: BossState, i: BossInput): BossTick {
   const events: BossEvent[] = []

@@ -12,6 +12,7 @@ import { useStageStore } from '../../game/state/stageStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { correctLinkCount } from '../../game/systems/caseBoard'
 import { questionSegments } from '../journal/caseBoardView'
+import { RitePanelBody } from './RitePanel'
 import { altarStatus, verdictMessage } from './altarPanelView'
 import './altarPanel.css'
 
@@ -141,6 +142,7 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
 /** Mount once. Renders while the altar panel is open on the game screen. */
 export function AltarPanel() {
   const open = useOverlayStore((s) => s.altarPanelOpen)
+  const stage = useStageStore((s) => s.stage)
   const screen = useGameStore((s) => s.screen)
   const taken = useGameStore((s) => s.taken)
   const close = useMemo(() => () => useOverlayStore.getState().setAltarPanelOpen(false), [])
@@ -151,5 +153,6 @@ export function AltarPanel() {
   }, [open, screen, taken, close])
 
   if (!open || screen !== 'game' || taken) return null
-  return <AltarPanelBody onClose={close} />
+  // Stage 3's answer is the rite: relic placement, not a sentence of blanks.
+  return stage === 3 ? <RitePanelBody onClose={close} /> : <AltarPanelBody onClose={close} />
 }

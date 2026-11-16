@@ -13,6 +13,7 @@ import { useEndingStore } from './game/state/endingStore'
 import { EndingScreen } from './ui/menus/EndingScreen'
 import { EndingCamera } from './scene/effects/EndingCamera'
 import { IntroCamera } from './scene/effects/IntroCamera'
+import { AltarRite } from './scene/world/AltarRite'
 import { FinalRite } from './scene/world/FinalRite'
 import { ContentWarning } from './ui/menus/ContentWarning'
 import { LoadingScreen } from './ui/menus/LoadingScreen'
@@ -103,6 +104,7 @@ function GameScreen() {
           <CoinPiles />
           <WaveDirector />
           <FinalRite />
+          <AltarRite />
           <ScareZoneVolumes />
           <ScareProps />
           <ScareStager />

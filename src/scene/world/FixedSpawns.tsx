@@ -12,6 +12,7 @@ import { assetUrl } from '../../data/assets'
 import { useCaseStore } from '../../game/state/caseStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { useWorldStore } from '../../game/state/worldStore'
+import { revealedIds } from '../../game/systems/caseSave'
 import { availableFixedSpawns } from '../../game/systems/spawns'
 import '../assets/preloadModels'
 import { Interactable } from './Interactable'
@@ -46,9 +47,16 @@ export function FixedSpawns() {
   const collect = useSpawnStore((s) => s.collectFixed)
   const phase = useWorldStore((s) => s.phase)
   const closedCases = useCaseStore((s) => s.closed)
+  const caseProgress = useCaseStore((s) => s.cases)
   const available = useMemo(
-    () => availableFixedSpawns(world, phase, undefined, closedCases),
-    [world, phase, closedCases],
+    () =>
+      availableFixedSpawns(
+        world,
+        phase,
+        undefined,
+        revealedIds({ closed: closedCases, cases: caseProgress }),
+      ),
+    [world, phase, closedCases, caseProgress],
   )
   // A taken key, relic or page lingers for the cue fade instead of blinking out.
   const spawns = useLingering(available, (s) => s.id)

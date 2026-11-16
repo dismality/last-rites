@@ -16,6 +16,7 @@ import { colliderOwner } from './colliderOwners'
 import {
   giveAllClues,
   giveClue,
+  giveRelic,
   linkClues,
   setAltarPanel,
   skipToStage,
@@ -24,6 +25,9 @@ import {
   unsolvedMinigames,
 } from '../dev/devActions'
 import { caseOfStage } from '../data/cases'
+import { RITE_ORDER } from '../data/relics'
+import { useAccusationStore } from '../game/state/accusationStore'
+import { useRiteStore } from '../game/state/riteStore'
 import { useCaseStore } from '../game/state/caseStore'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
@@ -192,7 +196,7 @@ const api = {
     lockOverride.enabled = true
   },
   /** The function the final rite and the death check call to start an ending. */
-  startEnding(id: 'rest' | 'uneasy-peace' | 'taken'): void {
+  startEnding(id: 'rest' | 'taken'): void {
     startEnding(id)
   },
   /** Seconds into the ending camera sequence (the clock the subtitles follow). */
@@ -314,6 +318,18 @@ const api = {
   /** Sets the Grave Coin balance through the real store action (for the hint price checks). */
   setCoins(n: number): void {
     useProgressionStore.getState().setCoins(n)
+  },
+  /** Puts all five relics in the satchel only (the rite panel places them; unlike "Give all relics"). */
+  giveAllRelics(): void {
+    RITE_ORDER.forEach(giveRelic)
+  },
+  /** JSON-safe copy of the rite altar: which relic stands in which place. */
+  riteState(): unknown {
+    return toSnapshot(useRiteStore.getState().rite)
+  },
+  /** JSON-safe copy of the accusation: chosen options and what the altar said. */
+  accusationState(): unknown {
+    return toSnapshot(useAccusationStore.getState())
   },
   /** Opens or closes the altar answer panel. */
   setAltarPanel(open: boolean): string {

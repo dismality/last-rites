@@ -8,6 +8,7 @@ import { dropStack, pickupDrop, type Vec3, type WorldDrop } from '../systems/sat
 import { ITEM_MAP } from '../../data/items'
 import type { ItemId } from '../types'
 import { FIXED_SPAWNS } from '../../data/zones'
+import { revealedIds } from '../systems/caseSave'
 import { collectFixedSpawn, dayOneSpawns, type SpawnWorld } from '../systems/spawns'
 import { emit } from '../events'
 import { useCaseStore } from './caseStore'
@@ -79,7 +80,7 @@ export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
       spawnId,
       useWorldStore.getState().phase,
       undefined,
-      useCaseStore.getState().closed,
+      revealedIds(useCaseStore.getState()),
     )
     if (world === before) return
     set({ world })

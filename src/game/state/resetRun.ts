@@ -12,8 +12,10 @@ import { graveBurstRuntime } from '../../scene/effects/graveBurstRuntime'
 import { meleeRuntime } from '../../scene/player/meleeRuntime'
 import { resetWeaponRuntime } from '../../scene/player/weaponRuntime'
 import { resetScareRuntime } from '../../scene/scares/scareRuntime'
+import { useAccusationStore } from './accusationStore'
 import { useAchievementStore } from './achievementStore'
 import { useBossStore } from './bossStore'
+import { useRiteStore } from './riteStore'
 import { useChapelStore } from './chapelStore'
 import { useCoinStore } from './coinStore'
 import { resetCombatTickRuntime } from './combatTick'
@@ -84,6 +86,8 @@ export const REPLACED_STORES = [
   useDescentStore,
   useDoorStore,
   useBossStore,
+  useRiteStore,
+  useAccusationStore,
   useEffectStore,
   useFeedbackStore,
   useInteractionStore,

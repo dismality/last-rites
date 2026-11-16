@@ -4,15 +4,15 @@ import { ACHIEVEMENTS } from '../../data/achievements'
 import { achievementsMenuModel } from './achievementsMenuModel'
 
 describe('achievementsMenuModel', () => {
-  it('lists all 12 entries', () => {
-    expect(achievementsMenuModel([], false).entries).toHaveLength(12)
+  it('lists all 13 entries', () => {
+    expect(achievementsMenuModel([], false).entries).toHaveLength(13)
   })
 
   it('tags locked entries and leaves unlocked ones untagged', () => {
     const m = achievementsMenuModel(['a-rest'], false)
     expect(m.entries.find((e) => e.id === 'a-rest')).toMatchObject({ unlocked: true, tag: null })
     const locked = m.entries.filter((e) => !e.unlocked)
-    expect(locked).toHaveLength(11)
+    expect(locked).toHaveLength(12)
     expect(locked.every((e) => e.tag === 'Locked' && e.goal.length > 0)).toBe(true)
   })
 

@@ -47,6 +47,9 @@ export function handlePauseKey(code: string): void {
  */
 export function handlePointerLockLost(): void {
   if (escOwnedByOverlay() || isOverlayOpen()) return
+  // startEnding frees the cursor itself (the ending has buttons), and the lock-loss event lands
+  // after the screen has switched. Pausing then froze the ending sequence's clock at 0.
+  if (useGameStore.getState().screen !== 'game') return
   useGameStore.getState().setPaused(true)
 }
 

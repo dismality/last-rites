@@ -5,7 +5,7 @@ import { SATCHEL_SLOTS_MAX as MAX_SATCHEL_SLOTS } from '../../data/items'
 import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { Inventory, Phase, PlayerState, WorldState } from '../types'
 import type { ChapelState } from './repairs'
-import type { MysteryGateId, MysteryState } from './mystery'
+import { migrateEnding, type MysteryGateId, type MysteryState } from './mystery'
 import { sanitizeInventorySlots } from './combatSave'
 import type { CombatSave } from './combatSave'
 import type { ProgressionSave } from './progressionSave'
@@ -70,6 +70,7 @@ export interface SaveFile
 
 const PHASES: readonly Phase[] = ['day', 'dusk', 'night', 'dawn']
 const GATES: readonly MysteryGateId[] = ['mausoleum-row', 'catacombs', 'ossuary']
+/** 'uneasy-peace' is retired but old saves still hold it; migrateEnding maps it on load. */
 const ENDINGS = ['rest', 'uneasy-peace', 'taken']
 
 /** Saves from before the intro existed: past night 1 day means the player has seen it. */
@@ -227,6 +228,7 @@ export function fromSaveFile(
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,
+      ending: migrateEnding(m.ending as string | undefined, m.relics.length),
       pages: new Set(m.pages) as MysteryState['pages'],
       clues: new Set(m.clues),
       relics: new Set(m.relics) as MysteryState['relics'],

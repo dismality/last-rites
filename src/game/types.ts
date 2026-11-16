@@ -110,7 +110,7 @@ export type RelicId =
 export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId | AmmoId
 
 /** Ending IDs (design bible §1) */
-export type EndingId = 'rest' | 'uneasy-peace' | 'taken'
+export type EndingId = 'rest' | 'taken'
 
 /** Journal page numbers */
 export type PageNumber = 1 | 2 | 3 | 4 | 5
@@ -321,7 +321,7 @@ export type ContractId =
   | 'c-wailer-2' | 'c-boards-3' | 'c-gather-8' | 'c-unhurt'
 export type AchievementId =
   | 'a-first-light' | 'a-grave-robber' | 'a-marksman' | 'a-close-shave' | 'a-combo'
-  | 'a-barricade' | 'a-pages' | 'a-relics' | 'a-crane' | 'a-rest' | 'a-endless-10' | 'a-patron'
+  | 'a-barricade' | 'a-pages' | 'a-relics' | 'a-crane' | 'a-rest' | 'a-justice' | 'a-endless-10' | 'a-patron'
 export type MerchantRowId =
   | 'bandage' | 'lamp-oil' | 'revolver-cartridges' | 'shotgun-shells' | 'holy-water'
   | 'black-powder' | 'lead-shot' | 'wood-planks' | 'kola-tonic' | 'silver-filings'

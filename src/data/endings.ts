@@ -64,36 +64,6 @@ export const ENDINGS: readonly EndingDef[] = [
     closingLine: 'Dawn comes over Hollowmere, and the dead lie down.',
   },
   {
-    id: 'uneasy-peace',
-    title: 'Uneasy Peace',
-    duration: 45,
-    sky: 'dawn',
-    shake: 0,
-    camera: {
-      position: [
-        [10, 1.6, 6],
-        [4, 2.5, 14],
-        [-12, 3, 12],
-        [-26, 2.5, 8],
-        [-33, 1.4, 8],
-      ],
-      target: [
-        [10, 1.2, 9.5],
-        [0, 1, 10],
-        [-25, 0.5, 8],
-        [-35, 0.3, 8],
-        [-36, 0.2, 8],
-      ],
-    },
-    lines: [
-      { at: 1, hold: 8, text: 'The rite holds. The bell clapper hangs still, for now.' },
-      { at: 12, hold: 9, text: 'Most of the dead are quiet. Most.' },
-      { at: 23, hold: 10, text: 'On the west hill, one small grave keeps its own time.' },
-      { at: 34, hold: 10, text: 'You write "unfinished" in the ledger, and you stay.' },
-    ],
-    closingLine: 'You write "unfinished" in the ledger, and you stay.',
-  },
-  {
     id: 'taken',
     title: 'Taken',
     duration: 42,
@@ -126,3 +96,16 @@ export const ENDINGS: readonly EndingDef[] = [
 export const ENDING_MAP: Readonly<Record<EndingId, EndingDef>> = Object.fromEntries(
   ENDINGS.map((e) => [e.id, e]),
 ) as Readonly<Record<EndingId, EndingDef>>
+
+/**
+ * The Justice for Elias epilogue (design bible §1, Req 18.3). Shown before the walk-out when the
+ * Stage 3 accusation was right. The wording is the bible's; split into beats so it can be read in turn.
+ */
+export const JUSTICE_EPILOGUE: readonly string[] = [
+  "At sunrise Silas Vane's cart is found at the gate, empty.",
+  'The receipt book lies open on the seat, in a hand you know.',
+  "The parish ledger goes to the Bishop, and Elias Thorne's name goes back on the stone.",
+]
+
+/** Shown on the Rest summary when the accusation was wrong or never given (Req 18.4). */
+export const SILAS_DEFAULT_LINE = "Silas Vane's cart rolled away at dawn, as it always does."

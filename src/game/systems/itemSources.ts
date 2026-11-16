@@ -5,8 +5,7 @@
 import { ELITE_DROPS } from '../../data/elites'
 import { MERCHANT_ROWS } from '../../data/merchant'
 import { LOOT_TABLE_MAP, type LootTableId } from '../../data/lootTables'
-import { FIXED_SPAWNS, SPAWN_POINTS, ZONES } from '../../data/zones'
-import type { CaseId } from '../../data/stages'
+import { FIXED_SPAWNS, SPAWN_POINTS, ZONES, type Revealed } from '../../data/zones'
 import type { ItemId, ItemStack, Phase } from '../types'
 
 export interface SourcePoint {
@@ -114,7 +113,7 @@ export interface SourceWorld {
   phase: Phase
   collectedFixed: readonly string[]
   /** Solved cases; a reward spawn counts as a source only after its case (optional for old callers). */
-  closedCases?: readonly CaseId[]
+  closedCases?: readonly Revealed[]
 }
 
 export interface MarkTarget {

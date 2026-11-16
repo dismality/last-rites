@@ -9,6 +9,7 @@
 // Continue and New Game need no cue reset of their own.
 
 import { DOORS } from '../../data/barricades'
+import type { EvidenceCardId } from '../../data/cases'
 import { GATE_DEFS } from '../../data/gateHints'
 import type { InteractableKind } from '../../data/interactables'
 import { ITEM_MAP } from '../../data/items'
@@ -137,6 +138,17 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
     case 'bell-post': {
       const p = useCaseStore.getState().cases['saved-by-the-bell']
       return { usedUp: false, idle: useStageStore.getState().stage !== 1 || p.minigames.includes('1b') }
+    }
+    case 'hymn-board':
+    case 'psalter': {
+      const p = useCaseStore.getState().cases['sealed-catacombs']
+      return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3a') }
+    }
+    case 'evidence-card':
+      return { usedUp: useCaseStore.getState().cases['sealed-catacombs'].evidenceFound.includes(subject as EvidenceCardId) }
+    case 'timeline-slate': {
+      const p = useCaseStore.getState().cases['sealed-catacombs']
+      return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3b') }
     }
     case 'workbench':
       return OPEN

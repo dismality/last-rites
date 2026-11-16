@@ -7,7 +7,6 @@ import {
   craneFighting,
   initialBoss,
   riteBlocked,
-  riteCapS,
   tickBoss,
   type BossEvent,
   type BossInput,
@@ -73,12 +72,22 @@ describe('bossDirector rise', () => {
     expect(p3.state.congregationIn).toBe(18)
   })
 
-  it('caps the rite at 44 s until he is dead', () => {
-    expect(riteCapS(initialBoss())).toBe(44)
+  it('blocks the rite before he rises and while he lives, and lifts it when he is dead', () => {
     expect(riteBlocked(initialBoss())).toBe(true)
-    const dead = { ...initialBoss(), stage: 'dead' as const }
-    expect(riteCapS(dead)).toBe(45)
-    expect(riteBlocked(dead)).toBe(false)
+    expect(riteBlocked({ ...initialBoss(), stage: 'risen' as const })).toBe(true)
+    expect(riteBlocked({ ...initialBoss(), stage: 'dying' as const })).toBe(true)
+    expect(riteBlocked({ ...initialBoss(), stage: 'dead' as const })).toBe(false)
+  })
+
+  it('starts the 10 s rising clock only once riteStarted is true (first relic)', () => {
+    const idle = tickBoss(initialBoss(), input({ riteStarted: false, dt: 20 }))
+    expect(idle.state.stage).toBe('dormant')
+    expect(idle.state.riteClock).toBe(0)
+    const started = tickBoss(initialBoss(), input({ riteStarted: true, dt: 9 }))
+    expect(started.state.stage).toBe('dormant')
+    expect(started.state.riteClock).toBe(9)
+    const risen = tickBoss(started.state, input({ riteStarted: true, dt: 1 }))
+    expect(risen.events.map((e) => e.type)).toContain('riseTelegraph')
   })
 
   it('freezes with no events when the player is dead', () => {

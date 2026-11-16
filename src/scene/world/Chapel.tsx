@@ -74,7 +74,9 @@ export function Chapel() {
     function onKeyDown(e: KeyboardEvent) {
       if (e.code !== 'KeyE') return
       // Don't fire if any overlay is already open.
-      if (chapelRepairOpen) return
+      // Read the store, not the render closure: after Esc/Cancel the listener is re-bound a
+      // frame late, and a fast E in that gap would see the stale "open" flag and be dropped.
+      if (useUiWorldStore.getState().chapelRepairOpen) return
 
       playerPos.current.copy(playerPositionRef.current)
 

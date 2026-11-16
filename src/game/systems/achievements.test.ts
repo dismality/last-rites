@@ -24,7 +24,8 @@ const facts = fc.record({
   pagesRead: fc.integer({ min: 0, max: 5 }),
   relics: fc.integer({ min: 0, max: 5 }),
   craneRested: fc.boolean(),
-  ending: fc.constantFrom('rest', 'uneasy-peace', 'taken', null),
+  ending: fc.constantFrom('rest', 'taken', null),
+  justice: fc.boolean(),
   endlessNight: fc.integer({ min: 0, max: 12 }),
   coinsSpent: fc.integer({ min: 0, max: 150 }),
 }) as fc.Arbitrary<AchievementFacts>
@@ -35,11 +36,20 @@ describe('achievements', () => {
   it('unlocks Close Shave only at 10 HP or less on a clear', () => {
     const base = {
       nightsSurvived: 0, digs: 0, nightHeadshotKills: 0, bestCombo: 1, boardsNailed: 0,
-      pagesRead: 0, relics: 0, craneRested: false, ending: null, endlessNight: 0, coinsSpent: 0,
+      pagesRead: 0, relics: 0, craneRested: false, ending: null, justice: false, endlessNight: 0, coinsSpent: 0,
     }
     expect(evaluateAchievements([], { ...base, clearHp: 10 })).toEqual(['a-close-shave'])
     expect(evaluateAchievements([], { ...base, clearHp: 11 })).toEqual([])
     expect(evaluateAchievements([], { ...base, clearHp: null })).toEqual([])
+  })
+
+  it('unlocks Justice for Elias only on a right accusation, whatever the ending', () => {
+    const base = {
+      nightsSurvived: 0, digs: 0, nightHeadshotKills: 0, bestCombo: 1, boardsNailed: 0, clearHp: null,
+      pagesRead: 0, relics: 0, craneRested: false, ending: null, endlessNight: 0, coinsSpent: 0,
+    }
+    expect(evaluateAchievements([], { ...base, justice: true })).toEqual(['a-justice'])
+    expect(evaluateAchievements([], { ...base, justice: false, ending: 'rest' })).toEqual(['a-rest'])
   })
 
   it('parseUnlocked handles null, bad JSON and wrong types', () => {

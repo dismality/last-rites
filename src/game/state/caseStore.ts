@@ -4,7 +4,7 @@
 // Pure zustand: no React / three.js imports.
 
 import { create } from 'zustand'
-import { CASES, caseOfStage, type BellPostId, type CaseDef, type CaseId, type DeductionNote, type MinigameId } from '../../data/cases'
+import { CASES, caseOfStage, type BellPostId, type CaseDef, type CaseId, type DeductionNote, type EvidenceCardId, type MinigameId } from '../../data/cases'
 import type { AltarVerdict } from '../systems/altarAnswer'
 import { addLink, correctLinkCount, curseMeter, EMPTY_BOARD, visibleClues } from '../systems/caseBoard'
 import { checkFinalAnswer, fillSlot as fillSlotRule, isAnswerComplete } from '../systems/caseAnswer'
@@ -14,6 +14,8 @@ import {
   CASE_PERSISTED,
   freshCaseSave,
   type CaseProgress,
+  sanitizeCardIds,
+  sanitizeHymnTiles,
   type LedgerLine,
   type CaseSave,
 } from '../systems/caseSave'
@@ -42,10 +44,21 @@ interface CaseStoreState extends CaseSave {
   submitMinigame: (id: MinigameId, correct: boolean) => void
   /** Replace the minigame 1a draft lines (kept when the overlay closes). */
   setLedgerLines: (lines: LedgerLine[]) => void
+  /** Minigame 3a: keep the five tiles as set (kept when the overlay closes). */
+  setHymnTiles: (tiles: readonly (string | null)[]) => void
+  /** Minigame 3b: record an evidence card as examined in the world. False for a card already held. */
+  findEvidence: (id: EvidenceCardId) => boolean
+  /** Minigame 3b: keep the arrangement of cards on the slate (kept when the overlay closes). */
+  setTimeline: (order: readonly EvidenceCardId[]) => void
   /** Minigame 1b: record a bell post as fully examined (bell, rope and tag read). */
   examineBell: (id: BellPostId) => void
   /** Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. */
   giveAnswer: () => AnswerOutcome
+  /**
+   * A relic placed in the wrong slot of the rite (Req 17.3): the altar judges it as a wrong
+   * answer, so the 30 s lock, the instant wave, the link rule and Sharp Eye all apply.
+   */
+  misplaceRelic: () => AltarVerdict
   /** Buy the next hint tier with Grave Coins (Req 9.1-9.3). */
   useHint: () => HintOutcome
   /** A solved case moves to the closed list (Req 4.5). */
@@ -113,6 +126,18 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     if (grew) addScore(-DOUBT_SCORE_PENALTY)
   },
 
+  setHymnTiles: (tiles) =>
+    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, hymnTiles: sanitizeHymnTiles(tiles) })),
+
+  findEvidence: (id) => {
+    if (get().cases['sealed-catacombs'].evidenceFound.includes(id)) return false
+    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, evidenceFound: [...p.evidenceFound, id] }))
+    return true
+  },
+
+  setTimeline: (order) =>
+    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, timeline: sanitizeCardIds(order) })),
+
   setLedgerLines: (lines) => patchProgress(set, 'saved-by-the-bell', (p) => ({ ...p, ledgerLines: lines })),
 
   examineBell: (id) =>
@@ -120,8 +145,20 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
       p.bellsExamined.includes(id) ? p : { ...p, bellsExamined: [...p.bellsExamined, id] },
     ),
 
+  misplaceRelic: () => {
+    const def = activeCase()
+    const links = correctLinkCount({ links: get().cases[def.id].links }, def)
+    const verdict = useStageStore.getState().giveAltarAnswer(false, links, 'case')
+    // Same bookkeeping as a wrong case answer: only a judged answer counts against Sharp Eye.
+    if (verdict.kind === 'wrong') patchProgress(set, def.id, (q) => ({ ...q, wrongAnswers: q.wrongAnswers + 1 }))
+    return verdict
+  },
+
   giveAnswer: () => {
     const def = activeCase()
+    // Stage 3's answer is the rite itself (relic placement, `riteStore`); a filled slot sheet
+    // must never solve it around Father Crane.
+    if (def.id === 'sealed-catacombs') return { kind: 'incomplete' }
     const p = get().cases[def.id]
     if (!isAnswerComplete(def.final, p.slots)) return { kind: 'incomplete' }
     const correct = checkFinalAnswer(def, p.slots)

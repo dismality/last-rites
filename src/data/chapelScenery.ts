@@ -86,6 +86,15 @@ export const HYMN_BOARD_POSITION: Vec3 = [12.47, 1.75, 8.7]
 export const HYMN_BOARD_NUMBERS: readonly number[] = [4, 19, 2, 41, 23]
 
 /**
+ * The vestry psalter (spec 10 task 4.3): lies on the cupboard's shelf (top 0.88) beside the
+ * revolver, which sits at z 7.6. The shelf spans z 7.1 to 8.1, so the book stays clear of its edge.
+ */
+export const PSALTER_POSITION: Vec3 = [7.9, 0.89, 7.95]
+
+/** Where the five brass letter tiles lie on the altar top (y 1.0), as offsets from the altar's centre. */
+export const HYMN_TILE_ROW = { spacing: 0.24, y: 1.02, forward: -0.15 } as const
+
+/**
  * The catacomb stair under the cover (tools/blender/chapel_interior.py `stair()`), chapel-local.
  * The opening is x0..x1 and z0..innerBackZ; the steps run on under the end wall into the dark,
  * where the vault comes down to the steps, so only the part inside the chapel can be walked.

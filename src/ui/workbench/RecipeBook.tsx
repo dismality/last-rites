@@ -41,6 +41,7 @@ import { usePinStore } from '../../game/state/pinStore'
 import { usePlayerStore } from '../../game/state/playerStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { useWorldStore } from '../../game/state/worldStore'
+import { revealedIds } from '../../game/systems/caseSave'
 import { NONE_LEFT_TEXT, nearestSource } from '../../game/systems/itemSources'
 import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
@@ -178,7 +179,7 @@ function UnlockedEntry({
     const place = nearestSource(target.item, from, {
       materials: spawn.materials,
       collectedFixed: spawn.collectedFixed,
-      closedCases: useCaseStore.getState().closed,
+      closedCases: revealedIds(useCaseStore.getState()),
       dugOnDay: useDigStore.getState().dig.dugOnDay,
       day: world.nightNumber,
       phase: world.phase,

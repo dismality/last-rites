@@ -74,4 +74,28 @@
   cursor: pointer;
 }
 .altar-panel__btn:hover { border-color: var(--ember); }
+.rite-panel__slots { margin: 0 0 0.75rem; padding: 0; list-style: none; }
+.rite-panel__slot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+.rite-panel__label { min-width: 7rem; font-family: var(--font-num); }
+.rite-panel__done { flex: 1; font-style: italic; }
 .altar-panel__btn--quiet { color: var(--ink); background: transparent; border-color: var(--ink); }
+
+/* The Stage 3 accusation block (spec 10 task 4.6). */
+.altar-panel__accusation {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--parchment-dark);
+}
+.altar-panel__subtitle {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+}

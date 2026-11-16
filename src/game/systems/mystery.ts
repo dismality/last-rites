@@ -12,15 +12,15 @@ export const MYSTERY_GATE_KEYS: Readonly<Record<MysteryGateId, KeyItemId>> = {
   ossuary: 'iron-ossuary-key',
 }
 
-/** Seconds the player must hold Interact at the altar (design bible §8). */
-export const RITE_DURATION = 45
-
 export interface MysteryState {
   pages: ReadonlySet<PageNumber>
   clues: ReadonlySet<string>
   relics: ReadonlySet<RelicId>
   gates: Readonly<Record<MysteryGateId, boolean>>
-  /** Seconds of rite completed, 0..RITE_DURATION */
+  /**
+   * Retired with the 45 s hold (spec 10 task 4.5): always 0 now. The field stays so older saves
+   * and Retry snapshots still load; relic placement lives in `riteStore`.
+   */
   riteProgress: number
   ending?: EndingId
   /** Father Crane was put to rest. Optional so older saves load; endings still depend only on relics. */
@@ -64,22 +64,15 @@ export function openGate(
   return { ...state, gates: { ...state.gates, [gate]: true } }
 }
 
-/**
- * Advances the rite while holding. Releasing pauses (never resets) progress,
- * so a zombie interruption is recoverable. Clamped at RITE_DURATION.
- */
-export function tickRite(state: MysteryState, dt: number, holding: boolean): MysteryState {
-  if (!holding || dt <= 0 || state.riteProgress >= RITE_DURATION) return state
-  return { ...state, riteProgress: Math.min(RITE_DURATION, state.riteProgress + dt) }
-}
-
-export function isRiteComplete(state: MysteryState): boolean {
-  return state.riteProgress >= RITE_DURATION
-}
-
-/** Total over all non-negative integers: 5+ rest, 3-4 uneasy peace, otherwise taken. */
+/** Total over all non-negative integers: all five relics is Rest, anything less is Taken. Uneasy Peace is retired (spec 10, Req 17.8). */
 export function chooseEnding(relicCount: number): EndingId {
   if (relicCount >= 5) return 'rest'
-  if (relicCount >= 3) return 'uneasy-peace'
   return 'taken'
+}
+
+/** A stored ending from any build: the retired Uneasy Peace becomes Rest or Taken by relic count (spec 10 design decision 12). */
+export function migrateEnding(stored: string | undefined, relicCount: number): EndingId | undefined {
+  if (stored === undefined) return undefined
+  if (stored === 'rest' || stored === 'taken') return stored
+  return chooseEnding(relicCount)
 }

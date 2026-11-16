@@ -14,6 +14,7 @@ import {
   giveRelic,
   giveWeapon,
   killAll,
+  placeAllRelics,
   setChapelLevel,
   setTime,
   skipToNight,
@@ -176,6 +177,15 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(() => solveMinigame('1b'))}>
               Solve 1b
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('3a'))}>
+              Solve 3a
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('3b'))}>
+              Solve 3b
+            </button>
+            <button type="button" onClick={run(placeAllRelics)}>
+              Give all relics (in order)
             </button>
           </Row>
           <Row>

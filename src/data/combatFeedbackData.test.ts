@@ -20,6 +20,10 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'altar-wrong',
   'altar-locked',
   'altar-solved',
+  'hymn-tiles-wrong',
+  'hymn-stair-open',
+  'crypt-pin-pulled',
+  'relic-placed',
   // Spec 09 task 11l
   'pin-reached',
 ]

@@ -169,6 +169,7 @@ describe('§12 achievements', () => {
       ['a-rest', 'Rest', 'Reach the Rest ending'],
       ['a-endless-10', 'Long Night', 'Reach night 10 in Endless Survival'],
       ['a-patron', 'Valued Custom', 'Spend 100 Grave Coins in one run'],
+      ['a-justice', 'Justice for Elias', 'Name Silas Vane at the altar, with the right motive, means and opportunity'],
     ])
   })
   it('thresholds', () => {

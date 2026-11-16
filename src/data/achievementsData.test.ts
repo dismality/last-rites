@@ -2,16 +2,16 @@ import { describe, expect, it } from 'vitest'
 import { ACHIEVEMENT_THRESHOLDS, ACHIEVEMENTS, ACHIEVEMENTS_KEY, TOAST } from './achievements'
 
 describe('achievement values (design bible §12)', () => {
-  it('has the 12 ids in order', () => {
+  it('has the 13 ids in order', () => {
     expect(ACHIEVEMENTS.map((a) => a.id)).toEqual([
       'a-first-light', 'a-grave-robber', 'a-marksman', 'a-close-shave', 'a-combo', 'a-barricade',
-      'a-pages', 'a-relics', 'a-crane', 'a-rest', 'a-endless-10', 'a-patron',
+      'a-pages', 'a-relics', 'a-crane', 'a-rest', 'a-endless-10', 'a-patron', 'a-justice',
     ])
   })
 
   it('ids and names are unique', () => {
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(12)
-    expect(new Set(ACHIEVEMENTS.map((a) => a.name)).size).toBe(12)
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(13)
+    expect(new Set(ACHIEVEMENTS.map((a) => a.name)).size).toBe(13)
   })
 
   it('every name and goal text is non-empty', () => {

@@ -76,8 +76,6 @@ export const readObjectiveInput = (): ObjectiveInput => {
   const availability = riteAvailability({
     nightNumber: world.nightNumber,
     phase: world.phase,
-    wavesCleared: useEndingStore.getState().nightFiveCleared,
-    relicCount: relics,
     finalNight: riteFinalNight(),
   })
   const story = isStoryRun()
@@ -97,9 +95,10 @@ export const readObjectiveInput = (): ObjectiveInput => {
       zombiesLeft: living,
     },
     rite: {
-      // Story waves never end, so the rite is offered as soon as it can start (until task 4).
-      available: availability === 'ready' && (useEndingStore.getState().nightFiveCleared || story),
-      running: mystery.riteProgress > 0 || useEndingStore.getState().riteStarted,
+      // Story waves never end, so the rite is offered for the whole of stage 3's night.
+      available: availability === 'ready' && story,
+      // The first placed relic sets riteStarted; the night's end clears it with the altar.
+      running: useEndingStore.getState().riteStarted,
       // Only while he is on the field; before he rises or after he falls the rite line shows.
       craneAlive: craneFighting(useBossStore.getState().boss),
     },

@@ -192,7 +192,7 @@ describe('§8 wave additions (07)', () => {
 describe('§2 and §7 boss and barricades (07)', () => {
   it('boss', () => {
     expectFields('BOSS', BOSS, {
-      riseAfterS: 10, riseTelegraphS: 1.5, nameCardS: 3, riteCapS: 44, deathQuietS: 4,
+      riseAfterS: 10, riseTelegraphS: 1.5, nameCardS: 3, deathQuietS: 4,
       phaseAt: { two: 0.6, three: 0.25 },
       speed: { 1: 1.2, 2: 1.5, 3: 1.7 },
       saltSpeedMult: 0.5,

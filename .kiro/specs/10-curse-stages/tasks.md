@@ -98,7 +98,7 @@ Common rules for all tasks:
   - [x] 2.8 Finish
     - Run the Finish steps for task 2; commit `case board and case systems (spec 10 task 2)`
 
-- [ ] 3. Stage 1: Saved by the Bell
+- [x] 3. Stage 1: Saved by the Bell
   - [x] 3.1 Case 1 data
     - Fill `cases.ts` for Case 1: ledger of 8 entries, stones (Marsh, Hale, Ames, Pell and 2 more), 6-8 clues with the red herrings (fresh flowers on Hale, toppled Marsh stone), notes, the Final_Question, hints and the Closed-case page
     - Update `clues.ts`, `journal.ts` and the Pell grave key placement; extend `cases.test.ts`
@@ -132,43 +132,43 @@ Common rules for all tasks:
   - [x] 3.9 Milestone: run the full e2e suite and fix what broke
     - Run the whole Playwright suite once after Stage 1 and fix every failure that this spec caused
     - _Requirements: 29.5_
-  - [-] 3.10 Finish
+  - [x] 3.10 Finish
     - Run the Finish steps for task 3; commit `stage 1 case and minigames (spec 10 task 3)`
 
 - [ ] 4. Stage 3: The Sealed Catacombs, the Rite and Silas
-  - [ ] 4.1 Case 3 data
+  - [x] 4.1 Case 3 data
     - Fill `cases.ts` for Case 3: hymn board numbers and the 60-hymn index spelling BELOW, six evidence cards and order, relic order from the confession and notes, Josiah Vane flyleaf, Vane & Sons receipt, letter, the Accusation question, red herrings (oil at another crypt, old bishop's seal), Closed-case page
     - Update `relics.ts`, `journal.ts` and `captions.ts`; extend `cases.test.ts`
     - _Requirements: 7.1, 7.2, 15.1, 16.1, 17.1, 18.1, 18.2_
-  - [ ] 4.2 Pure rules for 3a, 3b, the Rite and the Accusation
+  - [x] 4.2 Pure rules for 3a, 3b, the Rite and the Accusation
     - Add `hymnTiles` and `evidenceTimeline` to `caseMinigames.ts`; create `rite.ts` (`placeRelic`, order, Crane gate); extend `caseAnswer.ts` for the Accusation; write `rite.test.ts` and extend `caseMinigames.test.ts`
     - **Property 16: Right answers accepted, wrong answers rejected** (3a, 3b, Accusation); **Property 19: The rite completes only in order and with Crane fallen**
     - _Requirements: 15.2, 15.3, 16.2, 16.4, 17.3-17.6, 18.3_
-  - [ ] 4.3 Minigame 3a overlay and hymn board props
+  - [x] 4.3 Minigame 3a overlay and hymn board props
     - Create `HymnMinigame.tsx` (board numbers, psalter index text, five tiles, keyboard arrows/Enter) and the hymn board, letter tiles and vestry psalter props; the whistle opens the stair on success
     - _Requirements: 15.1-15.5, 11.9_
-  - [ ] 4.4 Minigame 3b overlay and crypt props
+  - [x] 4.4 Minigame 3b overlay and crypt props
     - Create `TimelineMinigame.tsx` (six cards, drag and keyboard lift/move), the evidence props (boots, bench letter, ruts, oil, nail marks, hasp pin) and the crypt opening with Elias's body and the Iron Ossuary Key
     - _Requirements: 16.1-16.5, 11.9_
-  - [ ] 4.5 The Rite: relic placement
+  - [x] 4.5 The Rite: relic placement
     - Create `riteStore.ts` and `AltarRite.tsx`; replace the 45 s hold in `mystery.ts`, `finalRite.ts` and `FinalRite.tsx`; start Crane's 10 s rising clock on the first relic; hold the rite while Crane lives; "[a sour note from the altar]" subtitle; keyboard placement
     - Update `finalRite.test.ts`, `mystery.test.ts`, `bossDirector.test.ts`
     - _Requirements: 17.1-17.7_
-  - [ ] 4.6 Silas reveal, Accusation, epilogue and endings
+  - [x] 4.6 Silas reveal, Accusation, epilogue and endings
     - Add the Accusation panel to `AltarPanel.tsx`, the epilogue, the achievement *Justice for Elias*, the default line, and retire Uneasy Peace in `endings.ts` and `mystery.chooseEnding`; keep the merchant trading normally until the reveal
     - Update `endings.test.ts`, `achievements.test.ts`
     - _Requirements: 17.8, 18.1-18.6_
-  - [ ] 4.7 Dev hooks for Stage 3
+  - [x] 4.7 Dev hooks for Stage 3
     - Add "Solve 3a", "Solve 3b", "Give all relics" in correct order to the Dev_Panel
     - _Requirements: 5.3_
-  - [ ] 4.8 Stage 3 e2e and screenshots
+  - [x] 4.8 Stage 3 e2e and screenshots
     - Create `e2e/case3.spec.ts`: solve 3a and 3b with mouse and keyboard (wrong and right), place the relics in order with Crane rising on the first, give the correct and a wrong Accusation; a keyboard-only run
     - Save the screenshot pairs for 3a, 3b, the Rite and the Accusation panel
     - _Requirements: 15.6, 15.7, 16.6, 16.7, 17.9, 17.10, 18.7, 18.8_
   - [ ] 4.9 Milestone: run the full e2e suite and fix what broke
     - Run the whole Playwright suite once after Stage 3 and fix every failure that this spec caused
     - _Requirements: 29.5_
-  - [ ] 4.10 Finish
+  - [-] 4.10 Finish
     - Run the Finish steps for task 4; commit `stage 3 case, rite and Silas (spec 10 task 4)`
 
 - [ ] 5. Stage 2: The Resurrection Men

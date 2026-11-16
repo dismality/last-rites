@@ -6,6 +6,10 @@ import {
   CASE_1_REWARD,
   CASE_1_RIGHT_FLAGS,
   CASE_1_STONES,
+  CASE_3_EVIDENCE,
+  CASE_3_HYMN_BOARD,
+  CASE_3_TIMELINE_ORDER,
+  CASE_3_VANE_PAPERS,
   CASE_MAP,
   HINT_COSTS,
   caseOfStage,
@@ -13,6 +17,10 @@ import {
   type ClueDef,
 } from './cases'
 import { ITEM_MAP } from './items'
+import { CAPTIONS } from './captions'
+import { HYMN_BOARD_NUMBERS } from './chapelScenery'
+import { JOURNAL_PAGE_MAP } from './journal'
+import { RELIC_MAP, RITE_ORDER, RITE_STEP_LINES } from './relics'
 import { TOMBSTONE_MAP, type TombstoneId } from './tombstones'
 import { CLOSED_CASE_PAGES } from './caseText'
 import { STAGES, type StageNumber } from './stages'
@@ -176,6 +184,60 @@ describe('case 1 minigame data', () => {
     expect(c1.final.answer[0]).toBe("Pell's grave")
     expect(c1.final.answer[1]).toContain('rope was cut')
     expect(c1.final.answer[1]).toContain('certificate was signed before')
+  })
+})
+
+describe('case 3 data', () => {
+  const c3 = CASE_MAP['sealed-catacombs']
+  it('has a 60-hymn index whose first letters at the board numbers spell BELOW', () => {
+    expect(CASE_3_HYMN_BOARD.index).toHaveLength(60)
+    expect([...CASE_3_HYMN_BOARD.numbers]).toEqual([...HYMN_BOARD_NUMBERS])
+    const word = CASE_3_HYMN_BOARD.numbers.map((n) => CASE_3_HYMN_BOARD.index[n - 1][0]).join('')
+    expect(word).toBe(CASE_3_HYMN_BOARD.letters)
+    expect(CASE_3_HYMN_BOARD.confession).toBe('What I hid, I hid beneath the Word.')
+  })
+  it('has six evidence cards and one right order covering each exactly once', () => {
+    expect(CASE_3_EVIDENCE).toHaveLength(6)
+    expect([...CASE_3_TIMELINE_ORDER].sort()).toEqual(CASE_3_EVIDENCE.map((e) => e.id).sort())
+    const times = CASE_3_TIMELINE_ORDER.map((id) => CASE_3_EVIDENCE.find((e) => e.id === id)!)
+    expect(times[0].time).toBe('Midnight')
+    expect(times[5].time).toBe('Before dawn')
+    for (const e of CASE_3_EVIDENCE) {
+      expect(e.beat.length).toBeGreaterThan(0)
+      if (e.clueId) expect(c3.clues.some((k) => k.id === e.clueId)).toBe(true)
+    }
+  })
+  it("takes the relics in the confession's order and names them in the final answer", () => {
+    expect(RITE_ORDER).toHaveLength(5)
+    expect(new Set(RITE_ORDER).size).toBe(5)
+    expect(c3.final.answer).toEqual(RITE_ORDER.map((id) => RELIC_MAP[id].name))
+    for (const id of RITE_ORDER) expect(RITE_STEP_LINES[id].length).toBeGreaterThan(0)
+    const page4 = JOURNAL_PAGE_MAP[4].text
+    const at = RITE_ORDER.map((id) =>
+      page4.indexOf(RELIC_MAP[id].name.split(' ').pop()!.toLowerCase()),
+    )
+    expect(at.every((i) => i >= 0)).toBe(true)
+    expect([...at].sort((a, b) => a - b)).toEqual(at)
+  })
+  it('links the Vane hand across letter, flyleaf and receipt, and has the two red herrings', () => {
+    expect(CASE_3_VANE_PAPERS.letter).toContain("undertaker's family")
+    expect(CASE_3_VANE_PAPERS.flyleaf).toContain('Josiah Vane')
+    expect(CASE_3_VANE_PAPERS.receipt).toContain('Vane & Sons')
+    expect(c3.accusation?.answer).toEqual([
+      'Silas Vane',
+      'the handwriting',
+      'the hearse-pin',
+      'the cart ruts',
+    ])
+    expect(c3.clues.filter((k) => k.redHerring).map((k) => k.id)).toEqual([
+      'oil-other-crypt',
+      'old-bishops-seal',
+    ])
+  })
+  it('captions the stage 3 sounds', () => {
+    for (const id of ['hymn-tiles-wrong', 'hymn-stair-open', 'crypt-pin-pulled', 'relic-placed']) {
+      expect(CAPTIONS.some((c) => c.id === id)).toBe(true)
+    }
   })
 })
 
