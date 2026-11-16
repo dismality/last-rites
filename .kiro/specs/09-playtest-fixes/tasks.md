@@ -197,7 +197,8 @@ Tasks run in the order the user set. Every task ends with **Finish**:
   - Hut lantern: now smoked glass with low emission; if a lantern point light is added, keep it warm and low (intensity about 1.5, distance 5) and never raise the glass emission
   - Draw calls (230–374 against 150): instance repeated props (headstones, candles, bones, bats, crates), merge static props per area with mergeGeometries where they share a material, and skip rendering areas the player is not in (catacombs while outside, the graveyard while underground). Log draw calls per area before and after, and which areas are still over 150
   - Design bible first; kiro-log with "Decisions made unattended"; lint, build, unit tests; commit locally (`... (spec 09 task 11n-e)`), never push
-- [ ] 11p. Textured zombie keeps its own colours
+- [x] 11p. Textured zombie keeps its own colours
+  - Done outside Kiro by Claude (commit a60c3cb): `texturedZombieColor` and `texturedColdFill` in `zombieMaterial.ts`, 4 new unit tests; night screenshots in the browser at 8 m (the 2 m shot did not frame the zombies). The design bible was not changed; it has no tint numbers to update
   - Full brief: `docs/kiro-prompt-next.md` Part A. `zombie.glb` is now a textured gravedigger zombie; today's tint caps (`ZOMBIE_MAX_VALUE`) and blue cold fill wash out its texture
   - Pure maths in `src/.../zombieMaterial.ts`, branch on the source material having a `map`: shambler (white tint) keeps `color` white and the `ZOMBIE_MATERIAL_PARAMS` roughness, metalness and env; other looks (lurker, wailer, bloater) multiply the tint blended about 50% toward white and keep `ZOMBIE_MIN_VALUE`; cold fill on textured skins about 25% of `COLD_FILL` (or removed if the lantern no longer turns the texture orange; judge in Chrome at 1 to 2 m)
   - Untextured materials (the Quaternius brute and Father Crane) keep today's path exactly
