@@ -8,6 +8,7 @@ import { Compass } from './Compass'
 import { ZoneCard } from './ZoneCard'
 import { StaminaBar } from './StaminaBar'
 import { DamageFeedback } from './DamageFeedback'
+import { GrabEdge } from './GrabEdge'
 import { Crosshair } from './Crosshair'
 import { InteractPrompt } from './InteractPrompt'
 import { Subtitles } from './Subtitles'
@@ -50,6 +51,7 @@ export function Hud() {
   return (
     <div className="hud">
       <DamageFeedback />
+      <GrabEdge />
       <Crosshair />
       <InteractPrompt />
       <ObjectiveTracker />

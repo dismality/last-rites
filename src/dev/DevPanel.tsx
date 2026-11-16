@@ -33,6 +33,7 @@ import {
   skipHunchTime,
   playWinCutscene,
   triggerScare,
+  triggerGrab,
   unlockAllRecipes,
   type TimeTarget,
 } from './devActions'
@@ -371,6 +372,9 @@ export function DevPanel() {
             </select>
             <button type="button" onClick={run(() => triggerScare(scare))}>
               Trigger scare
+            </button>
+            <button type="button" onClick={run(triggerGrab)}>
+              Trigger grab
             </button>
           </Row>
           <Row>

@@ -28,6 +28,8 @@ export type SoundId =
   | 'thunder-far'
   | 'rain-noise'
   | 'pin-reached'
+  | 'grab-stinger'
+  | 'grab-stinger-soft'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -287,6 +289,24 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.02,
     decayS: 0.7,
     layers: [tone('sine', 523, 520, 0.18), tone('sine', 784, 780, 0.1)],
+  },
+  // The grab kill-cam (spec 10 task 8): a hard scrape of noise over two clashing low tones.
+  'grab-stinger': {
+    id: 'grab-stinger',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.005,
+    decayS: 1.1,
+    layers: [noise('bandpass', 2600, 500, 1.2, 0.6), tone('sawtooth', 110, 92, 0.22), tone('sawtooth', 117, 98, 0.18)],
+  },
+  // Reduced intensity: the same shape, quieter and softer at the front.
+  'grab-stinger-soft': {
+    id: 'grab-stinger-soft',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.04,
+    decayS: 0.7,
+    layers: [noise('lowpass', 1400, 400, 0.8, 0.22), tone('sine', 110, 92, 0.12)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {

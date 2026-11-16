@@ -2,6 +2,7 @@
 // combat sound. The queue in `src/game/systems/captions.ts` applies the 3-caption cap.
 
 import type { SoundId } from './sounds'
+import { GRAB_CAPTION } from './killCam'
 
 /** Moments that have no synth voice but still caption: the boss's last words and spec 08 events. */
 export const SILENT_CAPTION_EVENTS = [
@@ -60,6 +61,8 @@ export type CaptionId =
   | 'crypt-pin-pulled'
   | 'relic-placed'
   | 'pin-reached'
+  | 'grab-stinger'
+  | 'grab-stinger-soft'
 
 export interface CaptionDef {
   id: CaptionId
@@ -189,6 +192,9 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'relic-placed', event: 'relic-placed', text: '[a low note from the altar]', minSeconds: 2 },
   // Spec 09 task 11l: the wording is the task's.
   { id: 'pin-reached', event: 'pin-reached', text: '[pin reached]', minSeconds: 1.5 },
+  // Spec 10 task 8: the grab kill-cam, at Full and Reduced (Off shows the same words on its own).
+  { id: 'grab-stinger', event: 'grab-stinger', text: GRAB_CAPTION, minSeconds: 1.5 },
+  { id: 'grab-stinger-soft', event: 'grab-stinger-soft', text: GRAB_CAPTION, minSeconds: 1.5 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

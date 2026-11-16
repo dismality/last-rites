@@ -20,7 +20,9 @@ import {
   tickHeadBob,
   type BobState,
 } from '../../game/systems/movement'
-import { shakeMagnitude } from '../../game/systems/melee'
+import { forwardFromYaw, shakeMagnitude } from '../../game/systems/melee'
+import { heldGrabPose } from '../../game/state/killCamActions'
+import { KILL_CAM } from '../../data/killCam'
 import { blockMoveMultiplier } from '../../game/systems/playerHealth'
 import { dodgeVelocity } from '../../game/systems/dodge'
 import { effectMods } from '../../game/systems/effects'
@@ -137,19 +139,17 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     const player = usePlayerStore.getState()
     const snap = input.sample()
 
-    const look = applyLook(
-      player.yaw,
-      player.pitch,
-      snap.lookDX,
-      snap.lookDY,
-      settings.mouseSensitivity,
-      settings.invertY,
-    )
+    // A grab holds the keeper facing what seized them: no look and no walking (spec 10 task 8).
+    const held = heldGrabPose()
+    const look =
+      held ??
+      applyLook(player.yaw, player.pitch, snap.lookDX, snap.lookDY, settings.mouseSensitivity, settings.invertY)
 
     // A grave hand holds the ankle: halve speed for its duration, then tick it down.
     const live = useCombatStore.getState().live
-    const speed =
-      moveSpeed(snap.sprint, player.stamina) *
+    const speed = held
+      ? 0
+      : moveSpeed(snap.sprint, player.stamina) *
       slowFactor(scareRuntime.slowLeft) *
       effectMods(useEffectStore.getState().effects).moveSpeed *
       aimMoveMult(weaponRuntime.aiming) *
@@ -158,7 +158,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     scareRuntime.shakeAge += dt
     const walk = moveVelocity(look.yaw, snap.forward, snap.strafe, speed)
     // A running dodge replaces walking; Rapier still stops the dash at walls (Req 9.9).
-    const dash = live.dodge ? dodgeVelocity(live.dodge) : null
+    const dash = live.dodge && !held ? dodgeVelocity(live.dodge) : null
     const vx = dash ? dash.x : walk[0]
     const vz = dash ? dash.z : walk[1]
     // The Toll's shove is a one-frame displacement, so the controller still honours walls.
@@ -191,7 +191,13 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     camera.rotation.order = 'YXZ' // yaw first, then pitch, so looking up doesn't roll the view
     // Recoil is a visual kick on top of the player's own pitch; it is never written back.
     camera.rotation.set(look.pitch + recoilOffsetRad(weaponRuntime.recoil), look.yaw, 0)
-    const fov = aimFovDeg(settings.fov, weaponRuntime.aimBlend)
+    // The close-up leans the eye toward the zombie and narrows the view; never written back.
+    if (held && held.pushM > 0) {
+      const f = forwardFromYaw(look.yaw)
+      camera.position.x += f.x * held.pushM
+      camera.position.z += f.z * held.pushM
+    }
+    const fov = aimFovDeg(settings.fov, weaponRuntime.aimBlend) - (held?.fovDropDeg ?? 0)
     const perspective = camera as THREE.PerspectiveCamera
     if (perspective.isPerspectiveCamera && perspective.fov !== fov) {
       perspective.fov = fov
@@ -205,6 +211,10 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
     if (shake > 0) {
       camera.position.x += (Math.random() - 0.5) * 2 * shake
       camera.position.y += (Math.random() - 0.5) * 2 * shake
+    }
+    if (held?.shake) {
+      camera.position.x += (Math.random() - 0.5) * 2 * KILL_CAM.shakeM
+      camera.position.y += (Math.random() - 0.5) * 2 * KILL_CAM.shakeM
     }
 
     playerPositionRef.current.set(next.x, next.y - CENTRE_Y, next.z)

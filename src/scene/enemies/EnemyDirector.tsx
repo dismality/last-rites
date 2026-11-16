@@ -33,6 +33,7 @@ import {
 import { input } from '../player/input'
 import { isSimFrozen } from '../../game/state/menuState'
 import { hurtPlayer } from '../../game/state/retryNight'
+import { zombieBlow } from '../../game/state/killCamActions'
 import { loopCue, tickEnemies, type AIEvent } from '../../game/systems/enemyAI'
 import {
   LUNGE_SPEED_FULL,
@@ -155,7 +156,10 @@ function handleEvent(ev: AIEvent): void {
         break
       }
       // A lurker staged by the scare director may hurt but never deal the killing blow (Req 4.7).
-      hurtPlayer(
+      // A Brute or Lurker may seize a weak or winded keeper first (spec 10 task 8); the blow is the same.
+      zombieBlow(
+        ev.enemyType,
+        ev.pos,
         isScareEnemy(ev.uid)
           ? capScareDamage(usePlayerStore.getState().health, ev.damage)
           : ev.damage,

@@ -899,6 +899,8 @@ When a Brute, Lurker or Sprinter reaches the player while they are below 25% hea
 | Off | No camera pull; a red edge flash and the subtitle "[something seizes you]" only |
 | Flashing lights off | No flash (a steady edge instead) |
 
+- **As built (spec 10 task 8):** only the Brute and the Lurker grab (there is no Sprinter in the game). "Facing" is within 60° of straight ahead. The blow is the zombie's own hit, held back until release, so the kill-cam itself never adds damage. Reduced holds 0.7 s with a quieter stinger. Reduced motion keeps the turn but drops the lean-in, zoom and shake. The keeper is released facing the zombie. A red edge shows at every intensity (pulsing, or steady with Flashing lights off), with the subtitle "[something seizes you]"; at Off the subtitle shows even with Subtitles off. Dodging, god mode and an already-held keeper are never seized.
+
 ### Sanctuary health (10, stretch: E10)
 The chapel gets an overall health bar on top of its door boards: zombies that break in damage the altar area. At 0 the stage restarts from dusk under the Retry Night rules. The bar shows on the HUD only at night and only after the doors have been barred, as a number and a bar.
 

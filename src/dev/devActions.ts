@@ -54,6 +54,11 @@ import { stageOfNight, useStageStore } from '../game/state/stageStore'
 import { MODES } from '../data/modes'
 import type { EndingId, ItemId, KeyItemId, MaterialId, PageNumber, RelicId } from '../game/types'
 import { scareRuntime } from '../scene/scares/scareRuntime'
+import { forwardFromYaw } from '../game/systems/melee'
+
+/** Below 25% of 100, and a Lurker's 20 leaves the keeper standing on Normal. */
+const GRAB_TEST_HEALTH = 24
+const GRAB_BEHIND_M = 2
 import type { ScareEventId } from '../data/scares'
 import { STAGES, type StageNumber } from '../data/stages'
 import {
@@ -502,6 +507,19 @@ export function startShortVigil(): string {
 export function skipHunchTime(): string {
   useHunchStore.getState().skip(KEEPER_HUNCH.afterS)
   return 'Two minutes without a clue'
+}
+
+/**
+ * A grab kill-cam on demand (spec 10 task 8): the keeper drops below 25% health and a Lurker wakes
+ * 2 m behind, so its blow seizes them through the real rules (60 s cooldown and all).
+ */
+export function triggerGrab(): string {
+  usePlayerStore.getState().setHealth(GRAB_TEST_HEALTH)
+  const p = usePlayerStore.getState()
+  const f = forwardFromYaw(p.yaw)
+  const at = { x: p.position[0] - f.x * GRAB_BEHIND_M, z: p.position[2] - f.z * GRAB_BEHIND_M }
+  addEnemies([make('lurker', at)])
+  return `Health ${GRAB_TEST_HEALTH}; a Lurker behind you`
 }
 
 export function triggerEnding(id: EndingId): string {

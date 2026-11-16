@@ -36,6 +36,7 @@ import { ItemNameLabel } from './ui/hud/ItemNameLabel'
 import { GameLoop } from './scene/GameLoop'
 import { PostEffects } from './scene/effects/PostEffects'
 import { DustBurst } from './scene/effects/DustBurst'
+import { KillCam } from './scene/effects/KillCam'
 import { GraveBurst } from './scene/effects/GraveBurst'
 import { CaseCollapse } from './scene/enemies/CaseCollapse'
 import { EnemyDirector } from './scene/enemies/EnemyDirector'
@@ -128,6 +129,7 @@ function GameScreen() {
           <SaltCircles />
           <PinBeacons />
           <DustBurst />
+          <KillCam />
           <CaseCollapse />
           <GraveBurst />
           <DamageNumbers />

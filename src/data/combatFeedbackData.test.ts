@@ -26,6 +26,9 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'relic-placed',
   // Spec 09 task 11l
   'pin-reached',
+  // Spec 10 task 8 (checked in killCam.test.ts)
+  'grab-stinger',
+  'grab-stinger-soft',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

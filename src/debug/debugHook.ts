@@ -23,7 +23,10 @@ import {
   solveCurrentCase,
   solveCurrentMinigame,
   unsolvedMinigames,
+  triggerGrab,
 } from '../dev/devActions'
+import { useKillCamStore } from '../game/state/killCamStore'
+import { simClock } from '../game/state/simClock'
 import { caseOfStage } from '../data/cases'
 import { RITE_ORDER } from '../data/relics'
 import { useAccusationStore } from '../game/state/accusationStore'
@@ -200,6 +203,30 @@ const api = {
   /** The function the final rite and the death check call to start an ending. */
   startEnding(id: 'rest' | 'taken'): void {
     startEnding(id)
+  },
+  /** Grab kill-cam (spec 10 task 8): starts so far, the held grab and what the camera is doing. */
+  killCam(): {
+    count: number
+    lastStartS: number | null
+    now: number
+    held: { enemy: string; pull: boolean; holdS: number; shake: boolean; closeUp: boolean; stinger: string | null } | null
+    edge: string | null
+    fov: number | null
+  } {
+    const k = useKillCamStore.getState()
+    const cam = bodyRuntime.camera as THREE.PerspectiveCamera | null
+    return {
+      count: k.count,
+      lastStartS: k.lastStartS,
+      now: simClock.now,
+      held: k.active && { enemy: k.active.enemy, ...k.active.plan },
+      edge: k.edge?.kind ?? null,
+      fov: cam?.isPerspectiveCamera ? cam.fov : null,
+    }
+  },
+  /** The Dev_Panel's "Trigger grab": health below 25% and a Lurker waking behind the keeper. */
+  triggerGrab(): string {
+    return triggerGrab()
   },
   /** Keeper's hunch: seconds of day play since the last clue and the clue the flame leans to. */
   hunch(): { sinceClueS: number; found: number; target: string | null; at: number[] | null } {

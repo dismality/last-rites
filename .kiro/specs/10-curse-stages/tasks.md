@@ -256,18 +256,23 @@ Common rules for all tasks:
     - Done outside Kiro by Claude
     - Run the Finish steps for task 7; commit `keeper's hunch and short vigil (spec 10 task 7)`
 
-- [ ] 8. E7: Grab kill-cam
-  - [ ] 8.1 Pure kill-cam rules
+- [x] 8. E7: Grab kill-cam
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 8.1 Pure kill-cam rules
+    - Done outside Kiro by Claude. Data in `src/data/killCam.ts`; Property 21 with fast-check
     - Create `killCam.ts` (trigger by health below 25% or empty stamina and not facing, 1.2 s, 60 s cooldown, intensity table, lethal rule) and `killCam.test.ts`
     - **Property 21: Kill-cam cooldown and intensity**
     - _Requirements: 25.1-25.7_
-  - [ ] 8.2 Camera, effects and captions
+  - [x] 8.2 Camera, effects and captions
+    - Done outside Kiro by Claude. Also `state/killCamStore.ts`, `state/killCamActions.ts` (zombie blows go through `zombieBlow`) and the HUD `GrabEdge.tsx`. Only the Brute and Lurker grab: the game has no Sprinter
     - Create `src/scene/effects/KillCam.tsx`; hook the camera in `FirstPersonController.tsx`; add the stinger, the "[something seizes you]" caption and the steady-edge variant; honour Scare intensity, Flashing lights and Camera shake; silhouette and dust only
     - _Requirements: 25.3-25.6, 25.8, 29.1, 29.4_
-  - [ ] 8.3 Kill-cam e2e
+  - [x] 8.3 Kill-cam e2e
+    - Done outside Kiro by Claude. The e2e must not call `keepAlive` (it refills health); screenshots `killcam-full`, `killcam-off`, `killcam-steady-edge`
     - Add a "Trigger grab" button to the Dev_Panel; create `e2e/killcam.spec.ts` for each intensity (camera, subtitle, cooldown)
     - _Requirements: 25.9_
-  - [ ] 8.4 Finish
+  - [x] 8.4 Finish
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 8; commit `grab kill-cam (spec 10 task 8)`
 
 - [ ] 9. E9: Stamina by stage and difficulty (cuttable, cut order 5)

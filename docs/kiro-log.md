@@ -1797,3 +1797,26 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Behind the player the flame leans fully to the nearer way round; within 2 m of the clue it stands straight.
   - Reduced motion sets the lean at once with no sway; with Head bob off there is no sway either. The lean never changes brightness.
   - The dawn card names the case next to the count, so 0/6 is not read as the case just closed.
+
+### 2026-11-16: Outside Kiro: 10-curse-stages task 8: E7 grab kill-cam
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **What happened:**
+  - Rules: `systems/killCam.ts`, with Property 21 tested with fast-check.
+  - When it fires: a Brute or Lurker blow on a keeper below 25% health, or out of stamina and not facing it. At most once per 60 s.
+  - What plays at each intensity:
+    - Full: the camera turns to the zombie and closes in for 1.2 s, with a stinger and shake.
+    - Reduced: a 0.7 s hold, a quieter stinger and no shake.
+    - Off: no camera move, only the red edge and a forced subtitle.
+  - The zombie's own blow lands on release.
+  - Accessibility: Flashing lights off gives a steady edge.
+  - New sounds `grab-stinger` and `grab-stinger-soft` share the caption "[something seizes you]".
+  - Dev button "Trigger grab"; debug hook calls `killCam()` and `triggerGrab()`.
+  - `e2e/killcam.spec.ts` passes in Chrome for Full, Reduced, Off and Flashing lights off, checking the camera, subtitle, edge and cooldown. The dev-panel and scare-settings specs still pass.
+- **Found on the way:**
+  - The design names a Sprinter, but no such zombie exists, so only the Brute and the Lurker grab.
+  - The debug hook's `keepAlive` refills health, so the kill-cam e2e must not call it.
+- **Decisions made unattended:**
+  - The kill-cam adds no damage of its own: it holds back the zombie's normal blow until release, so a scare is never the sole cause of death.
+  - A lethal blow plays the full close-up even at Reduced; Off never moves the camera, even when the blow is lethal.
+  - Under reduced motion the camera still turns to the zombie but does not lean in, zoom or shake.
+  - Dodging, god mode and an already-held keeper are never seized.

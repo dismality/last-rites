@@ -58,6 +58,7 @@ import { useStageStore } from './stageStore'
 import { useCaseStore } from './caseStore'
 import { useClueRevealStore } from './clueRevealStore'
 import { useHunchStore } from './hunchStore'
+import { useKillCamStore } from './killCamStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -99,6 +100,7 @@ export const REPLACED_STORES = [
   useItemNameStore,
   useClueRevealStore,
   useHunchStore,
+  useKillCamStore,
 ] as unknown as readonly Resettable[]
 
 /** Stores with their own reset (they bump counters, clear storage or keep persistent parts). */

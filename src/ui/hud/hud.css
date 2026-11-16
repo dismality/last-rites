@@ -279,6 +279,14 @@ img.hud-prompt__rune-img {
   background: radial-gradient(ellipse at center, transparent 45%, var(--blood) 100%);
 }
 
+/* The grab kill-cam's red edge (spec 10 task 8): pulsing, or steady with Flashing lights off. */
+.hud-grab-edge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 6vmin 2vmin var(--blood);
+}
+
 .hud-desat {
   position: absolute;
   inset: 0;
