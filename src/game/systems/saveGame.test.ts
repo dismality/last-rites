@@ -83,9 +83,11 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
       }),
       riteProgress: fc.integer({ min: 0, max: 45 }),
       craneRested: fc.boolean(),
+      cluesRead: fc.integer({ min: 0, max: 3 }),
     })
     .map((m) => ({
       ...m,
+      cluesRead: Math.min(m.cluesRead, m.clues.length),
       pages: new Set(m.pages),
       clues: new Set(m.clues),
       relics: new Set(m.relics),

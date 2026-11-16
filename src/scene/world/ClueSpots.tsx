@@ -6,9 +6,9 @@ import { DRACO_PATH, clueModelUrl } from '../../data/assets'
 import { NOTICE_POST_BOXES } from '../../data/propScenery'
 import '../assets/preloadModels'
 import { CLUE_SPOTS, type ClueSpot } from '../../data/tombstones'
-import { pushJournalAddedToast } from '../../game/state/journalToast'
+import { LEDGER_REFUSAL } from '../../data/clueReveal'
+import { useClueRevealStore } from '../../game/state/clueRevealStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
-import { useToastStore } from '../../game/state/toastStore'
 import { canDiscoverClue } from '../../game/systems/tombstones'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { Interactable } from './Interactable'
@@ -18,7 +18,8 @@ const CLUE_OUTLINE_RANGE_M = 4
 
 function examineSpot(spot: ClueSpot): void {
   if (!canDiscoverClue(spot.clueId, useInventoryStore.getState().inventory)) {
-    useToastStore.getState().push('The entries mean nothing without the parish ledger to compare.')
+    // Same place and fade as a clue, but plain, so it is never mistaken for a found clue.
+    useClueRevealStore.getState().revealPlain(LEDGER_REFUSAL)
     return
   }
   useMysteryStore.getState().discoverClue(spot.clueId)
@@ -42,7 +43,6 @@ export function ClueSpots() {
             id={`clue-${spot.clueId}`}
             kind="clue-spot"
             subject={spot.clueId}
-            onUsedUp={pushJournalAddedToast}
             outlineRange={CLUE_OUTLINE_RANGE_M}
             runeHeight={0.9}
             onInteract={() => examineSpot(spot)}

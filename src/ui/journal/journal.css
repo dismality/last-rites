@@ -121,6 +121,17 @@
 .journal-pages__sheet { flex: 1; }
 
 .journal-clues__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.journal-clues__item { display: flex; align-items: flex-start; gap: 0.75rem; }
+.journal-clues__picture { flex: 0 0 48px; width: 48px; height: 48px; object-fit: contain; }
+.journal-clues__picture--none { display: inline-block; }
+.journal-clues__words { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.journal-clues__title { font-family: var(--font-heading); font-size: 1.05rem; }
+/* A small red ink dot on clues found since the tab was last read. */
+.journal-clues__dot {
+  display: inline-block; width: 0.5rem; height: 0.5rem; margin-left: 0.4rem; vertical-align: middle;
+  border-radius: 50%; background: var(--blood-bright);
+}
+.journal-tabs__badge { font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--blood-bright); }
 /* Hand-drawn underline: a background line that grows left to right. */
 .journal-clues__text {
   background: linear-gradient(var(--blood), var(--blood)) no-repeat 0 100% / 100% 2px;

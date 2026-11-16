@@ -22,6 +22,7 @@ import {
 import { economy } from './economyPort'
 import { useStageStore } from './stageStore'
 import { useWorldStore } from './worldStore'
+import { useClueRevealStore } from './clueRevealStore'
 
 export type LinkResult = { added: boolean; note: DeductionNote | null }
 export type HintOutcome =
@@ -84,6 +85,11 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     const def = CASES.find((c) => c.clues.some((x) => x.id === id))
     if (!def || get().cases[def.id].found.includes(id)) return false
     patchProgress(set, def.id, (p) => ({ ...p, found: [...p.found, id] }))
+    // Clue reveal (spec 09 task 11q). Minigames and the merchant's receipt say so themselves.
+    const clue = def.clues.find((x) => x.id === id)
+    if (clue && clue.found.kind !== 'minigame' && clue.found.kind !== 'purchase') {
+      useClueRevealStore.getState().revealCaseClue(id, clue.title, clue.line)
+    }
     return true
   },
 

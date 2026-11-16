@@ -25,6 +25,11 @@ export interface MysteryState {
   ending?: EndingId
   /** Father Crane was put to rest. Optional so older saves load; endings still depend only on relics. */
   craneRested?: boolean
+  /**
+   * How many of `clues` (in found order) the player has seen in the journal's Clues tab; the rest
+   * are new (spec 09 task 11q). Optional so older saves load: missing means all read.
+   */
+  cluesRead?: number
 }
 
 export function createMysteryState(): MysteryState {
@@ -34,6 +39,7 @@ export function createMysteryState(): MysteryState {
     relics: new Set(),
     gates: { 'mausoleum-row': false, catacombs: false, ossuary: false },
     riteProgress: 0,
+    cluesRead: 0,
   }
 }
 
@@ -75,4 +81,9 @@ export function migrateEnding(stored: string | undefined, relicCount: number): E
   if (stored === undefined) return undefined
   if (stored === 'rest' || stored === 'taken') return stored
   return chooseEnding(relicCount)
+}
+
+/** Clues found since the Clues tab was last read (found order is the set's order). */
+export function unreadClueCount(state: Pick<MysteryState, 'clues' | 'cluesRead'>): number {
+  return Math.max(0, state.clues.size - (state.cluesRead ?? state.clues.size))
 }

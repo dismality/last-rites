@@ -3,7 +3,9 @@
 // closes it. At dusk, night and dawn the world keeps running: the screen dims, no scare begins
 // while it is open, J still closes it and Esc opens the pause menu instead (spec 10 F8).
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
-import { CLUES } from '../../data/clues'
+import { CLUES, CLUE_MAP } from '../../data/clues'
+import { cluePicture, clueTitle } from '../../data/clueReveal'
+import { unreadClueCount } from '../../game/systems/mystery'
 import { JOURNAL_PAGES } from '../../data/journal'
 import { emit } from '../../game/events'
 import { RELICS } from '../../data/relics'
@@ -83,7 +85,16 @@ function PagesTab() {
 
 function CluesTab() {
   const clues = useMysteryStore((s) => s.mystery.clues)
-  const found = CLUES.filter((c) => clues.has(c.id))
+  // The clues that were new when the tab opened keep their red dot while it stays open.
+  const [unread] = useState(() => {
+    const m = useMysteryStore.getState().mystery
+    return new Set([...m.clues].slice(m.clues.size - unreadClueCount(m)))
+  })
+  useEffect(() => {
+    useMysteryStore.getState().markCluesRead()
+  }, [clues])
+  // Found order, oldest first (the set keeps insertion order, and saves keep it too).
+  const found = [...clues].map((id) => CLUE_MAP[id]).filter((c) => c !== undefined)
   return (
     <div className="journal-clues">
       <p className="journal__count">
@@ -93,14 +104,33 @@ function CluesTab() {
         <p className="journal__empty">Nothing noted yet. Read the stones and look closely.</p>
       ) : (
         <ul className="journal-clues__list">
-          {found.map((c, i) => (
-            <li key={c.id} className="journal-clues__item">
-              {/* Staggered so entries appear to be underlined by hand one after another. */}
-              <span className="journal-clues__text" style={{ animationDelay: `${i * 120}ms` }}>
-                {c.text}
-              </span>
-            </li>
-          ))}
+          {found.map((c, i) => {
+            const picture = cluePicture(c.id)
+            const isNew = unread.has(c.id)
+            return (
+              <li key={c.id} className={isNew ? 'journal-clues__item journal-clues__item--new' : 'journal-clues__item'}>
+                {picture ? (
+                  <img className="journal-clues__picture" src={picture} alt="" draggable={false} />
+                ) : (
+                  <span className="journal-clues__picture journal-clues__picture--none" aria-hidden="true" />
+                )}
+                <div className="journal-clues__words">
+                  <span className="journal-clues__title">
+                    {clueTitle(c.id)}
+                    {isNew && (
+                      <span className="journal-clues__dot" role="img" aria-label="new">
+                        {' '}
+                      </span>
+                    )}
+                  </span>
+                  {/* Staggered so entries appear to be underlined by hand one after another. */}
+                  <span className="journal-clues__text" style={{ animationDelay: `${i * 120}ms` }}>
+                    {c.text}
+                  </span>
+                </div>
+              </li>
+            )
+          })}
         </ul>
       )}
     </div>
@@ -172,6 +202,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
   })
 
   const running = useWorldStore((s) => s.phase !== 'day')
+  const unreadClues = useMysteryStore((s) => unreadClueCount(s.mystery))
 
   useEffect(() => {
     tabRefs.current.pages?.focus()
@@ -227,6 +258,12 @@ function JournalBody({ onClose }: { onClose: () => void }) {
               onClick={() => setTab(t.id)}
             >
               {t.label}
+              {t.id === 'clues' && unreadClues > 0 && (
+                <span className="journal-tabs__badge" aria-label={`${unreadClues} new`}>
+                  {' ·'}
+                  {unreadClues}
+                </span>
+              )}
             </button>
           ))}
         </div>

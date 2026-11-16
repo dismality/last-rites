@@ -12,6 +12,7 @@ import { Crosshair } from './Crosshair'
 import { InteractPrompt } from './InteractPrompt'
 import { Subtitles } from './Subtitles'
 import { Toast } from './Toast'
+import { ClueReveal } from './ClueReveal'
 import { DuskHint } from './DuskHint'
 import { WaveTally } from './WaveTally'
 import { DigBar } from './DigBar'
@@ -75,6 +76,7 @@ export function Hud() {
       <StaminaBar />
       <DigBar />
       <Subtitles />
+      <ClueReveal />
       <Toast />
       <DuskHint />
       {/* Score on top, minimap beneath it: one column, so the map never lands on the score. */}

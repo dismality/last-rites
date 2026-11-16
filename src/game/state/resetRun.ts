@@ -56,6 +56,7 @@ import { useTombstoneStore } from './tombstoneStore'
 import { useUiWorldStore } from './uiWorldStore'
 import { useStageStore } from './stageStore'
 import { useCaseStore } from './caseStore'
+import { useClueRevealStore } from './clueRevealStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -95,6 +96,7 @@ export const REPLACED_STORES = [
   useTombstoneStore,
   useToastStore,
   useItemNameStore,
+  useClueRevealStore,
 ] as unknown as readonly Resettable[]
 
 /** Stores with their own reset (they bump counters, clear storage or keep persistent parts). */

@@ -171,7 +171,8 @@ function validMystery(v: unknown): boolean {
     GATES.every((g) => typeof (v.gates as Obj)[g] === 'boolean') &&
     isNum(v.riteProgress) &&
     (v.ending === undefined || ENDINGS.includes(v.ending as string)) &&
-    (v.craneRested === undefined || typeof v.craneRested === 'boolean')
+    (v.craneRested === undefined || typeof v.craneRested === 'boolean') &&
+    (v.cluesRead === undefined || isNum(v.cluesRead))
   )
 }
 
@@ -229,6 +230,8 @@ export function fromSaveFile(
       ...m,
       craneRested: m.craneRested ?? false,
       ending: migrateEnding(m.ending as string | undefined, m.relics.length),
+      // Older saves have no read count: their clues count as read.
+      cluesRead: Math.min(m.cluesRead ?? m.clues.length, m.clues.length),
       pages: new Set(m.pages) as MysteryState['pages'],
       clues: new Set(m.clues),
       relics: new Set(m.relics) as MysteryState['relics'],
