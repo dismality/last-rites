@@ -1,11 +1,20 @@
 // Item definitions — mirrored from docs/game-design.md §3 and §4.
 // Pure data: no logic, no side effects.
 
-import type { AmmoId, CraftedItemId, ItemId, KeyItemId, MaterialId, RelicId } from '../game/types'
+import type { AmmoId, CraftedItemId, ItemId, KeyItemId, MaterialId, RelicId, ComponentId } from '../game/types'
 
 export type { MaterialId } from '../game/types'
 
-export type ItemKind = 'material' | 'ammo' | 'weapon' | 'consumable' | 'placeable' | 'key' | 'relic' | 'lore'
+export type ItemKind =
+  | 'material'
+  | 'ammo'
+  | 'weapon'
+  | 'consumable'
+  | 'placeable'
+  | 'key'
+  | 'relic'
+  | 'lore'
+  | 'component'
 
 /** Satchel limits (design bible §3). */
 export const SATCHEL_SLOTS = 12
@@ -43,6 +52,18 @@ const ITEM_MODEL_DIR = 'assets/models/items'
 function modelPath(id: ItemId): string {
   const file = id.startsWith('journal-page-') ? 'journal-page' : id
   return `${ITEM_MODEL_DIR}/${file}.glb`
+}
+
+/** A crafted part for a Tier 2 or 3 recipe (spec 10 task 10); stacks like a material. */
+function component(id: ComponentId, name: string): ItemDef {
+  return {
+    id,
+    name,
+    kind: 'component',
+    stackLimit: MATERIAL_STACK_LIMIT,
+    icon: `rune-${id}`,
+    model: modelPath(id),
+  }
 }
 
 function material(id: MaterialId, name: string): ItemDef {
@@ -117,6 +138,10 @@ export const ITEMS: readonly ItemDef[] = [
   material('black-powder', 'Black Powder'),
   material('lead-shot', 'Lead Shot'),
   material('silver-filings', 'Silver Filings'),
+
+  // Components (spec 10 task 10)
+  component('iron-head', 'Iron Head'),
+  component('oil-wick', 'Oil Wick'),
 
   // Ammunition
   ammo('revolver-cartridge', 'Revolver Cartridges'),

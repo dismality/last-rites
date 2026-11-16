@@ -111,6 +111,8 @@ export const ITEM_ICON_URLS: Readonly<Record<ItemId, string>> = {
   'black-powder': icon('black-powder'),
   'lead-shot': icon('lead-shot'),
   'silver-filings': icon('silver-filings'),
+  'iron-head': icon('iron-head'),
+  'oil-wick': icon('oil-wick'),
   'revolver-cartridge': icon('revolver-cartridge'),
   'shotgun-shell': icon('shotgun-shell'),
   'rusty-shovel': icon('rusty-shovel'),

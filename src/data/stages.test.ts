@@ -34,7 +34,13 @@ describe('stage data (design bible §8, §13)', () => {
   })
 
   it('unlocks the bible recipes at the stage dawns, and only real recipes', () => {
-    expect(STAGE_MAP[1].dawnUnlocks).toEqual(['r-sharpened-shovel', 'r-holy-water-flask', 'r-lantern-trap'])
+    expect(STAGE_MAP[1].dawnUnlocks).toEqual([
+      'r-sharpened-shovel',
+      'r-holy-water-flask',
+      'r-lantern-trap',
+      'r-iron-head',
+      'r-oil-wick',
+    ])
     expect(STAGE_MAP[2].dawnUnlocks).toEqual(['r-nail-bomb', 'r-blessed-rounds'])
     expect(STAGE_MAP[3].dawnUnlocks).toEqual([])
     for (const s of STAGES) for (const r of s.dawnUnlocks) expect(RECIPE_MAP[r]).toBeDefined()

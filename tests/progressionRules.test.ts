@@ -170,12 +170,12 @@ describe('structure rule: this spec adds no binary assets', () => {
     'stone-wall-column stone-wall-curve stone-wall-damaged stone-wall trunk-long trunk urn-round urn-square'
   ).split(' ')
   for (const w of WORLD) ALLOWED.add(`models/world/${w}.glb`)
-  /** The 31 world item models from tools/blender/world_items.py, credited in docs/CREDITS.md. */
+  /** The 33 world item models from tools/blender/world_items.py (two are spec 10's components), credited in docs/CREDITS.md. */
   const ITEMS = (
     'bandage black-powder blessed-rounds bone-club bone candle-wax cloth grave-salt holy-water-flask ' +
     'holy-water iron-nail journal-page kola-tonic lamp-oil lantern-refill lantern-trap lead-shot nail-bomb ' +
     'parish-ledger revolver-cartridge revolver rusty-shovel salt-circle sharpened-shovel shotgun-shell ' +
-    'shotgun silver-filings silver-sabre tallow-candle wood-axe wood-plank'
+    'shotgun silver-filings silver-sabre tallow-candle wood-axe wood-plank iron-head oil-wick'
   ).split(' ')
   for (const i of ITEMS) ALLOWED.add(`models/items/${i}.glb`)
   /** Scene pieces and props from tools/blender (chapel, hut, catacombs, props.py), credited in docs/CREDITS.md. */

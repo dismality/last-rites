@@ -250,6 +250,20 @@ If built, recipes are grouped in three tiers tied to the stage that unlocks them
 
 The recipe book shows the tier and any missing component. If E4 is cut, the flat recipes above stand, unlocked at the stage dawns shown in the table.
 
+- **As built (spec 10 task 10):** tiers apply in the Story modes (Easy, Normal, Hard, Short Vigil). Endless keeps the flat recipes above and has no component recipes. Tier 1 is the flat recipes unchanged (the start four, the Salt Circle and the two ammunition recipes). Tiered inputs:
+
+| Recipe | Tier | Inputs with tiers on |
+|---|---|---|
+| `r-iron-head` (component) | 2 | 2 iron nails, 1 wood plank |
+| `r-oil-wick` (component) | 2 | 1 cloth, 1 candle wax, 1 lamp oil |
+| `r-sharpened-shovel` | 2 | Iron Head, 2 iron nails, 1 wood plank, 2 cloth, plus the Rusty Shovel |
+| `r-holy-water-flask` | 2 | Oil Wick, 2 holy water, 2 cloth, 1 candle wax |
+| `r-lantern-trap` | 2 | Oil Wick, 2 lamp oil, 3 iron nails, 1 cloth |
+| `r-nail-bomb` | 3 | Iron Head, 3 iron nails, 1 holy water, 1 lamp oil, 1 grave salt; blueprint "Bomb plan" (clues `hearse-pin-hasp` and `oil-other-crypt`) |
+| `r-blessed-rounds` | 3 | 2 holy water, 2 silver filings, 2 black powder, 2 lead shot; blueprint "Blessing rite" (clues `old-bishops-seal` and `hymn-letters-below`) |
+
+  The component recipes unlock with Tier 2 at the Stage 1 dawn. A blueprint is held once both its clues are found and is never used up. Recipes that need a component are not hidden as "???" by it, since components are crafted, never found. The book groups the unlocked recipes under "Tier N · Stage N" headings, tags each one, and lists "Needs component: Iron Head (craft it first)" and "Blueprint: Bomb plan, 1/2 clues found" under the ingredients. A missing component reads "Craft it first" instead of a place, and Mark on map skips it. The Silver Sabre upgrades stay on the Upgrades tab and are not tiered. Property 23 checks that, with tiers on, the weakest weapon and the cheapest recipe (components counted as their materials) both rise from tier to tier.
+
 ---
 
 ## 6. Player

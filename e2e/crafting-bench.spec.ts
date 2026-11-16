@@ -1,6 +1,8 @@
 import { test, expect, type Page } from '@playwright/test'
 import { RECIPES } from '../src/data/recipes'
 import { ITEM_MAP } from '../src/data/items'
+import { BLUEPRINTS } from '../src/data/blueprints'
+import { effectiveRecipe } from '../src/game/systems/tieredCrafting'
 import type { ItemId } from '../src/game/types'
 // Spec 09 task 24.2 (D2): crafting and the workbench in real Chrome.
 //
@@ -93,13 +95,18 @@ test('D2: every recipe crafts in 1.5 s at the bench, a hit cancels, upgrades and
     h.takePickup('revolver')
     h.takePickup('shotgun')
   })
+  // Spec 10 task 10: Normal plays with tiers on, so the Tier 3 blueprints need their clues found.
+  for (const bp of Object.values(BLUEPRINTS)) {
+    for (const c of bp.clues) await page.evaluate((id) => window.__lastRites!.giveClue(id), c)
+  }
   await expect(page.locator('.recipe-entry--locked')).toHaveCount(0)
   await expect(page.locator('.recipe-book__list > .recipe-entry')).toHaveCount(RECIPES.length)
   await page.waitForTimeout(300)
 
   // --- Every recipe -------------------------------------------------------------------------
   const timings: string[] = []
-  for (const r of RECIPES) {
+  // Normal is a Story mode: each recipe crafts with its tiered inputs (components included).
+  for (const r of RECIPES.map((x) => effectiveRecipe(x, true))) {
     const out = r.output.item
     const inputs: Slot[] = r.inputs.map((i) => ({ item: i.item, qty: i.qty }))
     if (r.consumesTool) inputs.push({ item: r.consumesTool, qty: 1 })

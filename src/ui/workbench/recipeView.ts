@@ -4,7 +4,7 @@
 import { ITEM_MAP } from '../../data/items'
 import { RECIPE_MAP } from '../../data/recipes'
 import type { RecipeDef } from '../../data/recipes'
-import { canCraft } from '../../game/systems/crafting'
+import { canCraftTiered, effectiveRecipe, type TieredCheck } from '../../game/systems/tieredCrafting'
 import { mergeCollected } from '../../game/systems/recipeDiscovery'
 import { joinSources, orSources, sourcePhrases, type Here } from '../../game/systems/itemSources'
 import type { Inventory, ItemId, RecipeId } from '../../game/types'
@@ -46,7 +46,8 @@ export function recipeCard(
   const row = (item: ItemId, need: number, tool: boolean): IngredientRow => {
     const lack = Math.min(need, Math.max(0, lackOf.get(item) ?? 0))
     const have = need - lack
-    const sources = lack > 0 ? sourcePhrases(item, from) : []
+    const component = ITEM_MAP[item]?.kind === 'component'
+    const sources = lack > 0 && !component ? sourcePhrases(item, from) : []
     return {
       item,
       name: nameOf(item),
@@ -58,7 +59,12 @@ export function recipeCard(
       mark: lack > 0 ? '✗' : '✓',
       note: lack > 0 ? `need ${lack} more` : 'have enough',
       sources,
-      found: sources.length > 0 ? `Found: ${joinSources(sources)}` : '',
+      found:
+        lack > 0 && component
+          ? `Craft it first: ${nameOf(item)}`
+          : sources.length > 0
+            ? `Found: ${joinSources(sources)}`
+            : '',
     }
   }
   const out = nameOf(recipe.output.item)
@@ -79,7 +85,8 @@ export function recipeItems(recipe: RecipeDef): ItemId[] {
 /** A recipe is discovered once the player has held at least one of each of its ingredients. */
 export function isDiscovered(recipe: RecipeDef, collected: readonly ItemId[]): boolean {
   const set = new Set(collected)
-  return recipeItems(recipe).every((i) => set.has(i))
+  // Components (spec 10 task 10) are crafted, never found: they do not hide a recipe.
+  return recipeItems(recipe).every((i) => set.has(i) || ITEM_MAP[i]?.kind === 'component')
 }
 
 /** The title a list row shows: the real name, or "???" until the recipe is discovered. */
@@ -109,9 +116,19 @@ export function unknownRecipeTip(card: RecipeCard, collected: readonly ItemId[])
   return parts.join(' ')
 }
 
-/** The first ingredient with a shortfall, in recipe order: what Mark on map looks for. */
+/** The first ingredient with a shortfall, in recipe order: what Mark on map looks for. Components are crafted, never found. */
 export function firstMissing(card: RecipeCard): IngredientRow | undefined {
-  return card.ingredients.find((i) => i.lack > 0)
+  return card.ingredients.find((i) => i.lack > 0 && ITEM_MAP[i.item]?.kind !== 'component')
+}
+
+/** The tier lines under a recipe (spec 10 task 10): the missing components and the blueprint. */
+export function tierLines(check: TieredCheck): string[] {
+  const out = check.missingComponents.map((c) => `Needs component: ${nameOf(c)} (craft it first)`)
+  const bp = check.blueprint
+  if (bp !== null) {
+    out.push(bp.ready ? `Blueprint: ${bp.name} (pieced together)` : `Blueprint: ${bp.name}, ${bp.have}/${bp.need} clues found`)
+  }
+  return out
 }
 
 export interface PinCardView {
@@ -126,11 +143,14 @@ export function pinCardView(
   pinned: RecipeId | null,
   unlocked: readonly RecipeId[],
   inv: Inventory,
+  /** Tiered crafting (spec 10 task 10): off by default, as in Endless. */
+  tiers: { on: boolean; found: readonly string[] } = { on: false, found: [] },
 ): PinCardView | null {
   if (pinned === null || !unlocked.includes(pinned)) return null
-  const recipe = RECIPE_MAP[pinned]
-  if (!recipe) return null
-  const result = canCraft(inv, recipe)
+  const base = RECIPE_MAP[pinned]
+  if (!base) return null
+  const recipe = effectiveRecipe(base, tiers.on)
+  const result = canCraftTiered(inv, base, tiers.on, tiers.found)
   const card = recipeCard(recipe, result.missing)
   return { recipeId: pinned, title: card.title, rows: card.ingredients, craftable: result.ok }
 }

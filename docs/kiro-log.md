@@ -1834,3 +1834,18 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The cap is worked out from the current stage, and stages only move forward in a run, so it never rises. A retried night keeps its stage.
   - The difficulty drain multiplies with Adrenaline's halving rather than replacing it.
   - "max N" is always shown, not only with the accessible HUD, because the requirement asks for the cap as a number.
+
+### 2026-11-16: Outside Kiro: 10-curse-stages task 10: E4 tiered crafting
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **What happened:**
+  - Every recipe has a tier (1 to 3). In the Story modes Tier 2 recipes need a crafted component (Iron Head or Oil Wick) plus more materials, and Tier 3 recipes also need a blueprint pieced from 2 Case 3 clues.
+  - Endless keeps the flat recipes and has no component recipes.
+  - Rules: `systems/tieredCrafting.ts`, with Property 23 (damage and cost rise with tier). Data: `data/recipes.ts`, `data/blueprints.ts`. The store reads it through `state/tieredCraft.ts`.
+  - The recipe book groups recipes by tier, tags them, and says which component or blueprint is missing. The pinned card and the bench ghost use the tiered inputs.
+  - New Blender models and icons for the Iron Head and the Oil Wick (`tools/blender/world_items.py`).
+  - `e2e/tiered-crafting.spec.ts` crafts an Iron Head, then a Tier 2 Sharpened Shovel, with real clicks at the bench, and passes in Chrome. Kiro's D2 bench e2e now gives the blueprint clues and crafts every recipe with its tiered inputs, and passes. The recipe-sources e2e still passes.
+- **Decisions made unattended:**
+  - The component recipes unlock with Tier 2 at the Stage 1 dawn (they are added to that stage's dawn unlocks).
+  - A component does not keep a recipe "???": components are crafted, never found.
+  - Blueprints are never used up, and the Silver Sabre upgrades are not tiered (they stay on the Upgrades tab).
+  - `crafting.ts` is unchanged; the tiered check wraps it.

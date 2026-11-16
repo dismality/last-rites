@@ -16,6 +16,7 @@ import type { UnlockEvent, CraftResult } from '../systems/crafting'
 import { RECIPE_MAP } from '../../data/recipes'
 import { useInventoryStore } from '../state/inventoryStore'
 import { mergeCollected } from '../systems/recipeDiscovery'
+import { checkCraft, craftingRecipe } from './tieredCraft'
 
 // ---------------------------------------------------------------------------
 // Types
@@ -200,7 +201,11 @@ export const useCraftingStore = create<CraftingState>((set, get) => ({
     }
 
     const { inventory, setInventory } = useInventoryStore.getState()
-    const result = craft(inventory, recipe)
+    // Tiered crafting (spec 10 task 10): the tiered inputs, and a Tier 3 blueprint must be pieced.
+    if (!checkCraft(inventory, recipe).ok) {
+      return { ok: false, error: 'missing-inputs' } as CraftResult
+    }
+    const result = craft(inventory, craftingRecipe(recipe))
     if (result.ok) {
       setInventory(result.inv)
     }

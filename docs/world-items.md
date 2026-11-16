@@ -39,3 +39,5 @@ top at +Y; everything else lies flat as it would rest on the ground. `journal-pa
 | `kola-tonic` | Kola Tonic | 58 x 171 x 57 | 446 |
 | `journal-page` | Journal Page | 156 x 26 x 205 | 1366 |
 | `parish-ledger` | Parish Ledger | 241 x 65 x 343 | 712 |
+| `iron-head` | Iron Head | 195 x 51 x 56 | 184 |
+| `oil-wick` | Oil Wick | 83 x 27 x 87 | 688 |

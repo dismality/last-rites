@@ -294,21 +294,27 @@ Common rules for all tasks:
     - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 9; commit `stage stamina caps (spec 10 task 9)`
 
-- [ ] 10. E4: Tiered crafting (cuttable, cut order 2)
-  - [ ] 10.1 Tier data
+- [x] 10. E4: Tiered crafting (cuttable, cut order 2)
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 10.1 Tier data
+    - Done outside Kiro by Claude. Components Iron Head and Oil Wick (items, Blender models, icons); blueprints in `src/data/blueprints.ts`; §5 has an "As built" note
     - Add tier, component and blueprint fields to `src/data/recipes.ts` (components such as the Iron Head; blueprints pieced from 2 clues plus a rare material); update `docs/game-design.md` §5
     - _Requirements: 27.1, 27.2_
-  - [ ] 10.2 Pure tiered crafting
+  - [x] 10.2 Pure tiered crafting
+    - Done outside Kiro by Claude. `crafting.ts` is unchanged: `tieredCrafting.ts` wraps `canCraft`; the store reads it through `state/tieredCraft.ts`
     - Create `tieredCrafting.ts` and extend `crafting.ts` (component check, blueprint check, missing-component report); write `tieredCrafting.test.ts`
     - **Property 23: Tier damage and cost rise together**
     - _Requirements: 27.2, 27.3, 27.4_
-  - [ ] 10.3 Recipe book UI
+  - [x] 10.3 Recipe book UI
+    - Done outside Kiro by Claude. Tier headings and tags, component and blueprint lines; the pinned card and the bench ghost use the tiered inputs
     - Show the tier and the missing component in the recipe book; keep the flat recipes when tiers are off
     - _Requirements: 27.4, 27.5_
-  - [ ] 10.4 Tiered crafting e2e
+  - [x] 10.4 Tiered crafting e2e
+    - Done outside Kiro by Claude. Screenshots `tiered-crafting-needs-component` and `tiered-crafting-done`; the D2 bench e2e now crafts every recipe with its tiered inputs
     - Create `e2e/tiered-crafting.spec.ts`: craft a component then a Tier 2 weapon at the workbench
     - _Requirements: 27.6_
-  - [ ] 10.5 Finish
+  - [x] 10.5 Finish
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 10; commit `tiered crafting (spec 10 task 10)`
 
 - [ ] 11. Name the Dead (cuttable, cut order 1)

@@ -1,4 +1,5 @@
 import { useCraftingStore } from '../../game/state/craftingStore'
+import { foundClues, tiersOn } from '../../game/state/tieredCraft'
 import { useGameStore } from '../../game/state/gameStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { pinCardView } from '../workbench/recipeView'
@@ -13,7 +14,7 @@ export function PinnedRecipe() {
   const pinned = useCraftingStore((s) => s.pinnedRecipe)
   const unlocked = useCraftingStore((s) => s.unlockedRecipes)
   const inventory = useInventoryStore((s) => s.inventory)
-  const view = pinCardView(pinned, unlocked, inventory)
+  const view = pinCardView(pinned, unlocked, inventory, { on: tiersOn(), found: foundClues() })
   if (screen !== 'game' || view === null) return null
   return (
     <aside className="hud-pin" aria-label={`Pinned recipe: ${view.title}`}>

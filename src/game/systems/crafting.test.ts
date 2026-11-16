@@ -47,9 +47,10 @@ describe('unlockRecipes', () => {
     expect(ids).toHaveLength(4)
   })
 
-  it('returns exactly r-sharpened-shovel after night 1', () => {
+  it('returns exactly r-sharpened-shovel and the Tier 2 component recipes after night 1', () => {
     const ids = unlockRecipes({ type: 'dawnStarted', night: 1 })
-    expect(ids).toEqual(['r-sharpened-shovel'])
+    // Spec 10 task 10: the Iron Head and Oil Wick unlock with Tier 2 (hidden from the book in Endless).
+    expect(ids).toEqual(['r-sharpened-shovel', 'r-iron-head', 'r-oil-wick'])
   })
 
   it('returns r-holy-water-flask and r-blessed-rounds after night 2', () => {

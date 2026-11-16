@@ -620,6 +620,33 @@ def parish_ledger():
     return m
 
 
+def iron_head():
+    """Tier 2 component (spec 10 task 10): a forged iron wedge nailed onto a short oak block."""
+    m = new("iron-head", "Iron Head")
+    box(m, (0, 0, 0.012), (0.16, 0.05, 0.024), "oak", 0.003)
+    # The wedge: thick at the back, tapering to an edge at +X.
+    lathe(m, [(0, -0.05), (0.022, -0.05), (0.024, 0.0), (0.012, 0.05), (0, 0.055)], "iron", seg=4,
+          matrix=at(0.06, 0, 0.034) @ Matrix.Rotation(radians(90), 4, "Y") @ Matrix.Rotation(radians(45), 4, "Z"))
+    box(m, (0.0, 0, 0.026), (0.018, 0.056, 0.006), "rust", 0.001)
+    for dy in (-0.016, 0.0, 0.016):
+        cyl(m, 0.026, 0.031, 0.0045, "rust", seg=6, matrix=at(-0.03, dy, 0))
+    return m
+
+
+def oil_wick():
+    """Tier 2 component (spec 10 task 10): a coil of oiled cloth wick bound with twine, wax-sealed."""
+    m = new("oil-wick", "Oil Wick")
+    for i in range(3):
+        a = radians(120 * i)
+        sweep(m, smooth([(0.03 * cos(a), 0.03 * sin(a), 0.008), (0.03 * cos(a + 1.2), 0.03 * sin(a + 1.2), 0.012),
+                         (0.03 * cos(a + 2.2), 0.03 * sin(a + 2.2), 0.008)], 2), 0.007, "oil", seg=8)
+    lathe(m, [(0, 0), (0.016, 0), (0.017, 0.016), (0, 0.018)], "cloth", seg=12)
+    lathe(m, [(0, 0.016), (0.012, 0.016), (0.011, 0.026), (0, 0.027)], "wax", seg=10)
+    sweep(m, [(-0.04, 0, 0.012), (0, 0.042, 0.014), (0.04, 0, 0.012), (0, -0.042, 0.014), (-0.04, 0, 0.012)], 0.0016,
+          "twine", seg=4)
+    return m
+
+
 BUILDERS = [
     bone, iron_nail, candle_wax, holy_water, cloth, lamp_oil, grave_salt, wood_plank, black_powder, lead_shot, silver_filings,
     revolver_cartridge, shotgun_shell, blessed_rounds,
@@ -627,6 +654,7 @@ BUILDERS = [
     bone_club, holy_water_flask, nail_bomb, lantern_trap, salt_circle, tallow_candle, bandage, lantern_refill,
     revolver, shotgun, wood_axe, silver_sabre, kola_tonic,
     journal_page, parish_ledger,
+    iron_head, oil_wick,
 ]
 
 

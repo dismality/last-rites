@@ -11,7 +11,8 @@ describe('content data integrity', () => {
   it('stacks materials to the limit, ammo to its own limit, and everything else singly', () => {
     for (const item of ITEMS) {
       if (item.kind === 'ammo') continue // limits checked in combatItemsData.test.ts
-      expect(item.stackLimit).toBe(item.kind === 'material' ? MATERIAL_STACK_LIMIT : 1)
+      // Spec 10 components stack like materials.
+      expect(item.stackLimit).toBe(item.kind === 'material' || item.kind === 'component' ? MATERIAL_STACK_LIMIT : 1)
     }
   })
 

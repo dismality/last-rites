@@ -45,7 +45,8 @@ export const STAGES: readonly StageDef[] = [
     fog: [0.02, 0.03],
     aliveCap: 12,
     maxStamina: 100,
-    dawnUnlocks: ['r-sharpened-shovel', 'r-holy-water-flask', 'r-lantern-trap'],
+    // Tier 2 arrives with its components (spec 10 task 10).
+    dawnUnlocks: ['r-sharpened-shovel', 'r-holy-water-flask', 'r-lantern-trap', 'r-iron-head', 'r-oil-wick'],
   },
   {
     stage: 2,

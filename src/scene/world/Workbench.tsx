@@ -14,6 +14,7 @@
 // Architecture note: state lives in worldStore / inventoryStore / craftingStore.
 // This component is *rendering only* — it reads stores and drives visuals.
 
+import { checkCraft, craftingRecipe } from '../../game/state/tieredCraft'
 import { useRef, useMemo, useEffect, useLayoutEffect, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { Clone, Html, useGLTF } from '@react-three/drei'
@@ -27,7 +28,6 @@ import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useToastStore } from '../../game/state/toastStore'
 import { emit } from '../../game/events'
-import { canCraft } from '../../game/systems/crafting'
 import { RECIPES, RECIPE_MAP } from '../../data/recipes'
 import { ghostView, recipeCard } from '../../ui/workbench/recipeView'
 import { playCraftingComplete, playCraftingCancel } from '../../audio/AudioManager'
@@ -381,13 +381,14 @@ function RecipeGhost() {
   const progress = useCraftingStore((s) => s.craftingProgress)
   const inventory = useInventoryStore((s) => s.inventory)
   const ref = useRef<THREE.Mesh>(null)
-  const recipe = selected ? RECIPE_MAP[selected] : undefined
+  const base = selected ? RECIPE_MAP[selected] : undefined
+  const recipe = base ? craftingRecipe(base) : undefined
   const view = useMemo(() => {
-    if (!recipe) return null
-    const card = recipeCard(recipe, canCraft(inventory, recipe).missing)
+    if (!recipe || !base) return null
+    const card = recipeCard(recipe, checkCraft(inventory, base).missing)
     const crafting = progress && progress.recipeId === recipe.id ? progress.elapsed / progress.duration : 0
     return ghostView(card, crafting)
-  }, [recipe, inventory, progress])
+  }, [recipe, base, inventory, progress])
   useFrame((_, delta) => {
     if (ref.current) ref.current.rotation.y += delta * 0.6
   })
@@ -517,9 +518,10 @@ export function Workbench() {
   const craftableMaterials = useMemo(() => {
     const set = new Set<MaterialId>()
     const unlockedSet = new Set(unlockedRecipes)
-    for (const recipe of RECIPES) {
-      if (!unlockedSet.has(recipe.id)) continue
-      const result = canCraft(inventory, recipe)
+    for (const base of RECIPES) {
+      if (!unlockedSet.has(base.id)) continue
+      const recipe = craftingRecipe(base)
+      const result = checkCraft(inventory, base)
       if (result.ok) {
         for (const input of recipe.inputs) {
           if (MATERIAL_ORDER.includes(input.item as MaterialId)) {

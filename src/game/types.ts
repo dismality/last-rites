@@ -29,6 +29,9 @@ export type MaterialId =
   | 'lead-shot'
   | 'silver-filings'
 
+/** Crafted components for Tier 2 and 3 recipes (spec 10 task 10, tiered crafting). */
+export type ComponentId = 'iron-head' | 'oil-wick'
+
 /** Ammunition IDs (each stack takes one satchel slot) */
 export type AmmoId = 'revolver-cartridge' | 'shotgun-shell'
 
@@ -107,7 +110,7 @@ export type RelicId =
   | 'reliquary-heart'
 
 /** Any item that can appear in the satchel */
-export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId | AmmoId
+export type ItemId = MaterialId | CraftedItemId | KeyItemId | RelicId | AmmoId | ComponentId
 
 /** Ending IDs (design bible §1) */
 export type EndingId = 'rest' | 'taken'
@@ -129,6 +132,8 @@ export type RecipeId =
   | 'r-revolver-cartridge'
   | 'r-shotgun-shell'
   | 'r-blessed-rounds'
+  | 'r-iron-head'
+  | 'r-oil-wick'
 
 // ---------------------------------------------------------------------------
 // Inventory

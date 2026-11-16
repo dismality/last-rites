@@ -2,6 +2,20 @@
 // Pure data: no logic, no side effects.
 
 import type { FirearmId, ItemId, RecipeId } from '../game/types'
+import type { BlueprintId } from './blueprints'
+
+/** Spec 10 task 10 (tiered crafting): Tier 1 is Stage 1, Tier 2 Stage 2, Tier 3 Stage 3. */
+export type RecipeTier = 1 | 2 | 3
+
+/**
+ * The tiered version of a recipe (Story modes). Tier 2 swaps in a crafted component plus 5 to 7
+ * materials; Tier 3 also needs a blueprint pieced from 2 clues, plus a rare material. Endless keeps
+ * the flat `inputs` (Req 27.5).
+ */
+export interface TieredRecipe {
+  inputs: { item: ItemId; qty: number }[]
+  blueprint?: BlueprintId
+}
 
 export interface RecipeDef {
   id: RecipeId
@@ -25,6 +39,12 @@ export interface RecipeDef {
   outputCap?: 'partial'
   /** Crafting animation duration in seconds (default 1.5). */
   craftTime: number
+  /** The recipe book's tier group (spec 10 task 10). */
+  tier: RecipeTier
+  /** The tiered recipe, when it differs from the flat one. */
+  tiered?: TieredRecipe
+  /** Only exists with tiers on: a component recipe is hidden in Endless. */
+  tieredOnly?: true
 }
 
 export const RECIPES: RecipeDef[] = [
@@ -38,6 +58,7 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'bone-club', qty: 1 },
     unlock: { type: 'start' },
     craftTime: 1.5,
+    tier: 1,
   },
   {
     id: 'r-bandage',
@@ -45,6 +66,7 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'bandage', qty: 1 },
     unlock: { type: 'start' },
     craftTime: 1.5,
+    tier: 1,
   },
   {
     id: 'r-tallow-candle',
@@ -55,6 +77,7 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'tallow-candle', qty: 1 },
     unlock: { type: 'start' },
     craftTime: 1.5,
+    tier: 1,
   },
   {
     id: 'r-lantern-refill',
@@ -65,6 +88,7 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'lantern-refill', qty: 1 },
     unlock: { type: 'start' },
     craftTime: 1.5,
+    tier: 1,
   },
 
   // --- Night unlocks ---
@@ -75,6 +99,15 @@ export const RECIPES: RecipeDef[] = [
     consumesTool: 'rusty-shovel',
     unlock: { type: 'night', night: 1 },
     craftTime: 1.5,
+    tier: 2,
+    tiered: {
+      inputs: [
+        { item: 'iron-head', qty: 1 },
+        { item: 'iron-nail', qty: 2 },
+        { item: 'wood-plank', qty: 1 },
+        { item: 'cloth', qty: 2 },
+      ],
+    },
   },
   {
     id: 'r-holy-water-flask',
@@ -85,6 +118,15 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'holy-water-flask', qty: 1 },
     unlock: { type: 'night', night: 2 },
     craftTime: 1.5,
+    tier: 2,
+    tiered: {
+      inputs: [
+        { item: 'oil-wick', qty: 1 },
+        { item: 'holy-water', qty: 2 },
+        { item: 'cloth', qty: 2 },
+        { item: 'candle-wax', qty: 1 },
+      ],
+    },
   },
   {
     id: 'r-lantern-trap',
@@ -96,6 +138,15 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'lantern-trap', qty: 1 },
     unlock: { type: 'night', night: 3 },
     craftTime: 1.5,
+    tier: 2,
+    tiered: {
+      inputs: [
+        { item: 'oil-wick', qty: 1 },
+        { item: 'lamp-oil', qty: 2 },
+        { item: 'iron-nail', qty: 3 },
+        { item: 'cloth', qty: 1 },
+      ],
+    },
   },
   {
     id: 'r-nail-bomb',
@@ -107,6 +158,17 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'nail-bomb', qty: 1 },
     unlock: { type: 'night', night: 4 },
     craftTime: 1.5,
+    tier: 3,
+    tiered: {
+      inputs: [
+        { item: 'iron-head', qty: 1 },
+        { item: 'iron-nail', qty: 3 },
+        { item: 'holy-water', qty: 1 },
+        { item: 'lamp-oil', qty: 1 },
+        { item: 'grave-salt', qty: 1 },
+      ],
+      blueprint: 'bp-nail-bomb',
+    },
   },
 
   // --- Journal unlocks ---
@@ -119,6 +181,7 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'salt-circle', qty: 1 },
     unlock: { type: 'journal', page: 3 },
     craftTime: 1.5,
+    tier: 1,
   },
   // --- Weapon pickup unlocks and ammunition (spec 07) ---
   {
@@ -131,6 +194,7 @@ export const RECIPES: RecipeDef[] = [
     outputCap: 'partial',
     unlock: { type: 'pickup', weapon: 'revolver' },
     craftTime: 1.5,
+    tier: 1,
   },
   {
     id: 'r-shotgun-shell',
@@ -143,6 +207,7 @@ export const RECIPES: RecipeDef[] = [
     outputCap: 'partial',
     unlock: { type: 'pickup', weapon: 'shotgun' },
     craftTime: 1.5,
+    tier: 1,
   },
   {
     id: 'r-blessed-rounds',
@@ -153,6 +218,43 @@ export const RECIPES: RecipeDef[] = [
     output: { item: 'blessed-rounds', qty: 1 },
     unlock: { type: 'night', night: 2 },
     craftTime: 1.5,
+    tier: 3,
+    tiered: {
+      inputs: [
+        { item: 'holy-water', qty: 2 },
+        { item: 'silver-filings', qty: 2 },
+        { item: 'black-powder', qty: 2 },
+        { item: 'lead-shot', qty: 2 },
+      ],
+      blueprint: 'bp-blessed-rounds',
+    },
+  },
+
+  // --- Components (spec 10 task 10, tiered crafting): Story modes only, unlocked with Tier 2 ---
+  {
+    id: 'r-iron-head',
+    inputs: [
+      { item: 'iron-nail', qty: 2 },
+      { item: 'wood-plank', qty: 1 },
+    ],
+    output: { item: 'iron-head', qty: 1 },
+    unlock: { type: 'night', night: 1 },
+    craftTime: 1.5,
+    tier: 2,
+    tieredOnly: true,
+  },
+  {
+    id: 'r-oil-wick',
+    inputs: [
+      { item: 'cloth', qty: 1 },
+      { item: 'candle-wax', qty: 1 },
+      { item: 'lamp-oil', qty: 1 },
+    ],
+    output: { item: 'oil-wick', qty: 1 },
+    unlock: { type: 'night', night: 1 },
+    craftTime: 1.5,
+    tier: 2,
+    tieredOnly: true,
   },
 ]
 

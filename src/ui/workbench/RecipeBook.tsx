@@ -19,7 +19,10 @@
   - Missing quantities are announced via aria-live on the entry.
 */
 
-import { useCallback, useEffect, useId, useState } from 'react'
+import { bookRecipes, canCraftTiered } from '../../game/systems/tieredCrafting'
+import { useProgressionStore } from '../../game/state/progressionStore'
+import { MODES } from '../../data/modes'
+import { Fragment, useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { ItemIcon } from '../satchel/ItemIcon'
 import {
@@ -31,6 +34,7 @@ import {
   tooltipTarget,
   unknownIngredientText,
   unknownRecipeTip,
+  tierLines,
 } from './recipeView'
 import { useCaseStore } from '../../game/state/caseStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
@@ -43,7 +47,6 @@ import { useSpawnStore } from '../../game/state/spawnStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { revealedIds } from '../../game/systems/caseSave'
 import { NONE_LEFT_TEXT, nearestSource } from '../../game/systems/itemSources'
-import { canCraft } from '../../game/systems/crafting'
 import { RECIPES } from '../../data/recipes'
 import { ITEM_MAP } from '../../data/items'
 import { UpgradeList } from './UpgradeList'
@@ -120,6 +123,10 @@ function LockedEntry({ recipe }: { recipe: RecipeDef }) {
 
 interface UnlockedEntryProps {
   recipe: RecipeDef
+  /** Spec 10 task 10: missing components and the blueprint, as lines under the ingredients. */
+  tierNotes: string[]
+  /** "Tier 2" tag; null with tiers off (Endless). */
+  tierTag: string | null
   craftable: boolean
   missing: { item: ItemId; qty: number }[]
   highlighted: boolean
@@ -144,7 +151,7 @@ interface UnlockedEntryProps {
  * - Keyboard: Enter crafts, P pins.
  */
 function UnlockedEntry({
-  recipe, craftable, missing, highlighted, isCrafting, craftProgress,
+  recipe, tierNotes, tierTag, craftable, missing, highlighted, isCrafting, craftProgress,
   discovered, collected, pinned, onCraft, onPin, onTip,
 }: UnlockedEntryProps) {
   const setHighlight = useCraftingStore((s) => s.setHighlight)
@@ -198,6 +205,8 @@ function UnlockedEntry({
         craftable ? 'Craftable.' : 'Cannot craft.',
         `Makes ${card.title}.`,
         card.ingredients.map((i) => `${i.label}, ${i.note}`).join('; '),
+        tierTag ? `${tierTag}.` : '',
+        ...tierNotes.map((n) => `${n}.`),
         pinned ? 'Pinned.' : '',
         craftable ? 'Enter to craft.' : '',
         target ? 'M to mark the nearest source on the map.' : '',
@@ -245,6 +254,7 @@ function UnlockedEntry({
           </span>
         )}
         <h3 className="recipe-entry__name">{title}</h3>
+        {tierTag && <span className="recipe-entry__tier">{tierTag}</span>}
         {discovered && recipe.consumesTool && (
           <span className="recipe-entry__upgrade-tag" title="Upgrades an existing tool">
             ⟳ upgrade
@@ -292,6 +302,15 @@ function UnlockedEntry({
           )
         })}
       </ul>
+      {discovered && tierNotes.length > 0 && (
+        <ul className="recipe-entry__tier-notes" aria-label="Tier needs">
+          {tierNotes.map((n) => (
+            <li key={n} data-testid="tier-note">
+              {n}
+            </li>
+          ))}
+        </ul>
+      )}
       {target && (
         <div className="recipe-entry__mark-row">
           <button
@@ -363,6 +382,10 @@ export function RecipeBook() {
   const craftingProgress = useCraftingStore((s) => s.craftingProgress)
   const startCrafting = useCraftingStore((s) => s.startCrafting)
   const inventory = useInventoryStore((s) => s.inventory)
+  // Tiered crafting (spec 10 task 10): on in Story modes; Tier 3 blueprints read the clues found.
+  const tiers = useProgressionStore((s) => MODES[s.mode].story)
+  const cases = useCaseStore((s) => s.cases)
+  const found = useMemo(() => Object.values(cases).flatMap((p) => p.found), [cases])
   const collected = useCraftingStore((s) => s.collectedItems)
   const pinnedRecipe = useCraftingStore((s) => s.pinnedRecipe)
   const togglePin = useCraftingStore((s) => s.togglePin)
@@ -400,15 +423,17 @@ export function RecipeBook() {
   // Visible only when workbench is open.
   if (!workbenchOpen) return null
 
-  // Partition recipes: unlocked (in order from RECIPES) + locked remainder.
+  // Partition recipes: unlocked (by tier, then in order from RECIPES) + locked remainder.
+  // Tiered crafting (spec 10 task 10): Story modes use the tiered recipes; Endless the flat ones.
+  const book = bookRecipes(tiers)
   const unlockedSet = new Set(unlockedRecipes)
-  const orderedUnlocked = RECIPES.filter((r) => unlockedSet.has(r.id))
-  const locked = RECIPES.filter((r) => !unlockedSet.has(r.id))
+  const orderedUnlocked = book.filter((r) => unlockedSet.has(r.id)).sort((a, b) => (tiers ? a.tier - b.tier : 0))
+  const locked = book.filter((r) => !unlockedSet.has(r.id))
 
   // Pre-compute craftability for every unlocked recipe.
   const craftability = new Map(
     orderedUnlocked.map((r) => {
-      const result = canCraft(inventory, r)
+      const result = canCraftTiered(inventory, r, tiers, found)
       return [r.id, result]
     }),
   )
@@ -458,8 +483,9 @@ export function RecipeBook() {
 
         {tab === 'recipes' && (<ul className="recipe-book__list" aria-label="Recipe list">
           {/* Unlocked recipes first */}
-          {orderedUnlocked.map((recipe) => {
+          {orderedUnlocked.map((recipe, idx) => {
             const result = craftability.get(recipe.id)!
+            const head = tiers && (idx === 0 || orderedUnlocked[idx - 1].tier !== recipe.tier)
             const isHighlighted = recipe.inputs.some((i) => highlightedItems.has(i.item)) ||
               (recipe.consumesTool ? highlightedItems.has(recipe.consumesTool) : false)
             const isCrafting = craftingProgress?.recipeId === recipe.id
@@ -467,9 +493,16 @@ export function RecipeBook() {
               ? craftingProgress!.elapsed / craftingProgress!.duration
               : 0
             return (
+              <Fragment key={recipe.id}>
+              {head && (
+                <li className="recipe-book__tier-head" data-testid="tier-head">
+                  Tier {recipe.tier} · Stage {recipe.tier}
+                </li>
+              )}
               <UnlockedEntry
-                key={recipe.id}
                 recipe={recipe}
+                tierNotes={tierLines(result)}
+                tierTag={tiers ? `Tier ${recipe.tier}` : null}
                 craftable={result.ok}
                 missing={result.missing}
                 highlighted={isHighlighted}
@@ -482,6 +515,7 @@ export function RecipeBook() {
                 onPin={togglePin}
                 onTip={onTip}
               />
+              </Fragment>
             )
           })}
 
