@@ -229,19 +229,19 @@ function AltarBody({ rest, others }: { rest: ChapelBox; others: readonly ChapelB
   // Opened during play: until the slide starts (next frame) the box stays where the altar still is,
   // so a fixed box never appears 0.6 m nearer the door on top of the player. A game loaded with the
   // stair open starts at rest.
-  const sawSealed = useRef(!stairOpen)
-  const slideDone = useRef(false)
-  if (!stairOpen) {
-    sawSealed.current = true
-    slideDone.current = false
+  const [sawSealed, setSawSealed] = useState(!stairOpen)
+  const [slideDone, setSlideDone] = useState(false)
+  if (!stairOpen && (!sawSealed || slideDone)) {
+    setSawSealed(true)
+    setSlideDone(false)
   }
-  const fixedOffset = stairOpen && sawSealed.current && !slideDone.current ? 0 : restOffset
+  const fixedOffset = stairOpen && sawSealed && !slideDone ? 0 : restOffset
 
   useFrame(() => {
     const off = altarRuntime.offset
     const nowMoving = stairOpen && off !== restOffset
     if (nowMoving !== moving) {
-      if (!nowMoving) slideDone.current = true
+      if (!nowMoving) setSlideDone(true)
       setMoving(nowMoving)
     }
     if (moving) body.current?.setNextKinematicTranslation({

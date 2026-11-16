@@ -1,6 +1,6 @@
 # Kiro Development Log
 
-How Kiro was used to build Last Rites. Entries are added as work happens (see `.kiro/steering/kiro-log.md` for the format).
+How Kiro was used to build Last Rites. Entries are added as work happens (see `.kiro/steering/kiro-log.md` for the format). Entries headed **Outside Kiro** were made by Claude (Claude Code), mostly the Blender art and the prompts handed to Kiro; every asset and who made it is in `docs/CREDITS.md`.
 
 ---
 
@@ -1481,6 +1481,10 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Reused `isInsideHut` from the hut-door logic for the building test rather than `objectiveAim` itself, since the hint measures the player to the object, not to the compass aim point. Chapel and catacomb bounds come from `CHAPEL` and `CATACOMBS` data.
   - Near-state defaults to true until the first tick so the prompt never flashes the far text at start.
   - Hull thickness is clamped to 3 to 6 cm after a first 1.5 cm version read as invisible on a flat clue. The near screenshot uses the burial notice board (an upright parchment); the flat floor "marks" props are too dark to judge by eye.
+### 2026-11-14: Outside Kiro: textured gravedigger zombie
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **What happened:** Replaced the body of `enemies/zombie.glb` with a realistic gravedigger zombie generated with Microsoft TRELLIS.2 from a reference image. `tools/blender/trellis_zombie/` reduces it to 12k triangles, bakes its colour to a 1024 px texture, and puts it on the old Quaternius skeleton with the same 9 clips, so no game code had to change. Checked in the browser: it renders and animates. Its night tint went to Kiro as 11p.
+
 ### 2026-11-14: 09-playtest-fixes task 11n-a: Chapel inside and out
 - **Kiro feature used:** spec task, steering (process rules, tech budget), Playwright browser and GPU perf specs
 - **What happened:** The first part of this task (both chapel GLBs mounted in `ChapelBuilding.tsx` over collider-only Slabs, old chapel visuals removed, interior and buttress colliders from the JSON via `systems/chapelColliders.ts`, bell swing at `bell-pivot` on the dusk and wave bells, door lantern light at its anchor, stair cover hidden when the whistle opens the stair, page 5 / font loot / pew loot / revolver seated, revolver Shelf removed, AgX tone mapping, N8AO at low intensity, bloom at threshold 1, moon shadows in a 28 m box around the player with soft PCF, the warm interior fog, the Low graphics setting) was committed by the user as dd946f0 after an earlier run stopped on an auth error. This run made the tree green and finished the checks: `bellSwing.test.ts` and `chapelColliders.test.ts` (aisle cut, altar shortening, lectern drop, buttress trim), the interior fog numbers moved to `src/data/interiorFog.ts`, a navigation fix, a `bellMeshAngle` and `objectVisible` debug probe, and `e2e/scenery-chapel.spec.ts` (screenshots in `e2e/screenshots/scenery/`, a real WASD walk door → aisle → altar → vestry with no snag, the bell mesh swinging 0.107 rad peak at dusk, the stair cover hidden after the whistle).
@@ -1530,6 +1534,10 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** Looking at the shots found three bad camera spots in the spec, not game bugs: the woodpile view stood against the hut wall, the lamp-post view stood inside the hut, and the cart view was covered by the dawn card. Silas only stands at the cart on the new day after a boon is picked, so the spec now waits for the picker, presses 1, and waits for day and the merchant. Every prop sits on the ground or its rest with nothing floating or sunk. One run failed on `ERR_CONNECTION_REFUSED` while the dev server started; the rerun passed 2/2.
 - **Decisions made unattended:** none beyond the camera spots.
 
+### 2026-11-15: Outside Kiro: chapel stair, ground hole, hut lantern and clue pictures
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **What happened:** In answer to Kiro's 11n-a and 11n-d reports: `chapel_interior.py` now builds the 12-step stair under the cover and cuts the floor round it, and names the altar parts `chapel-altar-*` so they can slide; `graveyard.glb` lost 8 ground faces over the open grave at x 9..11, z 9..11; the hut's hanging lantern glass became smoked glass with low emission (it had been mistaken for a glowing north window). `tools/blender/clue_icons.py` rendered a 512 px picture of each of the 9 clue models into `public/assets/icons/clues/` for 11q. Handed to Kiro as 11n-e, 11p and 11q in `docs/kiro-prompt-next.md`.
+
 ### 2026-11-15: 09-playtest-fixes task 11n-e (part 1): Chapel stair, sliding altar, ground hole, hut lantern
 - **Kiro feature used:** spec task (done by the orchestrator directly: the task tool could not save tasks.md, "Failed to save"), Playwright browser spec, fast-check
 - **What happened:** Claude's new `chapel-interior.glb` has the `chapel-stair` mesh under the cover, and `graveyard.glb` a hole in the ground at x 9..11, z 9..11. When the whistle opens the stair, the cover hides as before, and every `chapel-altar-*` mesh now slides 0.6 m toward the door over 2 s (ease-out). The altar collider and its whistle and answer hotspots move by the same amount, and the aisle cut ends 0.6 m nearer the door so the altar box stays whole. The y = 0 physics floor is split around the opening (`splitAroundHole`, property-tested to cover the floor minus the hole), and a ramp along the step nosings (rise 0.19, run 0.27, 35°) plus two shaft-wall colliders let the player walk down. Pure rules in `src/game/systems/chapelStair.ts`, numbers in `src/data/chapelScenery.ts` (`CHAPEL_STAIR`, `ALTAR_SLIDE`). The hut's one warm light now sits at the model's `hanging-lantern` anchor at intensity 1.5, distance 5 (was 2 and 7, 0.15 m higher), and the smoked glass keeps its low emission.
@@ -1563,12 +1571,6 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Intro cut from 35 s to 21 s: shots 4, 5, 4, 4, 4 s (shot 2 keeps 5 s for its long card), card timings and the grave burst moved earlier. Fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible �11 updated first.
 - **What Kiro caught or sped up:** introTimeline.test.ts still pinned 35 s; updated with the data test (18-22 s). Lint, build and unit tests pass.
 - **Decisions made unattended:** 21 s total counts as "about 20 s" and keeps each card visible 3.4 s or more.
-
-### 2026-11-15: 09-playtest-fixes task 21: Shorter intro (B15)
-- **Kiro feature used:** spec task
-- **What happened:** Intro cut from 35 s to 21 s: shots of 4, 5, 4, 4 and 4 s (shot 2 keeps 5 s for its long card), with card timings and the grave burst moved earlier. The fog flyover, the five shots and the hut card "Elias left a page on the table." are unchanged. Skip (Space/Enter) and reduced-motion handling are untouched. Design bible §11 updated first.
-- **What Kiro caught or sped up:** `introTimeline.test.ts` still pinned 35 s; updated it along with the data test (18-22 s). Lint, build and 2235 unit tests pass.
-- **Decisions made unattended:** 21 s counts as "about 20 s"; each card stays visible 3.4 s or more.
 
 ### 2026-11-15: 09-playtest-fixes task 22: Quit confirmation, Continue and autosave (B16, F5)
 - **Kiro feature used:** spec task, PBT
@@ -1630,11 +1632,29 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Added `systems/caseMinigames.ts` with the `ledgerFlags` and `bellPosts` verdicts (`{ ok, firstWrong?, message? }`), `candidateGraves` and `bellClues`. The wrong-answer messages and Pell's `tagClueId` went into `data/cases.ts`. `caseMinigames.test.ts` holds Property 16 for 1a and 1b (200 runs each).
 - **What Kiro caught or sped up:** the case data had no clue for the early tag on a post, so a `tagClueId` field was added instead of hard-coding the clue in the rules.
 
+### 2026-11-16: 10-curse-stages task 3.4: Minigame 1a overlay and hut ledger
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added `LedgerMinigame.tsx` on the minigame shell (two-page spread, lines drawn with the mouse, or arrows, Enter and F on the keyboard), pure rules in `systems/ledgerMinigame.ts` with `ledgerMinigame.test.ts`, and the ledger page on the hut shelf (`LedgerShelfPage` in `Hut.tsx`, beside the powder tin), wired to `caseStore.submitMinigame`.
+- **What Kiro caught or sped up:** not recorded.
+- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+
 ### 2026-11-16: 10-curse-stages task 3.5: Minigame 1b overlay and bell posts
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `BellsMinigame.tsx` (turn, inspect, Tab between posts, C marks the cut bell) on the shell, pure rules in `systems/bellsMinigame.ts`, `CaseProps.tsx` (plain-mesh bell posts, shown after 1a, no lights, no colliders) with a new `bell-post` interactable, `bellsExamined` in the case save, and `caseLayout.test.ts` for the post anchors.
 - **What Kiro caught or sped up:** the new layout test found Hale's guessed post position 1.5 m from the journal page 2 spawn; it moved to the stone's west side in `data/cases.ts`.
-### 2026-11-15: 10-curse-stages task 3.8: Stage 1 e2e and screenshots
+### 2026-11-16: 10-curse-stages task 3.6: Final answer, reward and receipt
+- **Kiro feature used:** spec task
+- **What happened:** The case 1 final answer is given at the altar. On solving it, `caseSolvedWatcher.ts` places the Rusted Crypt Key in Pell's grave (`CASE_1_REWARD` in `cases.ts`; the `fx-crypt-key` spawn in `zones.ts` now has `revealedBy: 'saved-by-the-bell'`). `merchant.ts` hands over the Vane & Sons receipt on the run's first story-mode purchase in stage 1 (`receiptDue`), tested in `merchant.test.ts`.
+- **What Kiro caught or sped up:** not recorded.
+- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+
+### 2026-11-16: 10-curse-stages task 3.7: Dev hooks for Stage 1
+- **Kiro feature used:** spec task
+- **What happened:** "Solve 1a" and "Solve 1b" buttons in the Dev_Panel, which solve each minigame through the real store actions with a right verdict (`devActions.ts`).
+- **What Kiro caught or sped up:** not recorded.
+- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+
+### 2026-11-16: 10-curse-stages task 3.8: Stage 1 e2e and screenshots
 - **Kiro feature used:** spec task
 - **What happened:** Added `e2e/case1.spec.ts`. One test opens 1a at the hut shelf and 1b at Pell's post with a real E press, then solves them with the mouse, including a wrong flag (Pell as "Plot") and a wrong post (Hale). At night it gives a wrong altar answer (lock reads 21-30 s, a wave spawns at once), then the right one (`nightCleared` and dawn). A keyboard-only test solves both with arrows, Enter, 1-3, F, Tab and C. It saves screenshot pairs `case1-ledger`, `case1-bells` and `case1-altar`, and writes `e2e/logs/case1-first-minigame.json` (1a opens 1.2 s into the day; the hut shelf is 1.8 m from the spawn, about 0.6 s on foot).
 - **What Kiro caught or sped up:** The mouse drag never reached the ledger because the canvas held a real pointer lock under the open overlay. StrictMode's double effect switches the overlay flag off and on, the brief "closed" moment asks for a relock, and Chrome grants it after the release check has run. `cursorRelease.ts` now gives back any lock that arrives while a screen wants the cursor. The run also found the altar lock reading "0:31": the panel rounded the night clock to the nearest quarter second. `AltarPanel.tsx` now rounds up.
@@ -1644,3 +1664,19 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Ran the whole Playwright suite (main 90 passed, 8 skipped; perf 15 passed), plus lint (clean), build (ok) and vitest (2291 passed, 2 failed). The stale-test fixes for the 3-stage design were already in the working tree (items-1-6, items-7-12, obstruction, playthrough). Eight tests stay `test.fixme` with a spec 10 reason: items-7-12 items 8, 9 (x2), 10b, 11 (x3) and playthrough "main story path". They need the night-five 45 s rite hold, which the stage 3 Rite (task 4.5) replaces; task 4.9 rewrites the item tests and task 12.1 rewrites the playthrough. No Dev_Panel action was used to hide a failure.
 - **Not caused by spec 10 (listed, not fixed):** `tests/chapelScenery.test.ts` fails 2 tests ("shortens a pew rather than moving it..." with a float mismatch 0.41999999999999993 vs 0.42, and "pew loot on the west pew seat" with an undefined pew). They follow the uncommitted rework of `public/assets/models/scene/chapel-interior-colliders.json` and `chapel-interior.glb`, which is scenery work, not spec 10.
 - **What Kiro caught or sped up:** the milestone run found no new spec 10 breakage beyond the parked tests.
+
+### 2026-11-16: Outside Kiro: chapel pews moved for the altar slide
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **What happened:** In the playtest of 11n-e the player was trapped at the altar: the slid altar collider left only 0.61 m between it and the back pews, narrower than the 0.70 m player. `chapel_interior.py` now puts the pew rows at z 0.4, 1.4 and 2.4 (were 1.0, 2.0, 3.0), which leaves about 1.2 m; only the six pew colliders changed. The code side (the altar landing on the player, the descent to the catacombs, the loot spot on the back pew) went to Kiro as 11n-f. Until `zones.ts` moves the pew loot, two `tests/chapelScenery.test.ts` tests fail (see task 3.9).
+
+### 2026-11-16: Task lists for 11n-f, 11p, 11q and spec 11-horror-pass
+- **Kiro feature used:** specs
+- **What happened:** Commit 5345af2 added 11n-f (chapel stair fix), 11p (textured zombie colours) and 11q (clue models, reveal and journal) to `09-playtest-fixes/tasks.md`, and created spec `11-horror-pass` (requirements, design and tasks, H1 to H7) from `docs/kiro-prompt-next.md`. The same commit took in Claude's moved pews.
+- **What Kiro caught or sped up:** not recorded.
+- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+
+### 2026-11-16: 09-playtest-fixes task 11n-f: Chapel stair never traps the player and leads to the catacombs
+- **Kiro feature used:** spec task, fast-check, Playwright browser spec
+- **What happened:** An earlier interrupted run had already put the 11n-f code into commit be22e36 (swept in with the spec 10 changes): a kinematic altar body that pushes the player ahead of it while it slides, a nearest-free-spot safety net, the descent trigger (`StairDescent.tsx`, `systems/stairDescent.ts`, `DescentFade.tsx`: fade out 0.6 s, black 0.5 s with input held, fade in 0.8 s, arrival at world (25, 41.5) facing +z), guidance redirected to the chapel stair, saves inside the shaft restored to the corridor, the pew loot spot moved to z 7.42, and `e2e/chapel-stair.spec.ts`. This run checked all of it against the brief and the design bible §2 "The chapel stair (09)", which already matches the code, so no bible text changed. The one defect found was in `AltarBody` (ChapelBuilding.tsx): it read and wrote refs during render, which failed lint (6 `react-hooks/refs` errors). Those two refs are now state.
+- **What Kiro caught or sped up:** lint failed on the committed code; fixed. Lint clean, build ok, 2314 unit tests pass. Browser at 1280x720 (`e2e/chapel-stair.spec.ts` 4 tests, `e2e/scenery-chapel.spec.ts` 4 tests, 8/8 pass): whistle while against the altar (player z settles at 8.56 with no jitter), walk round the left and the right of the altar to the stair, descend and arrive at (25, 0.05, 41.5), walk back out through the corridor gate, Continue from a save made in the catacombs. Screenshots in `e2e/screenshots/stair/`.
+- **Decisions made unattended:** (1) Did not redo code that was already committed and passing; verified and fixed only the lint failure. (2) No ascend trigger at the corridor mouth: the brief says only if cheap, and the open gate is the way out (the bible says so). (3) Replaced the two refs with `useState` and the set-state-during-render reset pattern rather than disabling the lint rule. (4) The 11n-e draw-call work was not touched; it stays open.
