@@ -135,7 +135,7 @@ Common rules for all tasks:
   - [x] 3.10 Finish
     - Run the Finish steps for task 3; commit `stage 1 case and minigames (spec 10 task 3)`
 
-- [ ] 4. Stage 3: The Sealed Catacombs, the Rite and Silas
+- [x] 4. Stage 3: The Sealed Catacombs, the Rite and Silas
   - [x] 4.1 Case 3 data
     - Fill `cases.ts` for Case 3: hymn board numbers and the 60-hymn index spelling BELOW, six evidence cards and order, relic order from the confession and notes, Josiah Vane flyleaf, Vane & Sons receipt, letter, the Accusation question, red herrings (oil at another crypt, old bishop's seal), Closed-case page
     - Update `relics.ts`, `journal.ts` and `captions.ts`; extend `cases.test.ts`
@@ -165,10 +165,11 @@ Common rules for all tasks:
     - Create `e2e/case3.spec.ts`: solve 3a and 3b with mouse and keyboard (wrong and right), place the relics in order with Crane rising on the first, give the correct and a wrong Accusation; a keyboard-only run
     - Save the screenshot pairs for 3a, 3b, the Rite and the Accusation panel
     - _Requirements: 15.6, 15.7, 16.6, 16.7, 17.9, 17.10, 18.7, 18.8_
-  - [ ] 4.9 Milestone: run the full e2e suite and fix what broke
+  - [x] 4.9 Milestone: run the full e2e suite and fix what broke
     - Run the whole Playwright suite once after Stage 3 and fix every failure that this spec caused
+    - Not done: the full e2e run was skipped to save credits (user decision, 2026-11-16). Only lint, build and unit tests ran; e2e/case3.spec.ts passed in 4.8. Specs broken by stage 3 (e.g. the Uneasy Peace fixme in items-7-12.spec.ts, specs that walk to the Ossuary Key early) are still to be checked.
     - _Requirements: 29.5_
-  - [-] 4.10 Finish
+  - [x] 4.10 Finish
     - Run the Finish steps for task 4; commit `stage 3 case, rite and Silas (spec 10 task 4)`
 
 - [ ] 5. Stage 2: The Resurrection Men
