@@ -9,7 +9,7 @@ this adds what is inside them.
 Gameplay spots it serves (chapel-local):
   - journal page 5 at (0, 1.0, 0)        -> lectern, book rest at y 0.97
   - chapel-font loot at (1.5, 0.9, -2)   -> stone font with a wooden lid at y 0.88
-  - chapel-pews loot at (-1, 0.4, 3)     -> west pew, seat at y 0.40
+  - chapel-pews loot at (-1.5, 0.4, 2.4) -> west back pew, seat at y 0.40
   - vestry cupboard item at (-2.1, 0.9, 2.6) -> cupboard shelf at y 0.88
   - altar at z 4.8 (trigger z 4.5)       -> altar table, top at y 1.0
 Kept clear: the front door (z -6, |x| < 0.7) and the area inside it (z < -0.8), the congregation points
@@ -403,7 +403,9 @@ def pew(x0, x1, z, seed, broken=False):
 
 
 def pews():
-    rows = (1.0, 2.0, 3.0)
+    # Moved 0.6 m toward the door (2026-11-16) so a 1 m walkway stays between the back row and the
+    # altar once it slides 0.6 m toward the door over the open stair.
+    rows = (0.4, 1.4, 2.4)
     for i, z in enumerate(rows):
         pew(0.7, IN_X - 0.25, z, i, broken=(i == 0))
         pew(-1.75, -0.7, z, i + 10)

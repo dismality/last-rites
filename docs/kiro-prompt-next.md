@@ -1,14 +1,14 @@
 # Kiro prompt: everything not yet in Kiro's task list
 
-Paste everything below the line into Kiro. It collects the three pieces Kiro hasn't added to its specs yet: 11p (textured zombie colours), 11q (clue models, reveal text and journal entries) and spec 11 (horror pass). It replaces pasting `kiro-prompt-zombie-tint.md` and `kiro-prompt-clue-reveal.md` separately. Part C of `kiro-prompt-all.md` is included in full.
+Paste everything below the line into Kiro. It collects everything Kiro hasn't done yet: 11n-f (the chapel stair traps the player and leads nowhere), the rest of 11n-e (draw calls), 11p (textured zombie colours), 11q (clue models, reveal text and journal entries) and spec 11 (horror pass). It replaces pasting `kiro-prompt-chapel-stair-fix.md`, `kiro-prompt-zombie-tint.md` and `kiro-prompt-clue-reveal.md` separately. Part C of `kiro-prompt-all.md` is included in full.
 
 ---
 
 These are new tasks from the user's playtests that aren't in your task lists yet. Add them first, then work in this order. This order overrides any "do it next" line inside the parts below.
 
-1. Finish the **11n-d** per-prop screenshot test you left open, and commit it.
-2. Do the **art fixes** in Part 0 below (Claude has changed the models; you wire them up).
-3. Add **11p** and **11q** to `.kiro/specs/09-playtest-fixes/tasks.md` after 11o, and create **spec 11-horror-pass** (`.kiro/specs/11-horror-pass/`: requirements, design, tasks) from Part C. Commit the task lists on their own. Also commit Claude's uncommitted files with them: `public/assets/icons/clues/`, `tools/blender/clue_icons.py`, the clue-icons row in `docs/CREDITS.md`, `docs/kiro-prompt-clue-reveal.md` and this file.
+1. Add **11n-f** to `.kiro/specs/09-playtest-fixes/tasks.md` and do it first (Part 0 below). It blocks the story path.
+2. Finish **11n-e**: the chapel stair, ground hole and hut lantern are in (3feb71a); only the draw-call work is left (Part 0, last section). Then tick 11n-e.
+3. Add **11p** and **11q** to the same tasks file after 11n-f, and create **spec 11-horror-pass** (`.kiro/specs/11-horror-pass/`: requirements, design, tasks) from Part C. Commit the task lists on their own. Also commit Claude's uncommitted files with them: `public/assets/icons/clues/`, `tools/blender/clue_icons.py`, `tools/blender/chapel_interior.py` with `chapel-interior.glb` and `chapel-interior-colliders.json` (pews moved for 11n-f), the clue-icons row in `docs/CREDITS.md`, and the `docs/kiro-prompt-*.md` files.
 4. Do **11p**, then **11q**.
 5. Do **spec 11, H1 to H7**.
 6. Carry on with spec 10.
@@ -26,15 +26,59 @@ The feature freeze is **26 November**. If spec 11 can't all fit, finish in this 
 
 ---
 
-# Part 0. Art fixes from your last report (do these first)
+# Part 0. 11n-f: the chapel stair traps the player and leads nowhere
 
-**Chapel stair.** `chapel-interior.glb` now has real stairs under the cover: a new mesh `chapel-stair` (12 steps down toward +z, shaft walls, a low vault and a black end block), and the floor is cut around the opening (x −0.65..0.65, z 4.75 to the back wall). The cover is still the `chapel-stair-cover` slabs; hide them when `mystery.gates.catacombs` opens, as you do now.
-- The altar sits over the front half of the opening, so when the stair opens, slide every mesh named `chapel-altar-*` (stone, cloth, brass, wax, flames) together 0.6 m toward −z over about 2 s with a stone-grind sound. Move the altar collider and its interaction spots by the same amount. `chapel-interior.json` has an `altar-meshes` note saying the same.
-- Add colliders for the stair: a ramp following the steps (rise 0.19, run 0.27) and the shaft walls, so the player can walk down to the catacombs entry. Check it in the browser: walk down and back up, no snagging and no falling through.
+The user's words: "after the stone grinds it blocks me in" and "I can't enter, if I'm supposed to".
 
-**Graveyard ground.** `graveyard.glb` has a hole cut in the `ground-in-ground` mesh at world x 9..11, z 9..11 (8 faces), so the open grave there no longer shows grass across it. Nothing to change unless something of yours relied on that patch; check it in the browser.
+### What goes wrong
 
-**Hut "north window".** There was no window: it was the hanging lantern's glass, whose emissive blew out under bloom. Claude changed it to smoked glass with low emission in `hut.glb`; checked in game, it's now a dim amber glow. If you add a point light for the lantern, keep it warm and low (intensity about 1.5, distance 5) and don't raise the glass emission.
+1. **The altar lands on the player.** The whistle is used at the altar trigger (chapel-local z 4.5). When the stair opens, `altarRestOffset` moves the altar collider 0.6 m toward the door at once, to z 3.9..4.7. That's on top of the player, who gets pushed out in front of the altar.
+2. **There was no way round the altar.** The back pews ended at z 3.29 and the slid altar collider starts at z 3.9. That leaves a 0.61 m gap, but the player capsule is 0.70 m wide (radius 0.35). So the player can't reach either side of the altar, or the stair behind it.
+3. **The stair is a dead end.** The steps run 1.1 m to the end wall and into a black vault. Nothing takes the player down to the catacombs, so the reveal ("Stone shifts beyond the altar. A stair is open.") promises an entrance that doesn't exist. Today the only way in is the iron corridor gate at x 25 on the south edge, which opens on the same gate flag.
+
+### Already done in the art (Claude)
+
+`tools/blender/chapel_interior.py` now puts the pew rows at z 0.4, 1.4 and 2.4 instead of 1.0, 2.0 and 3.0. Both `chapel-interior.glb` and `chapel-interior-colliders.json` are re-exported, and only the six pew boxes changed. The back pews now end at z 2.69, which leaves a walkway of about 1.2 m between them and the slid altar.
+- Move the `chapel-pews` loot spot in `src/data/zones.ts` from `[8.5, 0.41, 8]` to `[8.5, 0.41, 7.4]`, so it sits on the back west pew's seat again.
+- Update any test or dev data that assumes pews at z 1/2/3 (the aisle-clearing tests, congregation points, the case-altar screenshots).
+
+### Fixes in code
+
+1. **The altar must never land on the player.** Use whichever approach is simpler, but the result must be that the player is never inside the altar collider:
+   - **(a) Kinematic collider:** give the altar collider its own kinematic body that follows `altarSlideOffset` every frame. While the altar slides, push the player capsule out ahead of it, toward −z.
+   - **(b) Step back first:** when the whistle is used, ease the player back to chapel-local (0, 3.2), facing the altar, over 0.4 s before the slide starts (a stumble back as the floor shakes, with a light camera shake). Keep input locked only for those 0.4 s.
+   - **Either way:** add a safety net. If the player capsule ever overlaps a chapel collider after the slide, move it to the nearest free spot in the aisle.
+2. **A walkable route round the altar.** Check, with a 0.35 m radius capsule, that the player can walk from the aisle round **both** sides of the slid altar to the back edge of the opening (z about 4.75) and step onto the ramp. If the vestry cupboard, the floor break at (1.7, 4.6) or anything else pinches the route under 0.8 m, shorten that collider and log it.
+3. **Going down takes you to the catacombs.** Add a descent trigger:
+   - **Trigger:** a box inside the stair opening whose top sits below y −0.5, so the player has to walk down about three steps.
+   - **Entering it:**
+     - fade to black over 0.6 s;
+     - play footsteps on stone going down, with the caption "[footsteps descend into the dark]";
+     - put the player inside the catacomb corridor just past its gate (world x 25, z ≈ 41.5, facing +z), with velocity zeroed;
+     - fade back in over 0.8 s.
+   - **Input:** locked only while the screen is black.
+   - **Zone:** set the zone to `catacombs` and fire whatever the corridor gate already fires on entry, such as guidance, the objective step and the music bed.
+   - **Way back:** the corridor's open gate is the way out to the graveyard. Add a matching ascend trigger only if it's cheap: at the corridor mouth, inside the gate, it would put the player at the top of the chapel stair facing −z. Otherwise just walking out of the gate is fine.
+   - **Guidance:** once the stair is open, the waypoint, objective text and compass marker should point at the chapel stair, not the corridor gate.
+   - **Saves:** Continue and both Retries restore a player who was in the catacombs to the corridor, never to the inside of the stair shaft.
+4. **The stair stays readable as a stair.** Keep the end wall collider where the vault comes down, so the player can't walk into the black block. The fade should start before they reach it.
+
+### Tests
+
+**Unit:**
+- the trigger's box sits inside the opening and below y −0.5;
+- the arrival point is inside the catacomb corridor and clear of its colliders;
+- after the slide, a 0.35 m capsule fits along the walkway on both sides of the altar, with every collider taken into account;
+- the moved loot spot sits on a pew seat.
+
+**Browser** (screenshots at 1280x720):
+1. stand right against the altar, use the whistle (dev hook), and watch the slide: never stuck, no jitter inside the altar;
+2. walk round the left side and the right side of the altar to the stair;
+3. walk down and arrive in the catacombs after the fade;
+4. walk back out through the corridor gate;
+5. Continue from a save made in the catacombs.
+
+### Rest of 11n-e: draw calls
 
 **Draw calls (230–374, budget 150).** The scene models are small: graveyard 23, hut 18, chapel interior 16, catacombs 14, chapel exterior 11 primitives. Most of the count comes from props placed one by one. Use `InstancedMesh` (or drei `<Instances>`) for repeated props (headstones, candles, bones, bats, crates), merge static props per area with `mergeGeometries` where they share a material, and skip rendering areas the player is not in (catacombs while outside, the graveyard while underground). Log the draw calls before and after in the kiro-log, and say which areas are still over 150.
 
