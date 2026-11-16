@@ -1728,7 +1728,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** `placeAllRelics` already existed privately for objective rule 2, so no second path to the altar was written.
 - **Decisions made unattended:** (1) "Give all relics in correct order" gives all five and, only when the rite is open (stage 3 night, case unsolved), places them in rite order through `riteStore.place`; by day it only gives them and says so. (2) Crane is not killed: the rite still waits for him, as in play. (3) No new devCheats flag and no game-side hook.
 
-### 2026-11-12: 10-curse-stages task 4.8: Stage 3 e2e and screenshots
+### 2026-11-16: 10-curse-stages task 4.8: Stage 3 e2e and screenshots
 - **Kiro feature used:** spec task (e2e in real Chrome with the dev hook)
 - **What happened:** Added `e2e/case3.spec.ts` (mouse run and keyboard-only run). It covers the hymn board (empty, wrong, right, stair opens), the six evidence props and the timeline (wrong, drag, right, crypt opens), the rite (wrong relic with 30 s lock and wave, right order, Crane rising on the first), a wrong and a right Accusation, Crane's fall, the Justice for Elias epilogue. Screenshot pairs: `case3-hymn`, `case3-timeline`, `case3-rite`, `case3-accusation`, `case3-epilogue` at 1280x720 and 800x600. Added hook methods `giveAllRelics`, `riteState`, `accusationState`.
 - **What Kiro caught or sped up:** (1) The psalter list had a fixed max-height in a multi-column box, so hymns 24 to 60 spilled sideways out of view and hymn 41 (needed for the O tile) could not be read; fixed in `minigameShell.css` and the spec now checks hymn 41 is visible. (2) After a relic was placed in the rite panel the focused select and button were replaced by text and keyboard focus fell to the page; `RitePanel.tsx` now refocuses the first control.
@@ -1739,7 +1739,16 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The wrong accusation is asserted to cause no lock and no extra wrong count (Req 18), the wrong relic to cause both.
   - Did not commit (4.10 does) and did not run the full suite (4.9).
 
-### 2026-11-14: 10-curse-stages tasks 4.9 and 4.10: finish
+### 2026-11-16: 10-curse-stages tasks 4.9 and 4.10: finish
 - **Kiro feature used:** spec task
 - **What happened:** The full e2e run (4.9) was skipped to save credits; the stage 3 e2e (e2e/case3.spec.ts) passed earlier in 4.8. 4.10 ran lint, build and unit tests (2386 passed), all clean, then committed spec 10 task 4 locally.
 - **What Kiro caught or sped up:** nothing new; no fixes were needed.
+
+### 2026-11-16: Outside Kiro: 09-playtest-fixes task 11p: Textured zombie keeps its own colours
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
+- **What happened:** The tint caps and cold fill were tuned for the flat cartoon skins and turned the TRELLIS texture blue-purple at night. Textured materials now take the tint half-way toward white (`texturedZombieColor`; the shambler stays white, the lurker keeps the value floor) and a quarter of the cold fill (`texturedColdFill`); the brute and Father Crane keep the old path. 4 unit tests; night screenshots in Chrome at 8 m show the painted skin with no purple cast and the lurker still darker. Commit a60c3cb.
+
+### 2026-11-16: Outside Kiro: 09-playtest-fixes task 11q: Clue reveal and journal entries
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
+- **What happened:** A found clue now fades in below the crosshair with its picture, title, text and "Noted in your journal (J)", holds by length (3.5 s + 45 ms a character, at most 10 s) and fades out, one at a time, waiting while a menu, examine or a minigame is open (`systems/clueReveal.ts`, `ui/hud/ClueReveal.tsx`). It replaces the "Clue noted" and "Added to your journal" toasts; the ledger refusal uses the same spot, plain. The Clues tab lists clues in found order with 48 px pictures, a red dot on new ones and "Clues ·N" on the tab; the read count is saved (`mystery.cluesRead`). The clue pictures were re-rendered cropped tight to the model. Played in headless Chrome at 1280x720, 800x600 and with reduced motion. Commit 35e980d.
+- **Decisions:** case clues found inside a minigame or by the merchant's receipt get no reveal, since those already announce them. On screens under 900 px wide the reveal keeps to the middle band, clear of the controls panel and the hotbar. The clue models at each spot were already in place from 11n-d.
