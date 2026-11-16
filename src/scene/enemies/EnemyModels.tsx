@@ -26,7 +26,13 @@ import { isSimFrozen } from '../../game/state/menuState'
 import type { AIEnemy } from '../../game/systems/enemyAI'
 import '../assets/preloadModels'
 import { CraneProps } from './CraneProps'
-import { ZOMBIE_MATERIAL_PARAMS, adjustZombieColor, zombieColdFill } from './zombieMaterial'
+import {
+  ZOMBIE_MATERIAL_PARAMS,
+  adjustZombieColor,
+  texturedColdFill,
+  texturedZombieColor,
+  zombieColdFill,
+} from './zombieMaterial'
 import { EliteMarks } from './EliteMarks'
 
 const FADE_S = 0.15
@@ -108,13 +114,17 @@ function tintedMaterial(cache: TintCache, type: EnemyId, src: THREE.Material): T
         { r: 0, g: 0, b: 0 } as THREE.RGB,
         THREE.SRGBColorSpace,
       )
-      const [r, g, b] = adjustZombieColor([base.r, base.g, base.b], [tint.r, tint.g, tint.b])
+      // A textured skin (the gravedigger) keeps its painted colours; the flat brute keeps the caps.
+      const textured = Boolean(std.map)
+      const [r, g, b] = textured
+        ? texturedZombieColor([tint.r, tint.g, tint.b])
+        : adjustZombieColor([base.r, base.g, base.b], [tint.r, tint.g, tint.b])
       std.color.setRGB(r, g, b, THREE.SRGBColorSpace)
       std.roughness = ZOMBIE_MATERIAL_PARAMS.roughness
       std.metalness = ZOMBIE_MATERIAL_PARAMS.metalness
       std.envMapIntensity = ZOMBIE_MATERIAL_PARAMS.envMapIntensity
       // Only a faint cold fill (no warm glow): the lantern stays the only warm light on the skin.
-      const [er, eg, eb] = zombieColdFill([r, g, b])
+      const [er, eg, eb] = textured ? texturedColdFill([r, g, b]) : zombieColdFill([r, g, b])
       std.emissive?.setRGB(er, eg, eb, THREE.SRGBColorSpace)
     }
     cache.set(key, m)

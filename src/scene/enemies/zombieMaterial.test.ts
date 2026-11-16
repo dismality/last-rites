@@ -3,6 +3,10 @@ import fc from 'fast-check'
 import {
   ZOMBIE_MAX_SATURATION,
   ZOMBIE_MAX_VALUE,
+  ZOMBIE_MIN_VALUE,
+  TEXTURED_COLD_FILL_SCALE,
+  texturedColdFill,
+  texturedZombieColor,
   adjustZombieColor,
   zombieColdFill,
   type Rgb,
@@ -59,5 +63,40 @@ describe('adjustZombieColor', () => {
     const e = hsv(ember)
     expect(e.v).toBeGreaterThan(ZOMBIE_MAX_VALUE)
     expect(e.s).toBeGreaterThan(ZOMBIE_MAX_SATURATION)
+  })
+})
+
+describe('textured skins (spec 09 task 11p)', () => {
+  it('leaves the shambler white so the texture shows as painted', () => {
+    expect(texturedZombieColor([1, 1, 1])).toEqual([1, 1, 1])
+  })
+  it('blends a tint half-way toward white and keeps the lurker above the floor', () => {
+    fc.assert(
+      fc.property(rgb, (tint) => {
+        const c = texturedZombieColor(tint)
+        c.forEach((x, i) => {
+          expect(x).toBeGreaterThanOrEqual(Math.min(tint[i], 1) - 1e-9)
+          expect(x).toBeLessThanOrEqual(1)
+        })
+        expect(Math.max(...c)).toBeGreaterThanOrEqual(ZOMBIE_MIN_VALUE - 1e-9)
+      }),
+    )
+    const lurker = texturedZombieColor([0.42, 0.435, 0.478])
+    expect(lurker[0]).toBeCloseTo(0.71, 2)
+  })
+  it('keeps the looks apart: the lurker darker than the wailer, the wailer bluer than the shambler', () => {
+    const lurker = texturedZombieColor([0.42, 0.435, 0.478])
+    const wailer = texturedZombieColor([0.788, 0.839, 0.902])
+    expect(Math.max(...lurker)).toBeLessThan(Math.max(...wailer))
+    expect(wailer[2] - wailer[0]).toBeGreaterThan(0)
+  })
+  it('gives a textured skin a quarter of the flat cold fill', () => {
+    fc.assert(
+      fc.property(rgb, (c) => {
+        const t = texturedColdFill(c)
+        const f = zombieColdFill(c)
+        t.forEach((x, i) => expect(x).toBeCloseTo(f[i] * TEXTURED_COLD_FILL_SCALE, 9))
+      }),
+    )
   })
 })

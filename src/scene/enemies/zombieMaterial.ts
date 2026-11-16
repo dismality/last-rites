@@ -66,3 +66,33 @@ export function adjustZombieColor(base: Rgb, tint: Rgb): Rgb {
     Math.min(Math.max(v, ZOMBIE_MIN_VALUE), ZOMBIE_MAX_VALUE),
   )
 }
+
+/**
+ * Textured skins (the TRELLIS gravedigger in zombie.glb, docs/enemy-models.md). Spec 09 task 11p.
+ * The texture is already a pale, desaturated corpse, so the caps above (made for the flat cartoon
+ * colours) only darkened it and the cold fill washed it blue-purple at night. Here the tint is a
+ * gentle multiply: half-way toward white, so lurker and wailer still read as different without
+ * losing the painted skin. White (the shambler) stays white.
+ */
+export const TEXTURED_TINT_STRENGTH = 0.5
+/** Share of COLD_FILL a textured skin keeps: enough to stop the lantern turning it orange. */
+export const TEXTURED_COLD_FILL_SCALE = 0.25
+
+/** The material colour for a textured skin: the tint blended toward white, never darker than the floor. */
+export function texturedZombieColor(tint: Rgb, strength = TEXTURED_TINT_STRENGTH): Rgb {
+  const mixed: Rgb = [
+    clamp01(1 - strength * (1 - tint[0])),
+    clamp01(1 - strength * (1 - tint[1])),
+    clamp01(1 - strength * (1 - tint[2])),
+  ]
+  const v = Math.max(...mixed)
+  if (v >= ZOMBIE_MIN_VALUE) return mixed
+  const k = v === 0 ? 0 : ZOMBIE_MIN_VALUE / v
+  return v === 0 ? [ZOMBIE_MIN_VALUE, ZOMBIE_MIN_VALUE, ZOMBIE_MIN_VALUE] : [mixed[0] * k, mixed[1] * k, mixed[2] * k]
+}
+
+/** The cold fill for a textured skin: a quarter of the flat-skin fill, scaled by the material colour. */
+export function texturedColdFill(color: Rgb): Rgb {
+  const [r, g, b] = zombieColdFill(color)
+  return [r * TEXTURED_COLD_FILL_SCALE, g * TEXTURED_COLD_FILL_SCALE, b * TEXTURED_COLD_FILL_SCALE]
+}
