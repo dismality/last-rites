@@ -28,6 +28,8 @@ export type InteractableKind =
   | 'merchant'
   | 'barricade-door'
   | 'workbench'
+  | 'ledger-shelf'
+  | 'bell-post'
 
 /** Things that react to Interact by proximity and draw no prompt, rune or outline of their own. */
 export type ProximityKind = 'chapel-repair-point' | 'chapel-altar-heal' | 'final-rite'
@@ -192,6 +194,30 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     resetsOn: 'a board breaks',
     needs: { what: 'nails or planks', prompt: '{need}' },
     idlePrompt: 'Door is full',
+  },
+  // Spec 10 task 3.4: the parish register page on the hut shelf starts minigame 1a.
+  'ledger-shelf': {
+    kind: 'ledger-shelf',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'Hut.tsx',
+    endsWhen: 'the ledger is cross-checked (minigame 1a solved), or the story is past stage 1',
+    resetsOn: 'New Game',
+    idlePrompt: 'The ledger is cross-checked',
+  },
+  // Spec 10 task 3.5: a safety-bell post at a candidate grave opens minigame 1b.
+  'bell-post': {
+    kind: 'bell-post',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the bells are solved (minigame 1b solved), or the story is past stage 1',
+    resetsOn: 'New Game',
+    idlePrompt: 'The bells are examined',
   },
   workbench: {
     kind: 'workbench',

@@ -154,7 +154,15 @@ export interface BellPostDef {
   condition: BellCondition
   /** The clue the player gets by finding the telling detail, if any. */
   clueId?: Case1ClueId
+  /** The clue the tag gives, when the tag itself is telling (Pell's early date). */
+  tagClueId?: Case1ClueId
 }
+
+/** Shown when a ledger flag is wrong (requirement 12.4). */
+export const LEDGER_WRONG_FLAG_MESSAGE = 'These two agree'
+
+/** Shown when the wrong post is named as the cut bell (requirement 13.4). */
+export const BELL_WRONG_POST_MESSAGE = 'That rope is sound. Look again at the others.'
 
 export const CASE_1_LEDGER: readonly LedgerEntryDef[] = [
   {
@@ -293,7 +301,7 @@ export const CASE_1_RIGHT_FLAGS: readonly { stoneId: string; kind: LedgerFlagKin
   { stoneId: 'hale', kind: 'plot' },
 ]
 
-// Posts stand 1.2 m beside their stones (x offset): guesses until task 3.5 checks the anchors.
+// Posts stand 1.2 m beside their stones (x offset). Hale's is on the west side to clear the journal page 2 spawn. Checked by caseLayout.test.ts.
 export const CASE_1_BELLS: readonly BellPostDef[] = [
   {
     id: 'bell-pell',
@@ -304,11 +312,12 @@ export const CASE_1_BELLS: readonly BellPostDef[] = [
     tag: 'Certificate signed 12 March 1862, the day before the ledger says he died.',
     condition: 'rope-cut',
     clueId: 'pell-rope-cut',
+    tagClueId: 'pell-tag-early',
   },
   {
     id: 'bell-hale',
     stone: 'hale',
-    position: [-13.4, 0, -15.8],
+    position: [-15.8, 0, -15.8],
     rope: 'The rope is whole, a little green with damp.',
     bell: 'The bell rings clear when turned.',
     tag: 'Certificate signed 5 November 1849, the day of death.',

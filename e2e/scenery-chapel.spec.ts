@@ -198,9 +198,11 @@ test.describe('chapel scenery (11n-a)', () => {
       const f = h.body()!.feet
       h.teleport(f[0], f[2], { y: f[1] + 0.02, yaw: Math.PI, pitch: -0.2 })
     })
+    // Stop short of the descent trigger (spec 09 task 11n-f: the steps' surface below y -0.5 takes
+    // the player down to the catacombs; e2e/chapel-stair.spec.ts covers that).
     let lowest = 0
-    for (let i = 0; i < 8; i++) {
-      await walkFor(page, 'MoveForward', 250) // +z, down the steps
+    for (let i = 0; i < 8 && (await feet(page))[2] < 10.2; i++) {
+      await walkFor(page, 'MoveForward', 120) // +z, down the steps
       lowest = Math.min(lowest, (await feet(page))[1])
     }
     await page.waitForTimeout(600)
@@ -224,6 +226,7 @@ test.describe('chapel scenery (11n-a)', () => {
       const f = h.body()!.feet
       h.teleport(f[0], f[2], { y: f[1] + 0.02, yaw: -Math.PI / 2, pitch: 0 })
     })
+    console.log('before east', JSON.stringify(await feet(page)))
     await walkFor(page, 'MoveForward', 1500) // east, off the steps
     const out = await feet(page)
     console.log('back out feet', JSON.stringify(out))

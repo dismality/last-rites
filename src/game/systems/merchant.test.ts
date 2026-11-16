@@ -11,6 +11,7 @@ import {
   merchantRow,
   tryBuy,
   withinTradeRange,
+  receiptDue,
   type Stock,
 } from './merchant'
 
@@ -114,5 +115,13 @@ describe('merchant', () => {
     const stock: Stock = { rows: [{ id: 'holy-water', qty: 2 }] }
     const r = tryBuy(stock, 'holy-water', 3, createInventory(), 12)
     expect(r).toMatchObject({ ok: false, reason: 'coins', text: 'Need 8 coins, you have 3' })
+  })
+})
+
+describe('Vane & Sons receipt (Req 14.5)', () => {
+  it('is due once, in story runs only', () => {
+    expect(receiptDue({ story: true, stage: 1, found: [] })).toBe(true)
+    expect(receiptDue({ story: true, stage: 1, found: ['vane-receipt'] })).toBe(false)
+    expect(receiptDue({ story: false, stage: 1, found: [] })).toBe(false)
   })
 })

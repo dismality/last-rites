@@ -27,6 +27,7 @@ import { ScorePanel } from './ScorePanel'
 import { Minimap, MinimapHotkey } from './Minimap'
 import { AchievementToasts } from './AchievementToasts'
 import { DawnCard } from './DawnCard'
+import { DescentFade } from './DescentFade'
 import { MerchantMenu } from '../merchant/MerchantMenu'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
@@ -87,6 +88,7 @@ export function Hud() {
       <AchievementToasts />
       <DawnCard />
       <MerchantMenu />
+      <DescentFade />
     </div>
   )
 }

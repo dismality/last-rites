@@ -75,6 +75,7 @@ export function isOverlayOpen(): boolean {
     o.achievementsOpen ||
     o.modeSelectOpen ||
     o.altarPanelOpen ||
+    o.minigameOpen !== null ||
     isDawnPickPending() ||
     getDevCheats().panelOpen
   )

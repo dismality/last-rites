@@ -10,9 +10,11 @@ import { Clone, useGLTF } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type { Group } from 'three'
 import { DRACO_PATH, HUT_MODEL_URL, VENDING_MACHINE_MODEL_URL } from '../../data/assets'
-import { HUT } from '../../data/cemeteryLayout'
+import { HUT, POWDER_TIN_HUT } from '../../data/cemeteryLayout'
 import { HUT_BOXES, HUT_LANTERN_LIGHT, VENDING_MACHINE } from '../../data/hutScenery'
 import '../assets/preloadModels'
+import { useOverlayStore } from '../../game/state/overlayStore'
+import { Interactable } from './Interactable'
 import { Slab } from './buildingParts'
 
 const DOOR_HEIGHT = 2.1
@@ -46,6 +48,28 @@ function HutModels() {
   )
 }
 
+/** Beside the powder tin on the shelf, so it is found without a search. */
+const LEDGER_PAGE_POSITION: readonly [number, number, number] = [POWDER_TIN_HUT[0] + 0.35, POWDER_TIN_HUT[1], POWDER_TIN_HUT[2]]
+
+/** The parish register page on the hut shelf (minigame 1a starts here). A flat sheet, no light. */
+function LedgerShelfPage() {
+  return (
+    <group position={[...LEDGER_PAGE_POSITION]}>
+      <Interactable
+        id="ledger-shelf"
+        kind="ledger-shelf"
+        runeHeight={0.3}
+        onInteract={() => useOverlayStore.getState().setMinigameOpen('1a')}
+      >
+        <mesh rotation={[-Math.PI / 2, 0, 0.2]}>
+          <boxGeometry args={[0.28, 0.2, 0.02]} />
+          <meshStandardMaterial color="#c9b88f" roughness={1} />
+        </mesh>
+      </Interactable>
+    </group>
+  )
+}
+
 export function Hut() {
   const { halfX, halfZ, height: h, wallThickness: t, doorWidth } = HUT
   const frontW = halfX - doorWidth / 2
@@ -54,6 +78,7 @@ export function Hut() {
   return (
     <group name="hut">
       <HutModels />
+      <LedgerShelfPage />
       <RigidBody type="fixed" colliders={false}>
         {/* Walls: collider only. The model draws them. */}
         <Slab position={[0, h / 2, -halfZ]} size={[halfX * 2 + t, h, t]} material="wood" visible={false} />

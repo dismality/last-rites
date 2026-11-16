@@ -7,7 +7,8 @@ import { expect, test, type Page } from '@playwright/test'
 // controller moves the body, no teleporting except to the start point), then pick both up through
 // the real Interact path. Headless Chrome runs WebGL on SwiftShader, so speed is not representative.
 
-const KEY = { id: 'rusted-crypt-key', spawn: 'fx-crypt-key', x: -12, z: -18 }
+// Spec 10: the key lies in Pell's grave (CASE_1_REWARD) once case 1 is closed, not at (-12, -18).
+const KEY = { id: 'rusted-crypt-key', spawn: 'fx-crypt-key', x: -8.4, z: -21.6 }
 const PAGE2 = { id: 'journal-page-2', spawn: 'fx-page-2', x: -12.5, z: -17 }
 const START_M = 9
 // The graveyard scene (task 11i) has a 0.84 m prop at (-15.87, -17.94), dead on the straight line in
@@ -35,7 +36,10 @@ interface WalkResult {
 async function startGame(page: Page): Promise<void> {
   await page.goto('/')
   await page.waitForFunction(() => window.__lastRites !== undefined)
-  await page.evaluate(() => window.__lastRites!.startRun('normal'))
+  await page.evaluate(() => {
+    window.__lastRites!.startRun('normal')
+    window.__lastRites!.closeCase('saved-by-the-bell')
+  })
   await page.waitForFunction(() => window.__lastRites!.body() !== null, undefined, { timeout: 90_000 })
 }
 

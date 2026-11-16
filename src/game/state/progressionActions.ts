@@ -6,16 +6,20 @@ import { UPGRADE_PER_RANK } from '../../data/dawnUpgrades'
 import { createRng, deriveSeed } from '../rng'
 import { dealContracts } from '../systems/contracts'
 import { pickUpgrade as raiseRank } from '../systems/dawnUpgrades'
-import { tryBuy, type BuyResult } from '../systems/merchant'
+import { MODES } from '../../data/modes'
+import { receiptDue, tryBuy, VANE_RECEIPT_CLUE, VANE_RECEIPT_TEXT, type BuyResult } from '../systems/merchant'
 import { nightPlan } from '../systems/waves'
 import { recordCoins } from '../systems/runStats'
 import type { DawnUpgradeId, ModeId, MerchantRowId } from '../types'
+import { useCaseStore } from './caseStore'
 import { currentModifiers, syncDerivedStats } from './derivedStats'
 import { useInventoryStore } from './inventoryStore'
 import { useOverlayStore } from './overlayStore'
 import { usePlayerStore } from './playerStore'
 import { initialProgression, useProgressionStore } from './progressionStore'
 import { resetRun } from './resetRun'
+import { useStageStore } from './stageStore'
+import { useToastStore } from './toastStore'
 import { updateRunStats } from './statsPort'
 import { useWorldStore } from './worldStore'
 
@@ -60,6 +64,15 @@ export function pickUpgrade(id: DawnUpgradeId): boolean {
   return true
 }
 
+/** Silas hands over the Vane & Sons receipt with the run's first purchase (spec 10, Req 14.5). */
+function handOverReceipt(): void {
+  const cases = useCaseStore.getState()
+  const found = Object.values(cases.cases).flatMap((c) => c.found)
+  const story = MODES[useProgressionStore.getState().mode].story
+  if (!receiptDue({ story, stage: useStageStore.getState().stage, found })) return
+  if (cases.findClue(VANE_RECEIPT_CLUE)) useToastStore.getState().push(VANE_RECEIPT_TEXT)
+}
+
 /** Coins, stock, satchel and spend stats change together, or not at all. */
 export function buyFromMerchant(id: MerchantRowId): BuyResult {
   const store = useProgressionStore.getState()
@@ -70,6 +83,7 @@ export function buyFromMerchant(id: MerchantRowId): BuyResult {
   inv.setInventory(result.inv)
   store.patch({ stock: result.stock, coins: result.coins })
   updateRunStats((s) => recordCoins(s, 0, result.spent))
+  handOverReceipt()
   return result
 }
 

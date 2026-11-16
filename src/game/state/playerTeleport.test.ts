@@ -5,6 +5,7 @@ import { usePlayerStore } from './playerStore'
 import { queueTeleport, takeTeleport } from './playerTeleport'
 import { resetRun } from './resetRun'
 import { retryNight, saveDuskSnapshot } from './retryNight'
+import { DESCENT_ARRIVAL } from '../systems/stairDescent'
 
 function fakeStorage(): Storage {
   const m = new Map<string, string>()
@@ -77,6 +78,25 @@ describe('player teleport', () => {
     takeTeleport()
     expect(loadGame()).toBe(true)
     expect(takeTeleport()?.position).toEqual([7, 0.05, -9])
+  })
+
+  it('Continue from inside the chapel stair shaft restores the player to the catacomb corridor', () => {
+    usePlayerStore.getState().setPosition([10, -0.6, 10.4])
+    saveGame()
+    usePlayerStore.getState().setPosition([0, 0.05, 0])
+    takeTeleport()
+    expect(loadGame()).toBe(true)
+    expect(takeTeleport()?.position).toEqual([...DESCENT_ARRIVAL.position])
+    expect(usePlayerStore.getState().position).toEqual([...DESCENT_ARRIVAL.position])
+    expect(usePlayerStore.getState().yaw).toBeCloseTo(Math.PI, 9)
+  })
+
+  it('Continue from the catacomb corridor keeps the saved spot', () => {
+    usePlayerStore.getState().setPosition([25, 0.05, 52])
+    saveGame()
+    takeTeleport()
+    expect(loadGame()).toBe(true)
+    expect(takeTeleport()?.position).toEqual([25, 0.05, 52])
   })
 
   it('New Game queues the start position', () => {

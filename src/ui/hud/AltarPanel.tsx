@@ -22,8 +22,9 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
   const def = caseOfStage(stage)
   const progress = useCaseStore((s) => s.cases[def.id])
   const altar = useStageStore((s) => s.altar)
-  // Quarter-second steps keep the countdown live without a render on every fixed step.
-  const now = useStageStore((s) => Math.round(s.nightElapsed * 4) / 4)
+  // Quarter-second steps keep the countdown live without a render on every fixed step. Rounded up,
+  // so the clock never runs behind the store and a fresh 30 s lock never reads "0:31".
+  const now = useStageStore((s) => Math.ceil(s.nightElapsed * 4) / 4)
   const solved = useStageStore((s) => s.caseSolved)
   const phase = useWorldStore((s) => s.phase)
   const [result, setResult] = useState('')

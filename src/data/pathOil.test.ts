@@ -1,4 +1,4 @@
-// Spec 09, B3: the day-1 oil lies on the walk from the hut to the crypt key, somewhere the player
+// Spec 09, B3 (the key moved to Pell's grave in spec 10 task 3.6, so the line is 3 m wide): the day-1 oil lies on the walk from the hut to the crypt key, somewhere the player
 // can reach. Adding it must not move a single tree (trees avoid spawn points).
 import { describe, expect, it } from 'vitest'
 import { generateHeadstones, generateTrees, HUT } from './cemeteryLayout'
@@ -8,11 +8,11 @@ const oil = SPAWN_POINTS.find((p) => p.id === 'grounds-path-oil')!
 const key = FIXED_SPAWNS.find((f) => f.id === 'fx-crypt-key')!
 
 describe('day-1 path oil', () => {
-  it('sits within 2 m of the straight line from the hut to the crypt key', () => {
+  it('sits within 3 m of the straight line from the hut to the crypt key (Pell grave)', () => {
     const [kx, , kz] = key.position
     const [x, , z] = oil.position
     const t = Math.max(0, Math.min(1, (x * kx + z * kz) / (kx * kx + kz * kz)))
-    expect(Math.hypot(x - t * kx, z - t * kz)).toBeLessThan(2)
+    expect(Math.hypot(x - t * kx, z - t * kz)).toBeLessThan(3)
   })
 
   it('is outside the hut and clear of every headstone', () => {

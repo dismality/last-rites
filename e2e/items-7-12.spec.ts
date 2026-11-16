@@ -292,7 +292,9 @@ test('item 7: zombie look at 1.5 m and 2 m at night, lantern on', async ({ page 
 // Items 8 and 9
 // ---------------------------------------------------------------------------------------------
 
-test('item 8: final rite objective follows Father Crane', async ({ page }) => {
+// Spec 10 task 3.9: night waves never clear any more and the 45 s rite hold is replaced by relic
+// placement (task 4.5), so this night-five path is parked until task 4.9 rewrites it for the Rite.
+test.fixme('item 8: final rite objective follows Father Crane', async ({ page }) => {
   test.setTimeout(900_000)
   const errors = await boot(page)
   await nightFiveReady(page, 5)
@@ -353,7 +355,8 @@ for (const vp of [
   { width: 1280, height: 720 },
   { width: 1920, height: 1080 },
 ]) {
-  test(`item 9: boss name card does not touch the boss bar at ${vp.width}x${vp.height}`, async ({ page }) => {
+  // Parked like item 8 (needs the night-five rite setup): task 4.9 rewrites it.
+  test.fixme(`item 9: boss name card does not touch the boss bar at ${vp.width}x${vp.height}`, async ({ page }) => {
     test.setTimeout(900_000)
     await page.setViewportSize(vp)
     const errors = await boot(page)
@@ -455,7 +458,9 @@ test('item 10a: no rune or hover cue during the intro cutscene', async ({ page }
   expect(errors).toEqual([])
 })
 
-test('item 10b: no rune or hover cue during an ending (Taken, reached through the real rite check)', async ({ page }) => {
+// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
+// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
+test.fixme('item 10b: no rune or hover cue during an ending (Taken, reached through the real rite check)', async ({ page }) => {
   test.setTimeout(900_000)
   const errors = await boot(page)
   await page.evaluate(() => window.__lastRites!.keepAlive(true))
@@ -552,7 +557,9 @@ async function measureEnding(page: Page, id: string) {
   await expect(page.locator('.ending__stat').first()).toBeVisible()
 }
 
-test('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)', async ({ page }) => {
+// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
+// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
+test.fixme('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
   await playRiteToEnding(page, 5)
@@ -560,7 +567,9 @@ test('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)',
   expect(errors).toEqual([])
 })
 
-test('item 11: Uneasy Peace ending reaches the summary unskipped (real rite, 4 relics)', async ({ page }) => {
+// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
+// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
+test.fixme('item 11: Uneasy Peace ending reaches the summary unskipped (real rite, 4 relics)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
   await playRiteToEnding(page, 4)
@@ -568,7 +577,9 @@ test('item 11: Uneasy Peace ending reaches the summary unskipped (real rite, 4 r
   expect(errors).toEqual([])
 })
 
-test('item 11: Taken ending reaches the summary unskipped (real night-5 check, 0 relics)', async ({ page }) => {
+// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
+// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
+test.fixme('item 11: Taken ending reaches the summary unskipped (real night-5 check, 0 relics)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
   await page.evaluate(() => window.__lastRites!.keepAlive(true))

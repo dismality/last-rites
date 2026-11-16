@@ -27,6 +27,8 @@ import {
   useWorldStore,
 } from '../../game/state'
 import { isMenuOpen, isSimFrozen } from '../../game/state/menuState'
+import { useOverlayStore } from '../../game/state/overlayStore'
+import { scareUiBlocking } from '../../game/systems/minigameShell'
 import { createEnemy } from '../../game/systems/enemyAI'
 import {
   createScareDirectorState,
@@ -110,7 +112,7 @@ export function ScareStager() {
     const dt = Math.min(rawDelta, MAX_DT)
     const player = usePlayerStore.getState()
     const settings = useSettingsStore.getState()
-    const blocking = isMenuOpen()
+    const blocking = scareUiBlocking(isMenuOpen(), useOverlayStore.getState().minigameOpen)
 
     const entered = scareRuntime.justEntered.splice(0)
     const result = tickScares(

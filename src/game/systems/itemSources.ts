@@ -6,6 +6,7 @@ import { ELITE_DROPS } from '../../data/elites'
 import { MERCHANT_ROWS } from '../../data/merchant'
 import { LOOT_TABLE_MAP, type LootTableId } from '../../data/lootTables'
 import { FIXED_SPAWNS, SPAWN_POINTS, ZONES } from '../../data/zones'
+import type { CaseId } from '../../data/stages'
 import type { ItemId, ItemStack, Phase } from '../types'
 
 export interface SourcePoint {
@@ -112,6 +113,8 @@ export interface SourceWorld {
   day: number
   phase: Phase
   collectedFixed: readonly string[]
+  /** Solved cases; a reward spawn counts as a source only after its case (optional for old callers). */
+  closedCases?: readonly CaseId[]
 }
 
 export interface MarkTarget {
@@ -127,6 +130,7 @@ function isAvailable(point: SourcePoint, item: ItemId, world: SourceWorld): bool
   if (point.fixed) {
     const spawn = FIXED_SPAWNS.find((f) => f.id === point.id)
     if (!spawn || world.collectedFixed.includes(point.id)) return false
+    if (spawn.revealedBy && !(world.closedCases ?? []).includes(spawn.revealedBy)) return false
     return !spawn.nightOnly || world.phase === 'night'
   }
   const lying = (world.materials[point.id] ?? []).some((s) => s.item === item && s.qty > 0)

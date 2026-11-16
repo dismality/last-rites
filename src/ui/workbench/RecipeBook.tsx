@@ -32,6 +32,7 @@ import {
   unknownIngredientText,
   unknownRecipeTip,
 } from './recipeView'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useCraftingStore } from '../../game/state/craftingStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
@@ -177,6 +178,7 @@ function UnlockedEntry({
     const place = nearestSource(target.item, from, {
       materials: spawn.materials,
       collectedFixed: spawn.collectedFixed,
+      closedCases: useCaseStore.getState().closed,
       dugOnDay: useDigStore.getState().dig.dugOnDay,
       day: world.nightNumber,
       phase: world.phase,

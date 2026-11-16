@@ -2,6 +2,7 @@
 
 import { FIXED_SPAWNS, SPAWN_POINTS, type FixedSpawn, type SpawnPoint } from '../../data/zones'
 import { LOOT_TABLE_MAP } from '../../data/lootTables'
+import type { CaseId } from '../../data/stages'
 import type { ItemStack, Phase } from '../types'
 import type { Rng } from '../rng'
 import { DAY1_HUT_MIN_CLOTH, DAY1_HUT_MIN_OIL } from '../../data/balance'
@@ -59,7 +60,13 @@ export function dayOneSpawns(rng: Rng): SpawnWorld {
 }
 
 /** Night-only spawns (the Child's Locket) are hidden at any other phase. */
-export function isFixedSpawnVisible(spawn: FixedSpawn, phase: Phase): boolean {
+export function isFixedSpawnVisible(
+  spawn: FixedSpawn,
+  phase: Phase,
+  closedCases: readonly CaseId[] = [],
+): boolean {
+  // A case reward lies in the world only once that case is solved (spec 10, Req 14.4).
+  if (spawn.revealedBy && !closedCases.includes(spawn.revealedBy)) return false
   return !spawn.nightOnly || phase === 'night'
 }
 
@@ -68,9 +75,10 @@ export function availableFixedSpawns(
   world: SpawnWorld,
   phase: Phase,
   spawns: readonly FixedSpawn[] = FIXED_SPAWNS,
+  closedCases: readonly CaseId[] = [],
 ): FixedSpawn[] {
   return spawns.filter(
-    (s) => !world.collectedFixed.includes(s.id) && isFixedSpawnVisible(s, phase),
+    (s) => !world.collectedFixed.includes(s.id) && isFixedSpawnVisible(s, phase, closedCases),
   )
 }
 
@@ -80,9 +88,12 @@ export function collectFixedSpawn(
   id: string,
   phase: Phase,
   spawns: readonly FixedSpawn[] = FIXED_SPAWNS,
+  closedCases: readonly CaseId[] = [],
 ): SpawnWorld {
   const spawn = spawns.find((s) => s.id === id)
-  if (!spawn || world.collectedFixed.includes(id) || !isFixedSpawnVisible(spawn, phase)) return world
+  if (!spawn || world.collectedFixed.includes(id) || !isFixedSpawnVisible(spawn, phase, closedCases)) {
+    return world
+  }
   return { ...world, collectedFixed: [...world.collectedFixed, id] }
 }
 

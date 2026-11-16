@@ -13,6 +13,7 @@ import { craneFighting } from '../systems/bossDirector'
 import { installControlHintWatchers } from './controlHintState'
 import { countRelics, riteAvailability } from '../systems/finalRite'
 import { cellAt, isExplored } from '../systems/mapReveal'
+import { redirectViaStair } from '../systems/stairDescent'
 import {
   selectObjective,
   type Objective,
@@ -152,8 +153,11 @@ const digTutorialActive = (): boolean => {
 /** Recomputes the objective now; writes only on change so subscribers stay quiet. */
 export const refreshGuidance = (): void => {
   const input = readObjectiveInput()
+  const selected = selectObjective(input)
+  // Once the chapel stair is open it is the way into the catacombs, not the corridor gate.
+  const via = redirectViaStair(selected.position, input.playerPos, input.progress.stairRevealed)
   const next = withDigTutorialMarker(
-    selectObjective(input),
+    via && via !== selected.position ? { ...selected, position: via } : selected,
     digTutorialActive(),
     input.playerPos,
     // Read from data (not digStore) to keep guidance free of the progression import cycle.

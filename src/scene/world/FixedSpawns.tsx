@@ -9,6 +9,7 @@ import { useGLTF } from '@react-three/drei'
 import { ITEM_MAP } from '../../data/items'
 import { itemSizeM } from '../../data/itemModels'
 import { assetUrl } from '../../data/assets'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useSpawnStore } from '../../game/state/spawnStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { availableFixedSpawns } from '../../game/systems/spawns'
@@ -44,7 +45,11 @@ export function FixedSpawns() {
   const world = useSpawnStore((s) => s.world)
   const collect = useSpawnStore((s) => s.collectFixed)
   const phase = useWorldStore((s) => s.phase)
-  const available = useMemo(() => availableFixedSpawns(world, phase), [world, phase])
+  const closedCases = useCaseStore((s) => s.closed)
+  const available = useMemo(
+    () => availableFixedSpawns(world, phase, undefined, closedCases),
+    [world, phase, closedCases],
+  )
   // A taken key, relic or page lingers for the cue fade instead of blinking out.
   const spawns = useLingering(available, (s) => s.id)
 

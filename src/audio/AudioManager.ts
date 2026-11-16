@@ -46,6 +46,11 @@ export function playSatchelCreak(opening: boolean): void {
   void opening
 }
 
+/** Footsteps on stone going down the chapel stair (spec 09 task 11n-f). TODO(audio): ~1.5 s of slow steps. */
+export function playStairFootsteps(): void {
+  // stub: the caption "[footsteps descend into the dark]" carries it until the audio task
+}
+
 /** Paper rustle when a journal page is collected. TODO(audio): short page-turn one-shot. */
 export function playPageTurn(): void {
   // stub

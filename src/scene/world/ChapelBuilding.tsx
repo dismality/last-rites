@@ -5,12 +5,12 @@
 // block the aisle, see systems/chapelColliders.ts). Mount inside <Physics>. Door and repair logic:
 // Chapel.tsx and ChapelDoors.tsx.
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { CuboidCollider, RigidBody } from '@react-three/rapier'
+import { CuboidCollider, RigidBody, type RapierRigidBody } from '@react-three/rapier'
 import { Matrix4, Vector3, type Group, type Object3D } from 'three'
-import { CHAPEL_ANCHORS, CHAPEL_MESH } from '../../data/chapelScenery'
+import { CHAPEL_ANCHORS, CHAPEL_MESH, type ChapelBox } from '../../data/chapelScenery'
 import {
   CHAPEL_EXTERIOR_MODEL_URL,
   CHAPEL_INTERIOR_MODEL_URL,
@@ -21,6 +21,17 @@ import { bellAngle } from '../../game/systems/bellSwing'
 import { chapelSceneColliders } from '../../game/systems/chapelColliders'
 import { altarRestOffset, altarSlideOffset, stairColliders } from '../../game/systems/chapelStair'
 import { playScareSound } from '../../audio/AudioManager'
+import { queuePlayerPush } from '../../game/state/playerPush'
+import { queueTeleport } from '../../game/state/playerTeleport'
+import { usePlayerStore } from '../../game/state/playerStore'
+import {
+  altarAt,
+  altarPushOut,
+  circleHitsBox,
+  nearestFreePoint,
+} from '../../game/systems/stairDescent'
+import { playerPositionRef } from './playerPositionRef'
+import { StairDescent } from './StairDescent'
 import { isBellActive } from '../../game/systems/repairs'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -32,6 +43,12 @@ import '../assets/preloadModels'
 import { Slab } from './buildingParts'
 import { bellRuntime, ringBell } from './bellRuntime'
 import { Interactable } from './Interactable'
+
+/** The altar's slide offset this frame (chapel -z is negative). ChapelModels writes it; AltarBody reads it. */
+const altarRuntime = { offset: 0 }
+
+/** Largest shove per frame that keeps a player ahead of the sliding altar (it moves 1 cm a frame at most). */
+const MAX_ALTAR_PUSH = 0.3
 
 const DOOR_HEIGHT = 2.5
 /** Warm door lantern: dim enough that the lantern's own light still leads. No shadow. */
@@ -177,6 +194,7 @@ function ChapelModels() {
     const start = slideStart.current
     const off =
       start === null ? altarRestOffset(stairOpen) : altarSlideOffset((performance.now() - start) / 1000)
+    altarRuntime.offset = off
     for (const a of altar.current) a.o.position.copy(a.base).addScaledVector(a.dir, -off)
     const b = bell.current
     if (!b) return
@@ -193,6 +211,84 @@ function ChapelModels() {
   )
 }
 
+/**
+ * The altar's collider: a kinematic body that follows the slide frame by frame (spec 09 task
+ * 11n-f). A static box that jumped 0.6 m at once landed on the player, who stands at the altar to
+ * use the whistle. While it slides, a player in its way is shoved ahead of it toward the door;
+ * once it has settled, a player still overlapping any chapel collider moves to the nearest free
+ * spot (the safety net, also run once for a game loaded with the stair open).
+ */
+function AltarBody({ rest, others }: { rest: ChapelBox; others: readonly ChapelBox[] }) {
+  const body = useRef<RapierRigidBody>(null)
+  const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
+  const settled = useRef(false)
+  const restOffset = altarRestOffset(stairOpen)
+  // Kinematic only while it moves; at rest it is a fixed box again, as every other chapel collider
+  // (the character controller steps off the top stair more readily beside a fixed body).
+  const [moving, setMoving] = useState(false)
+  // Opened during play: until the slide starts (next frame) the box stays where the altar still is,
+  // so a fixed box never appears 0.6 m nearer the door on top of the player. A game loaded with the
+  // stair open starts at rest.
+  const sawSealed = useRef(!stairOpen)
+  const slideDone = useRef(false)
+  if (!stairOpen) {
+    sawSealed.current = true
+    slideDone.current = false
+  }
+  const fixedOffset = stairOpen && sawSealed.current && !slideDone.current ? 0 : restOffset
+
+  useFrame(() => {
+    const off = altarRuntime.offset
+    const nowMoving = stairOpen && off !== restOffset
+    if (nowMoving !== moving) {
+      if (!nowMoving) slideDone.current = true
+      setMoving(nowMoving)
+    }
+    if (moving) body.current?.setNextKinematicTranslation({
+      x: CHAPEL_CENTER[0],
+      y: CHAPEL_CENTER[1],
+      z: CHAPEL_CENTER[2] + off,
+    })
+    const p = playerPositionRef.current
+    const x = p.x - CHAPEL_CENTER[0]
+    const z = p.z - CHAPEL_CENTER[2]
+    const inside = p.y > -0.3 && Math.abs(x) < CHAPEL.halfX && Math.abs(z) < CHAPEL.halfZ
+    if (!stairOpen) {
+      settled.current = false
+      return
+    }
+    if (inside && off !== restOffset) {
+      const dz = altarPushOut(x, z, altarAt(rest, off))
+      if (dz !== 0) queuePlayerPush(0, dz, Math.min(Math.abs(dz), MAX_ALTAR_PUSH))
+    }
+    if (!settled.current && off === restOffset) {
+      settled.current = true
+      const all = [...others, altarAt(rest, off)]
+      if (inside && all.some((b) => circleHitsBox(x, z, b))) {
+        const spot = nearestFreePoint(x, z, all)
+        if (spot) {
+          const pl = usePlayerStore.getState()
+          const feet: [number, number, number] = [spot.x + CHAPEL_CENTER[0], 0.05, spot.z + CHAPEL_CENTER[2]]
+          pl.setPosition(feet)
+          queueTeleport({ position: feet, yaw: pl.yaw, pitch: pl.pitch })
+        }
+      }
+    }
+  })
+
+  return (
+    <RigidBody
+      key={moving ? 'moving' : 'rest'}
+      ref={body}
+      type={moving ? 'kinematicPosition' : 'fixed'}
+      colliders={false}
+      position={[0, 0, moving ? altarRuntime.offset : fixedOffset]}
+    >
+      <CuboidCollider args={[rest.half[0], rest.half[1], rest.half[2]]} position={[...rest.center]} />
+    </RigidBody>
+  )
+}
+
 export function ChapelBuilding() {
   const { halfX, halfZ, height: h, wallThickness: t, doorWidth } = CHAPEL
   const sideW = halfX - doorWidth / 2
@@ -206,7 +302,11 @@ export function ChapelBuilding() {
   const stairOpen = useMysteryStore((s) => s.mystery.gates.catacombs)
   const altarDz = altarRestOffset(stairOpen)
   const altarZ = halfZ - 1.2 + altarDz
-  const sceneColliders = useMemo(() => chapelSceneColliders(altarDz), [altarDz])
+  // The altar has its own kinematic body (AltarBody); everything else is static and never moves.
+  const { altarRest, sceneColliders } = useMemo(() => {
+    const all = chapelSceneColliders(0)
+    return { altarRest: all.find((b) => b.note === 'altar')!, sceneColliders: all.filter((b) => b.note !== 'altar') }
+  }, [])
   const stair = useMemo(() => stairColliders(), [])
   const lantern = CHAPEL_ANCHORS.doorLanternLight
 
@@ -254,7 +354,7 @@ export function ChapelBuilding() {
         {/* Pews, font, cupboard, altar and buttresses from the models' JSON. */}
         {sceneColliders.map((b, i) => (
           <CuboidCollider
-            key={`${altarDz}-${i}`}
+            key={i}
             args={[b.half[0], b.half[1], b.half[2]]}
             position={[...b.center]}
             rotation={[0, b.rotY, 0]}
@@ -284,6 +384,8 @@ export function ChapelBuilding() {
         decay={2}
       />
 
+      <AltarBody rest={altarRest} others={sceneColliders} />
+      <StairDescent />
       <AltarStairReveal z={altarZ} />
       <CaseAltar z={altarZ} />
     </group>

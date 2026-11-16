@@ -10,6 +10,7 @@ import type { ItemId } from '../types'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { collectFixedSpawn, dayOneSpawns, type SpawnWorld } from '../systems/spawns'
 import { emit } from '../events'
+import { useCaseStore } from './caseStore'
 import { useExamineStore } from './examineStore'
 import { useInventoryStore } from './inventoryStore'
 import { useToastStore } from './toastStore'
@@ -73,7 +74,13 @@ export const useSpawnStore = create<SpawnStoreState>((set, get) => ({
     const spawn = FIXED_SPAWNS.find((s) => s.id === spawnId)
     if (!spawn) return
     const before = get().world
-    const world = collectFixedSpawn(before, spawnId, useWorldStore.getState().phase)
+    const world = collectFixedSpawn(
+      before,
+      spawnId,
+      useWorldStore.getState().phase,
+      undefined,
+      useCaseStore.getState().closed,
+    )
     if (world === before) return
     set({ world })
     emit({ type: 'itemCollected', itemId: spawn.item })

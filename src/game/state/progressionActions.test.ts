@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { DAWN_DURATION_S, DAWN_AFTER_PICK_S } from '../../data/balance'
 import { merchantRow } from '../systems/merchant'
+import { useCaseStore } from './caseStore'
 import { useInventoryStore } from './inventoryStore'
 import { useOverlayStore } from './overlayStore'
 import { usePlayerStore } from './playerStore'
@@ -84,6 +85,23 @@ describe('merchant', () => {
     const r = buyFromMerchant('bandage')
     expect(r.ok).toBe(false)
     expect(useProgressionStore.getState().stock?.rows[0].qty).toBe(3)
+  })
+
+  it('the first purchase hands over the Vane & Sons receipt once (Req 14.5)', () => {
+    const stock = () => ({ rows: [{ id: 'bandage' as const, qty: 3 }] })
+    useProgressionStore.getState().patch({ coins: 30, stock: stock() })
+    expect(useCaseStore.getState().cases['sealed-catacombs'].found).not.toContain('vane-receipt')
+    buyFromMerchant('bandage')
+    const found = () => useCaseStore.getState().cases['sealed-catacombs'].found
+    expect(found()).toEqual(['vane-receipt'])
+    buyFromMerchant('bandage')
+    expect(found()).toEqual(['vane-receipt'])
+  })
+
+  it('a failed purchase hands over no receipt', () => {
+    useProgressionStore.getState().patch({ coins: 0, stock: { rows: [{ id: 'bandage', qty: 3 }] } })
+    buyFromMerchant('bandage')
+    expect(useCaseStore.getState().cases['sealed-catacombs'].found).toEqual([])
   })
 
   it('opens and closes the overlay', () => {

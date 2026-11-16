@@ -2,7 +2,7 @@
 // (with its subtitle), the night-cleared score events, and at dawn the stage's recipe unlocks.
 // The zombies collapsing to dust is scene work (CaseCollapse). Pure wiring: no rules live here.
 
-import { caseOfStage } from '../../data/cases'
+import { caseOfStage, CASE_1_REWARD } from '../../data/cases'
 import { MODES } from '../../data/modes'
 import { useCaseStore } from './caseStore'
 import { useChapelStore } from './chapelStore'
@@ -13,6 +13,8 @@ import type { RecipeId } from '../types'
 import { emitCombatSound } from './combatSounds'
 import { useCraftingStore } from './craftingStore'
 import { useProgressionStore } from './progressionStore'
+import { usePinStore } from './pinStore'
+import { useToastStore } from './toastStore'
 import { updateRunStats } from './statsPort'
 import { stageOfNight, useStageStore } from './stageStore'
 import { useWorldStore } from './worldStore'
@@ -29,6 +31,16 @@ export function unlockStageRecipes(nightNumber: number): void {
   }))
 }
 
+/**
+ * Case 1 reward (Req 14.4): the key now lies in Pell's grave (the case's closed flag reveals the
+ * fixed spawn) and a map pin marks the mound. The Row gate opens with that key, as before.
+ */
+export function markCase1Reward(): void {
+  const [x, , z] = CASE_1_REWARD.position
+  usePinStore.getState().place({ x, z, name: "Pell's grave" })
+  useToastStore.getState().push("Something glints in Pell's grave. The Row gate will open to that key.")
+}
+
 /** Returns the unsubscribe function. Install once, next to the other watchers. */
 export function installCaseSolvedWatcher(): () => void {
   const offStage = useStageStore.subscribe((s, prev) => {
@@ -41,7 +53,9 @@ export function installCaseSolvedWatcher(): () => void {
     updateRunStats((r) => statsAfterClear(r, useProgressionStore.getState().mode, night))
     emit({ type: 'nightCleared', nightNumber: night })
     // After the score event, which reads this case's hints and wrong answers for Sharp Eye.
-    useCaseStore.getState().closeCase(caseOfStage(stageOfNight(night)).id)
+    const solved = caseOfStage(stageOfNight(night))
+    useCaseStore.getState().closeCase(solved.id)
+    if (solved.id === 'saved-by-the-bell') markCase1Reward()
   })
   const offDawn = subscribeToType('dawnStarted', (e) => {
     // The altar heals once per visit per day (design bible §2); nothing else cleared the flag.

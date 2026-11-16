@@ -103,36 +103,36 @@ Common rules for all tasks:
     - Fill `cases.ts` for Case 1: ledger of 8 entries, stones (Marsh, Hale, Ames, Pell and 2 more), 6-8 clues with the red herrings (fresh flowers on Hale, toppled Marsh stone), notes, the Final_Question, hints and the Closed-case page
     - Update `clues.ts`, `journal.ts` and the Pell grave key placement; extend `cases.test.ts`
     - _Requirements: 7.1, 7.2, 12.1, 13.3, 14.1, 14.4_
-  - [-] 3.2 Minigame shell
+  - [x] 3.2 Minigame shell
     - Create `src/ui/minigames/MinigameShell.tsx`: overlay frame counting in `isMenuOpen()` via `overlayStore`, focus trap, Esc to close, captions, no timer, partial progress kept
     - Make the Scare_Director skip scares while a Minigame is open
     - Write `minigameShell.test.ts` for the view model and the scare gate
     - _Requirements: 6.2, 11.1-11.5, 11.7_
-  - [~] 3.3 Pure rules for 1a and 1b
+  - [x] 3.3 Pure rules for 1a and 1b
     - Add `ledgerFlags` and `bellPosts` verdicts to `caseMinigames.ts` (3 right flags narrow to 3 graves; the cut rope, the rusted bell, the early tag) with tests
     - **Property 16: Right answers accepted, wrong answers rejected** (1a, 1b)
     - _Requirements: 11.6, 11.8, 12.2-12.4, 13.2, 13.4_
-  - [ ] 3.4 Minigame 1a overlay and hut ledger
+  - [x] 3.4 Minigame 1a overlay and hut ledger
     - Create `LedgerMinigame.tsx` (two-page spread, mouse lines, keyboard arrows/Enter/F, text messages); put the ledger page on the hut shelf in `Hut.tsx`; wire to `caseStore.submitMinigame` and Doubt
     - _Requirements: 12.1, 12.3-12.6, 6.8_
-  - [ ] 3.5 Minigame 1b overlay and bell posts
+  - [x] 3.5 Minigame 1b overlay and bell posts
     - Create `BellsMinigame.tsx` and the bell-post props in `CaseProps.tsx` (simple meshes, placed after 1a, clear of anchors, no lights); extend the layout tests with the new anchors
     - _Requirements: 13.1, 13.2, 13.5, 13.6, 11.9_
-  - [ ] 3.6 Final answer, reward and receipt
+  - [x] 3.6 Final answer, reward and receipt
     - Wire the Case 1 Final_Question at the altar; on solve place the Rusted Crypt Key in Pell's grave, mark the dig mound and open the Row gate; make the merchant hand over the Vane & Sons receipt at the first Stage 1 purchase in `merchant.ts`
     - Add tests for the reward and the receipt
     - _Requirements: 14.2-14.6_
-  - [ ] 3.7 Dev hooks for Stage 1
+  - [x] 3.7 Dev hooks for Stage 1
     - Add Stage 1 helpers to the Dev_Panel ("Solve 1a", "Solve 1b") through real store actions
     - _Requirements: 5.3_
-  - [ ] 3.8 Stage 1 e2e and screenshots
+  - [x] 3.8 Stage 1 e2e and screenshots
     - Create `e2e/case1.spec.ts`: solve 1a and 1b with mouse and keyboard, a wrong flag and a wrong post, then the right and a wrong altar answer at night (lock and instant wave); a keyboard-only run
     - Save the screenshot pairs for 1a, 1b and the altar panel; log the time to the first Minigame from Begin
     - _Requirements: 12.7, 12.8, 13.7, 13.8, 14.7, 14.8, 6.8_
-  - [ ] 3.9 Milestone: run the full e2e suite and fix what broke
+  - [x] 3.9 Milestone: run the full e2e suite and fix what broke
     - Run the whole Playwright suite once after Stage 1 and fix every failure that this spec caused
     - _Requirements: 29.5_
-  - [ ] 3.10 Finish
+  - [-] 3.10 Finish
     - Run the Finish steps for task 3; commit `stage 1 case and minigames (spec 10 task 3)`
 
 - [ ] 4. Stage 3: The Sealed Catacombs, the Rite and Silas

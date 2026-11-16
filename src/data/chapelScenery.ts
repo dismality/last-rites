@@ -103,6 +103,44 @@ export const CHAPEL_STAIR = {
   wallThickness: 0.2,
 } as const
 
+/**
+ * The descent trigger (spec 09 task 11n-f), chapel-local: the lower part of the stair opening. The
+ * feet must be below yMax = -0.5, about three steps down (the steps fall 0.19 m per 0.27 m), so
+ * the player has plainly gone down before the screen fades. z1 is the end wall's inner face.
+ */
+export const STAIR_DESCENT = {
+  x0: CHAPEL_STAIR.x0,
+  x1: CHAPEL_STAIR.x1,
+  /** Where the steps' surface passes y -0.5 (z 5.46): the trigger starts there. */
+  z0: CHAPEL_STAIR.z0 + (0.5 * CHAPEL_STAIR.run) / CHAPEL_STAIR.rise,
+  z1: CHAPEL_STAIR.innerBackZ,
+  yMin: -3,
+  yMax: -0.5,
+} as const
+
+/** Numbers of the stair descent and the altar slide's safety net (systems/stairDescent.ts). */
+export const STAIR_RULES = {
+  /** Feet height on arrival, as every spawn and teleport uses. */
+  arrivalFeetY: 0.05,
+  /** Arrival distance past the catacomb corridor's entrance line (0.4 m gate wall, then room to stand). */
+  arrivalInset: 1.5,
+  /** A position this far below the floor inside the opening is in the shaft. */
+  shaftBelowY: -0.2,
+  /** The controller keeps a 1 cm skin; overlap tests shave this much off the capsule radius. */
+  radiusSlack: 0.03,
+  /**
+   * Feet below this are on the steps, not on the chapel floor. The capsule pressed against the end
+   * wall hangs anywhere from 0.26 to 0.44 m down (browser probe), so the trigger reads the steps'
+   * depth under the player, not the feet height.
+   */
+  onStepsBelowY: -0.1,
+  /** Grid step of the nearest-free-spot search. */
+  searchStep: 0.05,
+} as const
+
+/** Seconds of the descent: fade out, the held black (input locked, the player moved), fade in. */
+export const STAIR_DESCENT_TIMING = { fadeOut: 0.6, black: 0.5, fadeIn: 0.8 } as const
+
 /** When the stair opens the altar slides toward the door (-z) so it no longer sits over the opening. */
 export const ALTAR_SLIDE = {
   distance: 0.6,

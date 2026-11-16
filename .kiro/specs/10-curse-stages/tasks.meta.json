@@ -305,6 +305,11 @@
         "executionId": "a292ccd5-246b-4f03-b6c6-4916a36be050",
         "chatSessionId": "sess_eb30ab1b-2666-4525-b6cc-14d64ab151c0",
         "timestamp": 1794755938730
+      },
+      {
+        "executionId": "a292ccd5-246b-4f03-b6c6-4916a36be050",
+        "chatSessionId": "sess_eb30ab1b-2666-4525-b6cc-14d64ab151c0",
+        "timestamp": 1794756079520
       }
     ],
     "3.3 Pure rules for 1a and 1b": [
@@ -312,6 +317,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703666
+      },
+      {
+        "executionId": "42c134c8-9d98-4577-9618-da621dc23abb",
+        "chatSessionId": "sess_6afd7d39-6fc6-411e-959c-66730831702b",
+        "timestamp": 1794756091477
+      },
+      {
+        "executionId": "42c134c8-9d98-4577-9618-da621dc23abb",
+        "chatSessionId": "sess_6afd7d39-6fc6-411e-959c-66730831702b",
+        "timestamp": 1794756165855
       }
     ],
     "3.4 Minigame 1a overlay and hut ledger": [
@@ -319,6 +334,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703696
+      },
+      {
+        "executionId": "298184a7-ad4a-441d-8166-8efe40694baf",
+        "chatSessionId": "sess_83ff9830-b237-4c1a-b1a2-5dc8c8a20ea9",
+        "timestamp": 1794756272902
+      },
+      {
+        "executionId": "298184a7-ad4a-441d-8166-8efe40694baf",
+        "chatSessionId": "sess_83ff9830-b237-4c1a-b1a2-5dc8c8a20ea9",
+        "timestamp": 1794756682746
       }
     ],
     "3.5 Minigame 1b overlay and bell posts": [
@@ -326,6 +351,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703731
+      },
+      {
+        "executionId": "b3dcdecd-c855-427e-b1f5-0fe868a8e62d",
+        "chatSessionId": "sess_29ab5218-d62b-4f7a-a66f-7f2e81ec9c46",
+        "timestamp": 1794756693945
+      },
+      {
+        "executionId": "b3dcdecd-c855-427e-b1f5-0fe868a8e62d",
+        "chatSessionId": "sess_29ab5218-d62b-4f7a-a66f-7f2e81ec9c46",
+        "timestamp": 1794756964892
       }
     ],
     "3.6 Final answer, reward and receipt": [
@@ -333,6 +368,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703765
+      },
+      {
+        "executionId": "aded1890-303e-4980-bb53-7765b9372fed",
+        "chatSessionId": "sess_631d8ea4-1769-422e-ae50-691e06d6e6d3",
+        "timestamp": 1794756976042
+      },
+      {
+        "executionId": "aded1890-303e-4980-bb53-7765b9372fed",
+        "chatSessionId": "sess_631d8ea4-1769-422e-ae50-691e06d6e6d3",
+        "timestamp": 1794757335880
       }
     ],
     "3.7 Dev hooks for Stage 1": [
@@ -340,6 +385,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703798
+      },
+      {
+        "executionId": "9742d871-baf4-4a7d-ad30-9588bfeb200a",
+        "chatSessionId": "sess_34a7685f-7b09-41e6-be24-10cdaf87b316",
+        "timestamp": 1794757348534
+      },
+      {
+        "executionId": "9742d871-baf4-4a7d-ad30-9588bfeb200a",
+        "chatSessionId": "sess_34a7685f-7b09-41e6-be24-10cdaf87b316",
+        "timestamp": 1794757404830
       }
     ],
     "3.8 Stage 1 e2e and screenshots": [
@@ -347,6 +402,16 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703830
+      },
+      {
+        "executionId": "555f5e12-59da-41f6-b1c6-b32504cfd752",
+        "chatSessionId": "sess_52a22873-4c94-4fdf-8ebd-a073e8bf2fcd",
+        "timestamp": 1794757415078
+      },
+      {
+        "executionId": "555f5e12-59da-41f6-b1c6-b32504cfd752",
+        "chatSessionId": "sess_52a22873-4c94-4fdf-8ebd-a073e8bf2fcd",
+        "timestamp": 1794758417118
       }
     ],
     "3.9 Milestone: run the full e2e suite and fix what broke": [
@@ -354,6 +419,21 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703863
+      },
+      {
+        "executionId": "64d334e1-fc30-4cbe-afd6-1617ed381271",
+        "chatSessionId": "sess_baa27210-3c28-4558-a5e2-c2b3ef08f073",
+        "timestamp": 1794759200423
+      },
+      {
+        "executionId": "628455a4-99a5-4755-98b1-b0e845bbb268",
+        "chatSessionId": "sess_7b9fce21-32f3-49a9-b553-b8f5ba080447",
+        "timestamp": 1794802665443
+      },
+      {
+        "executionId": "628455a4-99a5-4755-98b1-b0e845bbb268",
+        "chatSessionId": "sess_7b9fce21-32f3-49a9-b553-b8f5ba080447",
+        "timestamp": 1794804506977
       }
     ],
     "3.10 Finish": [
@@ -361,6 +441,11 @@
         "executionId": "5cc0a859-31b8-4a76-a434-87c6f2ab4edf",
         "chatSessionId": "sess_9f328a88-9cef-494a-884c-4feb6840e8c7",
         "timestamp": 1794564703898
+      },
+      {
+        "executionId": "803aeb59-775e-4382-b1b9-fcdd91b528a9",
+        "chatSessionId": "sess_40b62e46-a80b-4437-874b-46f685960a97",
+        "timestamp": 1794805149305
       }
     ],
     "4.1 Case 3 data": [

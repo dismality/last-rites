@@ -196,7 +196,10 @@ async function inventory(page: Page) {
   }
 }
 
-test('main story path: page 1 to the Rest ending', async ({ page }) => {
+// Spec 10 task 3.9: the old five-night path no longer exists (the key lies in Pell's grave after case 1,
+// night waves never clear, the rite is replaced in task 4.5). Task 12.1 rewrites this test for the
+// three stages, so it is parked until then.
+test.fixme('main story path: page 1 to the Rest ending', async ({ page }) => {
   test.setTimeout(900_000)
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
@@ -390,13 +393,17 @@ test('a lying key takes the crosshair from every side', async ({ page }) => {
   })
   await page.goto('/?dev=1')
   await page.waitForFunction(() => window.__lastRites !== undefined)
-  await page.evaluate(() => window.__lastRites!.startRun('normal'))
+  await page.evaluate(() => {
+    window.__lastRites!.startRun('normal')
+    // Spec 10: the key lies in Pell's grave only once case 1 is closed.
+    window.__lastRites!.closeCase('saved-by-the-bell')
+  })
   await page.waitForFunction(() => window.__lastRites!.body() !== null, undefined, { timeout: 90_000 })
   const key = spawn('fx-crypt-key')
   const failed: string[] = []
   for (const [dx, dz] of [
     [0, 1.3],
-    [0, -1.3],
+    // Not from the north: Pell's headstone stands 0.8 m behind the key (spec 10) and hides it.
     [1.3, 0],
     [-1.3, 0],
   ]) {

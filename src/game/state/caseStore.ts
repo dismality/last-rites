@@ -4,7 +4,7 @@
 // Pure zustand: no React / three.js imports.
 
 import { create } from 'zustand'
-import { CASES, caseOfStage, type CaseDef, type CaseId, type DeductionNote, type MinigameId } from '../../data/cases'
+import { CASES, caseOfStage, type BellPostId, type CaseDef, type CaseId, type DeductionNote, type MinigameId } from '../../data/cases'
 import type { AltarVerdict } from '../systems/altarAnswer'
 import { addLink, correctLinkCount, curseMeter, EMPTY_BOARD, visibleClues } from '../systems/caseBoard'
 import { checkFinalAnswer, fillSlot as fillSlotRule, isAnswerComplete } from '../systems/caseAnswer'
@@ -14,6 +14,7 @@ import {
   CASE_PERSISTED,
   freshCaseSave,
   type CaseProgress,
+  type LedgerLine,
   type CaseSave,
 } from '../systems/caseSave'
 import { economy } from './economyPort'
@@ -39,6 +40,10 @@ interface CaseStoreState extends CaseSave {
    * counts as a wrong answer and, in the day, adds Doubt (Req 9.4). Verdicts come from tasks 3 to 5.
    */
   submitMinigame: (id: MinigameId, correct: boolean) => void
+  /** Replace the minigame 1a draft lines (kept when the overlay closes). */
+  setLedgerLines: (lines: LedgerLine[]) => void
+  /** Minigame 1b: record a bell post as fully examined (bell, rope and tag read). */
+  examineBell: (id: BellPostId) => void
   /** Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. */
   giveAnswer: () => AnswerOutcome
   /** Buy the next hint tier with Grave Coins (Req 9.1-9.3). */
@@ -107,6 +112,13 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     // Each Doubt costs 50; a Doubt already at its cap adds nothing and costs nothing.
     if (grew) addScore(-DOUBT_SCORE_PENALTY)
   },
+
+  setLedgerLines: (lines) => patchProgress(set, 'saved-by-the-bell', (p) => ({ ...p, ledgerLines: lines })),
+
+  examineBell: (id) =>
+    patchProgress(set, 'saved-by-the-bell', (p) =>
+      p.bellsExamined.includes(id) ? p : { ...p, bellsExamined: [...p.bellsExamined, id] },
+    ),
 
   giveAnswer: () => {
     const def = activeCase()

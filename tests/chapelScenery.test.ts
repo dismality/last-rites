@@ -89,7 +89,7 @@ describe('chapel colliders keep the way clear', () => {
     for (const pew of pews) {
       const cleared = clearAisle(pew)!
       // Same outer edge and the same z; only the inner edge moved, to the aisle edge.
-      expect(cleared.center[2]).toBe(pew.center[2])
+      expect(cleared.center[2]).toBeCloseTo(pew.center[2], 6)
       expect(Math.min(Math.abs(cleared.center[0]) - cleared.half[0])).toBeCloseTo(CHAPEL_AISLE.halfWidth, 6)
       expect(Math.abs(cleared.center[0]) + cleared.half[0]).toBeCloseTo(Math.abs(pew.center[0]) + pew.half[0], 6)
     }
@@ -126,7 +126,7 @@ describe('chapel items rest on their surfaces', () => {
   it('pew loot on the west pew seat, with room for three stacks', () => {
     const f = spawn('chapel-pews')
     expect(gap(f.position[1], CHAPEL_SURFACES.pewSeatY)).toBeLessThanOrEqual(0.03)
-    const pew = CHAPEL_INTERIOR_BOXES.find((b) => b.note === 'pew' && b.center[0] < 0 && b.center[2] === 3.02)!
+    const pew = CHAPEL_INTERIOR_BOXES.find((b) => b.note === 'pew' && b.center[0] < 0 && Math.abs(b.center[2] - 2.42) < 1e-6)!
     const p = local(f.position)
     for (let i = 0; i < 3; i++) expect(inside(pew, { x: p.x + i * 0.35, z: p.z })).toBe(true)
   })

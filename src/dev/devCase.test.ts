@@ -5,7 +5,7 @@ import { useCaseStore } from '../game/state/caseStore'
 import { useOverlayStore } from '../game/state/overlayStore'
 import { useStageStore } from '../game/state/stageStore'
 import { freshCaseSave } from '../game/systems/caseSave'
-import { giveAllClues, giveClue, linkClues, setAltarPanel, solveCurrentMinigame, unsolvedMinigames } from './devActions'
+import { giveAllClues, giveClue, linkClues, setAltarPanel, solveCurrentMinigame, solveMinigame, unsolvedMinigames } from './devActions'
 
 const case1 = CASE_MAP['saved-by-the-bell']
 
@@ -21,6 +21,21 @@ describe('giveAllClues', () => {
     expect([...cases['saved-by-the-bell'].found].sort()).toEqual(case1.clues.map((c) => c.id).sort())
     expect(cases['resurrection-men'].found).toEqual([])
     expect(giveAllClues()).toContain('already')
+  })
+})
+
+describe('solveMinigame (Stage 1 helpers)', () => {
+  it('solves 1b without 1a, then reports a repeat, through the real store', () => {
+    expect(solveMinigame('1b')).toContain('Solved')
+    expect(useCaseStore.getState().cases[case1.id].minigames).toEqual(['1b'])
+    expect(solveMinigame('1b')).toContain('already')
+    expect(solveMinigame('1a')).toContain('Solved')
+    expect(unsolvedMinigames()).toEqual([])
+  })
+
+  it('refuses a minigame of another case', () => {
+    expect(solveMinigame('2a')).toContain('not part')
+    expect(useCaseStore.getState().cases[case1.id].minigames).toEqual([])
   })
 })
 

@@ -74,6 +74,14 @@ export function useCursorRelease(): void {
       else if (action === 'relock-on-gesture') pendingRelock = true
     }
 
+    // A lock request is granted asynchronously. If a screen opened in the meantime (StrictMode's
+    // double effect does this: the overlay flag blinks off and on), the late lock would trap the
+    // cursor under the overlay, so give it straight back.
+    const onLockChange = () => {
+      if (document.pointerLockElement && cursorWanted()) document.exitPointerLock()
+    }
+    document.addEventListener('pointerlockchange', onLockChange)
+
     const unsubs = [
       useGameStore.subscribe(check),
       useUiWorldStore.subscribe(check),
@@ -87,6 +95,7 @@ export function useCursorRelease(): void {
     check()
     return () => {
       unsubs.forEach((u) => u())
+      document.removeEventListener('pointerlockchange', onLockChange)
       window.removeEventListener('pointerdown', onGesture, true)
       window.removeEventListener('keydown', onGesture, true)
       window.removeEventListener('keyup', onGesture, true)

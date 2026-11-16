@@ -19,6 +19,8 @@ const caseSaveArb: fc.Arbitrary<CaseSave> = fc
         slots: fc.tuple(...c.final.slots.map((s) => fc.constantFrom<string | null>(null, ...s.options))),
         wrongAnswers: fc.nat(9),
         hints: fc.record({ revealed: fc.constantFrom(0, 1, 2, 3) as fc.Arbitrary<0 | 1 | 2 | 3> }),
+        ledgerLines: fc.constant([]),
+        bellsExamined: fc.constant([]),
       }),
     ),
   )
@@ -27,7 +29,7 @@ const caseSaveArb: fc.Arbitrary<CaseSave> = fc
       closed: subset(CASES.map((c) => c.id)),
       doubt: fc.record({ nightId: fc.integer({ min: 0, max: 3 }), doubt: fc.integer({ min: 0, max: 3 }) }),
     }).map(({ closed, doubt }) => ({
-      cases: Object.fromEntries(CASES.map((c, i) => [c.id, { ...ps[i], slots: [...ps[i].slots] }])) as CaseSave['cases'],
+      cases: Object.fromEntries(CASES.map((c, i) => [c.id, { ...ps[i], slots: [...ps[i].slots] }])) as unknown as CaseSave['cases'],
       closed: closed as CaseId[],
       doubt,
     })),
@@ -109,3 +111,5 @@ function minimalState() {
     recipes: [],
   }
 }
+
+

@@ -272,6 +272,13 @@ const api = {
   skipToStage(n: 1 | 2 | 3): string {
     return skipToStage(n)
   },
+  /**
+   * Closes a case through the real store action, as the solved watcher does at night. The e2e uses
+   * it to reveal what a closed case gives up (the Rusted Crypt Key lies in Pell's grave only then).
+   */
+  closeCase(id: 'saved-by-the-bell' | 'resurrection-men' | 'sealed-catacombs'): void {
+    useCaseStore.getState().closeCase(id)
+  },
   /** The Dev_Panel's "Solve current case" (the real store action). */
   solveCurrentCase(): string {
     return solveCurrentCase()

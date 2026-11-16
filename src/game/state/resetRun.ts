@@ -20,6 +20,7 @@ import { resetCombatTickRuntime } from './combatTick'
 import { useCombatStore } from './combatStore'
 import { useCraftingStore } from './craftingStore'
 import { useDigStore } from './digStore'
+import { useDescentStore } from './descentStore'
 import { useDoorStore } from './doorStore'
 import { useEffectStore } from './effectStore'
 import { useEndingStore } from './endingStore'
@@ -80,6 +81,7 @@ export const REPLACED_STORES = [
   useEnemyStore,
   useProjectileStore,
   useCombatStore,
+  useDescentStore,
   useDoorStore,
   useBossStore,
   useEffectStore,
@@ -121,6 +123,7 @@ export function resetRun(): void {
   useAchievementStore.getState().resetSession()
   useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, mapOpen: false, satchelOpen: false })
   useOverlayStore.getState().setAltarPanelOpen(false)
+  useOverlayStore.getState().setMinigameOpen(null)
 
   // Module-level runtimes.
   resetCombatTickRuntime()

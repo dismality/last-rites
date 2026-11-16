@@ -87,11 +87,16 @@ async function playNight(page: Page, n: number, expectedWaves: number) {
 
   const seenWaveIndexes = new Set<number>()
   const violations: string[] = []
+  // Spec 10: a story night has no wave count and ends only when the stage's case is solved, so the
+  // test answers the case (the real store action) and then kills what is left.
+  await page.evaluate(() => window.__lastRites!.solveCurrentCase())
   const deadline = Date.now() + 600_000
   for (;;) {
     const w = await snap<WaveSnap>(page, 'wave')
     const world = await snap<World>(page, 'world')
     seenWaveIndexes.add(w.waves.waveIndex)
+    // Solving the case ends the night with the director still "active" (spec 10), so dawn is fine.
+    if (world.phase === 'dawn') break
     if (w.waves.phase !== 'done' && world.phase !== 'night') violations.push(`phase ${world.phase} with waves ${w.waves.phase}`)
     if (w.waves.phase === 'done') break
     if (Date.now() > deadline) throw new Error(`night ${n} did not clear: ${JSON.stringify(w)}`)
@@ -113,23 +118,23 @@ async function playNight(page: Page, n: number, expectedWaves: number) {
   }
 }
 
-test('item 1: nights 1, 2 and 3 in a row', async ({ page }) => {
+test('item 1: stage nights 1 and 2 in a row', async ({ page }) => {
   test.setTimeout(1_800_000)
   const errors = await boot(page)
-  const plan = [2, 3, 3]
-  for (let n = 1; n <= 3; n++) {
+  // Spec 10: only stages 1 and 2 have a next day; solving stage 3 starts the ending instead.
+  const plan = [2, 3]
+  for (let n = 1; n <= plan.length; n++) {
     const r = await playNight(page, n, plan[n - 1])
     log(`item1 night ${n}: totalWaves=${r.startWave.totalWaves} waveNight=${r.startWave.waves.night} ` +
       `phaseAfter3s=${r.early.phase} dawnsBeforeClear=${r.dawnsSoFar} wavesSeen=${r.seenWaves} ` +
       `violations=${r.violations.length} pendingPick=${r.dawn.pendingPick?.length} ` +
       `banished=${r.dawn.dawnSummary?.zombiesBanished} dawnHeldWhilePicking=${r.stillDawn}`)
-    expect(r.startWave.totalWaves).toBe(r.expectedWaves)
+    // Spec 10: waves are endless, so there is no wave count to match (the case ends the night).
     expect(r.startWave.waves.night).toBe(n)
     // Night n+1 must not start in dawn because the previous night left wavesCleared set.
     expect(r.early.phase).toBe('night')
     expect(r.early.wavesCleared).toBe(false)
     expect(r.dawnsSoFar).toBe(n - 1)
-    expect(r.seenWaves).toBe(r.expectedWaves)
     expect(r.violations).toEqual([])
     expect(r.dawn.pendingPick).not.toBeNull()
     expect(r.stillDawn).toBe(true)

@@ -5,6 +5,7 @@ import { endingCameraRuntime } from '../effects/endingCameraRuntime'
 import { introCameraRuntime } from '../effects/introCameraRuntime'
 import { workbenchCameraRuntime } from '../world/workbenchCameraRuntime'
 import { isMenuOpen } from '../../game/state/menuState'
+import { useDescentStore } from '../../game/state/descentStore'
 
 /** True when the first-person controller must not read look input this frame. */
 export function isViewOwned(): boolean {
@@ -12,7 +13,9 @@ export function isViewOwned(): boolean {
     isMenuOpen() ||
     workbenchCameraRuntime.active ||
     endingCameraRuntime.active ||
-    introCameraRuntime.active
+    introCameraRuntime.active ||
+    // The stair descent holds input only while the screen is black (spec 09 task 11n-f).
+    useDescentStore.getState().locked
   )
 }
 

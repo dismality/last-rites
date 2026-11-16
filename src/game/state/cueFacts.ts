@@ -23,12 +23,14 @@ import { pickupDrop } from '../systems/satchel'
 import { canTakePickup } from '../systems/weaponPickups'
 import { canDiscoverClue, readTombstone } from '../systems/tombstones'
 import type { DoorId } from '../types'
+import { useCaseStore } from './caseStore'
 import { useCombatStore } from './combatStore'
 import { useDigStore } from './digStore'
 import { useDoorStore } from './doorStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMysteryStore } from './mysteryStore'
 import { useProgressionStore } from './progressionStore'
+import { useStageStore } from './stageStore'
 import { useSettingsStore } from './settingsStore'
 import { useSpawnStore } from './spawnStore'
 import { useTombstoneStore } from './tombstoneStore'
@@ -127,6 +129,14 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
       if (built && doors[door].length >= DOORS.slots) return { usedUp: false, idle: true }
       const p = nailPrompt({ built, doors }, useInventoryStore.getState().inventory, door)
       return p.canStart ? OPEN : { usedUp: false, need: p.text }
+    }
+    case 'ledger-shelf': {
+      const p = useCaseStore.getState().cases['saved-by-the-bell']
+      return { usedUp: false, idle: useStageStore.getState().stage !== 1 || p.minigames.includes('1a') }
+    }
+    case 'bell-post': {
+      const p = useCaseStore.getState().cases['saved-by-the-bell']
+      return { usedUp: false, idle: useStageStore.getState().stage !== 1 || p.minigames.includes('1b') }
     }
     case 'workbench':
       return OPEN

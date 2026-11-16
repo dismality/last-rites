@@ -216,6 +216,18 @@ export function solveCurrentMinigame(): string {
   return `Solved minigame ${next}`
 }
 
+/**
+ * Solves one named minigame (Stage 1 helpers "Solve 1a" and "Solve 1b") with a right verdict
+ * through the real `submitMinigame`. The store ignores a minigame of another case, so the
+ * report says so instead of claiming a solve.
+ */
+export function solveMinigame(id: MinigameId): string {
+  if (!activeCaseDef().minigames.includes(id)) return `Minigame ${id} is not part of the active case`
+  if (!unsolvedMinigames().includes(id)) return `Minigame ${id} is already solved`
+  useCaseStore.getState().submitMinigame(id, true)
+  return `Solved minigame ${id}`
+}
+
 /** Draws a string between two found clues, as the board does. */
 export function linkClues(a: string, b: string): string {
   const r = useCaseStore.getState().link(a, b)

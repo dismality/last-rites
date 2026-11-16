@@ -9,9 +9,9 @@
     "endsAt": [
       -19.97,
       0.05,
-      -35.82
+      -35.8
     ],
-    "distance": 1.18,
+    "distance": 1.2,
     "seconds": 40.1,
     "stuckAt": null,
     "near": null
@@ -29,7 +29,7 @@
       -57.2
     ],
     "distance": 1.19,
-    "seconds": 61,
+    "seconds": 61.1,
     "stuckAt": null,
     "near": null
   },
@@ -45,7 +45,7 @@
       0.05,
       36.23
     ],
-    "distance": 1.2,
+    "distance": 1.19,
     "seconds": 35.7,
     "stuckAt": null,
     "near": null
@@ -58,12 +58,12 @@
     ],
     "ok": true,
     "endsAt": [
-      -4.67,
+      -4.68,
       0.05,
-      35.45
+      35.46
     ],
-    "distance": 1.19,
-    "seconds": 35.2,
+    "distance": 1.18,
+    "seconds": 35.5,
     "stuckAt": null,
     "near": null
   },
@@ -75,12 +75,12 @@
     ],
     "ok": true,
     "endsAt": [
-      9.3,
+      9.39,
       0.05,
-      -2.97
+      -3.03
     ],
-    "distance": 1.19,
-    "seconds": 18.1,
+    "distance": 1.2,
+    "seconds": 18.7,
     "stuckAt": null,
     "near": null
   },
@@ -94,10 +94,10 @@
     "endsAt": [
       5.42,
       0.05,
-      9
+      9.01
     ],
-    "distance": 1.19,
-    "seconds": 8.8,
+    "distance": 1.18,
+    "seconds": 9,
     "stuckAt": null,
     "near": null
   },
@@ -114,7 +114,7 @@
       -21.04
     ],
     "distance": 1.19,
-    "seconds": 36.2,
+    "seconds": 36,
     "stuckAt": null,
     "near": null
   },
@@ -126,12 +126,12 @@
     ],
     "ok": true,
     "endsAt": [
-      0.82,
+      0.81,
       0.05,
-      -34.11
+      -34.1
     ],
-    "distance": 1.19,
-    "seconds": 60.3,
+    "distance": 1.2,
+    "seconds": 60.1,
     "stuckAt": null,
     "near": null
   },
@@ -145,10 +145,10 @@
     "endsAt": [
       29.72,
       0.05,
-      -24.83
+      -24.84
     ],
     "distance": 1.2,
-    "seconds": 49.4,
+    "seconds": 49.2,
     "stuckAt": null,
     "near": null
   },
@@ -160,12 +160,12 @@
     ],
     "ok": true,
     "endsAt": [
-      -34.19,
+      -34.2,
       0.05,
-      7.12
+      7.13
     ],
-    "distance": 1.2,
-    "seconds": 40.5,
+    "distance": 1.19,
+    "seconds": 40,
     "stuckAt": null,
     "near": null
   },
@@ -182,7 +182,7 @@
       13.04
     ],
     "distance": 1.2,
-    "seconds": 42.5,
+    "seconds": 42.1,
     "stuckAt": null,
     "near": null
   },
@@ -199,7 +199,7 @@
       29.09
     ],
     "distance": 1.19,
-    "seconds": 31.8,
+    "seconds": 31.5,
     "stuckAt": null,
     "near": null
   },
@@ -211,12 +211,12 @@
     ],
     "ok": true,
     "endsAt": [
-      -1.13,
+      -1.14,
       0.05,
-      34.17
+      34.18
     ],
-    "distance": 1.2,
-    "seconds": 32.7,
+    "distance": 1.19,
+    "seconds": 32.5,
     "stuckAt": null,
     "near": null
   },
@@ -230,10 +230,10 @@
     "endsAt": [
       27.19,
       0.05,
-      32.87
+      32.88
     ],
     "distance": 1.19,
-    "seconds": 39.4,
+    "seconds": 39.3,
     "stuckAt": null,
     "near": null
   },
@@ -245,11 +245,11 @@
     ],
     "ok": true,
     "endsAt": [
-      -1.25,
+      -1.26,
       0.05,
-      0.89
+      0.88
     ],
-    "distance": 1.18,
+    "distance": 1.19,
     "seconds": 1.2,
     "stuckAt": null,
     "near": null
@@ -264,10 +264,10 @@
     "endsAt": [
       12.04,
       0.05,
-      -19.42
+      -19.4
     ],
-    "distance": 1.17,
-    "seconds": 22.6,
+    "distance": 1.19,
+    "seconds": 27.4,
     "stuckAt": null,
     "near": null
   },
@@ -281,10 +281,10 @@
     "endsAt": [
       -23.33,
       0.05,
-      8.78
+      8.77
     ],
     "distance": 1.19,
-    "seconds": 17.9,
+    "seconds": 21.7,
     "stuckAt": null,
     "near": null
   },
@@ -298,10 +298,10 @@
     "endsAt": [
       6.54,
       0.05,
-      -4.52
+      -4.53
     ],
     "distance": 1.18,
-    "seconds": 14.5,
+    "seconds": 15.5,
     "stuckAt": null,
     "near": null
   }

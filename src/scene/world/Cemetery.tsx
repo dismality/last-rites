@@ -36,6 +36,7 @@ import { SPAWN_POINTS } from '../../data/zones'
 import { ChapelBuilding } from './ChapelBuilding'
 import { Gate, OssuaryDoor } from './Gates'
 import { GraveyardScene } from './GraveyardScene'
+import { CaseProps } from './CaseProps'
 import { Hut } from './Hut'
 import { InstancedModel } from './InstancedModel'
 import { useMysteryStore } from '../../game/state/mysteryStore'
@@ -308,6 +309,7 @@ export function Cemetery() {
       <LampPosts />
       <SpawnDressing />
       <Hut />
+      <CaseProps />
       <ChapelBuilding />
       {CORRIDORS.map((c) =>
         c.open ? <Avenue key={c.id} spec={c} /> : <Corridor key={c.id} spec={c} />,

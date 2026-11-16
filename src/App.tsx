@@ -26,6 +26,7 @@ import { ExamineOverlay } from './ui/examine/ExamineOverlay'
 import { Journal } from './ui/journal/Journal'
 import { BigMap } from './ui/map/BigMap'
 import { AltarPanel } from './ui/hud/AltarPanel'
+import { MinigameHost } from './ui/minigames/MinigameHost'
 import { TombstoneOverlay } from './ui/tombstone/TombstoneOverlay'
 import { Satchel } from './ui/satchel/Satchel'
 import { HotbarWheel } from './ui/satchel/HotbarWheel'
@@ -164,6 +165,7 @@ export default function App() {
       <Journal />
       <BigMap />
       <AltarPanel />
+      <MinigameHost />
       <Satchel />
       <HotbarWheel />
       {/* Last, so the item name shows above every overlay that lists items. */}

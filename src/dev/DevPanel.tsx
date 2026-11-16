@@ -21,6 +21,7 @@ import {
   skipToStage,
   solveCurrentCase,
   solveCurrentMinigame,
+  solveMinigame,
   spawnCrane,
   spawnOneOfEach,
   spawnWave,
@@ -169,6 +170,12 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(solveCurrentMinigame)}>
               Solve current minigame
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('1a'))}>
+              Solve 1a
+            </button>
+            <button type="button" onClick={run(() => solveMinigame('1b'))}>
+              Solve 1b
             </button>
           </Row>
           <Row>

@@ -14,6 +14,7 @@ import {
   type Vec3,
 } from './cemeteryLayout'
 import type { LootTableId } from './lootTables'
+import type { CaseId } from './stages'
 
 export type ZoneId = 'grounds' | 'mausoleum-row' | 'chapel' | 'catacombs'
 
@@ -112,7 +113,7 @@ export const SPAWN_POINTS: readonly SpawnPoint[] = [
   // and the west pew seat at 0.40, each 1 cm proud. Position y is the surface the model rests on.
   { id: 'chapel-font', zone: 'chapel', position: [11.5, 0.89, 3], lootTable: 'chapel-font' },
   // x 8.5 so up to three stacks (0.35 m apart, to the east) stay on the seat (world x 8.2..9.35).
-  { id: 'chapel-pews', zone: 'chapel', position: [8.5, 0.41, 8], lootTable: 'crypt-shelves' },
+  { id: 'chapel-pews', zone: 'chapel', position: [8.5, 0.41, 7.42], lootTable: 'crypt-shelves' },
   // Mausoleum Row
   {
     id: 'row-shelf-a',
@@ -157,11 +158,20 @@ export interface FixedSpawn {
   nightOnly?: boolean
   /** A flat item resting on a slope: degrees its surface leans toward -Z (the chapel door). */
   tiltDeg?: number
+  /** Lies in the world only once this case is solved (spec 10, Req 14.4). */
+  revealedBy?: CaseId
 }
 
 export const FIXED_SPAWNS: readonly FixedSpawn[] = [
   { id: 'fx-page-1', zone: 'grounds', position: [2.6, 0.78, -1.3], item: 'journal-page-1' },
-  { id: 'fx-crypt-key', zone: 'grounds', position: [-12, 0, -18], item: 'rusted-crypt-key' },
+  // In Pell's grave (CASE_1_REWARD.position in cases.ts) once case 1 is solved.
+  {
+    id: 'fx-crypt-key',
+    zone: 'grounds',
+    position: [-8.4, 0, -21.6],
+    item: 'rusted-crypt-key',
+    revealedBy: 'saved-by-the-bell',
+  },
   { id: 'fx-page-2', zone: 'grounds', position: [-12.5, 0, -17], item: 'journal-page-2' },
   { id: 'fx-bell-clapper', zone: 'grounds', position: [30, 0, -25], item: 'sextons-bell-clapper' },
   {

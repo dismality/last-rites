@@ -1,11 +1,20 @@
 // Save shape, sanitising and retry merge for the case store (spec 10 task 2.3, Req 4.1-4.6).
 // Pure: no stores, no React. Everything is JSON-safe arrays, so save -> load is the identity.
 
-import { CASES, type CaseId, type MinigameId } from '../../data/cases'
+import { CASES, CASE_1_BELLS, CASE_1_LEDGER, CASE_1_STONES, type BellPostId, type CaseId, type LedgerFlagKind, type MinigameId } from '../../data/cases'
 import { DOUBT_MAX } from '../../data/stages'
 import type { HintState } from './caseHints'
 import type { DoubtState } from './caseScore'
 import { linkKey } from './caseBoard'
+
+/** A line drawn on minigame 1a from a stone to a ledger entry; `flag`lag is set once a right flag is accepted. */
+export interface LedgerLine {
+  stoneId: string
+  ledgerId: string
+  flag: LedgerFlagKind | null
+}
+
+const FLAG_KINDS: readonly LedgerFlagKind[] = ['date', 'plot', 'certificate']
 
 /** One case's progress. Found clues, links and solved minigames are what Retry keeps. */
 export interface CaseProgress {
@@ -19,6 +28,10 @@ export interface CaseProgress {
   /** Wrong answers given (day minigames and the altar); Sharp Eye needs 0. */
   wrongAnswers: number
   hints: HintState
+  /** Minigame 1a draft: lines drawn so far. Kept when the overlay closes (Req 11.7). */
+  ledgerLines: LedgerLine[]
+  /** Minigame 1b: bell posts fully examined (bell, rope and tag). Kept when the overlay closes. */
+  bellsExamined: BellPostId[]
 }
 
 export interface CaseSave {
@@ -39,6 +52,8 @@ export function freshProgress(id: CaseId): CaseProgress {
     slots: (c?.final.slots ?? []).map(() => null),
     wrongAnswers: 0,
     hints: { revealed: 0 },
+    ledgerLines: [],
+    bellsExamined: [],
   }
 }
 
@@ -54,6 +69,20 @@ const isObj = (v: unknown): v is Record<string, unknown> => typeof v === 'object
 const count = (v: unknown, max = Number.MAX_SAFE_INTEGER): number =>
   typeof v === 'number' && Number.isFinite(v) ? Math.min(max, Math.max(0, Math.floor(v))) : 0
 const uniq = <T,>(xs: readonly T[]): T[] => Array.from(new Set(xs))
+
+/** Keeps well-formed lines only, one per stone and one per entry; stale ids are dropped. */
+export function sanitizeLedgerLines(raw: unknown): LedgerLine[] {
+  if (!Array.isArray(raw)) return []
+  const out: LedgerLine[] = []
+  for (const l of raw) {
+    if (!isObj(l) || typeof l.stoneId !== 'string' || typeof l.ledgerId !== 'string') continue
+    if (!CASE_1_STONES.some((s) => s.id === l.stoneId) || !CASE_1_LEDGER.some((e) => e.id === l.ledgerId)) continue
+    if (out.some((o) => o.stoneId === l.stoneId || o.ledgerId === l.ledgerId)) continue
+    const flag = FLAG_KINDS.find((k) => k === l.flag) ?? null
+    out.push({ stoneId: l.stoneId, ledgerId: l.ledgerId, flag })
+  }
+  return out
+}
 
 function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
   const def = CASES.find((c) => c.id === id)
@@ -76,6 +105,11 @@ function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
     }),
     wrongAnswers: count(raw.wrongAnswers),
     hints: { revealed: revealed as HintState['revealed'] },
+    ledgerLines: id === 'saved-by-the-bell' ? sanitizeLedgerLines(raw.ledgerLines) : [],
+    bellsExamined:
+      id === 'saved-by-the-bell'
+        ? (uniq(strings(raw.bellsExamined).filter((x) => CASE_1_BELLS.some((b) => b.id === x))) as BellPostId[])
+        : [],
   }
 }
 
@@ -112,6 +146,10 @@ export function mergeRetry(snapshot: CaseSave, current: CaseSave): CaseSave {
       found: union(s.found, c.found),
       links: union(s.links, c.links),
       minigames: union(s.minigames, c.minigames),
+      // A drawn line is knowledge too; the current draft is never older than the snapshot's.
+      ledgerLines: c.ledgerLines.length >= s.ledgerLines.length ? c.ledgerLines : s.ledgerLines,
+      // A post already examined stays examined, like a found clue.
+      bellsExamined: union(s.bellsExamined, c.bellsExamined),
     }
   }
   return { cases, closed: [...snapshot.closed], doubt: { ...snapshot.doubt } }

@@ -53,8 +53,8 @@ describe('digNeed', () => {
 describe('crypt key copy', () => {
   it('keeps the key on the ground, not in a mound', () => {
     const key = FIXED_SPAWNS.find((f) => f.id === 'fx-crypt-key')
-    expect(key?.position).toEqual([-12, 0, -18])
-    expect(MOUNDS.some((m) => m[0] === -12 && m[2] === -18)).toBe(false)
+    expect(key?.position).toEqual([-8.4, 0, -21.6])
+    expect(MOUNDS.some((m) => m[0] === -8.4 && m[2] === -21.6)).toBe(false)
   })
   it('no hint, objective or tutorial text implies a dig finds the key', () => {
     const copy = [

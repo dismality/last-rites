@@ -93,3 +93,22 @@ export const canOpenMerchant = (c: {
   majorActive: boolean
   inRange: boolean
 }): boolean => c.phase === 'day' && c.present && c.inRange && !c.majorActive
+
+/** The clue Silas hands over with the first purchase of a story run (spec 10, Req 14.5). */
+export const VANE_RECEIPT_CLUE = 'vane-receipt'
+
+/**
+ * Whether this purchase hands over the Vane & Sons receipt: the run's first purchase, story only,
+ * once. It is meant for Stage 1; a first purchase made later still gets it, so Case 3 can always
+ * be solved (Req 7.5). `found` is every clue id found so far.
+ */
+export function receiptDue(c: {
+  story: boolean
+  stage: number
+  found: readonly string[]
+}): boolean {
+  return c.story && c.stage >= 1 && !c.found.includes(VANE_RECEIPT_CLUE)
+}
+
+/** Caption and toast text for the hand-over. */
+export const VANE_RECEIPT_TEXT = 'Silas slips you a Vane & Sons receipt. The hand is oddly familiar.'
