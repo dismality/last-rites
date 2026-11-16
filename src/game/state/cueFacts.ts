@@ -35,6 +35,7 @@ import { useStageStore } from './stageStore'
 import { useSettingsStore } from './settingsStore'
 import { useSpawnStore } from './spawnStore'
 import { useTombstoneStore } from './tombstoneStore'
+import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
 const SATCHEL_FULL = 'satchel space'
@@ -164,5 +165,9 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
     }
     case 'workbench':
       return OPEN
+    case 'named-grave': {
+      const { sealed, glow } = useWaveStore.getState()
+      return { usedUp: sealed !== null && glow !== null && sealed.graveId === subject && sealed.wave === glow.wave }
+    }
   }
 }

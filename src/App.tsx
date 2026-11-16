@@ -63,6 +63,7 @@ import { FixedSpawns } from './scene/world/FixedSpawns'
 import { Tombstones } from './scene/world/Tombstones'
 import { LanternTraps } from './scene/world/LanternTraps'
 import { GraveMounds } from './scene/world/GraveMounds'
+import { NamedGrave } from './scene/world/NamedGrave'
 import { MaterialPickups } from './scene/world/MaterialPickups'
 import { SaltCircles } from './scene/world/SaltCircles'
 import { PinBeacons } from './scene/world/PinBeacons'
@@ -106,6 +107,7 @@ function GameScreen() {
           <ClueSpots />
           <MaterialPickups />
           <GraveMounds />
+          <NamedGrave />
           <Workbench />
           <EnemyDirector />
           {/* After EnemyDirector so music reads this frame's nearest zombie. */}

@@ -17,6 +17,7 @@ import { ClueReveal } from './ClueReveal'
 import { DuskHint } from './DuskHint'
 import { WaveTally } from './WaveTally'
 import { DigBar } from './DigBar'
+import { NameHold } from './NameHold'
 import { AmmoReadout } from './AmmoReadout'
 import { EffectIcons } from './EffectIcons'
 import { ChargeMeter } from './ChargeMeter'
@@ -77,6 +78,7 @@ export function Hud() {
       <Hotbar />
       <StaminaBar />
       <DigBar />
+      <NameHold />
       <Subtitles />
       <ClueReveal />
       <Toast />

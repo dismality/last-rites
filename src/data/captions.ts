@@ -63,6 +63,7 @@ export type CaptionId =
   | 'pin-reached'
   | 'grab-stinger'
   | 'grab-stinger-soft'
+  | 'name-spoken'
 
 export interface CaptionDef {
   id: CaptionId
@@ -195,6 +196,8 @@ export const CAPTIONS: readonly CaptionDef[] = [
   // Spec 10 task 8: the grab kill-cam, at Full and Reduced (Off shows the same words on its own).
   { id: 'grab-stinger', event: 'grab-stinger', text: GRAB_CAPTION, minSeconds: 1.5 },
   { id: 'grab-stinger-soft', event: 'grab-stinger-soft', text: GRAB_CAPTION, minSeconds: 1.5 },
+  // Spec 10 task 11: Name the Dead.
+  { id: 'name-spoken', event: 'name-spoken', text: '[a name, spoken: NAME]', template: true, minSeconds: 3 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

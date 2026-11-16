@@ -6,6 +6,7 @@ import { useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
 import { emit } from '../game/events'
 import { useDigStore } from '../game/state/digStore'
+import { useNameTheDeadStore } from '../game/state/nameTheDeadStore'
 import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '../game/state'
 import { tickCombat } from '../game/state/combatTick'
 import { tickControlHints } from '../game/state/controlHintState'
@@ -89,6 +90,8 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       pending.push(...r.events)
       // Same fixed step as everything else, so a dig takes DIG_DURATION_S of sim time.
       useDigStore.getState().step(STEP, input.peek().interact)
+      // Name the Dead (spec 10 task 11): the 3 s hold runs on the same fixed step.
+      useNameTheDeadStore.getState().step(STEP, input.peek().interact)
       const snap = input.peek()
       tickCombat(STEP, {
         interactHeld: snap.interact,

@@ -59,6 +59,7 @@ import { useCaseStore } from './caseStore'
 import { useClueRevealStore } from './clueRevealStore'
 import { useHunchStore } from './hunchStore'
 import { useKillCamStore } from './killCamStore'
+import { useNameTheDeadStore } from './nameTheDeadStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -101,6 +102,7 @@ export const REPLACED_STORES = [
   useClueRevealStore,
   useHunchStore,
   useKillCamStore,
+  useNameTheDeadStore,
 ] as unknown as readonly Resettable[]
 
 /** Stores with their own reset (they bump counters, clear storage or keep persistent parts). */

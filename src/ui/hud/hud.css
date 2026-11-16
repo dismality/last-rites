@@ -364,3 +364,72 @@ img.hud-prompt__rune-img {
 .hud-dawn__clues {
   font-weight: 700;
 }
+
+/* Name the Dead (spec 10 task 11): the hold ring with its caption and seconds, below the prompt. */
+.hud-name {
+  position: absolute;
+  bottom: 17vh;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.5rem 1rem;
+  color: var(--parchment);
+  text-shadow: 0 1px 3px var(--ink);
+  pointer-events: none;
+}
+.hud-name__ring {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--parchment-dark);
+}
+.hud-name__rune {
+  width: 2.7rem;
+  height: 2.7rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  font-size: 1.5rem;
+}
+.hud-name__caption,
+.hud-name__time {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+.hud-name__time {
+  font-family: var(--font-num);
+  font-variant-numeric: tabular-nums;
+}
+/* The floating label over the glowing grave: the name rune and the name, never colour alone. */
+.named-grave-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.7);
+  border: 1px solid var(--ember);
+  border-radius: 2px;
+  text-shadow: 0 1px 3px var(--ink);
+}
+.named-grave-label__rune {
+  color: var(--ember);
+  font-size: 1.2rem;
+}
+.named-grave-label[data-sealed='true'] {
+  border-color: var(--parchment-dark);
+}
+.named-grave-label__state {
+  font-style: italic;
+  font-size: 1rem;
+}

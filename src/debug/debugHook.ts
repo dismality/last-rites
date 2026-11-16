@@ -6,6 +6,8 @@
 // Pointer lock: headless Chrome is never granted it. `lockless(true)` (on by default once a run is
 // started through `startRun`) makes input.ts and the hotbar wheel act as if the canvas were locked.
 
+import { useNameTheDeadStore } from '../game/state/nameTheDeadStore'
+import { WAVE_GRAVES } from '../data/waves'
 import type * as THREE from 'three'
 import { Frustum, Matrix4 } from 'three'
 import { Box3, Raycaster, Vector2, Vector3 } from 'three'
@@ -205,6 +207,25 @@ const api = {
     startEnding(id)
   },
   /** Grab kill-cam (spec 10 task 8): starts so far, the held grab and what the camera is doing. */
+  /** Name the Dead (spec 10 task 11): the glowing grave, the seal, the hold and the run score. */
+  nameTheDead(): {
+    glow: { graveId: string; name: string; wave: number; x: number; z: number } | null
+    sealed: { graveId: string; wave: number } | null
+    progress: number
+    sealedCount: number
+    score: number
+  } {
+    const { glow, sealed } = useWaveStore.getState()
+    const g = glow ? WAVE_GRAVES.find((w) => w.id === glow.graveId) : undefined
+    const n = useNameTheDeadStore.getState()
+    return {
+      glow: glow && g ? { ...glow, x: g.x, z: g.z } : null,
+      sealed,
+      progress: n.progress,
+      sealedCount: n.sealedCount,
+      score: useProgressionStore.getState().score,
+    }
+  },
   killCam(): {
     count: number
     lastStartS: number | null

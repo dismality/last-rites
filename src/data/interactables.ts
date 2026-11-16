@@ -28,6 +28,7 @@ export type InteractableKind =
   | 'merchant'
   | 'barricade-door'
   | 'workbench'
+  | 'named-grave'
   | 'ledger-shelf'
   | 'bell-post'
   | 'hymn-board'
@@ -342,6 +343,17 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     file: 'Workbench.tsx',
     endsWhen: 'never: crafting is always available',
     resetsOn: 'not applicable',
+  },
+  // Spec 10 task 11: Name the Dead. Mounted only while a grave glows (Stage 2 and 3 nights).
+  'named-grave': {
+    kind: 'named-grave',
+    action: 'name',
+    category: 'used-up',
+    hold: true,
+    fadesBody: false,
+    file: 'NamedGrave.tsx',
+    endsWhen: 'the grave is named and sealed for this wave',
+    resetsOn: 'the next wave lights another grave; Retry Night, Continue and New Game',
   },
 }
 

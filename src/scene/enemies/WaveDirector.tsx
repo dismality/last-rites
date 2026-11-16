@@ -19,6 +19,8 @@ import { ringBell } from '../world/bellRuntime'
 import { isBellActive } from '../../game/systems/repairs'
 import { bellDue, shouldDespawnStuck, updateStuck, type StuckMark } from '../../game/systems/stageWaves'
 import { tickWaves } from '../../game/systems/waves'
+import { glowingGrave, openGraves } from '../../game/systems/nameTheDead'
+import { WAVE_GRAVES } from '../../data/waves'
 import {
   clearedRoute,
   createWaveEnemy,
@@ -68,13 +70,19 @@ export function WaveDirector() {
   useFrame((_s, rawDelta) => {
     if (isSimFrozen()) return
     const waves = useWaveStore.getState().waves
+    const { mode, seed } = useProgressionStore.getState()
+    // Name the Dead (Req 28.1): Stage 2 and 3 nights light one opening grave per wave.
+    const lit =
+      MODES[mode].story && waves.stage !== undefined && waves.phase === 'active' && useWorldStore.getState().phase !== 'day'
+    useWaveStore.getState().setGlow(lit ? glowingGrave(seed, waves.stage!, waves.waveIndex, WAVE_GRAVES) : null)
     if (waves.phase === 'idle' || waves.phase === 'done') return
 
-    const { mode } = useProgressionStore.getState()
     const enemies = useEnemyStore.getState().enemies
     const player = usePlayerStore.getState().position
     const r = tickWaves(waves, Math.min(rawDelta, MAX_DT), {
       playerPos: { x: player[0], z: player[2] },
+      // A grave named and sealed this wave stays shut (Req 28.2).
+      graves: openGraves(WAVE_GRAVES, useWaveStore.getState().sealed, waves.waveIndex),
       liveCount: enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length,
       rng: rng.current,
       eliteRng: eliteRng.current,

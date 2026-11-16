@@ -152,7 +152,7 @@ export type MarkId =
   'hut' | 'chapel' | 'graves' | 'merchant' | 'objective' | 'gate' | 'relic' | 'workbench' | 'player'
 
 /** Verbs that have an interaction rune image (64 px; shown at 32 px). */
-export type InteractRuneId = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail' | 'trade'
+export type InteractRuneId = 'pickup' | 'dig' | 'open' | 'read' | 'examine' | 'nail' | 'trade' | 'name'
 
 export interface IconIds {
   item: ItemId

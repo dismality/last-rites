@@ -1849,3 +1849,17 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - A component does not keep a recipe "???": components are crafted, never found.
   - Blueprints are never used up, and the Silver Sabre upgrades are not tiered (they stay on the Upgrades tab).
   - `crafting.ts` is unchanged; the tiered check wraps it.
+
+### 2026-11-16: Outside Kiro: 10-curse-stages task 11: Name the Dead
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **What happened:**
+  - In Stage 2 and 3 nights each wave lights one wave grave with a name, shown with an ember light and a floating label (the ᛞ rune and the name).
+  - Holding Interact there for 3 s speaks the name (caption "[a name, spoken: NAME]"), seals the grave for that wave and adds 100 score. A hit ends the hold. A name that no found clue gives shows "You don't know who lies here."
+  - Rules: `systems/nameTheDead.ts`, with Property 24 tested with fast-check. Data: `DEAD_NAMES` in `data/cases.ts` and `data/nameTheDead.ts`. Glue: `state/nameTheDeadStore.ts`; the wave store holds the lit and sealed graves.
+  - New interact action "name" ("Hold E: Name the dead") with a rune image drawn to match the others, and a new synth sound.
+  - `e2e/name-the-dead.spec.ts` holds the real E key at the lit grave in a Stage 2 night and checks the seal, the caption and the +100 score; a second test checks that a stranger's name is refused. Both pass in Chrome, as do the interaction-cues, rune-marks, stage-loop and kill-cam specs.
+- **Decisions made unattended:**
+  - "In the Case's evidence" means a clue naming that person has been found (any case). Two strangers are in no evidence, so the refusal can happen.
+  - The lit grave is picked from the run seed, stage and wave, so Retry Night lights the same graves.
+  - The glow light is always mounted (the scene's light count must stay constant) and is dark when no grave is lit.
+  - A hit ends the hold until E is let go; letting go or turning to another grave starts it afresh.

@@ -1229,3 +1229,30 @@ export const CASE_MAP: Readonly<Record<CaseId, CaseDef>> = {
 export function caseOfStage(stage: StageNumber): CaseDef {
   return CASES[stage - 1]
 }
+
+// ---------------------------------------------------------------------------
+// Name the Dead (spec 10 task 11, Req 28)
+// ---------------------------------------------------------------------------
+
+/** A name a glowing grave can show at night, and the evidence that names it. */
+export interface DeadNameDef {
+  name: string
+  /** The first stage whose nights may show it. */
+  stage: StageNumber
+  /** Finding any of these clues makes the name known. Empty: a stranger no evidence names. */
+  clues: readonly ClueId[]
+}
+
+/**
+ * The names come from the cases' evidence (the stones and the bells of Case 1, the watch log of
+ * Case 2, Elias's letter in Case 3). The strangers are in no evidence, so they can never be named.
+ */
+export const DEAD_NAMES: readonly DeadNameDef[] = [
+  { name: 'Esther Ames', stage: 2, clues: ['ames-bell-rusted', 'watch-log-gap'] },
+  { name: 'John Pell', stage: 2, clues: ['pell-rope-cut', 'pell-tag-early'] },
+  { name: 'Tobias Hale', stage: 2, clues: ['hale-fresh-flowers'] },
+  { name: 'Marsh', stage: 2, clues: ['marsh-stone-toppled'] },
+  { name: 'Hester Lowe', stage: 2, clues: [] },
+  { name: 'Elias Thorne', stage: 3, clues: ['elias-unsent-letter', 'hearse-cart-ruts'] },
+  { name: 'Ezra Crane', stage: 3, clues: [] },
+]

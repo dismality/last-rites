@@ -30,6 +30,7 @@ export type SoundId =
   | 'pin-reached'
   | 'grab-stinger'
   | 'grab-stinger-soft'
+  | 'name-spoken'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -300,6 +301,15 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     layers: [noise('bandpass', 2600, 500, 1.2, 0.6), tone('sawtooth', 110, 92, 0.22), tone('sawtooth', 117, 98, 0.18)],
   },
   // Reduced intensity: the same shape, quieter and softer at the front.
+  // Name the Dead (spec 10 task 11): a low hum under a breathy whisper, as a name is spoken.
+  'name-spoken': {
+    id: 'name-spoken',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.15,
+    decayS: 1.6,
+    layers: [tone('sine', 147, 147, 0.16), tone('sine', 220, 218, 0.08), noise('bandpass', 1800, 900, 1.2, 0.12)],
+  },
   'grab-stinger-soft': {
     id: 'grab-stinger-soft',
     spatial: false,

@@ -317,18 +317,23 @@ Common rules for all tasks:
     - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 10; commit `tiered crafting (spec 10 task 10)`
 
-- [ ] 11. Name the Dead (cuttable, cut order 1)
-  - [ ] 11.1 Data and pure rules
+- [x] 11. Name the Dead (cuttable, cut order 1)
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 11.1 Data and pure rules
+    - Done outside Kiro by Claude. `DEAD_NAMES` in `cases.ts` (two strangers no evidence names); tuning in `src/data/nameTheDead.ts`; Property 24 with fast-check
     - Add the names list from each Case's evidence to `cases.ts`; create `nameTheDead.ts` (hold 3 s, damage cancels, known or unknown name) and `nameTheDead.test.ts`
     - **Property 24: Name the Dead hold**
     - _Requirements: 28.1-28.4_
-  - [ ] 11.2 Glowing grave, hold UI and captions
+  - [x] 11.2 Glowing grave, hold UI and captions
+    - Done outside Kiro by Claude. `NamedGrave.tsx` (light always mounted, dark when unused), `NameHold.tsx`, interact action `name` with its rune image; the wave director skips the sealed grave
     - Add the glowing grave (rune plus text label), the hold ring, the caption and the +100 score; seal the grave for that wave in `waveStore.ts`
     - _Requirements: 28.1, 28.2, 28.4, 28.5_
-  - [ ] 11.3 Name the Dead e2e
+  - [x] 11.3 Name the Dead e2e
+    - Done outside Kiro by Claude. Holds the real E key; screenshots `name-the-dead-hold` and `name-the-dead-sealed`
     - Create `e2e/name-the-dead.spec.ts`: hold Interact at a glowing grave and assert the seal and the score
     - _Requirements: 28.6_
-  - [ ] 11.4 Finish
+  - [x] 11.4 Finish
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 11; commit `name the dead (spec 10 task 11)`
 
 - [ ] 12. Final task: full automated playthrough in Short Vigil (moved from spec 09 task 3)

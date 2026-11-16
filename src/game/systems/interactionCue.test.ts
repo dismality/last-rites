@@ -96,8 +96,8 @@ describe('interactionCue', () => {
     )
   })
 
-  it('every kind with a hold prompt is a dig', () => {
-    expect(INTERACTABLE_KINDS.filter((k) => INTERACTABLES[k].hold)).toEqual(['grave-mound'])
+  it('every kind with a hold prompt is a dig or Name the Dead (spec 10 task 11)', () => {
+    expect(INTERACTABLE_KINDS.filter((k) => INTERACTABLES[k].hold)).toEqual(['grave-mound', 'named-grave'])
   })
 })
 
