@@ -5,6 +5,7 @@ import { useOverlayStore } from '../../game/state/overlayStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { escClosesOverlay } from '../../game/systems/journalPause'
+import { endingPausable } from '../../game/state/endingStore'
 
 /** True when an overlay that owns Esc (it closes itself on Esc) is open. */
 function escOwnedByOverlay(): boolean {
@@ -28,6 +29,8 @@ function escOwnedByOverlay(): boolean {
  */
 export function handlePauseKey(code: string): void {
   if (code !== 'Escape') return
+  // On the ending screen only the epilogue card and the win walk-out pause; Esc skips the sequence.
+  if (useGameStore.getState().screen === 'ending' && !endingPausable()) return
   const { examining, journalOpen, mapOpen, satchelOpen } = useGameStore.getState()
   const { workbenchOpen, chapelRepairOpen } = useUiWorldStore.getState()
   const readerOwns = escClosesOverlay(useWorldStore.getState().phase, journalOpen || mapOpen)

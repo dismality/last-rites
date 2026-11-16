@@ -10,9 +10,13 @@ import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import { DRACO_PATH, GRAVEYARD_MODEL_URL } from '../../data/assets'
 import { GRAVEYARD_COLLIDERS } from '../../data/graveyardColliders'
+import { WIN_GATE_CLIP } from '../effects/winRuntime'
 
 /** Materials in the GLB that throw shadows (the lantern is the only shadow-casting light that matters). */
 const CASTING_MATERIALS = new Set(['lr-stone', 'lr-iron', 'lr-bark'])
+
+/** The fence and its footing: the win walk-out cuts the south gate through them (WIN_GATE_CLIP). */
+const GATE_CUT_MATERIALS = new Set(['lr-stone', 'lr-iron'])
 
 /** Prepares the cached glTF once: vertex colours on, grass seen from both sides, shadow flags. */
 function prepare(scene: THREE.Object3D): void {
@@ -30,6 +34,11 @@ function prepare(scene: THREE.Object3D): void {
         std.needsUpdate = true
       }
       if (m.name === 'lr-grass') m.side = THREE.DoubleSide
+      // Blender numbers repeated materials (lr-iron.003), so the cut matches on the base name.
+      if (GATE_CUT_MATERIALS.has(m.name.replace(/\.\d+$/, ''))) {
+        m.clippingPlanes = WIN_GATE_CLIP
+        m.clipIntersection = true
+      }
       if (CASTING_MATERIALS.has(m.name)) casts = true
     }
     mesh.castShadow = casts

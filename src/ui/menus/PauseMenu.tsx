@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { requestLock } from '../../scene/player/input'
 import { useGameStore } from '../../game/state/gameStore'
+import { endingPausable, useEndingStore } from '../../game/state/endingStore'
 import { resumeGame } from '../../game/state/menuState'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { closeAchievements, openAchievements } from '../../game/state/runFlow'
@@ -22,15 +23,20 @@ export function PauseMenu() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const achievementsOpen = useOverlayStore((s) => s.achievementsOpen)
+  // Re-render when the ending moves on, so the pause check above sees the new stage.
+  useEndingStore((s) => s.stage)
 
-  if (!paused || screen !== 'game') return null
+  // The ending screen pauses over the epilogue card and the win walk-out (Req 23.4).
+  if (!paused || (screen !== 'game' && !(screen === 'ending' && endingPausable()))) return null
   if (achievementsOpen) return <AchievementsMenu onClose={closeAchievements} />
 
   function resume() {
     // Deferred: the window-level Esc listener in usePauseTriggers runs after this
     // handler and would otherwise immediately re-pause.
     setTimeout(() => {
-      resumeGame(() => requestLock(document.querySelector('canvas')))
+      // The ending screen has buttons and no first-person view, so the cursor stays free there.
+      if (useGameStore.getState().screen === 'ending') useGameStore.getState().setPaused(false)
+      else resumeGame(() => requestLock(document.querySelector('canvas')))
     }, 0)
   }
 

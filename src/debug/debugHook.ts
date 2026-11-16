@@ -73,6 +73,7 @@ import { minimapRuntime } from '../ui/hud/minimapRuntime'
 import { useEndingStore } from '../game/state/endingStore'
 import { useBossStore } from '../game/state/bossStore'
 import { startEnding } from '../game/state/startEnding'
+import { winRuntime } from '../scene/effects/winRuntime'
 import { endingCameraRuntime } from '../scene/effects/endingCameraRuntime'
 import { useGuidanceStore } from '../game/state/guidanceStore'
 import { useSettingsStore } from '../game/state/settingsStore'
@@ -198,6 +199,19 @@ const api = {
   /** The function the final rite and the death check call to start an ending. */
   startEnding(id: 'rest' | 'taken'): void {
     startEnding(id)
+  },
+  /** The Rest ending straight into the win walk-out, past the sunrise (spec 10 task 6). */
+  playWinCutscene(): void {
+    startEnding('rest')
+    useEndingStore.getState().playWalkout()
+  },
+  /** Holds the win walk-out at `t` seconds (null lets it run on). For the gate-shot screenshots. */
+  holdWinAt(t: number | null): void {
+    winRuntime.holdAt = t
+  },
+  /** Seconds into the win walk-out, and how far the sun has risen. */
+  winClock(): { time: number; sun: number; active: boolean } {
+    return { time: winRuntime.time, sun: winRuntime.sun, active: winRuntime.active }
   },
   /** Seconds into the ending camera sequence (the clock the subtitles follow). */
   endingClock(): number {

@@ -22,6 +22,8 @@ import {
   transitionProgress,
   type SkyBlend,
 } from '../../game/systems/skyTransition'
+import { winSkyBlend } from '../../game/systems/winSequence'
+import { winRuntime } from '../effects/winRuntime'
 
 // The scene's fog colour is linear; the tint is written in sRGB like every palette colour.
 const INTERIOR_TINT_LINEAR = (() => {
@@ -95,8 +97,10 @@ export function SkyAndFog() {
 
   useFrame((_, delta) => {
     elapsed.current += delta
-    const blend = lerpBlend(from.current, to.current, transitionProgress(elapsed.current))
-    current.current = blend
+    const phaseBlend = lerpBlend(from.current, to.current, transitionProgress(elapsed.current))
+    current.current = phaseBlend
+    // The win walk-out carries the dawn on into sunrise and lifts the fog (spec 10, Req 23.1).
+    const blend = winRuntime.active ? winSkyBlend(phaseBlend, winRuntime.sun) : phaseBlend
 
     // Lightning and storm fog are applied on top of the blend each frame; the stored blend and the
     // world store's fogDensity stay untouched, so nothing sticks when the storm ends.

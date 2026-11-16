@@ -45,10 +45,13 @@ export function EndingCamera() {
     const rt = endingCameraRuntime
     const store = useEndingStore.getState()
     // After Skip (or the end) the camera holds its last pose behind the summary card.
+    // The win walk-out (WinCutscene) owns the camera after the Rest sunrise.
+    if (store.stage === 'walkout') return
+    if (store.stage === 'summary' && def.id === 'rest') return
     if (store.stage === 'sequence') {
       const step = advanceSequence(def, rt.time, rawDelta, useGameStore.getState().paused)
       rt.time = step.time
-      if (step.done) store.showSummary()
+      if (step.done) store.endSequence()
     } else if (store.stage === 'epilogue') {
       // The epilogue card reads over the chapel at the start of the walk-out.
       rt.time = 0

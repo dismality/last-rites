@@ -491,3 +491,10 @@ export function triggerEnding(id: EndingId): string {
   startEnding(id)
   return `Ending: ${id}`
 }
+
+/** The win walk-out on its own: the Rest ending begins and goes straight past the sunrise (spec 10 task 6.4). */
+export function playWinCutscene(): string {
+  startEnding('rest')
+  useEndingStore.getState().playWalkout()
+  return 'Win cutscene'
+}

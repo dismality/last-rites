@@ -9,9 +9,10 @@ import { updateRunStats } from './statsPort'
 
 /**
  * epilogue = the Justice for Elias card, shown before the walk-out (spec 10, Req 18.3);
- * sequence = camera path playing; summary = stats, credits and the exit buttons.
+ * sequence = camera path playing; walkout = the win cutscene after the Rest sunrise (spec 10,
+ * Req 23); summary = the ending card, stats, credits and the exit buttons.
  */
-export type EndingStage = 'epilogue' | 'sequence' | 'summary'
+export type EndingStage = 'epilogue' | 'sequence' | 'walkout' | 'summary'
 
 interface EndingStoreState {
   /** Bumped on every reset; the scene is keyed on it so the player body returns to spawn. */
@@ -29,7 +30,11 @@ interface EndingStoreState {
   beginEnding: (ending: EndingId, epilogue?: boolean) => void
   /** The epilogue card is read (or skipped): the sequence begins. */
   endEpilogue: () => void
+  /** The sequence ends (or is skipped): a won run walks out, any other goes to the summary. */
+  endSequence: () => void
   showSummary: () => void
+  /** Dev and tests: straight to the win walk-out of a Rest ending already begun. */
+  playWalkout: () => void
   reset: () => void
 }
 
@@ -39,6 +44,12 @@ const INITIAL = {
   riteStarted: false,
   ending: null,
   stage: 'sequence' as EndingStage,
+}
+
+/** Esc pauses on the ending screen only over the epilogue card and the win walk-out (Req 23.4). */
+export function endingPausable(): boolean {
+  const stage = useEndingStore.getState().stage
+  return stage === 'epilogue' || stage === 'walkout'
 }
 
 /** Counts a night as survived when its dawn arrives. Returns the unsubscribe function. */
@@ -59,6 +70,9 @@ export const useEndingStore = create<EndingStoreState>((set, get) => ({
     set({ ending, stage: epilogue ? 'epilogue' : 'sequence' })
   },
   endEpilogue: () => set((s) => (s.stage === 'epilogue' ? { stage: 'sequence' } : s)),
+  endSequence: () =>
+    set((s) => (s.stage === 'sequence' ? { stage: s.ending === 'rest' ? 'walkout' : 'summary' } : s)),
   showSummary: () => set({ stage: 'summary' }),
+  playWalkout: () => set((s) => (s.ending === 'rest' ? { stage: 'walkout' } : s)),
   reset: () => set({ ...INITIAL, runId: get().runId + 1 }),
 }))

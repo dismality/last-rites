@@ -29,6 +29,7 @@ import {
   teleportTo,
   teleportToObjective,
   triggerEnding,
+  playWinCutscene,
   triggerScare,
   unlockAllRecipes,
   type TimeTarget,
@@ -368,6 +369,9 @@ export function DevPanel() {
                 Ending: {e}
               </button>
             ))}
+            <button type="button" onClick={run(playWinCutscene)}>
+              Play win cutscene
+            </button>
           </Row>
         </Section>
 

@@ -215,20 +215,26 @@ Common rules for all tasks:
     - Done outside Kiro by Claude
     - Run the Finish steps for task 5; commit `stage 2 case and minigames (spec 10 task 5)`
 
-- [ ] 6. E5: Win cutscene
-  - [ ] 6.1 Pure win sequence
+- [x] 6. E5: Win cutscene
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 6.1 Pure win sequence
+    - Done outside Kiro by Claude. The data is in `src/data/winCutscene.ts` (process rule: no numbers in systems/); `endingSequence.ts` now takes any timeline (`SequenceTimeline`)
     - Create `src/game/systems/winSequence.ts` (timeline of 15 to 20 s reusing `cameraPath.ts` and `endingSequence.ts`, skip target, reduced-motion variant) and `winSequence.test.ts`
     - _Requirements: 23.1, 23.2, 23.5_
-  - [ ] 6.2 Cutscene scene and win card
+  - [x] 6.2 Cutscene scene and win card
+    - Done outside Kiro by Claude. The graveyard model has no exit gate, so the cutscene adds one in the south fence and clips the fence open behind it; a sun disc rises over the hills. WinCard heads the run summary
     - Create `src/scene/effects/WinCutscene.tsx` and `src/ui/menus/WinCard.tsx`: the walk down the main path and out the gates, rising sun, lifting fog, captions, Space/Enter skip, Esc pause, fades only under reduced motion or no camera shake
     - _Requirements: 23.1-23.6_
-  - [ ] 6.3 Flow wiring
+  - [x] 6.3 Flow wiring
+    - Done outside Kiro by Claude. `endingStats.ts` is new in systems (stages cleared, cases solved). `runFlow.ts` needed no change. Skipping the 44 s sunrise goes straight to the card (spec 09 item 11 asks one key to end the ending); played out, it leads into the walk
     - After the Stage 3 sunrise (and the epilogue when earned) start the cutscene, then the ending card and run summary; update `startEnding.ts`, `runFlow.ts`, `endingStats.ts` for stages and cases solved
     - _Requirements: 1.4, 23.3, 23.7_
-  - [ ] 6.4 Dev trigger, e2e and screenshots
+  - [x] 6.4 Dev trigger, e2e and screenshots
+    - Done outside Kiro by Claude. Screenshot pair `win-cutscene-gate-1280x720` and `-800x600`
     - Add a "Play win cutscene" button; create `e2e/win-cutscene.spec.ts` (play to the end, skip with Space, skip with Enter, Esc pauses); save the gate-shot screenshot pair
     - _Requirements: 23.8, 23.9_
-  - [ ] 6.5 Finish
+  - [x] 6.5 Finish
+    - Done outside Kiro by Claude
     - Run the Finish steps for task 6; commit `win cutscene (spec 10 task 6)`
 
 - [ ] 7. E11: Help and Short Vigil

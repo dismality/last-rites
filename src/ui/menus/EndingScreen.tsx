@@ -13,6 +13,9 @@ import { parseCredits } from '../../game/systems/credits'
 import { defaultLine } from '../../game/systems/accusation'
 import { activeLine, fadeAlpha, handleEpilogueKey, handleSkipKey } from '../../game/systems/endingSequence'
 import { endingCameraRuntime } from '../../scene/effects/endingCameraRuntime'
+import { currentWinSequence, winRuntime } from '../../scene/effects/winRuntime'
+import { activeCaption, handleWinKey } from '../../game/systems/winSequence'
+import { WinCard } from './WinCard'
 import { MODES } from '../../data/modes'
 import type { ModeId } from '../../game/types'
 import { MenuDialog } from './MenuDialog'
@@ -23,6 +26,8 @@ import './menus.css'
 /** Subtitled camera sequence: the closing lines are the narration, so they always show. */
 function Sequence() {
   const ending = useEndingStore((s) => s.ending)
+  // Skipping goes straight to the card, past the win walk-out too (spec 09 item 11: one key ends the
+  // ending). Played to its end, the Rest sunrise leads into the walk-out instead (EndingCamera).
   const showSummary = useEndingStore((s) => s.showSummary)
   const def = ending ? ENDING_MAP[ending] : null
   const [line, setLine] = useState('')
@@ -60,6 +65,55 @@ function Sequence() {
       </p>
       <button type="button" className="ending__skip" onClick={showSummary}>
         Skip (Esc)
+      </button>
+    </div>
+  )
+}
+
+/**
+ * The win walk-out's text layer (spec 10, Req 23): narration, a caption for every sound, the fades
+ * and Skip. Space or Enter skip to the card; Esc is left to pause, which holds the walk.
+ */
+function WalkOut() {
+  const showSummary = useEndingStore((s) => s.showSummary)
+  const def = useMemo(() => currentWinSequence(), [])
+  const [line, setLine] = useState('')
+  const [caption, setCaption] = useState('')
+  const [fade, setFade] = useState(1)
+
+  useEffect(() => {
+    let raf = 0
+    const poll = () => {
+      const t = winRuntime.time
+      setLine(activeLine(def, t)?.text ?? '')
+      setCaption(activeCaption(def, t)?.text ?? '')
+      setFade(Math.round(fadeAlpha(def, t) * 20) / 20)
+      raf = requestAnimationFrame(poll)
+    }
+    raf = requestAnimationFrame(poll)
+    return () => cancelAnimationFrame(raf)
+  }, [def])
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (useGameStore.getState().paused) return
+      handleWinKey(e, showSummary)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showSummary])
+
+  return (
+    <div className="ending ending--walkout" data-ending="rest" data-testid="win-cutscene">
+      <div className="ending__fade" style={{ opacity: fade }} aria-hidden="true" />
+      <p className="ending__caption" aria-live="polite">
+        {caption}
+      </p>
+      <p className="ending__line" role="status" aria-live="polite">
+        {line}
+      </p>
+      <button type="button" className="ending__skip" onClick={showSummary}>
+        Skip (Space)
       </button>
     </div>
   )
@@ -126,10 +180,16 @@ function Summary() {
 
   return (
     <MenuDialog titleId={titleId} variant="screen">
-      <h2 id={titleId} className="menu__title menu__title--hero">
-        {def.title}
-      </h2>
-      <p className="ending__closing">{def.closingLine}</p>
+      {ending === 'rest' ? (
+        <WinCard titleId={titleId} />
+      ) : (
+        <>
+          <h2 id={titleId} className="menu__title menu__title--hero">
+            {def.title}
+          </h2>
+          <p className="ending__closing">{def.closingLine}</p>
+        </>
+      )}
       {/* Only a won run has the Silas line: the accusation never changes whether it is won (Req 18.5). */}
       {ending === 'rest' && defaultLine(accusation) && <p className="ending__silas">{defaultLine(accusation)}</p>}
       <StatsPanel onClose={toTitle} />
@@ -161,5 +221,6 @@ export function EndingScreen() {
   const stage = useEndingStore((s) => s.stage)
   if (screen !== 'ending') return null
   if (stage === 'epilogue') return <Epilogue />
+  if (stage === 'walkout') return <WalkOut />
   return stage === 'sequence' ? <Sequence /> : <Summary />
 }

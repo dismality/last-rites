@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useGameStore, useWorldStore } from '../../game/state'
 import { isMenuOpen, isSimFrozen, resumeGame, setDawnPickProbe } from '../../game/state/menuState'
 import { useOverlayStore } from '../../game/state/overlayStore'
+import { useEndingStore } from '../../game/state/endingStore'
 import { handlePauseKey, handlePointerLockLost } from './usePauseTriggers'
 
 beforeEach(() => {
@@ -43,9 +44,11 @@ describe('pause triggers with 08 overlays', () => {
     useGameStore.getState().setScreen('ending')
     handlePointerLockLost()
     expect(useGameStore.getState().paused).toBe(false)
-    // Esc still pauses there.
+    // Esc still pauses over the win walk-out (the sequence's own Esc skips; see the ending block below).
+    useEndingStore.setState({ ending: 'rest', stage: 'walkout' })
     handlePauseKey('Escape')
     expect(useGameStore.getState().paused).toBe(true)
+    useEndingStore.getState().reset()
     useGameStore.getState().setScreen('game')
   })
 
@@ -113,5 +116,23 @@ describe('pause triggers with 08 overlays', () => {
     useOverlayStore.setState({ achievementsOpen: false })
     resumeGame(lock)
     expect(lock).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('Esc on the ending screen (spec 10, Req 23.4)', () => {
+  it('pauses over the epilogue card and the win walk-out, never over the sequence or the summary', () => {
+    useGameStore.setState({ screen: 'ending' })
+    for (const [stage, pauses] of [
+      ['sequence', false],
+      ['summary', false],
+      ['epilogue', true],
+      ['walkout', true],
+    ] as const) {
+      useGameStore.getState().setPaused(false)
+      useEndingStore.setState({ ending: 'rest', stage })
+      handlePauseKey('Escape')
+      expect(useGameStore.getState().paused, stage).toBe(pauses)
+    }
+    useEndingStore.getState().reset()
   })
 })

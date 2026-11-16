@@ -12,6 +12,7 @@ import { useSettingsStore } from './game/state'
 import { useEndingStore } from './game/state/endingStore'
 import { EndingScreen } from './ui/menus/EndingScreen'
 import { EndingCamera } from './scene/effects/EndingCamera'
+import { WinCutscene } from './scene/effects/WinCutscene'
 import { IntroCamera } from './scene/effects/IntroCamera'
 import { AltarRite } from './scene/world/AltarRite'
 import { FinalRite } from './scene/world/FinalRite'
@@ -78,7 +79,15 @@ function GameScreen() {
   const fov = useSettingsStore((s) => s.fov)
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'var(--ink)' }}>
-      <Canvas shadows="soft" camera={{ fov, near: 0.1, far: 200 }} dpr={[1, 1.5]}>
+      <Canvas
+        shadows="soft"
+        camera={{ fov, near: 0.1, far: 200 }}
+        dpr={[1, 1.5]}
+        // Material clipping planes (the win walk-out's gate cut in the fence) need this from the first compile.
+        onCreated={({ gl }) => {
+          gl.localClippingEnabled = true
+        }}
+      >
         <SkyAndFog />
         {/* After SkyAndFog so rain and lightning adjust the lights and fog it set this frame. */}
         <Weather />
@@ -129,6 +138,8 @@ function GameScreen() {
         <Viewmodel weaponState={null} />
         {/* After the controller so the ending path wins the camera. */}
         <EndingCamera />
+        {/* After EndingCamera: the win walk-out follows the Rest sunrise and owns the camera then. */}
+        <WinCutscene />
         <PostEffects />
         <ShaderPrecompile />
       </Canvas>

@@ -474,3 +474,45 @@
     animation-duration: 1.2s; /* a slow fade, never a movement */
   }
 }
+
+/* Win walk-out (spec 10 task 6): a sound caption sits above the narration line. */
+.ending__caption {
+  position: absolute;
+  left: 50%;
+  bottom: calc(12vh + 4.6rem);
+  transform: translateX(-50%);
+  margin: 0;
+  padding: 0.35rem 0.9rem;
+  font-family: var(--font-hand);
+  font-size: 1.25rem; /* 20 px, the subtitle minimum */
+  font-style: italic;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.7);
+  white-space: nowrap;
+}
+.ending__caption:empty {
+  display: none;
+}
+.wincard {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: center;
+}
+.wincard__kicker {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+.wincard__walk {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-hand);
+  font-size: 1.05rem;
+  color: var(--parchment-dark);
+}
+.wincard__rows {
+  width: min(100%, 22rem);
+}
