@@ -8,7 +8,8 @@ import {
 } from '../../data/balance'
 import type { StaminaState } from '../types'
 
-const clamp = (v: number) => Math.min(STAMINA_MAX, Math.max(0, v))
+/** Stamina stays within 0..cap; the cap is the stage's (spec 10 task 9), 100 by default. */
+const clamp = (v: number, cap: number = STAMINA_MAX) => Math.min(cap, Math.max(0, v))
 
 const safe = (v: number): number => (Number.isFinite(v) ? Math.max(0, v) : 0)
 
@@ -36,11 +37,13 @@ export function tickStamina(
   drainMult = 1,
   /** Scales regeneration only (Second Wind upgrade). */
   regenMult = 1,
+  /** Max stamina for the stage; a lower cap lowers current stamina at once (spec 10 Req 26.3). */
+  cap: number = STAMINA_MAX,
 ): StaminaState {
   const step = Math.max(0, dt)
   if (sprinting) {
     return {
-      stamina: clamp(s.stamina - STAMINA_DRAIN_PER_S * safe(drainMult) * step),
+      stamina: clamp(s.stamina - STAMINA_DRAIN_PER_S * safe(drainMult) * step, cap),
       regenDelayTimer: STAMINA_REGEN_DELAY_S,
     }
   }
@@ -48,7 +51,7 @@ export function tickStamina(
   const waited = Math.min(step, s.regenDelayTimer)
   const regenTime = step - waited
   return {
-    stamina: clamp(s.stamina + STAMINA_REGEN_PER_S * safe(regenMult) * regenTime),
+    stamina: clamp(s.stamina + STAMINA_REGEN_PER_S * safe(regenMult) * regenTime, cap),
     regenDelayTimer: s.regenDelayTimer - waited,
   }
 }

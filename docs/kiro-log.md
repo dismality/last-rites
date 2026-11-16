@@ -1820,3 +1820,17 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - A lethal blow plays the full close-up even at Reduced; Off never moves the camera, even when the blow is lethal.
   - Under reduced motion the camera still turns to the zombie but does not lean in, zoom or shake.
   - Dodging, god mode and an already-held keeper are never seized.
+
+### 2026-11-16: Outside Kiro: 10-curse-stages task 9: E9 stamina by stage and difficulty
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **What happened:**
+  - Max stamina is 100, 90 and 80 in Stages 1 to 3 (100 in Endless).
+  - Sprint drain is x0.8 on Easy, x1 on Normal, Short Vigil and Endless, and x1.2 on Hard.
+  - Rules: `systems/staminaCap.ts`, with Property 22 tested with fast-check. Data: `data/staminaCaps.ts`.
+  - The tick clamps stamina to the cap, so a smaller cap lowers it at once.
+  - The stamina bar's length is the cap's share of the full bar, with "max N" under it.
+  - `e2e/stamina.spec.ts` sprints with the real keys in Stages 1 and 2 and passes in Chrome. The control-hints spec, which also sprints, still passes.
+- **Decisions made unattended:**
+  - The cap is worked out from the current stage, and stages only move forward in a run, so it never rises. A retried night keeps its stage.
+  - The difficulty drain multiplies with Adrenaline's halving rather than replacing it.
+  - "max N" is always shown, not only with the accessible HUD, because the requirement asks for the cap as a number.

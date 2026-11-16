@@ -1,5 +1,6 @@
 // GameLoop: thin driver for the fixed-timestep simulation. All rules live in src/game.
 
+import { staminaDrainMult } from '../game/systems/staminaCap'
 import { Suspense, useRef, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
@@ -47,6 +48,8 @@ function withProgression(base: TickInput): TickInput {
     ...base,
     ...deriveTickInput(),
     regenMult: mods.staminaRegenMult,
+    // Adrenaline's halving and the difficulty's drain multiply (spec 10 task 9: Easy 0.8, Hard 1.2).
+    sprintDrainMult: (base.sprintDrainMult ?? 1) * staminaDrainMult(p.mode),
     lanternDrainMult: lanternDrainMultiplier(p.mode, p.ranks['long-wick'] ?? 0, p.storm.active),
   }
 }

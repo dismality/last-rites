@@ -1,6 +1,7 @@
 // Fixed-step glue for progression: combo decay, coin piles, run time, storm and music
 // (design "Timing"). Called once per fixed step from GameLoop after tickCombat.
 // Reads stores, holds no rules; the pure functions it calls live in src/game/systems/.
+import { staminaCap } from '../systems/staminaCap'
 import { CAPTION_MAP } from '../../data/captions'
 import { DAY_DURATION_S } from '../../data/balance'
 import { STAGE_COUNT } from '../../data/stages'
@@ -34,6 +35,8 @@ export interface ProgressionTickInput {
   holdDawn: boolean
   dayLengthS: number
   lastNight: number
+  /** Max stamina: 100, 90, 80 by Story stage, 100 in Endless (spec 10 task 9). */
+  staminaCap: number
   /** Story stages only: the case-solved flag and the wave index for fog. Absent in Endless. */
   caseSolved?: boolean
   waveIndex?: number
@@ -47,6 +50,7 @@ export function deriveTickInput(): ProgressionTickInput {
     holdDawn: p.pendingPick !== null,
     dayLengthS: mode.dayLengthS ?? DAY_DURATION_S,
     lastNight: mode.story ? STAGE_COUNT : Infinity,
+    staminaCap: staminaCap(useStageStore.getState().stage, mode.story),
     ...(mode.story
       ? { caseSolved: useStageStore.getState().caseSolved, waveIndex: useWaveStore.getState().waves.waveIndex }
       : {}),

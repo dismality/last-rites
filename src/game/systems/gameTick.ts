@@ -13,6 +13,8 @@ export interface TickInput {
   sprintDrainMult?: number
   /** Second Wind; scales stamina regeneration. Defaults to 1. */
   regenMult?: number
+  /** Max stamina for the stage (spec 10 task 9). Defaults to 100. */
+  staminaCap?: number
   /** Mode x Long Wick x storm (lanternDrainMultiplier). Defaults to 1. */
   lanternDrainMult?: number
   /** A dawn upgrade pick is pending; dawn freezes. */
@@ -43,7 +45,14 @@ export function runTick(s: TickSnapshot, input: TickInput, dt: number): TickResu
 
   // Sprinting needs stamina left, otherwise the player is forced to walk.
   const sprinting = input.sprinting && s.stamina.stamina > 0
-  const stamina = tickStamina(s.stamina, dt, sprinting, input.sprintDrainMult ?? 1, input.regenMult ?? 1)
+  const stamina = tickStamina(
+    s.stamina,
+    dt,
+    sprinting,
+    input.sprintDrainMult ?? 1,
+    input.regenMult ?? 1,
+    input.staminaCap,
+  )
 
   // Player movement is applied by the Rapier controller (task 6); only mirror stamina here.
   const player: PlayerState = { ...s.player, stamina: stamina.stamina }

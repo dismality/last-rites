@@ -275,18 +275,23 @@ Common rules for all tasks:
     - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 8; commit `grab kill-cam (spec 10 task 8)`
 
-- [ ] 9. E9: Stamina by stage and difficulty (cuttable, cut order 5)
-  - [ ] 9.1 Pure stamina cap
+- [x] 9. E9: Stamina by stage and difficulty (cuttable, cut order 5)
+  - Done outside Kiro by Claude; see the kiro-log entry
+  - [x] 9.1 Pure stamina cap
+    - Done outside Kiro by Claude. Data in `src/data/staminaCaps.ts`; `tickStamina` takes the cap; Property 22 with fast-check
     - Create `staminaCap.ts` and extend `stamina.ts` (caps 100 / 90 / 80, drain ×0.8 / 1 / 1.2, current stamina clamped to the cap); write `staminaCap.test.ts`
     - **Property 22: Stamina never exceeds a cap that never rises**
     - _Requirements: 26.1-26.4_
-  - [ ] 9.2 Store, bar and wiring
+  - [x] 9.2 Store, bar and wiring
+    - Done outside Kiro by Claude. The cap reaches the tick through `deriveTickInput`; the difficulty drain multiplies Adrenaline in `GameLoop`. The bar is the cap's share of its full length, with "max N" under it at 1rem
     - Wire the cap into `staminaRuntime.ts` and the stamina bar (cap shown as number and length)
     - _Requirements: 26.5_
-  - [ ] 9.3 Stamina e2e
+  - [x] 9.3 Stamina e2e
+    - Done outside Kiro by Claude. Screenshot `stamina-stage2-1280x720.png`
     - Create `e2e/stamina.spec.ts`: sprint in two Stages and assert the displayed cap
     - _Requirements: 26.6_
-  - [ ] 9.4 Finish
+  - [x] 9.4 Finish
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 9; commit `stage stamina caps (spec 10 task 9)`
 
 - [ ] 10. E4: Tiered crafting (cuttable, cut order 2)

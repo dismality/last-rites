@@ -29,10 +29,11 @@
 }
 
 .hud-stamina {
+  --stamina-bar-w: 200px;
   position: absolute;
   left: 50%;
   bottom: 48px;
-  width: 200px;
+  width: var(--stamina-bar-w);
   height: 8px;
   transform: translateX(-50%);
   border: 1px solid var(--parchment-dark);
@@ -55,13 +56,27 @@
 
 @media (max-width: 900px) {
   .hud-stamina {
-    width: 120px;
+    --stamina-bar-w: 120px;
   }
 }
 
 .hud-stamina__fill {
   height: 100%;
   background: var(--parchment);
+}
+
+/* The stage's max stamina, always shown under the bar (spec 10 task 9, Req 26.5). */
+.hud-stamina__cap {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.1;
+  color: var(--parchment);
+  text-shadow: 0 1px 2px var(--ink);
 }
 
 .hud-stamina__num {
