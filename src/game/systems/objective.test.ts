@@ -1,3 +1,4 @@
+import { CASE_2_CREST_LOCK } from '../../data/cases'
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
 import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
@@ -430,5 +431,39 @@ describe('selectObjective in story stages (spec 10)', () => {
     }
     const o = selectObjective({ ...day, stage: { stage: 1, curseLinks: 0, altarLockedS: 0, clues: { found: 2, total: 7 } } })
     expect(o.main).toBe('Solve the case: Saved by the Bell, clues 2/7')
+  })
+
+  it('by day shows the first unfinished step of the stage, with its count and place (§11)', () => {
+    const base = fc.sample(inputArb, 1)[0]
+    const day = {
+      ...base,
+      phase: 'day' as const,
+      needsWeapon: false,
+      story: true,
+      progress: { page1Read: true, cryptKey: true, whistle: false, stairRevealed: false, ossuaryKey: false, relics: 0 },
+    }
+    const st = (stage: 1 | 2 | 3, steps: { count: number; done: boolean }[]) =>
+      selectObjective({ ...day, stage: { stage, curseLinks: 0, altarLockedS: 0, clues: { found: 1, total: 6 }, day: steps } })
+    const open = { count: 0, done: false }
+    const done = { count: 1, done: true }
+    const o = st(2, [open, open, open])
+    expect(o.main).toBe("Open the sexton's crest lock (0/1)")
+    expect(o.marker).toBe('Crest lock')
+    expect(o.position).toEqual(CASE_2_CREST_LOCK.niche)
+    expect(st(2, [done, open, open]).main).toBe('Put the watch log in order (0/1)')
+    expect(st(2, [done, done, open]).main).toBe('Compare the boot prints (0/1)')
+    expect(st(2, [done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
+    expect(st(1, [done, { count: 2, done: false }]).main).toBe('Examine the three bells (2/3)')
+    expect(st(3, [done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
+    // The weapon rule keeps the step on its second line; night keeps the curse line.
+    const armed = selectObjective({
+      ...day,
+      needsWeapon: true,
+      secondsLeft: 30,
+      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] },
+    })
+    expect(armed.second).toBe("Open the sexton's crest lock (0/1)")
+    const night = selectObjective({ ...day, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] } })
+    expect(night.rule).toBe(1)
   })
 })

@@ -1766,3 +1766,8 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - A wrong crest setting never says which dial is wrong, so the lock cannot be solved by elimination; the watch log does mark the first page out of place (Req 20.3).
   - 2c is one act (pick a cast, pick boots, pair), so it keeps no draft.
   - Stage 2 props open their overlays by day only, like stage 3's; the tablets and the niche stay up at night.
+
+### 2026-11-16: Outside Kiro: stage objective lines and stage 3 walk clues
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code), loose ends from spec 10 task 5.
+- **What happened:** By day in a story stage the tracker now shows the first unfinished step of the case from `STAGE_DAY_RULES` (design bible §11), with its count and a compass marker: the ledger page, the nearest bell, the crest lock, the logbook, the casts, the hymn board, the slate, the nearest known relic. Rule 5 (the hut page) still comes first and rule 12 (craft a weapon) keeps the step on its second line; once every step is done it reads "Solve the case: <title>, clues N/M". Stage 3's walk clues are now props: the flyleaf on the catacomb floor (its old spot lay outside the map), the oil at the railing of the crypt at z −49.9 (the old spot was inside it) and the bishop's seal on the vestry cupboard. A unit test checks every walk clue lies in its own zone. Checked in Chrome; 2418 unit tests pass, lint and build clean.
+- **Decisions made unattended:** the old story rules 6-10 (crypt key, whistle, altar, ossuary key, relics) no longer show by day in a story stage; Endless and the five-night rules are unchanged.

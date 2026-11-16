@@ -2,6 +2,7 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
+import { caseOfStage, type MinigameId } from '../../data/cases'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
@@ -128,7 +129,23 @@ const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
     stage: s.stage,
     curseLinks: selectCorrectLinks(useCaseStore.getState(), s.stage),
     altarLockedS: Math.max(0, Math.ceil(s.altar.lockedUntil - s.nightElapsed)),
+    day: readStageDaySteps(s.stage),
   }
+}
+
+/** Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). */
+const readStageDaySteps = (stage: 1 | 2 | 3): { count: number; done: boolean }[] => {
+  const cases = useCaseStore.getState().cases
+  const solved = (id: MinigameId) => caseOfStage(stage).minigames.includes(id) && cases[caseOfStage(stage).id].minigames.includes(id)
+  const one = (id: MinigameId) => ({ count: solved(id) ? 1 : 0, done: solved(id) })
+  if (stage === 1) {
+    const bells = cases['saved-by-the-bell'].bellsExamined.length
+    return [one('1a'), { count: solved('1b') ? 3 : Math.min(3, bells), done: solved('1b') }]
+  }
+  if (stage === 2) return [one('2a'), one('2b'), one('2c')]
+  const inv = useInventoryStore.getState().inventory
+  const relics = countRelics(inv.relics, useMysteryStore.getState().mystery.relics)
+  return [one('3a'), one('3b'), { count: relics, done: relics >= 5 }]
 }
 
 const sameObjective = (a: Objective | null, b: Objective): boolean =>

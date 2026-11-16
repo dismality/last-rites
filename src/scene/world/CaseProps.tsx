@@ -326,6 +326,14 @@ function WalkClueShape({ clue }: { clue: ClueDef }) {
       </group>
     )
   }
+  if (clue.id === 'oil-other-crypt') {
+    return (
+      <mesh position={[0, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.3, 14]} />
+        <meshStandardMaterial color="#14110f" roughness={0.3} metalness={0.3} />
+      </mesh>
+    )
+  }
   if (clue.icon === 'read') {
     return (
       <mesh position={[0, 0.005, 0]} rotation={[0, 0.4, 0]}>
@@ -369,16 +377,12 @@ function WalkClue({ clue }: { clue: WalkClueDef }) {
   )
 }
 
-/**
- * Clues found by walking to them (the cases' walk sources): the active stage's case only, by day,
- * until found. Stage 3's walk positions are not yet checked against the world (the flyleaf's lies
- * outside the map), so only stages 1 and 2 mount theirs for now.
- */
+/** Clues found by walking to them (the cases' walk sources): the active stage's case only, by day, until found. */
 function WalkClues({ stage }: { stage: 1 | 2 | 3 }) {
   const c = caseOfStage(stage)
   const found = useCaseStore((s) => s.cases[c.id].found)
   const day = useWorldStore((s) => s.phase === 'day')
-  if (!day || stage === 3) return null
+  if (!day) return null
   return (
     <>
       {c.clues

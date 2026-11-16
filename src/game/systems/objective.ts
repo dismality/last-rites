@@ -10,6 +10,7 @@ import {
   OBJECTIVE_RULES,
   PREPARE_WEAPON_BEFORE_DUSK_S,
   PREPARE_WEAPON_RULE,
+  STAGE_DAY_RULES,
   type ObjectiveRuleDef,
   type ObjectiveRuleId,
 } from '../../data/objectiveRules'
@@ -57,6 +58,11 @@ export interface ObjectiveInput {
     altarLockedS: number
     /** Clues found for the case, when the case board can say. */
     clues?: { found: number; total: number }
+    /**
+     * Progress on the stage's day steps (`STAGE_DAY_RULES[stage]`, same order): the count shown
+     * and whether the step is done. When present, the steps replace story rules 6-10 by day.
+     */
+    day?: readonly { count: number; done: boolean }[]
   }
 }
 
@@ -194,6 +200,9 @@ const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
   // The prepare rule stands above the story objective, which moves down to the second line.
   if (def.id === PREPARE_WEAPON_RULE) {
     const story = ruleDef(matchRule({ ...i, needsWeapon: false }))
+    const step = STAGE_STEP_REPLACES.includes(story.id) ? stageDayObjective(i) : null
+    if (step) return step.main
+    if (i.stage?.day && STAGE_STEP_REPLACES.includes(story.id)) return stageCaseLine(i.stage)
     return story.id === 11 && i.stage ? stageCaseLine(i.stage) : mainLine(story, i)
   }
   const t = def.second ?? ''
@@ -226,9 +235,56 @@ const stageCaseLine = (stage: NonNullable<ObjectiveInput['stage']>): string => {
     : `Solve the case: ${title}`
 }
 
+/** Story rules the stage day steps stand in for (6-11: keys, whistle, stair, relics, fallback). */
+const STAGE_STEP_REPLACES: readonly ObjectiveRuleId[] = [6, 7, 8, 9, 10, 11]
+
+const nearest = (points: readonly Vec3[], from: Vec3): Vec3 | undefined => {
+  let best: Vec3 | undefined
+  let bestD = Infinity
+  for (const p of points) {
+    const d = dist2(p, from)
+    if (d < bestD) {
+      bestD = d
+      best = p
+    }
+  }
+  return best
+}
+
+/**
+ * By day in a story stage, the first unfinished step of the case (design bible §11, "rules 5-10
+ * per stage"). Rule ids 6, 7 and 8 stand for steps 1, 2 and 3. Null when every step is done.
+ */
+const stageDayObjective = (i: ObjectiveInput): Objective | null => {
+  const day = i.stage?.day
+  if (!i.stage || !day) return null
+  const rules = STAGE_DAY_RULES[i.stage.stage]
+  const at = rules.findIndex((_, k) => !day[k]?.done)
+  if (at < 0) return null
+  const rule = rules[at]
+  const count = clampInt(day[at]?.count ?? 0, 0, rule.target)
+  const place = rule.place
+  const position =
+    place.kind === 'point' ? place.at : place.kind === 'nearest' ? nearest(place.at, i.playerPos) : nearest(i.relicSites, i.playerPos)
+  const o: Objective = {
+    rule: (6 + at) as ObjectiveRuleId,
+    main: cut(`${rule.main} (${count}/${rule.target})`),
+    second: cut(ruleDef(6).second?.replace('{clock}', formatClock(i.secondsLeft)) ?? ''),
+    marker: rule.marker,
+  }
+  if (position) o.position = position
+  return o
+}
+
 export const selectObjective = (i: ObjectiveInput): Objective => {
   const matched = matchRule(i)
   if (i.stage && matched === 1) return curseObjective(i.stage)
+  if (i.phase === 'day' && i.story !== false && STAGE_STEP_REPLACES.includes(matched)) {
+    const step = stageDayObjective(i)
+    if (step) return step
+    // Every step done: the old key and relic rules no longer apply in a stage; name the case.
+    if (i.stage?.day) return { rule: 11, main: cut(stageCaseLine(i.stage)), second: cut(secondLine(ruleDef(11), i)) }
+  }
   const def = ruleDef(matched)
   if (i.stage && def.id === 11 && i.story !== false) {
     return {

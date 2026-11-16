@@ -35,6 +35,7 @@ import { CLOSED_CASE_PAGES } from './caseText'
 import { STAGES, type StageNumber } from './stages'
 import { FIXED_SPAWNS, type ZoneId } from './zones'
 import { avenueCrypts } from './cemeteryLayout'
+import { zoneAt } from '../game/systems/zoneAt'
 
 /** Zones a player can walk in by stage (Mausoleum Row needs the key from case 1, the
  *  catacombs the whistle from case 2). The chapel is always open. */
@@ -296,6 +297,17 @@ describe('case 2 data', () => {
     expect(Math.hypot(w.position[0] - CASE_2_CREST_LOCK.niche[0], w.position[2] - CASE_2_CREST_LOCK.niche[2])).toBeLessThan(1)
     const rh = c.clues.filter((k) => k.redHerring).map((k) => k.id)
     expect(rh).toEqual(['spade-fresh-clay', 'doctor-school-letter'])
+  })
+})
+
+describe('walk clue positions', () => {
+  it('every walk clue lies inside its own zone', () => {
+    for (const c of CASES) {
+      for (const k of c.clues) {
+        if (k.found.kind !== 'walk') continue
+        expect(zoneAt(k.found.position[0], k.found.position[2]), k.id).toBe(k.found.spot)
+      }
+    }
   })
 })
 

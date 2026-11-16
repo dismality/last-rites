@@ -1118,7 +1118,8 @@ const CASE_3: CaseDef = {
       line: 'Josiah Vane, parish undertaker, written in the same careful hand as the ledger.',
       icon: 'read',
       redHerring: false,
-      found: { kind: 'walk', spot: 'catacombs', position: [-8, -3, -75] },
+      // A loose flyleaf on the catacomb floor, past the scratch marks (the old spot lay outside the map).
+      found: { kind: 'walk', spot: 'catacombs', position: [25.4, 0.04, 49] },
     },
     {
       id: 'vane-receipt',
@@ -1134,7 +1135,8 @@ const CASE_3: CaseDef = {
       line: 'Lamp oil is spilled on the step of a different crypt. The sexton filled his lamps here.',
       icon: 'examine',
       redHerring: true,
-      found: { kind: 'walk', spot: 'mausoleum-row', position: [-24, 0, -50] },
+      // On the avenue at the railing gate of the crypt at z -49.9 (the old spot was inside it).
+      found: { kind: 'walk', spot: 'mausoleum-row', position: [-21.35, 0.01, -49.9] },
     },
     {
       id: 'old-bishops-seal',
@@ -1142,7 +1144,8 @@ const CASE_3: CaseDef = {
       line: 'A wax seal on a parish paper. The bishop who pressed it died years before Elias came.',
       icon: 'read',
       redHerring: true,
-      found: { kind: 'walk', spot: 'chapel', position: [8, 0, 9] },
+      // On the vestry cupboard top (0.89), beside the psalter and the weapon that lies there.
+      found: { kind: 'walk', spot: 'chapel', position: [7.9, 0.895, 7.25] },
     },
   ],
   notes: [

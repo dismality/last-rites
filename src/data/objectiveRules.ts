@@ -1,6 +1,10 @@
 // Objective tracker rules (design bible §11). Order is priority: the selector returns
 // the first rule whose condition matches, and rule 11 is the fallback.
 
+import { CASE_1_BELLS, CASE_2_CASTS, CASE_2_CREST_LOCK, CASE_2_LOGBOOK_POSITION, CASE_3_CRYPT_PROPS } from './cases'
+import { POWDER_TIN_HUT } from './cemeteryLayout'
+import { HYMN_BOARD_POSITION } from './chapelScenery'
+
 export type ObjectiveRuleId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
 
 /**
@@ -128,26 +132,44 @@ export const ALTAR_LOCKED_LINE = 'The altar is silent: {clock}'
 /** Rule 11 once every minigame of the case is solved: `{title}` and clue counts fill in. */
 export const CASE_SOLVE_LINE = 'Solve the case: {title}, clues {n}/{m}'
 
+type Point = readonly [number, number, number]
+
+/** Where a stage day step points: one place, the nearest of several, or the nearest known relic. */
+export type StageDayPlace =
+  | { readonly kind: 'point'; readonly at: Point }
+  | { readonly kind: 'nearest'; readonly at: readonly Point[] }
+  | { readonly kind: 'nearest-relic' }
+
 /** Day rules 5-10 per stage: the first unsolved line wins. `target` is the progress denominator. */
 export interface StageDayRule {
   readonly main: string
   readonly target: number
+  readonly marker: string
+  readonly place: StageDayPlace
 }
+
+/** The parish register page beside the powder tin on the hut shelf (Hut.tsx). */
+const LEDGER_PAGE: Point = [POWDER_TIN_HUT[0] + 0.35, POWDER_TIN_HUT[1], POWDER_TIN_HUT[2]]
 
 export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]>> = {
   1: [
-    { main: 'Cross-check the ledger against the stones', target: 1 },
-    { main: 'Examine the three bells', target: 3 },
+    { main: 'Cross-check the ledger against the stones', target: 1, marker: 'Ledger', place: { kind: 'point', at: LEDGER_PAGE } },
+    {
+      main: 'Examine the three bells',
+      target: 3,
+      marker: 'Bells',
+      place: { kind: 'nearest', at: CASE_1_BELLS.map((b) => b.position) },
+    },
   ],
   2: [
-    { main: "Open the sexton's crest lock", target: 1 },
-    { main: 'Put the watch log in order', target: 1 },
-    { main: 'Compare the boot prints', target: 1 },
+    { main: "Open the sexton's crest lock", target: 1, marker: 'Crest lock', place: { kind: 'point', at: CASE_2_CREST_LOCK.niche } },
+    { main: 'Put the watch log in order', target: 1, marker: 'Watch log', place: { kind: 'point', at: CASE_2_LOGBOOK_POSITION } },
+    { main: 'Compare the boot prints', target: 1, marker: 'Casts', place: { kind: 'point', at: CASE_2_CASTS[1].position } },
   ],
   3: [
-    { main: 'Set the hymn tiles at the altar', target: 1 },
-    { main: "Reconstruct Elias's last night", target: 1 },
-    { main: 'Gather the relics of the rite', target: 5 },
+    { main: 'Set the hymn tiles at the altar', target: 1, marker: 'Hymn board', place: { kind: 'point', at: HYMN_BOARD_POSITION } },
+    { main: "Reconstruct Elias's last night", target: 1, marker: 'Slate', place: { kind: 'point', at: CASE_3_CRYPT_PROPS.slate } },
+    { main: 'Gather the relics of the rite', target: 5, marker: 'Relic', place: { kind: 'nearest-relic' } },
   ],
 }
 
