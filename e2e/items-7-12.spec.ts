@@ -19,9 +19,6 @@ interface World {
   phaseTime: number
   nightNumber: number
 }
-interface WaveSnap {
-  waves: { phase: string; waveIndex: number }
-}
 interface Enemy {
   uid: string
   type: string
@@ -88,36 +85,54 @@ async function goToNight(page: Page, n: number) {
   await until(page, () => (window.__lastRites!.snapshot('world') as World).phase === 'night', null)
 }
 
-/** Kills each wave through the damage rules until the director reports the night's waves done. */
-async function clearWaves(page: Page, stopWhen?: () => Promise<boolean>) {
-  const deadline = Date.now() + 600_000
-  for (;;) {
-    const w = await snap<WaveSnap>(page, 'wave')
-    if (w.waves.phase === 'done') return
-    if (stopWhen && (await stopWhen())) return
-    if (Date.now() > deadline) throw new Error(`waves did not clear: ${JSON.stringify(w)}`)
-    await page.evaluate(() => window.__lastRites!.killAll())
-    await page.waitForTimeout(400)
-  }
-}
+const RELIC_NAMES = ["Crane's Rosary", "Sexton's Bell Clapper", "Child's Locket", 'Burial Shroud', 'Reliquary Heart']
 
-/** Night 5 with `relics` relics held, every wave cleared and the rite offered. */
-async function nightFiveReady(page: Page, relics: number) {
+/**
+ * Spec 10 task 4.9: the old night-five setup (clear every wave, then hold Interact 45 s) is gone.
+ * The last night is stage 3's, its waves never clear, and the rite is relic placement at the altar
+ * panel. Setup only (dev hook): skip to stage 3, mark its two minigames solved (case3.spec.ts plays
+ * them for real), hand over `relics` relics in rite order, and go to the night.
+ */
+async function riteReady(page: Page, relics: number) {
   await page.evaluate((r) => {
     const h = window.__lastRites!
     h.keepAlive(true)
+    h.skipToStage(3)
+    h.solveCurrentMinigame()
+    h.solveCurrentMinigame()
     r.forEach((id) => h.give(id as never, 1))
   }, RELICS.slice(0, relics) as unknown as string[])
-  await goToNight(page, 5)
-  await clearWaves(page)
+  await until(page, () => (window.__lastRites!.stageState() as { stage: number }).stage === 3, null, 30_000)
+  await goToNight(page, 3)
 }
 
-/** Stands at the altar and holds Interact: the real rite action (FinalRite.tsx reads the input). */
-async function holdRite(page: Page) {
-  await page.evaluate(() => window.__lastRites!.teleport(10, 8.5, { yaw: 0 }))
-  await bodyAt(page, 10, 8.5)
-  await page.evaluate(() => window.__lastRites!.hold('Interact'))
+/**
+ * Lays the first `n` relics in rite order with the real altar panel controls (select, then "Lay it
+ * here"), then closes the panel so the HUD is in view. The first relic starts Crane's 10 s clock.
+ */
+async function placeRelics(page: Page, n: number) {
+  await page.evaluate(() => window.__lastRites!.setAltarPanel(true))
+  const panel = page.getByRole('dialog', { name: 'The Rite of Rest' })
+  await expect(panel).toBeVisible()
+  for (let i = 0; i < n; i++) {
+    const slot = panel.locator('.rite-panel__slot').nth(i)
+    await slot.locator('select').selectOption({ label: RELIC_NAMES[i] })
+    await slot.getByRole('button', { name: 'Lay it here' }).click()
+    await expect(panel.locator('.rite-panel__done')).toHaveCount(i + 1, { timeout: 10_000 })
+  }
   await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).riteStarted, null, 30_000)
+  // The rite may already have finished (all five placed with Crane down): the panel goes with it.
+  if ((await panel.count()) > 0) await page.evaluate(() => window.__lastRites!.setAltarPanel(false))
+}
+
+/** Puts down Father Crane (and the waves) through the damage rules until the rite ends the run. */
+async function killCraneUntilEnding(page: Page) {
+  const deadline = Date.now() + 240_000
+  while ((await snap<EndingSnap>(page, 'ending')).ending === null) {
+    if (Date.now() > deadline) throw new Error(`no ending: boss ${JSON.stringify(await snap<Boss>(page, 'boss'))}`)
+    await page.evaluate(() => window.__lastRites!.killAll())
+    await page.waitForTimeout(500)
+  }
 }
 
 const objectiveMain = async (page: Page) => (await snap<Objective | null>(page, 'objective'))?.main ?? ''
@@ -281,7 +296,9 @@ test('item 7: zombie look at 1.5 m and 2 m at night, lantern on', async ({ page 
     // The numbers only mean something if the zombie really is in the frame and the diff is not noise.
     expect(m.pixels, `zombie pixels at ${d} m`).toBeGreaterThan(300)
     expect(m.noisePixels, `noise pixels at ${d} m`).toBeLessThan(m.pixels * 0.25)
-    expect(m.meanS, `mean saturation at ${d} m`).toBeLessThan(0.5)
+    // 0.5 fitted the old flat grey skins. Spec 09 task 11p keeps the TRELLIS texture's own colours,
+    // and the amber lantern on pale skin measures 0.57 to 0.66, so the ceiling is 0.75 (still catches a garish tint).
+    expect(m.meanS, `mean saturation at ${d} m`).toBeLessThan(0.75)
     expect(m.meanV, `mean value at ${d} m`).toBeGreaterThan(0.12)
   }
   log('item7 note: whether it looks "corpse-like" is a matter of taste; look at e2e/screenshots/zombie-1.5m.png and zombie-2m.png')
@@ -292,13 +309,12 @@ test('item 7: zombie look at 1.5 m and 2 m at night, lantern on', async ({ page 
 // Items 8 and 9
 // ---------------------------------------------------------------------------------------------
 
-// Spec 10 task 3.9: night waves never clear any more and the 45 s rite hold is replaced by relic
-// placement (task 4.5), so this night-five path is parked until task 4.9 rewrites it for the Rite.
-test.fixme('item 8: final rite objective follows Father Crane', async ({ page }) => {
+// Spec 10 task 4.9: rewritten for the stage 3 Rite. The rite is offered at once (the waves never
+// clear), the first relic laid starts it, and Crane's fall leaves the rest of the relics to place.
+test('item 8: final rite objective follows Father Crane', async ({ page }) => {
   test.setTimeout(900_000)
   const errors = await boot(page)
-  await nightFiveReady(page, 5)
-  await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).nightFiveCleared, null, 30_000)
+  await riteReady(page, 5)
   await until(page, () => (window.__lastRites!.snapshot('objective') as Objective | null)?.rule === 2, null, 30_000)
   const before = await objectiveMain(page)
   log(`item8 before the rite: "${before}"`)
@@ -321,7 +337,7 @@ test.fixme('item 8: final rite objective follows Father Crane', async ({ page })
     }, 50)
   })
 
-  await holdRite(page)
+  await placeRelics(page, 1)
   await until(page, () => (window.__lastRites!.snapshot('boss') as Boss).stage === 'risen', null, 180_000)
   const alive = await objectiveMain(page)
   const markers = await page.locator('.compass__marker--objective').allTextContents()
@@ -331,11 +347,8 @@ test.fixme('item 8: final rite objective follows Father Crane', async ({ page })
   expect(markers.join(' ')).toMatch(/\d+ m/)
   expect((await snap<World>(page, 'world')).phase).toBe('night')
 
-  // Releasing Interact keeps the rite at its 44 s cap; then he falls through the damage rules.
-  await page.evaluate(() => {
-    window.__lastRites!.release('Interact')
-    window.__lastRites!.killAll()
-  })
+  // He falls through the damage rules. One relic of five stands, so the rite waits for the rest.
+  await page.evaluate(() => window.__lastRites!.killAll())
   await until(page, () => (window.__lastRites!.snapshot('boss') as Boss).stage === 'dead', null, 60_000)
   await until(page, () => (window.__lastRites!.snapshot('objective') as Objective | null)?.main.startsWith('Finish the rite') === true, null, 30_000)
   const after = await objectiveMain(page)
@@ -343,6 +356,7 @@ test.fixme('item 8: final rite objective follows Father Crane', async ({ page })
   log(`item8 Crane dead: "${after}" compass objective markers=${JSON.stringify(markersAfter)}`)
   expect(after).toMatch(/^Finish the rite at the altar/)
   expect(markersAfter.length).toBeGreaterThan(0)
+  expect((await snap<EndingSnap>(page, 'ending')).ending).toBeNull()
 
   const seen = await page.evaluate(() => (window as unknown as { __obj: { main: string; stage: string }[] }).__obj)
   log(`item8 objective lines seen since the rite became available: ${JSON.stringify(seen)}`)
@@ -355,13 +369,13 @@ for (const vp of [
   { width: 1280, height: 720 },
   { width: 1920, height: 1080 },
 ]) {
-  // Parked like item 8 (needs the night-five rite setup): task 4.9 rewrites it.
-  test.fixme(`item 9: boss name card does not touch the boss bar at ${vp.width}x${vp.height}`, async ({ page }) => {
+  // Spec 10 task 4.9: the rite is started by laying the first relic (stage 3), not by a held E.
+  test(`item 9: boss name card does not touch the boss bar at ${vp.width}x${vp.height}`, async ({ page }) => {
     test.setTimeout(900_000)
     await page.setViewportSize(vp)
     const errors = await boot(page)
-    await nightFiveReady(page, 5)
-    await holdRite(page)
+    await riteReady(page, 5)
+    await placeRelics(page, 1)
     const handle = await rectsOf(page, '.boss-name-card', '.boss-bar')
     const r = (await handle.jsonValue()) as {
       a: Record<'left' | 'top' | 'right' | 'bottom', number>
@@ -458,13 +472,13 @@ test('item 10a: no rune or hover cue during the intro cutscene', async ({ page }
   expect(errors).toEqual([])
 })
 
-// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
-// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
-test.fixme('item 10b: no rune or hover cue during an ending (Taken, reached through the real rite check)', async ({ page }) => {
+// Spec 10 task 4.9: rewritten. A night no longer ends in Taken when its waves clear (they never
+// do, and Taken is now only a death without retry), so the ending is Rest, reached through the
+// real stage 3 rite: five relics laid at the altar panel and Crane put down by the damage rules.
+test('item 10b: no rune or hover cue during an ending (Rest, reached through the real rite)', async ({ page }) => {
   test.setTimeout(900_000)
   const errors = await boot(page)
-  await page.evaluate(() => window.__lastRites!.keepAlive(true))
-  await goToNight(page, 5)
+  await riteReady(page, 5)
   await aimAtGrave(page)
   await page.waitForTimeout(1500)
   const control = await cueState(page)
@@ -472,9 +486,9 @@ test.fixme('item 10b: no rune or hover cue during an ending (Taken, reached thro
   expect(control.handCrosshair).toBeGreaterThan(0)
   expect(control.cues!.visibleRunes).toBeGreaterThan(0)
 
-  // No relics and every wave cleared: FinalRite.tsx itself calls startEnding('taken').
-  await clearWaves(page, async () => (await snap<EndingSnap>(page, 'ending')).ending !== null)
-  await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).ending === 'taken', null, 60_000)
+  await placeRelics(page, 5)
+  await killCraneUntilEnding(page)
+  await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).ending === 'rest', null, 60_000)
   // The ending is set before the screen switches, and a SwiftShader frame lasts ~250 ms: sample only
   // once the ending screen is up and the scene has rendered after it, or the first sample reads the
   // last gameplay frame (seen once: 1 rune and a stale hover, then 7 clean samples).
@@ -530,20 +544,18 @@ async function installEndingWatch(page: Page) {
 const endingResult = (page: Page) =>
   page.evaluate(() => (window as unknown as { __end: { wall: number | null; maxClock: number; ending: string | null } }).__end)
 
-/** Plays the real rite (hold Interact at the altar) with `relics` relics, killing Crane when he rises. */
-async function playRiteToEnding(page: Page, relics: number) {
-  await nightFiveReady(page, relics)
+/** Plays the real stage 3 rite: all five relics laid at the altar panel, Crane killed when he rises. */
+async function playRiteToEnding(page: Page) {
+  await riteReady(page, 5)
   await installEndingWatch(page)
-  await holdRite(page)
+  await placeRelics(page, 5)
   await until(page, () => (window.__lastRites!.snapshot('boss') as Boss).stage === 'risen', null, 180_000)
-  await page.evaluate(() => window.__lastRites!.killAll())
-  // Interact stays held: progress was capped at 44 s and now runs on to 45 s.
-  await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).ending !== null, null, 240_000)
+  // The placed relics wait for him; his fall finishes the rite.
+  await killCraneUntilEnding(page)
 }
 
 async function measureEnding(page: Page, id: string) {
   await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).stage === 'summary', null, 240_000)
-  await page.evaluate(() => window.__lastRites!.release('Interact'))
   const r = await endingResult(page)
   log(`item11 ${id}: wall ${((r.wall ?? 0) / 1000).toFixed(1)} s, sequence clock reached ${r.maxClock.toFixed(1)} s, ending=${r.ending}`)
   expect(r.ending).toBe(id)
@@ -557,35 +569,47 @@ async function measureEnding(page: Page, id: string) {
   await expect(page.locator('.ending__stat').first()).toBeVisible()
 }
 
-// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
-// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
-test.fixme('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)', async ({ page }) => {
+// Spec 10 task 4.9: rewritten for the stage 3 rite (relic placement instead of the 45 s hold).
+test('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
-  await playRiteToEnding(page, 5)
+  await playRiteToEnding(page)
   await measureEnding(page, 'rest')
   expect(errors).toEqual([])
 })
 
-// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
-// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
-test.fixme('item 11: Uneasy Peace ending reaches the summary unskipped (real rite, 4 relics)', async ({ page }) => {
+// Spec 10 task 4.9: Uneasy Peace is retired (Req 17.8: the rite cannot be completed with fewer
+// than 5 relics). The 4-relic run now checks that: four laid, Crane down, and still no ending.
+test('item 11: with 4 relics the rite cannot finish (Uneasy Peace is retired)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
-  await playRiteToEnding(page, 4)
-  await measureEnding(page, 'uneasy-peace')
+  await riteReady(page, 4)
+  await placeRelics(page, 4)
+  await until(page, () => (window.__lastRites!.snapshot('boss') as Boss).stage === 'risen', null, 180_000)
+  await page.evaluate(() => window.__lastRites!.killAll())
+  await until(page, () => (window.__lastRites!.snapshot('boss') as Boss).stage === 'dead', null, 60_000)
+  await renderedFrames(page, 30)
+  const end = await snap<EndingSnap>(page, 'ending')
+  const st = (await page.evaluate(() => window.__lastRites!.stageState())) as { caseSolved: boolean }
+  const rite = (await page.evaluate(() => window.__lastRites!.riteState())) as { placed: Record<string, string> }
+  log(`item11 4 relics: ending=${end.ending} caseSolved=${st.caseSolved} placed=${Object.keys(rite.placed).length}`)
+  expect(end.ending).toBeNull()
+  expect(st.caseSolved).toBe(false)
+  expect(Object.keys(rite.placed)).toHaveLength(4)
+  expect((await snap<World>(page, 'world')).phase).toBe('night')
+  await until(page, () => (window.__lastRites!.snapshot('objective') as Objective | null)?.main.startsWith('Finish the rite at the altar (4/5)') === true, null, 30_000)
   expect(errors).toEqual([])
 })
 
-// Spec 10 task 3.9: parked. This path needs night waves to clear and the old 45 s rite hold; both
-// go away with the stage 3 Rite (task 4.5), and task 4.9 rewrites it.
-test.fixme('item 11: Taken ending reaches the summary unskipped (real night-5 check, 0 relics)', async ({ page }) => {
+// Spec 10 task 4.9: no night-end check starts Taken any more (waves never clear; Taken is a death
+// without retry). The ending is started through the same startEnding the game uses, then left to
+// run unskipped to the summary.
+test('item 11: Taken ending reaches the summary unskipped (startEnding, 0 relics)', async ({ page }) => {
   test.setTimeout(1_500_000)
   const errors = await boot(page)
   await page.evaluate(() => window.__lastRites!.keepAlive(true))
   await installEndingWatch(page)
-  await goToNight(page, 5)
-  await clearWaves(page, async () => (await snap<EndingSnap>(page, 'ending')).ending !== null)
+  await page.evaluate(() => window.__lastRites!.startEnding('taken'))
   await measureEnding(page, 'taken')
   expect(errors).toEqual([])
 })
