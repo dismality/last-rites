@@ -1882,3 +1882,16 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The lodge moved rather than opening a gap in the avenue's railing, so the avenue and its walls are unchanged.
   - The fix for Stage 3 keeps its props at night rather than lengthening the day, so Short Vigil keeps its 2-minute days.
   - Spec 09 task 3 keeps its "moved to spec 10 final task" note and stays unticked.
+
+### 2026-11-17: Outside Kiro: 11-horror-pass task 1: design bible horror pass
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 11-horror-pass task list Kiro wrote.
+- **What happened:**
+  - The design bible has a new section, "14. Horror pass (11)", with subsections 14.1 to 14.9: screen jumpscares, new creatures, zombie looks, bats, info dots, the vending machine, hands and lantern light, settings and controls, and the cut list. Each subsection has its numbers in tables, taken from the spec 11 requirements and design. A "Waiting list and placeholders" part gives the placeholder rules.
+  - Existing sections are updated: Grave Coins can be spent at the vending machine (§3); the Brisk Draught consumable and its timed effect (§4); the Pale Crawler, Hollow Bride and Corpse Hound rows (§7); hounds and crawlers on the wave ladder (§8); screen jumpscares as a major scare with their own cooldown (§9); info dots and the Creatures page (§11). §10 (controls) needs no change. The preamble lists the (11) tag.
+  - `tests/designBibleSection12.test.ts` checks the nine subsections and the cut list, and tests a small parser (`tests/helpers/designBible.ts`) that returns each subsection's tables as typed rows for the later data checks. A subsection marked cut is skipped.
+  - Lint, build and all 2501 unit tests pass. No code under `src/` changed.
+- **Decisions made unattended:**
+  - The section is numbered 14, not 12: the bible's §12 (progression, spec 08) and §13 (stages and cases, spec 10) already exist and those specs cite them by number. A note at the top of §14 says spec 11 calls it §12, and the parser finds the section by its title. (2026-11-17)
+  - Spec 11's night numbers are mapped to the 3-stage design: the crawler's "night 2" and the coffin scare are the stage 2 night, the hut window scare is the stage 3 night, and the hounds come from stage 2. (2026-11-17)
+  - The bestiary field notes and "What works" lines, the tell captions and the info-tip keys (one per journal tab, Pages and Closed cases included) were written for the bible from the spec; the tip texts themselves are written in task 5 from the code. (2026-11-17)
+  - The test reads the bible through Vite's raw import, as the other tests in `tests/` read files, because the project has no Node types. (2026-11-17)

@@ -1,0 +1,133 @@
+import { describe, expect, it } from 'vitest'
+import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsection, tableOf } from './helpers/designBible'
+
+// Spec 11 task 1.2 (Req 8.2, 8.3): the horror-pass section of the design bible ("§12" in spec 11,
+// "## 14. Horror pass" in the bible) has its nine subsections, and a small parser hands later tasks
+// typed table rows to compare with `src/data/`. Each feature task adds its own table-versus-data
+// check to this file; a subsection marked cut is skipped.
+
+const bible = readHorrorPass()
+
+describe('the horror pass in the design bible', () => {
+  it('has subsections 1 to 9, in order', () => {
+    expect(bible.subsections.map((s) => s.number)).toEqual(
+      Array.from({ length: 9 }, (_, i) => `${bible.sectionNumber}.${i + 1}`),
+    )
+  })
+
+  it('names the subsections of the spec 11 design', () => {
+    const titles = bible.subsections.map((s) => s.title.replace(/\s*\(.*\)\s*$/, ''))
+    expect(titles).toEqual([
+      'Screen jumpscares',
+      'New creatures',
+      'Zombie looks',
+      'Bats',
+      'Info dots',
+      'Vending machine',
+      'Hands and lantern light',
+      'Settings and controls',
+      'Cut list',
+    ])
+  })
+
+  it('gives every live subsection at least one table with rows', () => {
+    for (const s of liveSubsections(bible)) {
+      expect(s.tables.length, s.number).toBeGreaterThan(0)
+      for (const t of s.tables) expect(t.rows.length, `${s.number} ${t.header[0]}`).toBeGreaterThan(0)
+    }
+  })
+
+  it('accepts a spec 11 number or a bible number for a subsection', () => {
+    expect(subsection(bible, '12.6')).toBe(subsection(bible, `${bible.sectionNumber}.6`))
+  })
+
+  it('keeps the cut list in priority order and in step with the cut marks', () => {
+    const cuts = tableOf(subsection(bible, '12.9'), 'Priority').rows
+    expect(cuts.map((r) => Number(r.Priority))).toEqual([1, 2, 3, 4, 5, 6])
+    for (const row of cuts) {
+      expect(['Planned', 'Built', 'cut'], row.Feature).toContain(row.Status)
+      for (const n of row.Subsection.split(',').map((x) => x.trim())) {
+        const s = bible.subsections.find((x) => x.number === n)
+        expect(s, n).toBeDefined()
+        expect(s!.cut, `${n} cut mark matches the cut list`).toBe(row.Status === 'cut')
+      }
+    }
+    // Lowest priority goes first: a cut row never sits above a row that is not cut.
+    const firstCut = cuts.findIndex((r) => r.Status === 'cut')
+    if (firstCut >= 0) expect(cuts.slice(firstCut).every((r) => r.Status === 'cut')).toBe(true)
+  })
+
+  it('reads the vending rows as typed records', () => {
+    const rows = tableOf(subsection(bible, '12.6'), 'Row').rows
+    expect(rows).toHaveLength(6)
+    expect(rows[0]).toMatchObject({ ID: '`revolver-cartridge`', Qty: '6', Price: '12', 'Per day': '2' })
+  })
+})
+
+describe('the parser', () => {
+  const fixture = [
+    '## 2. Other',
+    '### 2.1 Not this (11)',
+    '| A | B |',
+    '|---|---|',
+    '| x | y |',
+    '',
+    '## 7. Horror pass (11)',
+    'Intro.',
+    '### 7.1 Faces (11, H1)',
+    '| Face | Edge |',
+    '|---|---|',
+    '| `a` | Bottom |',
+    '| `b` | Top |',
+    '',
+    'Text between tables.',
+    '',
+    '| Timing | Value |',
+    '| --- | --- |',
+    '| In | 70 ms |',
+    '### Unnumbered note',
+    '| Ignored | Table |',
+    '|---|---|',
+    '| 1 | 2 |',
+    '### 7.2 Bats (11, H4, cut)',
+    '| Bats | Value |',
+    '|---|---|',
+    '| Range | 14 m |',
+    '## 8. After',
+    '### 8.1 Not this either',
+  ].join('\n')
+
+  it('finds the section by its title, whatever its number', () => {
+    const h = parseHorrorPass(fixture)
+    expect(h.sectionNumber).toBe(7)
+    expect(h.subsections.map((s) => s.number)).toEqual(['7.1', '7.2'])
+  })
+
+  it('returns every table of a subsection as typed rows, stopping at an unnumbered heading', () => {
+    const s = parseHorrorPass(fixture).subsections[0]
+    expect(s.tables).toHaveLength(2)
+    expect(s.tables[0].rows).toEqual([
+      { Face: '`a`', Edge: 'Bottom' },
+      { Face: '`b`', Edge: 'Top' },
+    ])
+    expect(s.tables[1].rows).toEqual([{ Timing: 'In', Value: '70 ms' }])
+  })
+
+  it('skips a subsection marked cut', () => {
+    const h = parseHorrorPass(fixture)
+    expect(h.subsections[1].cut).toBe(true)
+    expect(liveSubsections(h).map((s) => s.number)).toEqual(['7.1'])
+  })
+
+  it('does not take "Cut list" for a cut mark', () => {
+    expect(parseHorrorPass('## 3. Horror pass\n### 3.9 Cut list (11)\n| A |\n|---|\n| 1 |').subsections[0].cut).toBe(false)
+  })
+
+  it('names a malformed row', () => {
+    expect(() => parseTables('| A | B |\n|---|---|\n| only one |')).toThrow(/only one/)
+  })
+
+  it('says so when there is no horror pass', () => {
+    expect(() => parseHorrorPass('## 1. Story')).toThrow(/Horror pass/)
+  })
+})

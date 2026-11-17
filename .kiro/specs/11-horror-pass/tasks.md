@@ -24,18 +24,21 @@ Common rules for all tasks:
 
 ## Tasks
 
-- [ ] 1. Design bible §12 "Horror pass" (never cut; committed on its own before any code)
-  - [ ] 1.1 Write §12 and the bible edits
+- [x] 1. Design bible §12 "Horror pass" (never cut; committed on its own before any code)
+  - [x] 1.1 Write §12 and the bible edits
     - Add §12 to `docs/game-design.md` with sections 12.1 to 12.9 of the design (screen jumpscares, new creatures, zombie looks, bats, info dots, vending machine, hands and lantern light, settings and controls, cut list); every table row carries names, IDs, counts, durations, radii, costs and cooldowns
     - Update the existing sections the design lists: §3 (item `brisk-draught`), §4 timed effects (`brisk-draught`: +25% move speed, 60 s), §7 (crawler, bride, hound), §8 waves, §9 scare director (screen scares, 180 s cooldown, 45 s gap), §11 HUD (info dots, Creatures page), §10 controls if any change; add the Waiting_List and Placeholder rules
     - Mark the freeze date and the cut order in §12.9
     - _Requirements: 8.1, 8.2, 8.3_
-  - [ ] 1.2 §12 mirror test scaffold
+    - Done outside Kiro by Claude. Written as `## 14. Horror pass (11)` with 14.1 to 14.9 (and a "Waiting list and placeholders" part), because the bible's §12 and §13 were already taken and specs 08 and 10 cite them by number; a note at the top of §14 says spec 11 calls it §12. Edits to §3, §4 (consumable and timed effect), §7, §8, §9 and §11; §10 needs no change
+  - [x] 1.2 §12 mirror test scaffold
     - Create `tests/designBibleSection12.test.ts`: assert §12 has sections 12.1 to 12.9 and a small parser that reads table rows by section heading and returns typed rows; later feature tasks add their own table-versus-data checks to this file
     - A section marked "cut" is skipped by the parser test
     - _Requirements: 8.2, 8.3_
-  - [ ] 1.3 Finish
+    - Done outside Kiro by Claude. The parser is `tests/helpers/designBible.ts` (`readHorrorPass`, `subsection(h, '12.6')`, `tableOf`, `liveSubsections`); it finds the section by its title, so either numbering works. A subsection is cut when its heading carries "(cut)" or ", cut)"
+  - [x] 1.3 Finish
     - Run the Finish steps for task 1 (docs and the new test only); commit `design bible section 12 horror pass (spec 11 task 1)` as its own commit with no code changes
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
 
 - [ ] 2. H6: The hut vending machine (cuttable, cut order 6)
   - [ ] 2.1 Foundation: Waiting_List, placeholders, asset budget and baseline perf

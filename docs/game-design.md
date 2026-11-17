@@ -2,7 +2,7 @@
 
 Source of truth for all game content. Code in `src/data/` mirrors these tables. If they disagree, this file wins; update the code.
 
-**Planned content.** Rows and sections tagged **(06)**, **(07)**, **(08)** or **(10)** belong to specs `06-clarity-and-hud`, `07-combat-and-enemies`, `08-progression-and-atmosphere` and `10-curse-stages`. They are added to `src/data/` by that spec's data task, not before. Untagged content is already in the game.
+**Planned content.** Rows and sections tagged **(06)**, **(07)**, **(08)**, **(10)** or **(11)** belong to specs `06-clarity-and-hud`, `07-combat-and-enemies`, `08-progression-and-atmosphere`, `10-curse-stages` and `11-horror-pass` (§14). They are added to `src/data/` by that spec's data task, not before. Untagged content is already in the game.
 
 **The 3-stage redesign (10).** On 2026-11-11 the five-night structure was replaced by three stages, each one day plus one night, each a "case" solved through puzzle minigames (§13). The detailed puzzle design lives in `docs/case-design.md`; where it and this file differ, `docs/case-design.md` wins. Until spec 10 is in the game, the code still plays the five-night structure described by the untagged numbers (night counts, wave tables, the 45 s hold rite); the **(10)** text says what replaces them. Content tagged **(10, stretch)** (E6 new enemies, E8 extra scares, E10 sanctuary health) is built only if time allows.
 
@@ -112,7 +112,7 @@ Each stack takes one satchel slot. Stack limits are higher than materials.
 | `shotgun-shell` | Shotgun Shells | 20 | Crafted; 4 come with the shotgun; elite drops |
 
 ### Currency (08)
-`grave-coin`, **Grave Coins**: a counter, not a satchel slot. Dropped by zombies and spent at the dawn merchant.
+`grave-coin`, **Grave Coins**: a counter, not a satchel slot. Dropped by zombies and spent at the dawn merchant. **(11)** Also spent at the hut's vending machine, by day or night (§14.6).
 
 ### Key items (no slot cost, shown in the journal)
 `rusted-crypt-key`, `bone-whistle`, `iron-ossuary-key`, `parish-ledger`, `journal-page-1` … `journal-page-5`
@@ -152,6 +152,7 @@ Each stack takes one satchel slot. Stack limits are higher than materials.
 | `silver-sabre` | Silver Sabre | Heavy melee | 28 (heavy 60) | 0.55 | ∞ | Hold to charge 0.6 s; heavy knocks down; +50% damage to Wailers. Crane crypt. **(07)** |
 | `blessed-rounds` | Blessed Rounds | Consumable | Applies Blessed Rounds | — | Single use | See Timed effects **(07)** |
 | `kola-tonic` | Kola Tonic | Consumable | Applies Adrenaline | — | Single use | Crypt shelves (rare), elite drops, the merchant **(07)** |
+| `brisk-draught` | Brisk Draught | Consumable | Applies Brisk Draught | — | Single use | The hut's vending machine only (§14.6) **(11)** |
 
 ### Firearms (07)
 | Stat | Service Revolver | Double-Barrel Shotgun |
@@ -209,6 +210,7 @@ One shared buff system. Each active effect shows an icon with its own glyph, a c
 | `blessed-rounds` | Blessed Rounds | Firearm damage ×2 | 30 s | Blessed Rounds consumable |
 | `adrenaline` | Adrenaline | Movement speed ×1.3, sprint stamina drain ×0.5 | 20 s | Kola Tonic |
 | `salt-circle` | Salt Circle | Zombies cannot cross the circle | 30 s | Placing a Salt Circle (shows the newest circle's time) |
+| `brisk-draught` | Brisk Draught | Movement speed ×1.25 | 60 s | Brisk Draught **(11)**. With Adrenaline active the larger speed multiplier applies, not the product |
 
 ---
 
@@ -292,6 +294,9 @@ Taking damage: brief red vignette (disabled when flashing lights is off) and a h
 | `bloater` | Bloater | 80 | 1.0 m/s | 15 | Swollen and slow. On death it swells for 0.8 s, then bursts in a cloud of grave gas: 25 damage within 3 m to the player **and** other zombies. A Bloater the burst takes to 0 HP swells and bursts in turn. Kill it at range. **(07)** | Wet gurgle; a rising hiss before it bursts |
 | `brute` | Brute | 300 | 1.1 m/s | 30 | Slow and tough. Light hits and kicks only stagger it for 0.3 s and never push it. Heavy attacks and shotgun blasts from 3 m or closer knock it down. Breaks barricade boards twice as fast. **(07)** | Heavy thudding steps, a low grunt |
 | `father-crane` | Father Aldous Crane | 1500 | 1.2 → 1.7 m/s | 30 / 20 | Boss, stage 3 only (**(10)** formerly night 5). See *Boss*. **(07)** | Chains of a censer, and a bell that isn't there |
+| `crawler` | Pale Crawler | 35 | 1.2 m/s crawl, 6 m/s lunge for 0.6 s | 8 | Hides under grave mounds and broken coffins from the stage 2 night; bursts out within 2 m and grabs. A level swing passes over it. See §14.2. **(11)** | A soil shiver and a wet click |
+| `bride` | Hollow Bride | 60 | 2.2 m/s | 0 (drains 20 oil) | A haunting from stage 2, at most one at a time, never in waves or elites; seen only in the lantern cone or within 3 m. See §14.2. **(11)** | A cold breath and faint humming |
+| `hound` | Corpse Hound | 45 | 5.5 m/s | 10 | Packs of 2 to 3 from stage 2 circle at 4 to 6 m and dart in one at a time. A gunshot or flare scatters them. See §14.2. **(11)** | A growl from the dark |
 
 ### Looks (07)
 Follow `docs/enemy-models.md`. No new model files.
@@ -427,6 +432,7 @@ The five fixed nights above become **endless escalating nights**, one per stage.
 - **Curse:** the night ends only when the stage's case is answered correctly (§13). A correct answer stops spawning, living zombies collapse to dust and the sunrise plays. A wrong answer spawns a wave at once and locks the altar for 30 s (never ends the run).
 - **Retry Night** returns to the start of that stage's dusk. The case's solved minigames and clue links are kept.
 - Fog thickens by stage, not by wave. Endless Survival keeps its own formula (§12).
+- **(11)** Corpse Hounds join the ladder rows from stage 2, and Pale Crawlers may be added as extras, by raising row sizes only, so a wave is never smaller than the one before and the alive caps hold. The Hollow Bride is never in a wave. Each tuning change is logged (§14.2).
 
 ---
 
@@ -455,6 +461,9 @@ Scare zones are trigger volumes placed in Mausoleum Row alleys, the catacombs an
 - **The first scare** stays the mild statue turn within the first 3 minutes. **The first minigame** must be reachable within 3 minutes too: stage 1's Ledger Cross-check starts from the hut shelf.
 - **Wrong day answers** add Doubt (§13), never a scare.
 - **No scare fires** during any minigame overlay, the satchel, the journal at day, crafting or pause. At night the journal does not pause, but no scare begins while it is open.
+
+### Screen jumpscares (11)
+Full-screen faces (§14.1) are major scares with their own 180 s cooldown on top of the 45 s major-scare gap. They are earned (a Pale Crawler's burst, the Hollow Bride's touch and three scripted moments), never rolled by the director, and follow the separate Jumpscares setting; Scare intensity still governs the events above.
 
 ### Extra scares (10, stretch: E8)
 Each has a telegraph and a subtitle, keeps the cooldown rules, and is added to the scare-accessibility hook's checks.
@@ -667,6 +676,10 @@ Plays once on New Game: about 20 s in-engine **(09, B15)** (was about 35 s), fiv
 It ends with the first objective appearing in the tracker.
 
 ---
+
+### Info dots and the Creatures page (11)
+- A small circled **i** next to each journal section heading and the main HUD panels shows a short how-to-play tooltip; the setting "Show info dots" (on) hides them all (§14.5).
+- The journal gets a **Creatures** page (the bestiary): each creature once seen shows its sketch, a field note and "What works"; unseen creatures stay hidden (§14.2).
 
 ## 12. Progression and atmosphere (08)
 
@@ -923,3 +936,263 @@ The chapel gets an overall health bar on top of its door boards: zombies that br
 ### Build order and cuts (deadline Dec 4, feature freeze Nov 26)
 Build: E1 stage loop, the case board, stage 1 (1a, 1b), stage 3 (3a, 3b, rite, Silas), stage 2 (2a, 2b, 2c), E5 win cutscene, E11 help and Short Vigil, E7 kill-cam, E9 stamina, E4 tiered crafting, Name the Dead.
 Cut in this order if time runs short: Name the Dead, E4, minigame 2c, minigame 2a (keep the whistle where it is now), E9. Do not cut the case board, stages 1 and 3, the rite, E1 or E5. E6, E8 and E10 are stretch only.
+
+---
+
+## 14. Horror pass (11)
+Spec `11-horror-pass` calls this section "§12". It is numbered 14 here because §12 (progression) and §13 (stages and cases) were already taken and specs 08 and 10 cite them by number. Every table row below is mirrored in `src/data/` with the same values (the file named in each subsection); if the two differ, this section wins. Rows tagged **(11)** are added by spec 11's tasks, not before. Feature freeze is 2026-11-26; §14.9 says what is cut, in which order.
+
+### Waiting list and placeholders (11)
+- Claude makes the art (models, rigs, clips, face images, the lantern cookie) in Blender at the fixed paths in `src/data/assets.ts`. Every expected art file of this spec is a row in `src/data/placeholders.ts` (path, kind, owner, feature, use).
+- Where a file is missing, the game uses a **placeholder**: the zombie model scaled and tinted (creatures), a labelled flat rectangle (face images), a plain bottle primitive named "Brisk Draught (placeholder)" (item), a plain cabinet with the real colliders and handle anchors (vending machine), a small dark ellipsoid (bats), a generated soft round texture (cookie), procedural Web Audio (sounds), and today's weapon-only viewmodel (hands). A placeholder is never final art.
+- Each placeholder use carries a `// PLACEHOLDER: <path>` comment and is registered once in the **Waiting_List** when its load fails. In dev (`?dev=1`) a placeholder shows a small "PLACEHOLDER" label.
+- The game builds, passes its tests and starts with every art file absent. The last task of spec 11 lists every file still waiting, with its full path.
+- New models are Draco or meshopt compressed; the sum of `public/assets` stays under 25 MB.
+
+### 14.1 Screen jumpscares (11, H1)
+A face slams onto the screen at an earned moment: a zombie face up from the bottom edge, a ghost down from the top. Data: `src/data/screenScares.ts`; rules: `src/game/systems/screenScares.ts`; overlay: `ScreenScare`, above the HUD.
+
+| Face | Set | Edge | Path |
+|---|---|---|---|
+| `face-zombie-1` | zombie-bottom | Bottom | `public/assets/scares/face-zombie-1.webp` |
+| `face-zombie-2` | zombie-bottom | Bottom | `public/assets/scares/face-zombie-2.webp` |
+| `face-crawler` | zombie-bottom | Bottom | `public/assets/scares/face-crawler.webp` |
+| `ghost-bride-1` | ghost-top | Top | `public/assets/scares/ghost-bride-1.webp` |
+| `ghost-bride-2` | ghost-top | Top | `public/assets/scares/ghost-bride-2.webp` |
+
+Faces are transparent `.webp`, 2048 px tall, under 300 KB. A pick is random within the set and never the same face twice in a row.
+
+| Timing | Value |
+|---|---|
+| Image height | 85% of the viewport height |
+| In | 70 ms, no easing |
+| Hold | 550 to 800 ms (random) |
+| Out | 250 ms, slides off its edge and fades to 0 |
+| Telegraph lead | 500 to 1500 ms (a flicker, creak, breath or music drop first) |
+| Cooldown | 180 s of sim time between screen scares |
+| Major-scare gap | 45 s after any major scare (§9) |
+| World dim | 30% brightness for the hold |
+| Scale jitter | 1.00 to 1.04 |
+| Duck | other audio −70% for the hold, back within 250 ms |
+| Off subtitle | 3 s |
+
+| Trigger | Set | When | Gameplay effect |
+|---|---|---|---|
+| `crawler` | zombie-bottom | A Pale Crawler bursts within 1.5 m in front | Grab damage after the out phase starts |
+| `bride` | ghost-top | The Hollow Bride reaches the player | Oil drain after the in phase ends |
+| `coffin-night-2` | zombie-bottom | Opening the marked broken coffin, stage 2 night | Once per save |
+| `hut-window-night-3` | zombie-bottom | Looking out of the hut's west window, stage 3 night | Once per save; the face presses against the glass |
+| `ossuary-grille` | ghost-top | Looking through the ossuary door's grille the first time | Once per save |
+
+- A trigger inside the cooldown is skipped: no face, the moment stays unused, and its gameplay effect applies at once.
+- While any overlay is open (menus, pause, journal, satchel, workbench, big map, examine, cutscenes, endings), a scare is held back and no cooldown starts.
+- A screen scare never takes health. The sting is three layers: a sharp attack, a low thud, and a scream or wail.
+- Pause stops the overlay's timers and its sound.
+
+| Jumpscares | Face | Flash (1 frame) | Shake | Chromatic split | Dim | Sting | Subtitle |
+|---|---|---|---|---|---|---|---|
+| Full | Yes | Yes | Yes | Yes | Yes | 100% | For the whole scare |
+| Reduced | Yes | No | No | No | No | 50% | For the whole scare |
+| Off | No | No | No | No | No | None | 3 s, describing the event |
+
+With Flashing lights off there is never a flash or chromatic split; with Camera shake off (or reduced motion without shake turned on) there is never shake. The gameplay effect is the same at every setting.
+
+### 14.2 New creatures (11, H2)
+Data: `src/data/enemies.ts` (`EnemyId`, `ENEMY_MAP`, `ENEMY_LOOKS`) and `src/data/creatures.ts`. Each creature warns before it attacks, and every tell and attack sound has a caption and plays from the creature's position.
+
+| ID | Name | HP | Speed | Damage | From | Waves | Elites |
+|---|---|---|---|---|---|---|---|
+| `crawler` | Pale Crawler | 35 | 1.2 m/s crawl; 6 m/s lunge for 0.6 s | 8 (grab) | Stage 2 night | Optional extras; mostly placed at spots | May be |
+| `bride` | Hollow Bride | 60 | 2.2 m/s drift | 0 (drains oil) | Stage 2 | Never | Never |
+| `hound` | Corpse Hound | 45 | 5.5 m/s | 10 (dart) | Stage 2 | Yes | May be |
+
+| Trait | Value |
+|---|---|
+| Crawler spots per stage 2 night | 3 to 6, distinct grave mounds or broken coffins |
+| Crawler burst range | 2 m |
+| Crawler face range | 1.5 m, in front |
+| Crawler grab cooldown | 1.5 s per crawler |
+| Crawler weakness | Horizontal melee misses (0 damage); downward swings, guns and lantern-trap fire hit normally |
+| Bride visible | Inside the lantern cone, or within 3 m |
+| Bride oil drain | 20 points of the 0 to 100 fuel scale, never below 0 |
+| Bride return | 30 to 60 s after she vanishes |
+| Bride alive | At most 1 |
+| Bride passes | Fences, gravestones |
+| Bride blocked by | Chapel walls, hut walls, salt circles |
+| Bride damage | Lead (revolver, shotgun) 0, with a no-effect cue; holy water, silver sabre, Blessed Rounds normal |
+| Bride lantern | Within 8 m: flame bends, light ×0.7 (a fade of at least 1 s with Flashing lights off) |
+| Hound pack | 2 to 3 |
+| Hound circle | 4 to 6 m |
+| Hound darts | One at a time, at least 2 s apart |
+| Hound scatter | A lantern flare or gunshot within 15 m scatters the pack for 4 s, with no damage |
+| Seen (bestiary) | In the lantern cone or within 10 m, once |
+| Scripted floor | A creature or scripted event never takes the player below 1 HP if they were above 1 HP when it began |
+
+| Creature | Tell (0.5 to 1.5 s before damage) | Caption |
+|---|---|---|
+| `crawler` | A soil shiver and a wet click | [soil shivers, a wet click] |
+| `bride` | A cold breath, the lantern flame bends, faint humming | [a cold breath, faint humming] |
+| `hound` | A growl from the dark | [a growl from the dark] |
+
+| Bestiary | Field note (at most 200 characters) | What works |
+|---|---|---|
+| `crawler` | It waits under mounds and broken coffins and drags itself out when you pass. Its body is too low for a level swing. | Swing down, shoot it, or burn it with a lantern trap. |
+| `bride` | A drifting bride seen only in your lantern's light. She cannot wound you, but her touch drinks your oil. | Holy water, the silver sabre, Blessed Rounds; she cannot cross salt. Lead passes through. |
+| `hound` | They hunt in twos and threes, circling out of reach until one darts in. | A gunshot or a lantern flare scatters them; guns and heavy swings bring them down. |
+
+Unseen creatures show no name and no sketch. Tuning changes to the wave tables are logged in `docs/kiro-log.md`; a wave is never smaller than the one before and the alive caps (12 / 16 / 20) hold.
+
+### 14.3 Zombie looks (11, H3)
+| Contract | Value |
+|---|---|
+| Models | `public/assets/models/enemies/zombie.glb`, `zombie-brute.glb`, `crawler.glb`, `bride.glb`, `hound.glb`, paths only in `src/data/assets.ts` |
+| Clips | Idle, Walk, Run, Crawl, Attack, Lunge, Threaten, HitReact, Death; the hound and the Bride use their own movement clip in place of Crawl |
+| Missing clip | Idle, with one warning per model and clip |
+| Missing model | Base `zombie.glb` |
+| Variants | `look-0` to `look-3`, one shown at a time, picked from the spawn uid (FNV-1a hash, mod 4) |
+| Missing variant | Base mesh only |
+| Tint | Only where a variant defines one; otherwise the file's materials |
+| Budget | One skinned mesh, under 15,000 triangles |
+| Looks per new id | 4 (`crawler`, `bride`, `hound` in `ENEMY_LOOKS`) |
+
+The style is original survival horror: grey-green mottled skin with exposed tendons, torn 1891 burial clothes, cloudy eyes, broken teeth, a shambling gait.
+
+### 14.4 Bats (11, H4)
+Data: `src/data/bats.ts`; rules: `src/game/systems/bats.ts`, `batPerches.ts`. Models `props/bat-perched.glb` and `props/bat-flying.glb`.
+
+| Bats | Value |
+|---|---|
+| Perched per night | 8 to 12, from stage 1; one per box (fewer if fewer boxes qualify, with no error) |
+| Perch boxes | Top face of `graveyard-colliders.json` boxes 0.6 to 1.6 m tall |
+| Watch range | 14 m: `head` and `eyes` turn on Y toward the player |
+| Turn limit | 120° either side of rest |
+| Ease time constant | 0.4 s (back to rest within 2 s) |
+| Take-off | Player within 3 m, or a gunshot within 10 m |
+| Flaps | 8 per second, `wing-left` and `wing-right` pivots |
+| Flight | 6 s on a curved path away from the player, then fades out in 1 s or less |
+| Return | 120 s after removal, to a different free box |
+| Chitter | At most one per 20 s while a bat is perched; caption at least 2 s |
+| Eyes | Emissive, steady with Flashing lights off; no light |
+| Belfry flock (optional) | 15 to 20 instanced bats at the dusk bell, gone within 10 s; skipped when frames average over 22 ms; no shake |
+
+Bats never hurt the player and never start a screen scare.
+
+### 14.5 Info dots (11, H5)
+A small circled **i** next to each journal section heading and each HUD panel below shows a parchment tooltip on how to play (not the story), at most 2 sentences, written from what the code does. Data: `src/data/infoTips.ts`.
+
+| Key | Where |
+|---|---|
+| `journal-pages` | Journal: Pages |
+| `journal-clues` | Journal: Clues |
+| `journal-case` | Journal: Case |
+| `journal-closed` | Journal: Closed cases |
+| `journal-relics` | Journal: Relics |
+| `journal-contracts` | Journal: Contracts |
+| `journal-map` | Journal: Map |
+| `journal-creatures` | Journal: Creatures (with H2) |
+| `hud-case-board` | Case board |
+| `hud-clues` | Clues |
+| `hud-curse` | Curse meter |
+| `hud-hints` | Hints (5, then 10, then 20 coins) |
+| `hud-map` | Map |
+| `hud-recipes` | Recipes |
+| `hud-satchel` | Satchel |
+| `hud-relics` | Relics |
+| `hud-oil` | Lantern oil |
+| `hud-stamina` | Stamina |
+| `hud-bestiary` | Bestiary |
+| `hud-coins` | Coins (mentions the vending machine) |
+
+- Hover, Tab focus or a tap opens the tooltip within 100 ms; leaving, blur or a tap outside closes it within 100 ms.
+- Escape closes an open tooltip and does not pause; with no tooltip open, Escape pauses as before.
+- The dot links to its tooltip with `aria-describedby` and has a visible focus state. At 800x600 with the plain font, a tooltip stays fully on screen and clear of the health bar, oil gauge and controls hint panel.
+- A journal tab added later needs a tip, or the tip test fails.
+
+### 14.6 Vending machine (11, H6)
+The "Hollowmere Automatic Dispenser": `props/vending-machine.glb` in the hut at (2.83, 0, 1.85), rotationY −π/2, colliders in `hut.json` and the machine's JSON. Interact within 2.5 m opens a panel in the merchant's style, by day and by night. Data: `src/data/vending.ts`; rules: `src/game/systems/vending.ts`.
+
+| Row | ID | Item | Qty | Price | Per day | Needs | Handle |
+|---|---|---|---|---|---|---|---|
+| 0 | `revolver-cartridge` | Revolver Cartridges | 6 | 12 | 2 | Revolver | `handle-0` |
+| 1 | `shotgun-shell` | Shotgun Shells | 4 | 14 | 2 | Shotgun | `handle-1` |
+| 2 | `lamp-oil` | Lamp Oil | 1 | 5 | 3 | — | `handle-2` |
+| 3 | `kola-tonic` | Kola Tonic | 1 | 18 | 1 | — | `handle-3` |
+| 4 | `brisk-draught` | Brisk Draught | 1 | 15 | 1 | — | `handle-4` |
+| 5 | `bandage` | Bandage | 1 | 7 | 2 | — | `handle-2` (shared with Lamp Oil) |
+
+- **Never stocked:** relics, key items, journal pages, recipes, clues, holy water, silver filings.
+- A gun's row shows only while the gun is owned (the elite-drop ownership rule, §7).
+- Each row shows the name, the price, "N left" today and a one-sentence description; an empty row shows a "Sold out" card.
+- **Buying** (within 1.2 s): the price is paid, the row's stock drops by 1, a coin clinks, the row's handle pulls out 5 cm (±1 cm) and springs back, and the goods drop into the tray and the satchel. The keeper is not protected and the world keeps running; Esc still pauses.
+- **Refusals** leave coins, stock and the satchel unchanged and say why: the coins short (with the shortfall), the satchel full, or sold out. Coins never go below 0.
+- **Dawn** resets every row to its per-day stock.
+- The marquee glass is emissive; one small warm shadowless light at `marquee-light` is added only where the frame budget allows.
+- Sounds: coin clink, handle pull, tray drop, refusal, each with a caption and played from the machine.
+- **Brisk Draught** (`brisk-draught`, `items/brisk-draught.glb`): +25% move speed for 60 s; see the timed effects (§4).
+
+### 14.7 Hands and lantern light (11, H7)
+Models: `public/assets/models/viewmodel/hands.glb` (clips Grip-Pistol, Grip-Haft, Grip-Long, Lantern-Hold, Throw, Reload-Revolver, Reload-Shotgun, Swing-Light, Swing-Heavy) and `viewmodel/lantern.glb` (with `glass` and `flame` meshes). Data: `src/data/lanternLight.ts`; rules: `gripClass.ts`, `lanternHand.ts`, `lanternFlicker.ts`.
+
+| Weapon | Grip |
+|---|---|
+| `revolver` | Pistol |
+| `shotgun` | Long |
+| `rusty-shovel` | Haft |
+| `sharpened-shovel` | Haft |
+| `wood-axe` | Haft |
+| `bone-club` | Haft |
+| `silver-sabre` | Haft |
+
+| Hands | Value |
+|---|---|
+| Grip switch | Within 0.3 s of changing weapon |
+| Lantern sway lag | 80 ms (±20 ms), with follow-through on turns; steady with Head bob off |
+| Sprint drop | 0.05 to 0.15 m lower |
+| Shotgun | Left hand on the fore-end, lantern hooked on the belt, light from the hip pointing forward and 10° to 20° down; back in the hand within 0.5 s after switching away |
+| Belt caption | "Lantern hooked to your belt", once per run (cleared by New Game, kept by Continue and the retries) |
+| Throw or heavy swing (axe, sabre) | The lantern hangs from the wrist strap, still lit, and is caught again within 0.6 s |
+| Missing hands or lantern model | Today's weapon-only viewmodel; the light comes from a fixed offset from the camera |
+
+| Light | Value |
+|---|---|
+| Spot | One, shadow-casting, shadow map 1024 or smaller, cookie of the cage bars (`public/assets/textures/lantern-cookie.png`) |
+| Fill | One point light, no shadow, radius 3 m or less |
+| Colour | `#ffb46b` (about 1900 K); below 15% oil `#ff6a3a` |
+| Origin | The lantern glass in the left hand, or the belt hook with the shotgun |
+| Breathing | 0.2 to 0.5 Hz |
+| Gutters | 4 to 12 Hz |
+| Dips | Up to −25% of base |
+| Low oil (below 15%) | Gutter amplitude ×2 or more, redder |
+| Sprint or gust | Gutter amplitude ×1.5 or more |
+| Oil at 0 | One flare of 0.3 s or less, then out; glass and flame show no emission |
+| Bride within 8 m | Light ×0.7 |
+| Flashing lights off | Changes slower than 1 Hz; no step over 10% of base per frame |
+| Low graphics | No cookie; the spot keeps its shadow |
+| Bloom | Flame and glass only |
+
+Range and brightness follow the oil (8 m full, 2 m empty, §11 Lantern), times the flicker signal; the flame scale and glass glow follow the same signal in the same frame. This light replaces today's lantern light, so the scene keeps at most 4 shadow-casting lights; GPU perf is measured before the first code task and after the last.
+
+### 14.8 Settings and controls (11)
+| Setting | Values | Default | Saved |
+|---|---|---|---|
+| Jumpscares | Full, Reduced, Off | Full | With the other settings; an unknown stored value loads as Full |
+| Show info dots | On, Off | On | With the other settings |
+
+- Jumpscares sits next to Scare intensity in the Settings menu. Scare intensity keeps governing the §9 scare director; Jumpscares governs only the screen faces.
+- Every new panel and tooltip works by keyboard with a visible focus state; every new cue has a non-colour form (shape, glyph, text or position).
+- Every new pulse, flash or strobe becomes a steady or slow change (under 3 per second) with Flashing lights off.
+- No new keys: the vending machine uses Interact (§10).
+
+### 14.9 Cut list (11)
+Feature freeze: **2026-11-26**. No new feature task of spec 11 starts after it. Cut from the bottom of this list first, and mark the cut subsection here as "cut" in the same change.
+
+| Priority | Feature | Subsection | Spec 11 task | Status |
+|---|---|---|---|---|
+| 1 | H6 vending machine | 14.6 | 2 | Planned |
+| 2 | H1 screen jumpscares | 14.1 | 3 | Planned |
+| 3 | H4 bats | 14.4 | 4 | Planned |
+| 4 | H5 info dots | 14.5 | 5 | Planned |
+| 5 | H7 hands and lantern light | 14.7 | 6 | Planned |
+| 6 | H2 new creatures and H3 zombie looks | 14.2, 14.3 | 7, 8 | Planned |
+
+This section, the waiting list and the shared rules are never cut.
