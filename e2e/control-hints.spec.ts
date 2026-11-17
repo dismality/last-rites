@@ -169,7 +169,7 @@ test('with the plain journal font on, the panel still fits at 800x600 and the jo
   await page.evaluate(() => window.__lastRites!.equip(1))
   const journalFont = () =>
     page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--font-journal').trim())
-  expect(await journalFont()).toContain('Homemade Apple')
+  expect(await journalFont()).toContain('Special Elite')
   await page.evaluate(() => window.__lastRites!.setSetting('plainJournalFont', true))
   expect(await journalFont()).toContain('IM Fell English')
   await page.waitForTimeout(800)

@@ -1938,3 +1938,14 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Shot 1 moved instead of the terrain changing, so the graveyard model is untouched. (2026-11-17)
   - The bank profile in the test was measured from `graveyard.glb` by raycasting in the running game. (2026-11-17)
+
+### 2026-11-17: Outside Kiro: fix: readable handwriting font
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (the cursive font was unreadable).
+- **What happened:**
+  - `--font-hand` was Homemade Apple, a looping cursive. It is now Special Elite, a worn typewriter face from Google Fonts (Apache 2.0). It is clear at 20 px and still fits the 1891 case-file mood.
+  - Every place that used the hand font changes with the token: intro cards, journal pages (unless "Plain font for journal" is on), Elias's page, tombstone epitaphs, recipe notes, ending lines and walk-out captions.
+  - CREDITS, the visual-style steering file and the plain-journal-font e2e check name the new font.
+  - Lint, build and all 2554 unit tests pass. The control-hints plain-font e2e test passes, and an intro card was checked in headed Chrome.
+- **Decisions made unattended:**
+  - Only the cursive font was replaced. IM Fell English (body and headings) and Cormorant Garamond (numbers) stay. (2026-11-17)
+  - The fallback is Courier New, then monospace, so the text stays readable while the web font loads. (2026-11-17)

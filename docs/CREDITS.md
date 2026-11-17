@@ -25,7 +25,7 @@ Every third-party asset used in Last Rites. Only CC0, CC-BY (with attribution be
 | Font | Author | Source | License |
 |---|---|---|---|
 | IM Fell English / IM Fell English SC | Igino Marini | Google Fonts | OFL |
-| Homemade Apple | Font Diner | Google Fonts | Apache 2.0 |
+| Special Elite | Astigmatic | Google Fonts | Apache 2.0 |
 | Cormorant Garamond | Christian Thalmann | Google Fonts | OFL |
 
 ## Libraries

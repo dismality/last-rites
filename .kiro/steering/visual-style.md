@@ -20,7 +20,7 @@ Victorian gothic cemetery in perpetual autumn: wet stone, iron fences, dead oaks
 
 ## Typography
 - Headings: **IM Fell English SC** (Google Fonts)
-- Body and handwritten journal: **IM Fell English** for print, **Homemade Apple** for the keeper's handwriting
+- Body and handwritten journal: **IM Fell English** for print, **Special Elite** (a worn typewriter face) for the keeper's notes; Homemade Apple was dropped as unreadable
 - UI numbers: **Cormorant Garamond** (tabular figures)
 - Minimum UI text size 16 px; subtitles 20 px with a dark backing.
 

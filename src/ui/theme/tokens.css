@@ -4,7 +4,7 @@
   Import this once in main.tsx; all components consume via var().
 */
 
-@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wdth,wght@0,75..125,300..700;1,75..125,300..700&family=Homemade+Apple&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cormorant+Garamond:ital,wdth,wght@0,75..125,300..700;1,75..125,300..700&family=Special+Elite&display=swap');
 
 :root {
   /* ── Colour palette ──────────────────────────────────────────── */
@@ -25,7 +25,7 @@
   /* ── Typography ─────────────────────────────────────────────── */
   --font-heading:   'IM Fell English SC', Georgia, serif;
   --font-body:      'IM Fell English', Georgia, serif;
-  --font-hand:      'Homemade Apple', cursive;
+  --font-hand:      'Special Elite', 'Courier New', monospace;
   /* Journal reading text: the keeper's hand, or the body font with "Plain font for journal" (see below). */
   --font-journal:   var(--font-hand);
   --font-num:       'Cormorant Garamond', Georgia, serif;
