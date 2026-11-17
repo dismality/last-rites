@@ -2,34 +2,41 @@
 
 *A first-person survival-horror mystery in a cursed Victorian cemetery. Built with [Kiro](https://kiro.dev) for Kiroween 2026 (Costume Contest).*
 
-**▶ Play:** https://YOUR-DEPLOY-URL.vercel.app
-**🎬 Demo video:** https://youtube.com/YOUR-VIDEO
+**▶ Play:** https://last-rites.vercel.app (desktop browser, keyboard and mouse)
+<!-- TODO before submitting: add the demo video link, e.g. **🎬 Demo video:** https://youtube.com/watch?v=… -->
 
 <!-- Add a screenshot or GIF here: ![Last Rites](docs/screenshot.png) -->
 
 ## The story
-You are the new gravekeeper of Hollowmere Cemetery. The last keeper vanished, and the dead won't stay buried. By day, search the graves for materials and clues. By night, survive what you dug up. Find the five relics and finish the rite before the fifth night ends.
+You are the new gravekeeper of Hollowmere Cemetery, October 1891. The last keeper, Elias Thorne, vanished, and the dead won't stay buried. By day, in a graveyard with nothing living in it, you search the grounds for materials and clues and solve small puzzles. By night the curse holds back the sun, and you survive the dead until you can name the truth at the altar. Solve three cases from Hollowmere's past, finish the rite, and walk out at sunrise, or the cemetery takes you.
 
 ## Features
-- First-person 3D exploration with a lantern that runs on fuel; light is a resource
-- 3D workbench crafting where the items you can combine glow
-- Three zombie types, including the Lurker that waits in dark alleys
-- A scare director that runs fair, telegraphed jumpscares
-- A mystery told through journal pages, tombstones and objects you examine in 3D
-- Five nights, chapel repairs, three endings
-- Full comfort settings: scare intensity (Full/Reduced/Off), no-flash mode, FOV, subtitles, rebindable keys
+- **The interface is part of the world:** the lantern flame is your oil gauge, the map is the keeper's pencil sketch that inks itself in as you explore, the journal and case board are ink on parchment, and the objective is marked by a pillar of lantern light
+- **Three cases, three curse stages:** clue hunting, a case board where you link evidence, and puzzles such as cross-checking the parish ledger against the stones
+- **First-person survival:** a lantern that runs on oil, melee and black-powder guns, blocking, dodging and kicking, boarding up the chapel doors
+- **Crafting** at the hut's workbench, where what you can make glows
+- **The dead:** shamblers, lurkers in dark alleys, wailers, bloaters, brutes and Father Crane
+- **Fair horror:** a scare director with telegraphed jumpscares, recorded sound effects and narration
+- **Modes:** Easy, Normal, Hard, Short Vigil and Endless
+- **Comfort settings:** scare intensity (Full/Reduced/Off), no-flash mode, FOV, head bob, subtitles for every important sound, plain journal font, rebindable keys
 
 ## Controls
 | Action | Key |
 |---|---|
 | Move / look | WASD / mouse |
 | Sprint | Shift |
-| Interact, dig | E |
-| Attack / aim | Left / right mouse |
+| Interact, dig (hold) | E |
+| Attack / block (aim with a gun) | Left / right mouse |
+| Heavy attack, kick, dodge | V, Q, C |
+| Reload | R |
 | Hotbar | 1–4 |
 | Satchel / journal | Tab / J |
 | Lantern | F |
+| Map / minimap | M / N |
+| Skip intro | Space or Enter |
 | Pause | Esc |
+
+All keys can be rebound in Settings.
 
 ## Run locally
 Requires Node.js 20 or later.
@@ -38,6 +45,8 @@ npm install
 npm run dev
 ```
 Open the URL shown in the terminal (usually http://localhost:5173).
+
+Recorded audio lives in `public/assets/audio/`; see `tools/audio/` for the scripts that make and convert it.
 
 Other commands: `npm run build`, `npm run test`, `npm run lint`.
 

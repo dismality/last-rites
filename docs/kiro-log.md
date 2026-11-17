@@ -84,7 +84,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Added `dayNight.ts`, `lantern.ts`, `stamina.ts` with tuning constants in `src/data/balance.ts`, plus unit and fast-check tests (step independence, radius bounds [1.5, 8], fuel/stamina bounds).
 - **What Kiro caught or sped up:** Stamina regen delay is consumed before regen so ticks stay step-independent; dusk uses the night drain rate (a judgment call, noted in code).
 
-### 2026-11-20: 01-foundation task 5: Fixed-timestep GameLoop and pause
+### 2026-11-07: 01-foundation task 5: Fixed-timestep GameLoop and pause
 - **Kiro feature used:** spec task
 - **What happened:** Added a pure accumulator (`fixedStep.ts`, STEP/MAX_DELTA) and a pure `runTick` (stamina → player → lantern → dayNight) so `GameLoop.tsx` is only a `useFrame` driver. Events are batched and emitted after all ticks; paused frames are skipped. Esc and pointer-lock loss call `setPaused(true)` via `usePauseTriggers`.
 - **What Kiro caught or sped up:** Moved the tick order and accumulator into testable pure modules, with unit and property tests. Build, tests and lint pass.
@@ -94,78 +94,78 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Added pure movement maths (movement.ts, with unit and property tests), a bindings-driven input module, a Rapier kinematic capsule FirstPersonController, and wrapped GameLoop children in <Suspense><Physics>.
 - **What Kiro caught or sped up:** context7 and the installed types showed the rapier v2 body type string is kinematicPosition (not kinematic-position-based). The React Compiler lint rule also caught mutating the hook-returned camera, so the camera is now updated from the useFrame state.
 
-### 2026-11-15: 01-foundation task 7: Lantern rendering
+### 2026-11-07: 01-foundation task 7: Lantern rendering
 - **Kiro feature used:** spec task
 - **What happened:** Added `Lantern.tsx` (shadow-casting amber SpotLight, fill PointLight, ember PointLight at 0 fuel, flicker, F toggle via the `Lantern` binding) and a pure `lanternIntensity` helper with a property test.
 - **What Kiro caught or sped up:** Kept the radius-to-intensity mapping in `src/game/systems` so the scene component holds no balance numbers.
 
-### 2026-11-20: 01-foundation task 8: Greybox cemetery
+### 2026-11-07: 01-foundation task 8: Greybox cemetery
 - **Kiro feature used:** spec task
 - **What happened:** Added `Cemetery.tsx` (grounds, hollow chapel shell with two door-frame colliders, Mausoleum Row and Catacombs corridors with key-gated colliders, boundary walls, instanced headstones and fence pickets). Layout is data in `src/data/cemeteryLayout.ts`; gate lock rule is a pure system (`gates.ts`) reading key items from the inventory store.
 - **What Kiro caught or sped up:** Noted that drei `Instances` can cache a stale bounding sphere before matrices are filled, so bounds are recomputed after the first frames. The old solid chapel nave in `Chapel.tsx` was removed since it would have blocked the door opening.
 
-### 2026-11-20: 01-foundation task 9: Sky, fog and phase transitions
+### 2026-11-07: 01-foundation task 9: Sky, fog and phase transitions
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `SkyAndFog` (5 s phase lerp of background, FogExp2 density, ambient and non-shadowing moonlight), a `PostEffects` stack, palette constants in `src/data/skyPalette.ts` and pure blend helpers with unit and property tests.
 - **What Kiro caught or sped up:** A property test exposed float rounding in `lerp` at k=1 (fixed with the `a*(1-k)+b*k` form); the React lint rules caught direct scene mutation inside hooks, so mutation moved into plain helpers.
 
-### 2026-11-21: 01-foundation task 10: Screens (content warning, loading, title, pause, settings)
+### 2026-11-07: 01-foundation task 10: Screens (content warning, loading, title, pause, settings)
 - **Kiro feature used:** spec task / MCP (context7 for drei `useProgress`)
 - **What happened:** Added `ContentWarning`, `LoadingScreen`, `TitleScreen`, `PauseMenu`, `Settings` and a shared `MenuDialog` (role=dialog, aria-modal, focus trap, Escape, focus restore) and routed them from `App.tsx`. Settings save on every change through the settings store.
 - **What Kiro caught or sped up:** Noticed the window-level Esc listener in `usePauseTriggers` would re-pause right after the menu's Esc-to-resume, so resume is deferred one tick.
 
-### 2026-11-21: 01-foundation task 11: Baseline HUD and subtitles
+### 2026-11-07: 01-foundation task 11: Baseline HUD and subtitles
 - **Kiro feature used:** spec task / steering (visual-style, accessibility)
 - **What happened:** Added `LanternHealth`, `FuelReservoir`, `StaminaBar`, `Crosshair`, `Subtitles`, a stub `DawnCard` and a `Hud` overlay mounted in `App.tsx` on the game screen, plus pure gauge helpers with unit and property tests.
 - **What Kiro caught or sped up:** Steering's "no colour alone" rule led to a jagged outline and "!" mark for low health and tick marks on the fuel tube.
 
-### 2026-11-20: 01-foundation task 12: Checkpoint, first playable
+### 2026-11-07: 01-foundation task 12: Checkpoint, first playable
 - **Kiro feature used:** spec task
 - **What happened:** Ran test (17 files, 153 tests pass), build and lint (all clean). Verified checklist items 3-9 by code inspection only; nothing was played in a browser and nothing was deployed.
 - **What Kiro caught or sped up:** `src/App.tsx` still renders a "game screen placeholder" and no `<Canvas>` is mounted anywhere. GameLoop, Cemetery, Lantern, SkyAndFog and FirstPersonController exist but are never rendered, so checklist items 3-7 cannot pass in a browser yet.
-### 2026-11-21: 03-crafting-inventory task 9: Checkpoint
+### 2026-11-01: 03-crafting-inventory task 9: Checkpoint
 - **Kiro feature used:** spec task
 - **What happened:** Ran test (17 files, 153 tests pass), lint and build, all clean. Verified `tests/checkpoint.test.ts` covers crafting a bone club, sharpening the shovel after `dawnStarted(1)`, and chapel repair stage 1. Checked by unit tests only, not in a browser.
 - **What Kiro caught or sped up:** No failures found; the integration test already existed, so no code changes were needed.
-### 2026-11-21: 02-exploration-collecting task 1: Item, zone and loot data
+### 2026-11-07: 02-exploration-collecting task 1: Item, zone and loot data
 - **Kiro feature used:** spec task / steering (tech, structure)
 - **What happened:** Added `items.ts`, `zones.ts`, `lootTables.ts`, a seeded mulberry32 `rng.ts` with `randInt`, and unit/property tests for the RNG and data integrity. Lint, build and test pass (19 files, 164 tests).
 - **What Kiro caught or sped up:** Reused the existing `ItemId`/`MaterialId` unions from `game/types.ts` instead of redefining them. Fixed-spawn positions and the parish ledger location are placeholders, because the design bible doesn't pin them down.
 
-### 2026-02-05: 02-exploration-collecting task 2: Inventory system with property tests
+### 2026-11-07: 02-exploration-collecting task 2: Inventory system with property tests
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `src/game/systems/inventory.ts` (`addItem`, `removeItem`, `hasItems`, `assignHotbar`) on the existing `Inventory` type, with fast-check properties for slot/stack limits, quantity conservation and add/remove inverse.
 - **What Kiro caught or sped up:** Reused the existing `Inventory` shape (arrays, not a `Set`) so the crafting and chapel stores keep working; keys, relics and pages go to `keyItems`/`relics` outside the 12 slots.
 
-### 2026-11-20: 02-exploration-collecting task 3: Loot rolling and daily respawn
+### 2026-11-07: 02-exploration-collecting task 3: Loot rolling and daily respawn
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `loot.ts` (`rollLoot`) and `spawns.ts` (`respawnForDay`, once-only fixed spawns, night-only locket) with matching tests and a fast-check bounds property.
 - **What Kiro caught or sped up:** Merging repeat draws of one item would have broken the min/max bound, so each draw returns its own stack.
 
-### 2026-11-22: 02-exploration-collecting task 4: Interaction raycast and Interactable wrapper
+### 2026-11-07: 02-exploration-collecting task 4: Interaction raycast and Interactable wrapper
 - **Kiro feature used:** spec task / steering (tech, accessibility, visual-style)
 - **What happened:** Added pure `interaction.ts` (prompt text, lantern pulse gating, range pick) with unit and fast-check tests, an interaction store, the `<Interactable>` wrapper (pulse, drei `Outlines`, rune sprite), `useInteractionRaycast` in the controller, and an `InteractPrompt` HUD ("E: Dig") plus crosshair hand.
 - **What Kiro caught or sped up:** Highlights pair glow with a rune shape cue. The pulse holds steady when flashing lights is off, because there is no separate reduce-motion setting yet. Nothing in the world uses `<Interactable>` yet (pickups arrive in task 5), so the scene behaviour is not exercised in-game.
 
-### 2026-11-22: 02-exploration-collecting task 5: Pickups and toasts
+### 2026-11-07: 02-exploration-collecting task 5: Pickups and toasts
 - **Kiro feature used:** spec task / steering (tech, accessibility, visual-style)
 - **What happened:** Added pure `pickup.ts` (wraps `addItem`, handles partial and refused pickups) with unit and fast-check conservation tests, `toastStore`, `spawnStore`, a parchment `Toast` HUD (`aria-live`, 2 s each, fade-only under reduced motion) and a `MaterialPickups` scene component using `<Interactable>`.
 - **What Kiro caught or sped up:** `addItem` already returned the exact refusal messages, so the rule reuses them. `MaterialPickups` is not mounted yet because the game screen is still a placeholder, so the in-game flow is untested.
-### 2026-11-23: 02-exploration-collecting task 6: Grave digging
+### 2026-11-07: 02-exploration-collecting task 6: Grave digging
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added pure `dig.ts` (`tickDig`: 3 s hold, cancel on move, hit, release or lost shovel, once per grave per day, `digCompleted` carries loot and the `hand-from-grave` roll for the scare director) with constants in `src/data/digging.ts`, two new `GameEvent` members, and unit plus fast-check tests.
 - **What Kiro caught or sped up:** A first test assumed the dig stayed cancelled while the key was still held; the system correctly restarts a fresh dig, so the test now stops on the cancelling tick. Nothing in the scene calls `tickDig` yet and the scare director hookup waits for spec 05.
 
-### 2026-11-20: 02-exploration-collecting task 7: Examine mode
+### 2026-11-07: 02-exploration-collecting task 7: Examine mode
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added the pure clue-reveal timer (`systems/examine.ts`, with unit and fast-check tests), an `examineStore`, an overlay R3F canvas with no-pan OrbitControls, and an accessible HTML overlay (Esc/E close, "Inspect markings" keyboard fallback). Simulation freezes through a new `gameStore.examining` flag checked by GameLoop, controller, lantern and raycast.
 - **What Kiro caught or sped up:** The pause triggers would have opened the pause menu on Esc and on the pointer-lock release, so they now ignore examine mode.
-### 2026-11-24: 02-exploration-collecting task 9: Self-drawing journal map
+### 2026-11-07: 02-exploration-collecting task 9: Self-drawing journal map
 - **Kiro feature used:** spec task / PBT / steering (tech, accessibility, visual-style)
 - **What happened:** Added pure `mapReveal.ts` (8 m grid `revealAt`, landmark discovery, save serialisation) with unit tests and fast-check properties for idempotence and save round-trip. Landmarks live in `data/mapLandmarks.ts`. A `mapStore` persists explored cells to localStorage and the controller reveals cells as the player moves. The canvas map (`ui/journal/Map.tsx`, `mapDraw.ts`) hatches new cells in with a pencil draw (fade under `prefers-reduced-motion`), draws distinct sketched icons plus a text legend, and a quill marker for position and facing. J opens it via `MapOverlay`.
 - **What Kiro caught or sped up:** Opening the journal releases pointer lock, which would have triggered the pause menu, so a `gameStore.journalOpen` flag now freezes the simulation and is ignored by the pause triggers. Map persistence uses its own key until the full save system exists (`last-rites-save` stays unwritten so Continue is not enabled by a map alone). Not visually checked in a browser.
 
-### 2026-11-20: 02-exploration-collecting task 8: Satchel overlay and hotbar
+### 2026-11-07: 02-exploration-collecting task 8: Satchel overlay and hotbar
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added the 4x3 leather satchel overlay (Tab, keyboard-navigable, drop to world, 1-4 hotbar binding), a HUD hotbar with number-key equip, and pure `satchel.ts` rules with tests. The satchel owns Esc and pointer-lock loss without pausing the game.
 - **What Kiro caught or sped up:** The React lint rule `set-state-in-effect` flagged a focus reset, and the pause trigger would have paused on the pointer-lock release, so it now skips while the satchel is open.
@@ -502,7 +502,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Added `src/game/systems/elites.ts` (`canBeElite`, `rollElite`, `eliteStats`, `rollEliteDrop`, `placeEliteDrop`) with `elites.test.ts`, covering Property 24 (table entries, 10,000-roll frequencies within 3 points, satchel-or-ground placement).
 - **What Kiro caught or sped up:** `rollElite` is tested to leave the rng untouched for ineligible spawns, which keeps existing wave seeds stable.
 
-### 2026-11-14: 07-combat-and-enemies task 2.9: Hit markers and damage numbers
+### 2026-11-09: 07-combat-and-enemies task 2.9: Hit markers and damage numbers
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added pure `hitMarker.ts` and `damageNumbers.ts` with fast-check tests for Property 19 (one marker per attack, kill larger, headshot dot and ring, 0.3 s steady, numbers expire by 0.8 s, cap 24, "!" on headshots, none when setting off).
 - **What Kiro caught or sped up:** Both new test files pass. Full-suite and build failures at the time came from parallel work on `crafting.ts`, not this task.
@@ -1986,3 +1986,22 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Checked in headed Chrome. All five intro lines play as their cards appear. Walking on grass plays a footstep about every 0.27 s, cycling through the 4 variants. No tone generator starts by day or at night, so there is no drone. Lint, build and all 2587 unit tests pass.
 - **Decisions made unattended:**
   - The score's code is kept and only switched off, so it can come back with one constant. (2026-11-18)
+
+### 2026-11-18: Outside Kiro: submission prep (README, log dates, audio credits, submission kit)
+- **Kiro feature used:** none. Made outside Kiro.
+- **What happened:**
+  - **README:** the real play URL; story, features and controls updated to the current game; a TODO for the demo video link.
+  - **Log dates:** 18 headings were dated before the hackathon (one said 2026-02-05) or after the commit that added them. Each now carries the date of that commit.
+  - **CREDITS:** rows for the ElevenLabs sound effects, narration and (future) music.
+  - **Submission kit:** a Devpost rules checklist; a new description; a drafted "How Kiro was used" section counted from the repo (11 specs, 420 of 478 tasks done, about 1,450 EARS requirements, 8 steering docs, 6 hooks, fast-check in 157 test files); and a new video script.
+- **Decisions made unattended:**
+  - Log dates were corrected to the commit date, which is the latest they can be; entries added in a bulk commit may have been written a few days earlier. (2026-11-18)
+  - The write-up leaves Crew, custom agents, powers and "what I'd do differently" as blanks to fill in, rather than claiming anything not in the log. (2026-11-18)
+
+### 2026-11-18: 11-horror-pass task 3.3: screen scare overlay, effects and audio
+- **Kiro feature used:** spec task, MCP (context7 for the postprocessing `Effect` and `wrapEffect` API)
+- **What happened:** Added the screen scare store and trigger action, the `ScreenScare` HUD overlay (85 vh face, 70 ms in, jitter and chromatic split, 250 ms out, one-frame flash), a `WorldDim` effect on the post-processing stack, the shake through `scareRuntime`, `screenScareAudio` (sting plus a 70% duck of the other buses) and the saved `screenScare` block in the progression save. Retry snapshots leave it out, New Game clears it.
+- **What Kiro caught or sped up:** Three existing tests that pin the progression field list failed on the new saved field and were updated. Installed postprocessing 3.0.4 has `wrapEffect` but no `createEffectComponent`, so the dim uses `wrapEffect`.
+- **Decisions made unattended:**
+  - The duck covers the music and SFX buses, and the sting plays straight to the master so the duck does not mute it. Reason: ducking the SFX bus would also cut the sting. (2026-11-18)
+  - A saved `lastStartSim` later than the current sim clock is pulled back to now on load, because the clock restarts at 0 with the page. (2026-11-18)
