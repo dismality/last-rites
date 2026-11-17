@@ -1,5 +1,6 @@
 import { createLogger, defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { audioManifestPlugin } from './tools/audio/audioManifestPlugin.mjs'
 
 // src/data/graveyardColliders.ts imports public/assets/models/scene/graveyard-colliders.json on
 // purpose, so the scene and the unit tests read the very same boxes (user decision, spec 09 11i).
@@ -16,7 +17,8 @@ for (const level of ['warn', 'warnOnce'] as const) {
 
 export default defineConfig({
   customLogger: logger,
-  plugins: [react()],
+  // audioManifestPlugin: lists public/assets/audio for the recorded-sound loader (src/audio/samples.ts).
+  plugins: [react(), audioManifestPlugin()],
   // Rapier WASM needs to be served correctly
   optimizeDeps: {
     exclude: ['@react-three/rapier'],

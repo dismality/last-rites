@@ -29,3 +29,6 @@ playwright-report/
 
 # Python bytecode from the Blender tools
 __pycache__/
+
+# Raw audio downloads (tools/audio/generate.mjs); the converted .ogg files are what the game uses.
+tools/audio/raw/

@@ -4,12 +4,20 @@
 // is safe with no audio context: the level is kept and the graph simply never builds.
 
 import { RAIN_NOISE, STORM } from '../data/storms'
+import { sampleBuffer } from './samples'
 import { getSynth, type SynthEngine } from './synth'
+
+/** Recorded rain loop (ambience/rain.ogg). When present it replaces the filtered noise. */
+export const RAIN_FILE = 'rain'
+/** The recording is already shaped, so it plays at this share of the noise bed's level. */
+const RAIN_FILE_GAIN = 3
 
 interface RainGraph {
   engine: SynthEngine
   source: AudioBufferSourceNode
   gain: GainNode
+  /** Playing the recorded loop rather than the noise. */
+  file: boolean
 }
 
 let level = 0
@@ -22,24 +30,29 @@ const clamp01 = (v: number): number => (Number.isFinite(v) ? Math.min(1, Math.ma
 function buildGraph(engine: SynthEngine): RainGraph | null {
   try {
     const { ctx } = engine
+    const recorded = sampleBuffer(RAIN_FILE)
     const source = ctx.createBufferSource()
-    source.buffer = engine.noiseBuffer()
+    source.buffer = recorded ?? engine.noiseBuffer()
     source.loop = true
-    const highpass = ctx.createBiquadFilter()
-    highpass.type = 'highpass'
-    highpass.frequency.value = RAIN_NOISE.highpassHz
-    const bandpass = ctx.createBiquadFilter()
-    bandpass.type = 'bandpass'
-    bandpass.frequency.value = RAIN_NOISE.bandpassHz
-    bandpass.Q.value = RAIN_NOISE.bandpassQ
     const gain = ctx.createGain()
     gain.gain.value = 0
-    source.connect(highpass)
-    highpass.connect(bandpass)
-    bandpass.connect(gain)
+    if (recorded) {
+      source.connect(gain)
+    } else {
+      const highpass = ctx.createBiquadFilter()
+      highpass.type = 'highpass'
+      highpass.frequency.value = RAIN_NOISE.highpassHz
+      const bandpass = ctx.createBiquadFilter()
+      bandpass.type = 'bandpass'
+      bandpass.frequency.value = RAIN_NOISE.bandpassHz
+      bandpass.Q.value = RAIN_NOISE.bandpassQ
+      source.connect(highpass)
+      highpass.connect(bandpass)
+      bandpass.connect(gain)
+    }
     gain.connect(engine.sfx)
     source.start()
-    return { engine, source, gain }
+    return { engine, source, gain, file: recorded !== null }
   } catch {
     return null
   }
@@ -49,18 +62,30 @@ function buildGraph(engine: SynthEngine): RainGraph | null {
 function ensureGraph(): RainGraph | null {
   const engine = getSynth()
   if (!engine) return null
-  if (graph && graph.engine === engine) return graph
+  // A rain file that finished decoding after the noise bed started takes over from it.
+  const upgrade = graph !== null && graph.engine === engine && !graph.file && sampleBuffer(RAIN_FILE) !== null
+  if (graph && graph.engine === engine && !upgrade) return graph
+  if (upgrade && graph) {
+    try {
+      graph.source.stop()
+      graph.gain.disconnect()
+    } catch {
+      // already stopped
+    }
+  }
   graph = buildGraph(engine)
   lastTarget = 0
   return graph
 }
 
 function apply(): void {
-  const target = frozen ? 0 : level * RAIN_NOISE.gain
+  const base = frozen ? 0 : level * RAIN_NOISE.gain
   // Don't spin up a graph just to hold silence.
-  if (target === 0 && !graph) return
+  if (base === 0 && !graph) return
   const g = ensureGraph()
-  if (!g || target === lastTarget) return
+  if (!g) return
+  const target = Math.min(1, base * (g.file ? RAIN_FILE_GAIN : 1))
+  if (target === lastTarget) return
   try {
     const param = g.gain.gain
     const now = g.engine.ctx.currentTime

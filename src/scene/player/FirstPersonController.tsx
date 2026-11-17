@@ -32,6 +32,8 @@ import {
   impactShakeAllowed,
   recoilOffsetRad,
 } from '../../game/systems/recoil'
+import { playFootstep } from '../../audio/AudioManager'
+import { STRIDE_START, stepSurface, tickStride } from '../../game/systems/footsteps'
 import { bodyRuntime } from './bodyRuntime'
 import { weaponRuntime } from './weaponRuntime'
 import { meleeRuntime } from './meleeRuntime'
@@ -65,6 +67,7 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
   const controller = useRef<KinematicCharacterController | null>(null)
   const bob = useRef<BobState>({ phase: 0, amplitude: 0 })
   const fallSpeed = useRef(0)
+  const stride = useRef(STRIDE_START)
   const { world, rapier } = useRapier()
   const canvas = useThree((s) => s.gl.domElement)
   useInteractionRaycast()
@@ -186,6 +189,15 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
 
     const moving = vx !== 0 || vz !== 0
     bob.current = tickHeadBob(bob.current, dt, moving, settings.headBob)
+    // Footsteps follow the ground actually covered (after walls), never a dodge or a shove.
+    if (!moving || dash || noclip) {
+      stride.current = STRIDE_START
+    } else {
+      const sprinting = snap.sprint && player.stamina > 0
+      const r = tickStride(stride.current, Math.hypot(m.x, m.z), grounded, sprinting)
+      stride.current = r.carry
+      if (r.step) playFootstep(stepSurface(next.x, next.z))
+    }
 
     camera.position.set(next.x, next.y + EYE_OFFSET + headBobOffset(bob.current), next.z)
     camera.rotation.order = 'YXZ' // yaw first, then pitch, so looking up doesn't roll the view

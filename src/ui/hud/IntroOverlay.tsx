@@ -1,4 +1,6 @@
 import { useEffect, useRef } from 'react'
+import { playRecorded } from '../../audio/AudioManager'
+import type { Voice } from '../../audio/synth'
 import { useGameStore } from '../../game/state/gameStore'
 import { useIntroStore } from '../../game/state/introStore'
 import { useSettingsStore } from '../../game/state'
@@ -23,8 +25,24 @@ export function IntroOverlay() {
 
   useEffect(() => {
     let raf = 0
+    // Narration (voice/intro-1.ogg ..): each card's line starts as the card appears; a new card,
+    // skipping, pausing or the intro ending cuts it. With no file the card is silent, as before.
+    let spokenShot = -1
+    let voice: Voice | null = null
+    const hush = () => {
+      voice?.stop()
+      voice = null
+    }
     const tick = () => {
       const st = introStateAt(introCameraRuntime.time)
+      const playing = useIntroStore.getState().playing && !useGameStore.getState().paused
+      if (!playing) {
+        hush()
+      } else if (st.card && st.shot !== spokenShot) {
+        spokenShot = st.shot
+        hush()
+        voice = playRecorded(`intro-${st.shot + 1}`)
+      }
       if (inkRef.current) inkRef.current.style.opacity = String(st.fade)
       const card = cardRef.current
       if (card) {
@@ -35,7 +53,10 @@ export function IntroOverlay() {
       raf = requestAnimationFrame(tick)
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      cancelAnimationFrame(raf)
+      hush()
+    }
   }, [])
 
   useEffect(() => {

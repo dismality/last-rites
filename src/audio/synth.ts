@@ -6,6 +6,7 @@
 import { Howl, Howler } from 'howler'
 import { SOUND_RECIPES, type SoundId, type SoundRecipe } from '../data/sounds'
 import { isAudioEnabled } from './audioEnabled'
+import { loadSamples, playSample } from './samples'
 
 /** Most voices alive at once; the oldest is cut when a new one would exceed this (Req 23.9). */
 export const MAX_VOICES = 16
@@ -20,7 +21,7 @@ const VOLUME_RAMP_S = 0.05
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQIAAAAAAA=='
 
-interface Voice {
+export interface Voice {
   stop: () => void
 }
 
@@ -77,6 +78,60 @@ export class SynthEngine {
       const oldest = this.voices.shift()
       oldest?.stop()
     }
+  }
+
+  /**
+   * Play a decoded recording on the sfx bus, positioned when `at` is given. It shares the voice
+   * cap with the synth voices. Returns a stop handle, or null if it could not start.
+   */
+  playBuffer(buffer: AudioBuffer, at?: SoundPosition, volume = 1, maxDistanceM = 40): Voice | null {
+    this.makeRoom()
+    const { ctx } = this
+    const src = ctx.createBufferSource()
+    src.buffer = buffer
+    const level = ctx.createGain()
+    level.gain.value = Math.max(0, volume)
+    src.connect(level)
+    const nodes: AudioNode[] = [level]
+    let tail: AudioNode = level
+    if (at) {
+      const panner = ctx.createPanner()
+      panner.panningModel = 'HRTF'
+      panner.distanceModel = 'inverse'
+      panner.maxDistance = maxDistanceM
+      panner.positionX.value = at.x
+      panner.positionY.value = at.y
+      panner.positionZ.value = at.z
+      level.connect(panner)
+      nodes.push(panner)
+      tail = panner
+    }
+    tail.connect(this.sfx)
+    let stopped = false
+    const voice: Voice = {
+      stop: () => {
+        if (stopped) return
+        stopped = true
+        try {
+          src.stop()
+        } catch {
+          // already stopped
+        }
+        for (const n of [src, ...nodes]) {
+          try {
+            n.disconnect()
+          } catch {
+            // already disconnected
+          }
+        }
+        const i = this.voices.indexOf(voice)
+        if (i >= 0) this.voices.splice(i, 1)
+      },
+    }
+    this.voices.push(voice)
+    src.onended = () => voice.stop()
+    src.start(ctx.currentTime)
+    return voice
   }
 
   play(id: SoundId, at?: SoundPosition, volume = 1): boolean {
@@ -193,6 +248,8 @@ export function unlockAudio(): SynthEngine | null {
     if (!ctx || !master) return null
     engine = new SynthEngine(ctx, master)
     void ctx.resume?.()
+    // Recorded files (public/assets/audio) decode in the background and take over as they land.
+    void loadSamples(engine)
     return engine
   } catch {
     return null
@@ -204,11 +261,18 @@ export function getSynth(): SynthEngine | null {
   return engine
 }
 
-/** Play a recipe. Safe to call before unlock, on a silent device, or with an unknown id. */
+/**
+ * Play a sound: its recorded file (sfx/<id>.ogg) when one is decoded, else its synth recipe.
+ * Safe to call before unlock, on a silent device, or with an unknown id.
+ */
 export function playSound(id: SoundId, at?: SoundPosition, volume = 1): void {
   if (!isAudioEnabled()) return
   try {
-    engine?.play(id, at, volume)
+    if (!engine) return
+    const recipe = SOUND_RECIPES[id]
+    const where = recipe && !recipe.spatial ? undefined : at
+    if (playSample(engine, id, where, volume, recipe?.maxDistanceM)) return
+    engine.play(id, at, volume)
   } catch {
     // never let sound break the game loop
   }

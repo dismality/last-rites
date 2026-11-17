@@ -1949,3 +1949,30 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Only the cursive font was replaced. IM Fell English (body and headings) and Cormorant Garamond (numbers) stay. (2026-11-17)
   - The fallback is Courier New, then monospace, so the text stays readable while the web font loads. (2026-11-17)
+
+### 2026-11-17: Outside Kiro: objective beacon, and grave glyphs only when digging is the objective
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (objectives were hard to find).
+- **What happened:**
+  - **Objective beacon** (`ObjectiveBeacon.tsx`, rules in `objectiveBeacon.ts`). The current objective now has a tall amber pillar of light (30 m, unlit emissive, ignores fog, no flashing). It also has a label naming it with the distance, e.g. "Crest lock · 30 m". It stands on the same point as the compass diamond and minimap marker (`guidanceStore.objective.position`), so it moves as the objective changes. It fades out from 6 m to 2 m, so it is gone once you arrive. It is hidden during the intro and while the objective has no place. When the objective is in the hut and the player is outside, the label says so ("Page · in the hut · 25 m").
+  - **Grave mounds.** The orange pillar that stood over every mound during the dig tutorial is gone; the objective beacon marks the mound the tutorial points at instead. A mound's dig glyph now shows from 16 m by day only while digging is the objective. Otherwise it shows in lantern range like any other target.
+  - Lint, build and all 2561 unit tests pass. The dig-mound, control-hints, hud-800x600, minimap, smoke, clue-outline, dev-panel and big-map e2e specs pass. The beacon was checked in headed Chrome on the hut page and on the stage 2 crest lock objectives, and the mounds showed no glyph from 10 m.
+- **Decisions made unattended:**
+  - One beacon, on the current objective only, rather than one per step, so it never points two ways at once. (2026-11-17)
+  - There is no setting to turn the beacon off; map pins keep their own "show in world" setting. (2026-11-17)
+  - The label uses the objective's existing marker names (Ledger, Bells, Crest lock and so on), so no new copy was written. (2026-11-17)
+
+### 2026-11-18: Outside Kiro: recorded audio files (loader, prompt sheet, generator, converter)
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (to add narration, sound effects and music).
+- **What happened:**
+  - **Loader** (`src/audio/samples.ts`, `sampleManifest.ts`). On audio unlock, the game reads `/assets/audio/manifest.json` and decodes the files it lists in the background. A Vite plugin (`tools/audio/audioManifestPlugin.mjs`) answers that request in dev and writes it into the build, so dropping a file into `public/assets/audio/<sfx|voice|ambience|music>/` is enough. A sound plays from its file when one is decoded and otherwise from its synth recipe, so files can be added a few at a time. `name-1` .. `name-N` files are variants of `name`, picked at random.
+  - **Wired to files:** every synth sound id; the stubbed sounds (crafting, satchel, stair steps, page turn, throws, heartbeat, scare sounds); captioned events with no synth voice (boss death, altar, merchant, relic); enemy cues (shamblers groan from `zombie-groan-*` at jittered intervals; lurker, wailer and bloater from their own files); a recorded rain loop over the noise bed; player footsteps (`footsteps.ts`: one step per 0.8 m walked or 1.1 m sprinted, wood in the hut, stone in the chapel and catacombs, grass elsewhere); and intro narration (`voice/intro-N`, started with each card and cut by a new card, pause or skip). File-only sounds stay silent until their file exists.
+  - **Prompt sheet** (`tools/audio/prompts.mjs`, rendered to `docs/audio-prompts.md`): 113 files across sound effects, ambience, music and narration, with the 15-file first batch marked. A unit test checks that every narration line matches the game's text word for word, and that every file marked as played is one the game asks for.
+  - **Generator** (`tools/audio/generate.mjs`): ElevenLabs Sound Effects, Text to Speech and Music. The key is read only from `ELEVENLABS_API_KEY`. It skips existing files, retries rate limits, and has `--dry-run`, `--check`, `--sheet`, `--only` and `--force`.
+  - **Converter** (`tools/audio/convert.mjs`, ffmpeg): `tools/audio/raw/` to `.ogg`. Effects and voice are mono and trimmed; ambience and music are stereo and left whole. All are peak-normalised. It was checked on a test tone: peaks land within 0.6 dB of target and silence is trimmed.
+  - In headed Chrome, two test files were listed by the manifest, decoded and played through `playSound` and `playFootstep`; a sound with no file fell back to its synth voice. The test files were then removed.
+  - Lint, build and all 2586 unit tests pass. The smoke, win-cutscene and dig-mound e2e specs pass.
+- **Not done:** music files, the ambience loops other than rain, journal-page and ending narration, and a separate voice volume slider. Narration plays on the SFX bus. All of these are in the sheet, marked "not played yet".
+- **Decisions made unattended:**
+  - `AUDIO_ENABLED` stays `false` (the user's playtest mute), so nothing is heard until it is set to `true`. (2026-11-18)
+  - The default ElevenLabs voices are premade "George" (narrator) and "Daniel" (Elias), and can be replaced with `ELEVENLABS_VOICE_NARRATOR` and `ELEVENLABS_VOICE_ELIAS`. (2026-11-18)
+  - Raw downloads in `tools/audio/raw/` are git-ignored; only the converted `.ogg` files are committed. (2026-11-18)
