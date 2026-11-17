@@ -2,7 +2,7 @@
 
 ## Overview
 
-This plan builds spec 11 in the priority order of `requirements.md`: the design bible §12 first (committed on its own), then H6 vending machine, H1 screen jumpscares, H4 bats, H5 info dots, H7 hands and lantern light, H2 new creatures, H3 zombie looks, and a final whole-spec check with GPU perf and the list of art still waiting on Claude.
+This plan builds spec 11 in the priority order of `requirements.md`: the design bible §12 first (committed on its own), then H6 vending machine, H1 screen jumpscares, H4 bats, H5 info dots, H7 hands and lantern light, H2 new creatures, H3 zombie looks, and a final whole-spec check with GPU perf and the list of art still waiting.
 
 Every top-level task ends with a **Finish** sub-task:
 
@@ -14,7 +14,7 @@ Common rules for all tasks:
 - Game logic stays in `src/game/` with no React, three.js or Howler imports; every system has a matching `*.test.ts` next to it. Tunable values live in `src/data/`.
 - Before writing code against `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `howler` or `fast-check`, look up the current API with context7 (steering rule `mcp-usage`).
 - Dev code stays in `src/dev/` and reaches the game only through the real stores and the `devCheats` paths.
-- Art comes from Claude at fixed paths in `src/data/assets.ts`. Where a file is missing, use a marked placeholder: a `// PLACEHOLDER: <path>` comment at the use site and a row in `src/data/placeholders.ts`, registered in the Waiting_List when the load fails. A placeholder is never final art, and the game must build, test and start with every art file absent.
+- Art is made in Blender, outside Kiro, at fixed paths in `src/data/assets.ts`. Where a file is missing, use a marked placeholder: a `// PLACEHOLDER: <path>` comment at the use site and a row in `src/data/placeholders.ts`, registered in the Waiting_List when the load fails. A placeholder is never final art, and the game must build, test and start with every art file absent.
 - Each browser spec saves screenshots at 1280x720 and 800x600 into `e2e/screenshots/`.
 - Property tests use fast-check with at least 100 runs and a comment `Feature: 11-horror-pass, Property N: <title>`.
 - Every new sound gets a caption in `src/data/captions.ts` and, if it comes from a place in the world, plays as 3D audio there. Every new effect obeys Jumpscares, Flashing lights and Camera shake, and every new panel works by keyboard with a visible focus state.
@@ -30,15 +30,15 @@ Common rules for all tasks:
     - Update the existing sections the design lists: §3 (item `brisk-draught`), §4 timed effects (`brisk-draught`: +25% move speed, 60 s), §7 (crawler, bride, hound), §8 waves, §9 scare director (screen scares, 180 s cooldown, 45 s gap), §11 HUD (info dots, Creatures page), §10 controls if any change; add the Waiting_List and Placeholder rules
     - Mark the freeze date and the cut order in §12.9
     - _Requirements: 8.1, 8.2, 8.3_
-    - Done outside Kiro by Claude. Written as `## 14. Horror pass (11)` with 14.1 to 14.9 (and a "Waiting list and placeholders" part), because the bible's §12 and §13 were already taken and specs 08 and 10 cite them by number; a note at the top of §14 says spec 11 calls it §12. Edits to §3, §4 (consumable and timed effect), §7, §8, §9 and §11; §10 needs no change
+    - Done outside Kiro. Written as `## 14. Horror pass (11)` with 14.1 to 14.9 (and a "Waiting list and placeholders" part), because the bible's §12 and §13 were already taken and specs 08 and 10 cite them by number; a note at the top of §14 says spec 11 calls it §12. Edits to §3, §4 (consumable and timed effect), §7, §8, §9 and §11; §10 needs no change
   - [x] 1.2 §12 mirror test scaffold
     - Create `tests/designBibleSection12.test.ts`: assert §12 has sections 12.1 to 12.9 and a small parser that reads table rows by section heading and returns typed rows; later feature tasks add their own table-versus-data checks to this file
     - A section marked "cut" is skipped by the parser test
     - _Requirements: 8.2, 8.3_
-    - Done outside Kiro by Claude. The parser is `tests/helpers/designBible.ts` (`readHorrorPass`, `subsection(h, '12.6')`, `tableOf`, `liveSubsections`); it finds the section by its title, so either numbering works. A subsection is cut when its heading carries "(cut)" or ", cut)"
+    - Done outside Kiro. The parser is `tests/helpers/designBible.ts` (`readHorrorPass`, `subsection(h, '12.6')`, `tableOf`, `liveSubsections`); it finds the section by its title, so either numbering works. A subsection is cut when its heading carries "(cut)" or ", cut)"
   - [x] 1.3 Finish
     - Run the Finish steps for task 1 (docs and the new test only); commit `design bible section 12 horror pass (spec 11 task 1)` as its own commit with no code changes
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
 
 - [x] 2. H6: The hut vending machine (cuttable, cut order 6)
   - [x] 2.1 Foundation: Waiting_List, placeholders, asset budget and baseline perf
@@ -48,43 +48,43 @@ Common rules for all tasks:
     - Run the existing GPU perf spec (`e2e/d8-perf.spec.ts` style) once on the current build and save `e2e/logs/horror-perf-before.json` (draw calls, frame time, shadow-light count) for task 9
     - **Property 30: Waiting list is idempotent and complete**
     - _Requirements: 8.14, 8.15, 8.16, 8.18, 8.22, 3.1_
-    - Done outside Kiro by Claude. No asset budget script existed, so `tests/assetBudget.test.ts` (with `tests/helpers/fileSizes.ts`) fails over 25 MB. The perf spec is `e2e/horror-perf.spec.ts` (in the perf project); the baseline already has draw calls over 150 in every scene (hut 191, night wave 362), 2 shadow lights and about 7 ms frames, so it records rather than asserts
+    - Done outside Kiro. No asset budget script existed, so `tests/assetBudget.test.ts` (with `tests/helpers/fileSizes.ts`) fails over 25 MB. The perf spec is `e2e/horror-perf.spec.ts` (in the perf project); the baseline already has draw calls over 150 in every scene (hut 191, night wave 362), 2 shadow lights and about 7 ms frames, so it records rather than asserts
   - [x] 2.2 Vending data
     - Create `src/data/vending.ts` (`VendingRowId`, `VENDING_ROWS` with exactly the six rows of Requirement 6.3, handle ids, blurbs, `VENDING_FORBIDDEN`); add the `brisk-draught` item to `src/data/items.ts` and `src/data/effects.ts` (+25% move speed, 60 s, glyph); add the vending sounds and captions to `src/data/sounds.ts` and `captions.ts`; add the §12.6 table check to `tests/designBibleSection12.test.ts`
     - _Requirements: 6.3, 6.4, 6.12, 6.16, 8.2_
-    - Done outside Kiro by Claude. The brisk-draught icon uses the missing-icon image and is a Waiting_List row
+    - Done outside Kiro. The brisk-draught icon uses the missing-icon image and is a Waiting_List row
   - [x] 2.3 Pure vending system, Brisk Draught effect and tests
     - Create `src/game/systems/vending.ts` (`freshStock`, `visibleRows` using the shared owned-gun predicate, `canBuy`, `buy`, `resetAtDawn`, `purchaseAnimation`) reusing `coins.ts` and the satchel fit rules; add `'brisk-draught'` to `EffectId` and the speed rule in `movement.ts` (larger multiplier wins over Adrenaline); write `vending.test.ts` and extend `effects.test.ts`, `movement.test.ts`
     - Extract the owned-gun predicate from `elites.ts` into a shared helper if it is not exported yet
     - **Property 21: Vending stock never includes forbidden items**; **Property 22: Vending visibility and purchase deltas**; **Property 23: Vending refusals leave state unchanged and coins never go negative**; **Property 24: Vending dawn reset**; **Property 25: Brisk Draught does not stack**
     - Add `tests/captionCoverage.test.ts` for **Property 10: Sound and caption coverage** over a list of new sound ids that later tasks extend
     - _Requirements: 6.3, 6.4, 6.5, 6.6, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13, 6.15, 6.16, 8.8_
-    - Done outside Kiro by Claude. The speed rule (larger multiplier wins) lives in `effectMods` in `src/game/systems/effects.ts`, where Adrenaline's speed is already combined, so `movement.ts` and `movement.test.ts` needed no change. `ownedGuns` was already exported from `elites.ts`
+    - Done outside Kiro. The speed rule (larger multiplier wins) lives in `effectMods` in `src/game/systems/effects.ts`, where Adrenaline's speed is already combined, so `movement.ts` and `movement.test.ts` needed no change. `ownedGuns` was already exported from `elites.ts`
   - [x] 2.4 Vending store, scene and panel
     - Create the vending store (stock per day, saved in `gameSave.ts`, reset at dawn, cleared by New Game); create `src/scene/world/VendingMachine.tsx` at (2.83, 0, 1.85) with rotationY −PI/2, `handle-0` to `handle-4` pull animation (5 cm ±1 cm), emissive marquee, optional shadowless `marquee-light` behind a frame-budget gate; add the colliders to `hut.json` and the machine's JSON
     - Create `src/ui/menus/VendingPanel.tsx` in the merchant's style (name, price, "N left", one-sentence blurb, "Sold out" card, refusal reason text, keyboard operable with visible focus); it does not pause the sim, does not protect the player, and does not block Esc
     - Wire Interact within 2.5 m in every phase, the coin clink, handle, tray and refusal sounds with 3D audio at the machine
     - _Requirements: 6.1, 6.2, 6.6, 6.7, 6.10, 6.14, 6.16, 8.9, 8.10, 8.13_
-    - Done outside Kiro by Claude. The panel is `src/ui/vending/VendingPanel.tsx`. The hut.json collider was already there. The handles are merged into the model's brass mesh, so five placeholder knobs `handle-0` to `handle-4` stand in. The marquee light is always mounted and its intensity is gated by the frame time and the shadow-light count (lights stay constant). The stock is saved and is part of the Retry snapshot; a sold-out machine stays interactable
+    - Done outside Kiro. The panel is `src/ui/vending/VendingPanel.tsx`. The hut.json collider was already there. The handles are merged into the model's brass mesh, so five placeholder knobs `handle-0` to `handle-4` stand in. The marquee light is always mounted and its intensity is gated by the frame time and the shadow-light count (lights stay constant). The stock is saved and is part of the Retry snapshot; a sold-out machine stays interactable
   - [x] 2.5 Placeholder assets for H6
     - Plain cabinet primitive (box with the real collider and invisible handle anchors) for `props/vending-machine.glb`, a bottle primitive named "Brisk Draught (placeholder)" for `items/brisk-draught.glb`, procedural Web Audio for missing sounds; each use has a `// PLACEHOLDER:` comment, a `placeholders.ts` row and a Waiting_List registration; extend the load-failure test so the machine stays fully usable
     - _Requirements: 6.17, 8.16, 8.22_
-    - Done outside Kiro by Claude. The vending sounds are procedural like every other sound, so no audio placeholder was needed
+    - Done outside Kiro. The vending sounds are procedural like every other sound, so no audio placeholder was needed
   - [x] 2.6 Dev hooks for the vending machine
     - Add "Give 100 grave coins" and "Reset vending stock" to the Dev_Panel through real store actions; add `vendingState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 6.2_
-    - Done outside Kiro by Claude
+    - Done outside Kiro
   - [x] 2.7 Vending e2e and screenshots
     - Create `e2e/vending.spec.ts`: walk to the machine, open it by day and at night, buy a row (handle pulls, coins drop, stock count drops, Brisk Draught shows its effect ring), refuse for coins and for a full satchel, sold out, dawn reset; a keyboard-only run
     - Save screenshots at 1280x720 and 800x600 of the panel and the machine in the hut
     - _Requirements: 6.2, 6.6, 6.8, 6.9, 6.10, 8.21_
-    - Done outside Kiro by Claude. Screenshots are in `e2e/screenshots/vending/`
+    - Done outside Kiro. Screenshots are in `e2e/screenshots/vending/`
   - [x] 2.8 Finish
     - Run the Finish steps for task 2; commit `hut vending machine (spec 11 task 2)`
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
 
-- [ ] 3. H1: Screen jumpscares (cuttable, cut order 5)
-  - [ ] 3.1 Settings and screen scare data
+- [~] 3. H1: Screen jumpscares (cuttable, cut order 5)
+  - [-] 3.1 Settings and screen scare data
     - Add `jumpscares` (`full | reduced | off`, default `full`, invalid stored value loads as `full`) and its Settings menu control next to Scare intensity (keyboard operable, visible focus) in `types.ts`, `settings.ts` and `Settings.tsx`
     - Create `src/data/screenScares.ts` (cooldown 180 s, in 70 ms, out 250 ms, hold 550 to 800 ms, 85 vh, image sets, `SCRIPTED_MOMENTS` for the coffin on night 2, the hut west window on night 3 and the ossuary grille); add the sting sounds and captions; add the §12.1 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 1.1, 1.2, 1.11, 1.16, 1.17, 8.2_
@@ -94,7 +94,7 @@ Common rules for all tasks:
     - **Property 1: Screen scare cooldown and overlay gating**; **Property 2: Effective scare effects follow the settings**; **Property 3: Scare timeline and telegraph bounds**; **Property 4: Image choice never repeats within a set**; **Property 5: Screen scare never reduces health** (the scare system part; the creature damage clamp part is added in task 7); **Property 20: Settings round trip** (jumpscares field; the info dots field is added in task 5)
     - Extend `tests/captionCoverage.test.ts` with the sting
     - _Requirements: 1.2, 1.3, 1.4, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.18, 1.19, 8.4, 8.5, 8.6, 8.7, 8.12_
-  - [ ] 3.3 Screen scare overlay, effects and audio
+  - [~] 3.3 Screen scare overlay, effects and audio
     - Create `src/ui/hud/ScreenScare.tsx` (85 vh image anchored bottom for zombie faces and top for ghost faces, linear 70 ms in, hold with scale jitter 1.00 to 1.04 and chromatic split, 250 ms out with slide and fade, one-frame white flash), the 30% world dim on the post-processing stack, camera shake through the existing channel, and `src/audio/screenScareAudio.ts` (attack, thud and scream layers, 70% master duck restored within 250 ms, 50% gain at Reduced)
     - Subtitle for the whole span at Full and Reduced, a 3 s descriptive subtitle at Off; Esc pauses within one frame and halts the timers and audio; `pointer-events: none`
     - Store the scare state (`lastStartSim`, used moments) in the progression save: kept by Continue, Retry Night and Retry from morning, cleared by New Game
@@ -260,7 +260,7 @@ Common rules for all tasks:
     - Run the asset budget check: total download under 25 MB and every new model compressed
     - _Requirements: 8.14, 8.15, 7.16_
   - [ ] 9.3 Waiting list report and bible check
-    - Run `tests/waitingList.test.ts` against `public/assets/` and print the full list of art files still waiting on Claude, with their full paths, into the kiro-log entry and the final report; confirm every Placeholder_Asset has a `PLACEHOLDER` comment and a registry row, and every cut part of §12 is marked "cut"
+    - Run `tests/waitingList.test.ts` against `public/assets/` and print the full list of art files still waiting, with their full paths, into the kiro-log entry and the final report; confirm every Placeholder_Asset has a `PLACEHOLDER` comment and a registry row, and every cut part of §12 is marked "cut"
     - Run the §12 mirror test and `docs/CREDITS.md` check for new third-party assets
     - _Requirements: 8.2, 8.3, 8.16, 8.17_
   - [ ] 9.4 Finish
@@ -273,7 +273,7 @@ Common rules for all tasks:
 - Task 5 (info dots) has no art files, so it has no placeholder sub-task.
 - If H6 is the only task left before the freeze, the Waiting_List foundation in 2.1 still stays, because every other task reuses it.
 - If task 3 (H1) is cut, task 7 skips sub-task 7.4's screen scare wiring and the crawler and bride deal their damage and drain directly. If task 5 is cut, 7.4 skips the Bestiary info dot. If task 6 is cut, 7.4 skips the lantern bend.
-- Art owed by Claude: models `props/vending-machine.glb`, `items/brisk-draught.glb`, `props/bat-perched.glb`, `props/bat-flying.glb`, `viewmodel/hands.glb`, `viewmodel/lantern.glb`, `enemies/crawler.glb`, `enemies/bride.glb`, `enemies/hound.glb` and the `look-0` to `look-3` meshes in `zombie.glb`; the five face images; `public/assets/textures/lantern-cookie.png`. The exact paths are in `src/data/placeholders.ts` after task 2.1, and the final list is produced by task 9.3.
+- Art still owed: models `props/vending-machine.glb`, `items/brisk-draught.glb`, `props/bat-perched.glb`, `props/bat-flying.glb`, `viewmodel/hands.glb`, `viewmodel/lantern.glb`, `enemies/crawler.glb`, `enemies/bride.glb`, `enemies/hound.glb` and the `look-0` to `look-3` meshes in `zombie.glb`; the five face images; `public/assets/textures/lantern-cookie.png`. The exact paths are in `src/data/placeholders.ts` after task 2.1, and the final list is produced by task 9.3.
 
 ## Task Dependency Graph
 

@@ -1,6 +1,6 @@
 # Kiro Development Log
 
-How Kiro was used to build Last Rites. Entries are added as work happens (see `.kiro/steering/kiro-log.md` for the format). Entries headed **Outside Kiro** were made by Claude (Claude Code), mostly the Blender art and the prompts handed to Kiro; every asset and who made it is in `docs/CREDITS.md`.
+How Kiro was used to build Last Rites. Entries are added as work happens (see `.kiro/steering/kiro-log.md` for the format). Entries headed **Outside Kiro** were made outside Kiro, mostly the Blender art and the prompts handed to Kiro; every asset and who made it is in `docs/CREDITS.md`.
 
 ---
 
@@ -1482,7 +1482,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Near-state defaults to true until the first tick so the prompt never flashes the far text at start.
   - Hull thickness is clamped to 3 to 6 cm after a first 1.5 cm version read as invisible on a flat clue. The near screenshot uses the burial notice board (an upright parchment); the flat floor "marks" props are too dark to judge by eye.
 ### 2026-11-14: Outside Kiro: textured gravedigger zombie
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **Kiro feature used:** none. Made outside Kiro; listed so the log shows every change, not only Kiro's.
 - **What happened:** Replaced the body of `enemies/zombie.glb` with a realistic gravedigger zombie generated with Microsoft TRELLIS.2 from a reference image. `tools/blender/trellis_zombie/` reduces it to 12k triangles, bakes its colour to a 1024 px texture, and puts it on the old Quaternius skeleton with the same 9 clips, so no game code had to change. Checked in the browser: it renders and animates. Its night tint went to Kiro as 11p.
 
 ### 2026-11-14: 09-playtest-fixes task 11n-a: Chapel inside and out
@@ -1494,7 +1494,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Fixed the navigation stall by trimming that one buttress collider's outer face from x −3.36 to −3.2 (`CHAPEL_BUTTRESS_TRIMS` in `src/data/chapelScenery.ts`), not by moving waypoints: shifting hut-ne/hut-se to x 5.4 or 5.2 only moved the oscillation to other graves. The mesh is unchanged; the navigation test is unchanged.
   - Hymn board: the board's numbers (4 · 19 · 2 · 41 · 23) match `docs/case-design.md` §3. `src/data/cases.ts` holds no board numbers yet (spec 10 task 4.3 adds them and the minigame). I did not place an interactable at [12.47, 1.75, 8.7]: with no minigame behind it, it would show a cue that does nothing, against the interaction-cue rule. `HYMN_BOARD_POSITION` is in data for task 4.3.
   - The new e2e spec runs in the main project; the perf spec takes `LOW=1` to measure the Low setting.
-- **Not seated / waiting on Claude:** the chapel interior has no stair geometry under `chapel-stair-cover`, so with the cover hidden a tiled floor still shows there instead of a stair down (screenshots `chapel-stair-sealed.png` / `chapel-stair-open.png`) (`public/assets/models/scene/chapel-interior.glb`). Everything in the 11n-a seating table is within 0.03 m (unit-tested).
+- **Not seated / waiting on new art:** the chapel interior has no stair geometry under `chapel-stair-cover`, so with the cover hidden a tiled floor still shows there instead of a stair down (screenshots `chapel-stair-sealed.png` / `chapel-stair-open.png`) (`public/assets/models/scene/chapel-interior.glb`). Everything in the 11n-a seating table is within 0.03 m (unit-tested).
 
 ### 2026-11-15: 09-playtest-fixes task 11n-b: Hut
 - **Kiro feature used:** spec task, steering (tech and structure rules), Playwright browser and GPU perf specs
@@ -1535,15 +1535,15 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:** none beyond the camera spots.
 
 ### 2026-11-15: Outside Kiro: chapel stair, ground hole, hut lantern and clue pictures
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **Kiro feature used:** none. Made outside Kiro; listed so the log shows every change, not only Kiro's.
 - **What happened:** In answer to Kiro's 11n-a and 11n-d reports: `chapel_interior.py` now builds the 12-step stair under the cover and cuts the floor round it, and names the altar parts `chapel-altar-*` so they can slide; `graveyard.glb` lost 8 ground faces over the open grave at x 9..11, z 9..11; the hut's hanging lantern glass became smoked glass with low emission (it had been mistaken for a glowing north window). `tools/blender/clue_icons.py` rendered a 512 px picture of each of the 9 clue models into `public/assets/icons/clues/` for 11q. Handed to Kiro as 11n-e, 11p and 11q in `docs/kiro-prompt-next.md`.
 
 ### 2026-11-15: 09-playtest-fixes task 11n-e (part 1): Chapel stair, sliding altar, ground hole, hut lantern
 - **Kiro feature used:** spec task (done by the orchestrator directly: the task tool could not save tasks.md, "Failed to save"), Playwright browser spec, fast-check
-- **What happened:** Claude's new `chapel-interior.glb` has the `chapel-stair` mesh under the cover, and `graveyard.glb` a hole in the ground at x 9..11, z 9..11. When the whistle opens the stair, the cover hides as before, and every `chapel-altar-*` mesh now slides 0.6 m toward the door over 2 s (ease-out). The altar collider and its whistle and answer hotspots move by the same amount, and the aisle cut ends 0.6 m nearer the door so the altar box stays whole. The y = 0 physics floor is split around the opening (`splitAroundHole`, property-tested to cover the floor minus the hole), and a ramp along the step nosings (rise 0.19, run 0.27, 35°) plus two shaft-wall colliders let the player walk down. Pure rules in `src/game/systems/chapelStair.ts`, numbers in `src/data/chapelScenery.ts` (`CHAPEL_STAIR`, `ALTAR_SLIDE`). The hut's one warm light now sits at the model's `hanging-lantern` anchor at intensity 1.5, distance 5 (was 2 and 7, 0.15 m higher), and the smoked glass keeps its low emission.
+- **What happened:** The new `chapel-interior.glb` has the `chapel-stair` mesh under the cover, and `graveyard.glb` a hole in the ground at x 9..11, z 9..11. When the whistle opens the stair, the cover hides as before, and every `chapel-altar-*` mesh now slides 0.6 m toward the door over 2 s (ease-out). The altar collider and its whistle and answer hotspots move by the same amount, and the aisle cut ends 0.6 m nearer the door so the altar box stays whole. The y = 0 physics floor is split around the opening (`splitAroundHole`, property-tested to cover the floor minus the hole), and a ramp along the step nosings (rise 0.19, run 0.27, 35°) plus two shaft-wall colliders let the player walk down. Pure rules in `src/game/systems/chapelStair.ts`, numbers in `src/data/chapelScenery.ts` (`CHAPEL_STAIR`, `ALTAR_SLIDE`). The hut's one warm light now sits at the model's `hanging-lantern` anchor at intensity 1.5, distance 5 (was 2 and 7, 0.15 m higher), and the smoked glass keeps its low emission.
 - **What Kiro caught or sped up:** `e2e/scenery-chapel.spec.ts` passes 4/4 on the GPU. The whistle opens the stair, the altar slides (`chapel-altar-slid.png`), the player who blew the whistle can still step back from the altar, then walks with held keys onto the steps from the east side, down to the end wall (feet 0.43 m down, the ramp predicts 0.44) and back up and out (feet back at y 0.01). No snag, no fall-through. The aisle walk to the altar and out through the vestry still passes. `chapel-stair-open.png` shows the steps and no grass in the opening, so the ground hole works. One run stopped higher on the steps (0.24 m down) after a short walk, so the depth check only asks that the player went down. Lint, build and unit tests pass (277 files, 2232 tests).
 - **Decisions made unattended:**
-  - **The stair is a dead end.** The steps run on under the end wall, but the low vault comes down to the steps there, so the walkable part ends at the end wall inside the chapel. The catacombs are 35 m away at world z 43–58 and keep their own gate. I did not add a fade-and-move to the catacombs; the design bible §2 now says so. Claude could extend the stair, or a later task could add the transition.
+  - **The stair is a dead end.** The steps run on under the end wall, but the low vault comes down to the steps there, so the walkable part ends at the end wall inside the chapel. The catacombs are 35 m away at world z 43–58 and keep their own gate. I did not add a fade-and-move to the catacombs; the design bible §2 now says so. The stair could be extended outside Kiro, or a later task could add the transition.
   - **Sound:** `playScareSound('stone-grind', …)` is called at the altar when the slide starts, but `playScareSound` is still a stub (AudioManager TODO), so only the existing caption "[Stone grinds behind the altar]" is heard today.
   - **Collider timing:** the altar collider jumps to its new place when the stair opens, while the mesh takes 2 s. The browser check shows the player is not trapped.
   - **Compass:** `CHAPEL_ALTAR` (the objective marker) stays at local z 4.5; 0.6 m does not change a bearing.
@@ -1636,7 +1636,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task / PBT
 - **What happened:** Added `LedgerMinigame.tsx` on the minigame shell (two-page spread, lines drawn with the mouse, or arrows, Enter and F on the keyboard), pure rules in `systems/ledgerMinigame.ts` with `ledgerMinigame.test.ts`, and the ledger page on the hut shelf (`LedgerShelfPage` in `Hut.tsx`, beside the powder tin), wired to `caseStore.submitMinigame`.
 - **What Kiro caught or sped up:** not recorded.
-- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+- _Logged afterwards, outside Kiro, from the code and the task list; Kiro did not write an entry for this task._
 
 ### 2026-11-16: 10-curse-stages task 3.5: Minigame 1b overlay and bell posts
 - **Kiro feature used:** spec task / PBT
@@ -1646,13 +1646,13 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task
 - **What happened:** The case 1 final answer is given at the altar. On solving it, `caseSolvedWatcher.ts` places the Rusted Crypt Key in Pell's grave (`CASE_1_REWARD` in `cases.ts`; the `fx-crypt-key` spawn in `zones.ts` now has `revealedBy: 'saved-by-the-bell'`). `merchant.ts` hands over the Vane & Sons receipt on the run's first story-mode purchase in stage 1 (`receiptDue`), tested in `merchant.test.ts`.
 - **What Kiro caught or sped up:** not recorded.
-- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+- _Logged afterwards, outside Kiro, from the code and the task list; Kiro did not write an entry for this task._
 
 ### 2026-11-16: 10-curse-stages task 3.7: Dev hooks for Stage 1
 - **Kiro feature used:** spec task
 - **What happened:** "Solve 1a" and "Solve 1b" buttons in the Dev_Panel, which solve each minigame through the real store actions with a right verdict (`devActions.ts`).
 - **What Kiro caught or sped up:** not recorded.
-- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+- _Logged afterwards, outside Kiro, from the code and the task list; Kiro did not write an entry for this task._
 
 ### 2026-11-16: 10-curse-stages task 3.8: Stage 1 e2e and screenshots
 - **Kiro feature used:** spec task
@@ -1666,14 +1666,14 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** the milestone run found no new spec 10 breakage beyond the parked tests.
 
 ### 2026-11-16: Outside Kiro: chapel pews moved for the altar slide
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code); listed so the log shows every change, not only Kiro's.
+- **Kiro feature used:** none. Made outside Kiro; listed so the log shows every change, not only Kiro's.
 - **What happened:** In the playtest of 11n-e the player was trapped at the altar: the slid altar collider left only 0.61 m between it and the back pews, narrower than the 0.70 m player. `chapel_interior.py` now puts the pew rows at z 0.4, 1.4 and 2.4 (were 1.0, 2.0, 3.0), which leaves about 1.2 m; only the six pew colliders changed. The code side (the altar landing on the player, the descent to the catacombs, the loot spot on the back pew) went to Kiro as 11n-f. Until `zones.ts` moves the pew loot, two `tests/chapelScenery.test.ts` tests fail (see task 3.9).
 
 ### 2026-11-16: Task lists for 11n-f, 11p, 11q and spec 11-horror-pass
 - **Kiro feature used:** specs
-- **What happened:** Commit 5345af2 added 11n-f (chapel stair fix), 11p (textured zombie colours) and 11q (clue models, reveal and journal) to `09-playtest-fixes/tasks.md`, and created spec `11-horror-pass` (requirements, design and tasks, H1 to H7) from `docs/kiro-prompt-next.md`. The same commit took in Claude's moved pews.
+- **What happened:** Commit 5345af2 added 11n-f (chapel stair fix), 11p (textured zombie colours) and 11q (clue models, reveal and journal) to `09-playtest-fixes/tasks.md`, and created spec `11-horror-pass` (requirements, design and tasks, H1 to H7) from `docs/kiro-prompt-next.md`. The same commit took in the pews moved outside Kiro.
 - **What Kiro caught or sped up:** not recorded.
-- _Logged afterwards by Claude from the code and the task list; Kiro did not write an entry for this task._
+- _Logged afterwards, outside Kiro, from the code and the task list; Kiro did not write an entry for this task._
 
 ### 2026-11-16: 09-playtest-fixes task 11n-f: Chapel stair never traps the player and leads to the catacombs
 - **Kiro feature used:** spec task, fast-check, Playwright browser spec
@@ -1689,7 +1689,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Kiro feature used:** spec task
 - **What happened:** Filled the Case 3 data in `src/data/cases.ts`: the hymn board (numbers 4, 19, 2, 41, 23, a 60-title psalter index whose first letters at those numbers spell BELOW, Crane's "beneath the Word" line, the wrong-tiles message), six evidence cards with the right midnight-to-dawn order and a caption beat each, and the Vane papers (letter, Josiah Vane flyleaf, Vane & Sons receipt). The two red herrings are now the oil at another crypt and the old bishop's seal (they replace the censer marks and cold hearth stubs). `relics.ts` now owns `RITE_ORDER` and a line per step; journal pages 3 and 4 state the order in Elias's and Crane's words; `captions.ts` has four stage 3 captions. `cases.test.ts` has a new case 3 block (BELOW from the index, card order, relic order against page 4, Vane papers, captions). Lint clean, build ok, 288 test files and 2324 tests pass.
 - **What Kiro caught or sped up:** deriving the relic names from `RELIC_MAP` removed a second hard-coded list that could drift from the data. A test reads the board numbers from `chapelScenery.ts`, so the painted board and the puzzle cannot disagree.
-- **Decisions made unattended:** (1) Evidence order: dry boots, unsent letter, cart ruts, spilled oil, hearse-pin, nail marks. The design lists the cards but not the order. The pin goes in before the scratching, and the replay shows he was sealed in alive. (2) Rite order is the order already in the stub and in the bible's relic list (rosary, clapper, locket, shroud, heart), told as Crane's prayer, bell, the smallest, the cloth and the heart. (3) Hymn titles are invented in period style so no real hymn text is copied. (4) The accusation options changed to match the new red herrings ("the old bishop's seal", "the oil at the other crypt"). (5) Caption wording for the hymn tiles, stair, pin and relic placement is mine. (6) Evidence cards carry a zone and a place in words only. Props and exact positions belong to task 4.4, which also checks the layout. (7) The old red herring ids were used nowhere else, so the rename is safe. Art: none made or needed in this task. Still waiting for Claude: the hymn board, letter tiles, psalter, evidence props and crypt opening, all simple meshes in tasks 4.3 and 4.4, and no stand-in art was shipped.
+- **Decisions made unattended:** (1) Evidence order: dry boots, unsent letter, cart ruts, spilled oil, hearse-pin, nail marks. The design lists the cards but not the order. The pin goes in before the scratching, and the replay shows he was sealed in alive. (2) Rite order is the order already in the stub and in the bible's relic list (rosary, clapper, locket, shroud, heart), told as Crane's prayer, bell, the smallest, the cloth and the heart. (3) Hymn titles are invented in period style so no real hymn text is copied. (4) The accusation options changed to match the new red herrings ("the old bishop's seal", "the oil at the other crypt"). (5) Caption wording for the hymn tiles, stair, pin and relic placement is mine. (6) Evidence cards carry a zone and a place in words only. Props and exact positions belong to task 4.4, which also checks the layout. (7) The old red herring ids were used nowhere else, so the rename is safe. Art: none made or needed in this task. Still waiting: the hymn board, letter tiles, psalter, evidence props and crypt opening, all simple meshes in tasks 4.3 and 4.4, and no stand-in art was shipped.
 ### 2026-11-16: 10-curse-stages task 4.2: Pure rules for 3a, 3b, the Rite and the Accusation
 - **Kiro feature used:** spec task, fast-check
 - **What happened:** `caseMinigames.ts` gained `hymnTiles` (letters read from the psalter data, not a literal "BELOW") and `evidenceTimeline` (full right order only, reports the first differing position). New `rite.ts` holds `placeRelic`, `isRiteDone` and `placedCount`: a right relic stays, a wrong one is returned, and completion needs all five in order and Crane not alive. `checkAccusation` already existed from task 2.2 and its property test already covers the Accusation, so `caseAnswer.ts` did not change. New `rite.test.ts` (Property 19, two properties plus examples) and extended `caseMinigames.test.ts` (Property 16 for 3a and 3b). Lint clean, build ok, 2337 tests pass.
@@ -1700,27 +1700,27 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** New `HymnMinigame.tsx` (board numbers, five brass tiles, the 60-title psalter as real text, Left/Right choose a tile, Up/Down or a letter key set it, Backspace clears, Enter blows the whistle) mounted in `MinigameHost`. Pure key rules in `systems/hymnMinigame.ts` with tests. The tiles are kept in the Case_Store (`hymnTiles` in `CaseProgress`, sanitised on load, merged on retry). A right setting solves 3a and, by day with the whistle held, opens the stair through `interactGate`; a wrong one adds Doubt and shows "The tiles do not sit true". `CaseProps.tsx` gained the hymn board hotspot, the vestry psalter and five altar tiles (stage 3, day, stair sealed). The altar whistle spot in `ChapelBuilding.tsx` opens the overlay in stage 3 until 3a is solved. Two new interactable kinds (`hymn-board`, `psalter`) have cue facts. Lint clean, build ok, 290 test files and 2345 tests pass. No browser test yet (task 4.8).
 - **What Kiro caught or sped up:** the interactables audit test forces each new kind into `interactables.ts`, so the cue rules were not forgotten.
 - **Decisions made unattended:** (1) The tiles are judged only when all five are set; a partial set gives "Set all five tiles first" and no Doubt. (2) The stair opens only by day, as the altar whistle already does; solved at night or without the whistle, 3a stays solved and the altar whistle opens the stair next morning. (3) The board hotspot is an invisible box on the painted board in the chapel model (no new model). (4) Psalter sits on the cupboard shelf at (7.9, 0.89, 7.95), 0.35 m from the revolver. (5) Altar tiles glow ember when set and vanish when the stair opens (the altar slides). (6) Board, psalter and tiles show only in stage 3 by day. (7) The "[brass tiles clatter]" caption has no sound yet, only the caption. (8) Tile letters are stored for stage 3's case only.
-- **Art still waiting for Claude:** PLACEHOLDER box meshes for the psalter book and the five brass tiles (no letters embossed); a hymn board plaque or highlight (the painted board is in the chapel GLB, the hotspot is invisible); a brass tile clatter sound.
+- **Art still waiting:** PLACEHOLDER box meshes for the psalter book and the five brass tiles (no letters embossed); a hymn board plaque or highlight (the painted board is in the chapel GLB, the hotspot is invisible); a brass tile clatter sound.
 
 ### 2026-11-16: 10-curse-stages task 4.4: Minigame 3b overlay and crypt props
 - **Kiro feature used:** spec task, fast-check
 - **What happened:** New `TimelineMinigame.tsx` (six evidence cards on a midnight-to-dawn track; drag, Earlier/Later buttons, and keyboard arrows, Space to lift, Enter to judge) mounted in `MinigameHost`, with pure rules in `systems/timelineMinigame.ts`. A right order solves 3b, finds its clues, replays the night as captions and opens the crypt; a wrong order adds Doubt and marks the first out-of-place card with a glyph and words. `CaseProps.tsx` gained five evidence props, the timeline slate and the opened crypt (door, doorway, Elias's body), all placeholder meshes. The cards and slate order are kept in the Case_Store (`evidenceFound`, `timeline`). The Iron Ossuary Key now waits for 3b: `FixedSpawn.revealedBy` accepts a minigame id. Two new interactable kinds (`evidence-card`, `timeline-slate`). Lint clean, build ok, 291 test files and 2367 tests pass. No browser test yet (task 4.8).
 - **What Kiro caught or sped up:** the interactables audit tests forced the two new kinds into `interactables.ts`. A property test over the keyboard rules proves Space and the arrows can reach the right order from the shelf order.
 - **Decisions made unattended:** (1) The dry boots reuse the existing hut clue spot. (2) Prop positions are guessed and checked only against collision boxes. (3) The crypt is a backdrop, so "opening" is set dressing with no collider. (4) New cards join the front of the arrangement in a fixed shelf order, so walking order does not give the answer. (5) Card times are hidden; only the two ends are labelled. (6) Judging needs all six cards, with no Doubt for fewer. (7) The key's reveal uses solved minigames as well as closed cases; old e2e that walk to the key in stage 1 or 2 will need the dev hook in the task 4.9 milestone. Details in `decisions-unattended.md` section 4.4.
-- **Art still waiting for Claude:** PLACEHOLDER meshes for the letter, ruts, oil, hearse-pin, nail marks, slate, opened door, doorway and Elias's body; a pin-pull sound.
+- **Art still waiting:** PLACEHOLDER meshes for the letter, ruts, oil, hearse-pin, nail marks, slate, opened door, doorway and Elias's body; a pin-pull sound.
 ### 2026-11-16: 10-curse-stages task 4.5: The Rite: relic placement
 - **Kiro feature used:** spec task, fast-check
 - **What happened:** The 45 s Interact hold is gone. New `riteStore.ts` places relics through the pure `rite.ts`: the first relic that stays sets `endingStore.riteStarted`, which starts Crane's 10 s rising clock in the boss director; a wrong relic goes through `caseStore.misplaceRelic` (the answer-lock rules: sour-note caption, instant wave, 30 s lock, link rule, Sharp Eye); five in order with Crane fallen solves the case and starts the Rest ending. New `RitePanel.tsx` (keyboard: Tab, arrows on a select, Enter) replaces the answer sheet at the altar in stage 3, and `AltarRite.tsx` draws the placed relics on the altar. `FinalRite.tsx` now only asks the store whether the rite can finish. Removed `tickRite`, `isRiteComplete`, `RITE_DURATION`, `stepRite`, `isHoldingRite`, `riteCapS`, `BOSS.riteCapS`, the `taken` availability, `RiteMeter` and the `final-rite` proximity kind. Updated `finalRite.test.ts`, `mystery.test.ts`, `bossDirector.test.ts`, the two data tests and the two checkpoint tests, and added `riteStore.test.ts`. Lint clean, build ok, 292 test files and 2368 tests pass. No browser test yet (task 4.8).
 - **What Kiro caught or sped up:** the `resetRun` registry test forced the new store into `REPLACED_STORES`. A first version had `guidanceTick` import `riteStore`, which pulled in `startEnding` and made an import cycle ("Cannot access 'dawnPickProbe' before initialization" in six test files); reading `endingStore.riteStarted` instead removed the cycle.
 - **Decisions made unattended:** (1) Placed relics stay in the satchel record, so the ending card and the R/5 count are unchanged; "returned to the satchel" for a wrong relic means it was never taken. (2) A wrong relic is judged exactly like a wrong case answer, so after two wrong ones with no new board link the altar answers "needs a link" and nothing else happens. (3) While the altar is locked a right relic is also refused ("the altar is silent"). (4) Completing the rite calls `solveCase()` (scoring, closing the case, the clear note) and then `startEnding('rest')` at once, as the old rite did, until the win cutscene (task 5) takes over the walk out. (5) The rite is open for the whole of stage 3's night, whatever the relic count; fewer than five placed never completes (Req 17.6). (6) Rite state is night-only and not saved: it clears when `riteStarted` clears (Retry Night, death, new run, ending). (7) `MysteryState.riteProgress` stays as a retired field, always 0, so older saves and Retry snapshots still load. (8) `caseStore.giveAnswer` returns `incomplete` for stage 3, so a slot sheet can never solve it around Crane. (9) The panel shows a relic's step line from Crane's confession only after it is placed, so it confirms and does not give the order away. (10) The altar heal stays off during stage 3's night, as it was while the rite was ready. (11) Dev "complete objective" for rule 2 now places all five relics in order; "Solve 3a/3b" and "Give all relics" stay for task 4.7. `endingStore.nightFiveCleared` is now only used by the old night-5 dev route and the wave director reset.
-- **Art still waiting for Claude:** PLACEHOLDER primitives for the five relics on the altar (torus, cone, sphere, flat box, octahedron, all with an ember glow) in `AltarRite.tsx`; a relic-placed sound (the caption `relic-placed` exists, no synth voice); a sour-note sound for `altar-wrong` if none exists yet.
+- **Art still waiting:** PLACEHOLDER primitives for the five relics on the altar (torus, cone, sphere, flat box, octahedron, all with an ember glow) in `AltarRite.tsx`; a relic-placed sound (the caption `relic-placed` exists, no synth voice); a sour-note sound for `altar-wrong` if none exists yet.
 
 ### 2026-11-16: 10-curse-stages task 4.6: Silas reveal, Accusation, epilogue and endings
 - **Kiro feature used:** spec task, fast-check
 - **What happened:** New ccusationStore.ts (four blanks plus a {given, correct} record) judges the Stage 3 accusation through the altar's own rule (giveAltarAnswer(..., 'accusation')) and caseAnswer.checkAccusation; pure rules in systems/accusation.ts. AccusationSection.tsx sits inside the rite panel at the altar (selects and an Accuse button, keyboard only). A right accusation adds an epilogue card (ending.stage = 'epilogue', Space or Enter go on, Esc still pauses, opacity fade only) before the walk-out; a wrong or missing one shows "Silas Vane's cart rolled away at dawn, as it always does." on the Rest summary. New achievement *Justice for Elias* (-justice). Uneasy Peace is retired from EndingId, endings.ts, chooseEnding, the dev list and the debug hook; old saves map it to Rest or Taken by relic count (migrateEnding). Added endings.test.ts, ccusation.test.ts, ccusationStore.test.ts; updated the mystery, achievement and ending tests. Lint clean, build ok, 295 test files and 2382 tests pass. No browser test yet (task 4.8).
 - **What Kiro caught or sped up:** reading stageStore.giveAltarAnswer showed that a right accusation would have called solveCase() and ended the night without the rite, breaking Req 18.5. It now solves only for kind 'case', and a store test pins it.
 - **Decisions made unattended:** (1) The accusation can be given at stage 3's night while the case is unsolved, before or during the rite; once the rite completes the ending starts at once. (2) A locked altar refuses it (same 30 s lock). A wrong one never locks, spawns a wave or counts a wrong answer (Property 7). (3) The record is not saved: autosaves fall at dawn and dusk, before it can be given. Retry Night keeps it; a new run clears it. (4) The epilogue card is its own ending stage before the sequence, because the walk-out cutscene is task 5; task 5 can keep that order. (5) The epilogue wording is mine, built from the bible's beats (empty cart, receipt book open on the seat, ledger to the Bishop, plus Elias's name back on the stone). (6) The default line shows only on the Rest summary, not on Taken. (7) No new sound or caption for a right or wrong accusation; the panel's live region says it. (8) The merchant already trades normally at every dawn and nothing in this task changes that. (9) The achievement is last in the table, as in the bible. (10) Epilogue ignores Esc so it still pauses.
-- **Art still waiting for Claude:** nothing was made. The epilogue is a text card over the chapel camera, a PLACEHOLDER for an illustrated plate of Silas's empty cart at the gate; an accusation-heard sound is also missing.
+- **Art still waiting:** nothing was made. The epilogue is a text card over the chapel camera, a PLACEHOLDER for an illustrated plate of Silas's empty cart at the gate; an accusation-heard sound is also missing.
 
 ### 2026-11-16: 10-curse-stages task 4.7: Dev hooks for Stage 3
 - **Kiro feature used:** spec task
@@ -1745,16 +1745,16 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** nothing new; no fixes were needed.
 
 ### 2026-11-16: Outside Kiro: 09-playtest-fixes task 11p: Textured zombie keeps its own colours
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
 - **What happened:** The tint caps and cold fill were tuned for the flat cartoon skins and turned the TRELLIS texture blue-purple at night. Textured materials now take the tint half-way toward white (`texturedZombieColor`; the shambler stays white, the lurker keeps the value floor) and a quarter of the cold fill (`texturedColdFill`); the brute and Father Crane keep the old path. 4 unit tests; night screenshots in Chrome at 8 m show the painted skin with no purple cast and the lurker still darker. Commit a60c3cb.
 
 ### 2026-11-16: Outside Kiro: 09-playtest-fixes task 11q: Clue reveal and journal entries
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro to save Kiro credits, from the 09-playtest-fixes task list Kiro wrote.
 - **What happened:** A found clue now fades in below the crosshair with its picture, title, text and "Noted in your journal (J)", holds by length (3.5 s + 45 ms a character, at most 10 s) and fades out, one at a time, waiting while a menu, examine or a minigame is open (`systems/clueReveal.ts`, `ui/hud/ClueReveal.tsx`). It replaces the "Clue noted" and "Added to your journal" toasts; the ledger refusal uses the same spot, plain. The Clues tab lists clues in found order with 48 px pictures, a red dot on new ones and "Clues ·N" on the tab; the read count is saved (`mystery.cluesRead`). The clue pictures were re-rendered cropped tight to the model. Played in headless Chrome at 1280x720, 800x600 and with reduced motion. Commit 35e980d.
 - **Decisions:** case clues found inside a minigame or by the merchant's receipt get no reveal, since those already announce them. On screens under 900 px wide the reveal keeps to the middle band, clear of the controls panel and the hotbar. The clue models at each spot were already in place from 11n-d.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 5: Stage 2, The Resurrection Men
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
 - **What happened:** Case 2 minigame data in `cases.ts` (suspects, six crest tablets, eight watch-log pages with the gap, three casts and four boots), the verdicts `crestDials`, `watchOrder` and `bootMatch` with Property 16 tests, save drafts for the dials and the log (`crestDials`, `watchLog`, sanitised and kept on Retry), and three overlays: `CrestLockMinigame`, `WatchLogMinigame` (reuses the 3b timeline keys and cards) and `BootPrintsMinigame`. World props in `CaseProps.tsx`: the logbook on the lodge table, the sexton's niche with four dials, six name tablets, three casts at the Ames grave. Five new interactable kinds with cue rules. The whistle now waits in the niche until 2a is solved. Dev buttons "Solve 2a/2b/2c". `e2e/case2.spec.ts` (mouse run with wrong answers and both altar answers, keyboard-only run) passes in Chrome; screenshot pairs saved. 2415 unit tests pass, lint and build clean.
 - **Found on the way:**
   - No code found clues of kind `walk` (nine across the cases), so the surgeon's receipt, which the right answer needs, could not be found. Walk clues of stages 1 and 2 are now props by day (`case-clue`). Stage 3's are not mounted: the vane flyleaf's position (−8, −3, −75) is outside the map, so those positions need checking first.
@@ -1768,12 +1768,12 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Stage 2 props open their overlays by day only, like stage 3's; the tablets and the niche stay up at night.
 
 ### 2026-11-16: Outside Kiro: stage objective lines and stage 3 walk clues
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code), loose ends from spec 10 task 5.
+- **Kiro feature used:** none. Made outside Kiro, loose ends from spec 10 task 5.
 - **What happened:** By day in a story stage the tracker now shows the first unfinished step of the case from `STAGE_DAY_RULES` (design bible §11), with its count and a compass marker: the ledger page, the nearest bell, the crest lock, the logbook, the casts, the hymn board, the slate, the nearest known relic. Rule 5 (the hut page) still comes first and rule 12 (craft a weapon) keeps the step on its second line; once every step is done it reads "Solve the case: <title>, clues N/M". Stage 3's walk clues are now props: the flyleaf on the catacomb floor (its old spot lay outside the map), the oil at the railing of the crypt at z −49.9 (the old spot was inside it) and the bishop's seal on the vestry cupboard. A unit test checks every walk clue lies in its own zone. Checked in Chrome; 2418 unit tests pass, lint and build clean.
 - **Decisions made unattended:** the old story rules 6-10 (crypt key, whistle, altar, ossuary key, relics) no longer show by day in a story stage; Endless and the five-night rules are unchanged.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 6: E5 win cutscene
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
 - **What happened:** After the Rest sunrise (and the Justice for Elias card when earned) the ending now plays an 18 s walk-out: the keeper walks from the hut door down the middle of the grounds and out of a gate in the south fence while a sun disc rises, the sky warms and the fog lifts. Narration lines and a caption for every sound; the bell toll is synthesised. Then the ending card (`WinCard`: title, closing line, stages cleared, cases solved) heads the run summary. New: `data/winCutscene.ts`, `systems/winSequence.ts`, `systems/endingStats.ts` (with tests), `scene/effects/WinCutscene.tsx` and `winRuntime.ts`, `ui/menus/WinCard.tsx`, a `walkout` stage in `endingStore`, the dev button "Play win cutscene" and hook calls `playWinCutscene`, `winClock`, `holdWinAt`. `e2e/win-cutscene.spec.ts` (played to the end with the gate shot; Space skip; Enter skip; Esc pause and Resume) passes in Chrome.
 - **Found on the way:**
   - The graveyard model has no way out: its only gates lead into the catacombs and Mausoleum Row. The cutscene stands its own gate in the middle of the south fence and clips the fence and footing open between the posts with material clipping planes. The planes sit on the materials from the first frame, so opening the gate never recompiles a shader. The fence stays shut in play.
@@ -1786,7 +1786,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Reduced motion and Camera shake off share one variant: same path, 2.5 s fades, no bob or sway.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 7: E11 keeper's hunch and Short Vigil
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro to save Kiro credits, from the 10-curse-stages task list Kiro wrote.
 - **What happened:** Short Vigil is a new Story mode (`short-vigil`): Normal's modifiers, the 3 stages with 120 s days and a full lantern. It is on the difficulty screen between Hard and Endless, and the objective clock reads its day length. The keeper's hunch (`systems/keeperHunch.ts`, Property 20 with fast-check; `state/hunchStore.ts`, ticked in `guidanceTick`): after 120 s of day play with no new clue, the HUD lantern flame leans toward the nearest unfound clue of the stage. The dawn card opens with "Clues found (next case): N/M". Dev buttons "Start Short Vigil" and "Skip 2 minutes without a clue"; hook calls `hunch()` and `skipHunch()`. `e2e/help.spec.ts` passes in Chrome: Short Vigil from the real mode select by keyboard, first Minigame 2.4 s after Begin plus a 0.6 s estimated walk (logged), dusk at 120 s, the flame leaning right then left with the clue's side, the dawn card screenshot pair.
 - **Found on the way:**
   - There is no flame in view on the lantern (it is only lights), so the hunch leans the flame on the HUD oil gauge, the one flame the player sees.
@@ -1799,7 +1799,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The dawn card names the case next to the count, so 0/6 is not read as the case just closed.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 8: E7 grab kill-cam
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 10-curse-stages task list Kiro wrote.
 - **What happened:**
   - Rules: `systems/killCam.ts`, with Property 21 tested with fast-check.
   - When it fires: a Brute or Lurker blow on a keeper below 25% health, or out of stamina and not facing it. At most once per 60 s.
@@ -1822,7 +1822,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Dodging, god mode and an already-held keeper are never seized.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 9: E9 stamina by stage and difficulty
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 10-curse-stages task list Kiro wrote.
 - **What happened:**
   - Max stamina is 100, 90 and 80 in Stages 1 to 3 (100 in Endless).
   - Sprint drain is x0.8 on Easy, x1 on Normal, Short Vigil and Endless, and x1.2 on Hard.
@@ -1836,7 +1836,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - "max N" is always shown, not only with the accessible HUD, because the requirement asks for the cap as a number.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 10: E4 tiered crafting
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 10-curse-stages task list Kiro wrote.
 - **What happened:**
   - Every recipe has a tier (1 to 3). In the Story modes Tier 2 recipes need a crafted component (Iron Head or Oil Wick) plus more materials, and Tier 3 recipes also need a blueprint pieced from 2 Case 3 clues.
   - Endless keeps the flat recipes and has no component recipes.
@@ -1851,7 +1851,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - `crafting.ts` is unchanged; the tiered check wraps it.
 
 ### 2026-11-16: Outside Kiro: 10-curse-stages task 11: Name the Dead
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 10-curse-stages task list Kiro wrote.
 - **What happened:**
   - In Stage 2 and 3 nights each wave lights one wave grave with a name, shown with an ember light and a floating label (the ᛞ rune and the name).
   - Holding Interact there for 3 s speaks the name (caption "[a name, spoken: NAME]"), seals the grave for that wave and adds 100 score. A hit ends the hold. A name that no found clue gives shows "You don't know who lies here."
@@ -1865,7 +1865,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - A hit ends the hold until E is let go; letting go or turning to another grave starts it afresh.
 
 ### 2026-11-17: Outside Kiro: 10-curse-stages task 12: full playthrough test
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 10-curse-stages task list Kiro wrote.
 - **What happened:**
   - `e2e/playthrough.spec.ts` is rewritten. It starts a New Game in Short Vigil through the real menus and plays all 3 stages to the ending card with `page.mouse` and `page.keyboard` only. God mode (the one Dev_Panel action allowed) keeps the fights fair; there is no teleport and no skip.
   - `e2e/support/walker.ts` reads the physics colliders, plans a route on a grid (A* and string pulling) and walks it with the real movement keys, turning the camera with real mouse moves under pointer lock. It stands near each prop, aims at it and holds E. `e2e/support/story.ts` has one function per stage: minigames are answered with real clicks, the altar answers with real select and button clicks, and Father Crane is fought with real swings.
@@ -1884,7 +1884,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Spec 09 task 3 keeps its "moved to spec 10 final task" note and stays unticked.
 
 ### 2026-11-17: Outside Kiro: 11-horror-pass task 1: design bible horror pass
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 11-horror-pass task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 11-horror-pass task list Kiro wrote.
 - **What happened:**
   - The design bible has a new section, "14. Horror pass (11)", with subsections 14.1 to 14.9: screen jumpscares, new creatures, zombie looks, bats, info dots, the vending machine, hands and lantern light, settings and controls, and the cut list. Each subsection has its numbers in tables, taken from the spec 11 requirements and design. A "Waiting list and placeholders" part gives the placeholder rules.
   - Existing sections are updated: Grave Coins can be spent at the vending machine (§3); the Brisk Draught consumable and its timed effect (§4); the Pale Crawler, Hollow Bride and Corpse Hound rows (§7); hounds and crawlers on the wave ladder (§8); screen jumpscares as a major scare with their own cooldown (§9); info dots and the Creatures page (§11). §10 (controls) needs no change. The preamble lists the (11) tag.
@@ -1897,7 +1897,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The test reads the bible through Vite's raw import, as the other tests in `tests/` read files, because the project has no Node types. (2026-11-17)
 
 ### 2026-11-17: Outside Kiro: 11-horror-pass task 2: H6 hut vending machine
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 11-horror-pass task list Kiro wrote.
+- **Kiro feature used:** none. Made outside Kiro, from the 11-horror-pass task list Kiro wrote.
 - **What happened:**
   - The vending machine in the hut now works, by day and at night. Walk within 2.5 m and press E to open its panel. The panel looks like the merchant's: each row has a name, a price, "N left", a one-line blurb and a Buy button. When a row runs out it shows a hatched "Sold out" card, and a refusal shows its reason as text. The panel can be used with the keyboard alone. It does not pause the world, does not protect the keeper and does not take Esc.
   - It sells six rows: Lamp Oil, Kola Tonic, the new Brisk Draught, Bandage, and Revolver and Shotgun Cartridges. The cartridge rows show only once that gun is owned. Stock refills at dawn, is saved with the game, is part of the Retry snapshot and is cleared by New Game. A purchase pulls a handle, then the item drops into the tray. Each step plays a 3D sound at the machine: coin, handle, tray, or a refusal buzz. All four sounds have captions.
@@ -1930,7 +1930,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The perf spec records the baseline instead of asserting the 150 draw-call budget, which the game already exceeds. (2026-11-17)
 
 ### 2026-11-17: Outside Kiro: fix: Resume and the intro's first shot
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (two bugs found in play).
+- **Kiro feature used:** none. Made outside Kiro (two bugs found in play).
 - **What happened:**
   - **Resume left the game paused.** On Resume, the pause menu, the cursor-release relock and the canvas click could each ask for pointer lock in the same frame. Chrome refused the overlapping requests. The fallback retry then fired a lock change with no lock, which the pause trigger read as "lock lost", so the game paused again at once. Now only one lock request is in flight at a time (`pointerLockRequest.ts`). A lock change pauses only when a lock the canvas actually held is lost (`lockChangeLosesLock` in `usePauseTriggers.ts`). Checked in headed Chrome with real pointer lock: Esc pauses, and Resume unpauses and takes the lock back.
   - **The intro's first shot looked through the ground.** Outside the front fence the outer terrain climbs a bank: y 0 at z 44, about 5.8 at z 62. Shot 1 started at a fixed 2.5 m at z 62, about 3.3 m under the bank, and the terrain's back faces are culled, so the first second of the intro showed empty fog and a hard ground edge. Shot 1 now comes down over the bank about 2.5 m above the grass (y 8.3 at z 62 to 2.5 at z 46). A new test samples every intro camera path against the bank's measured profile and needs 1.5 m of clearance.
@@ -1940,7 +1940,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The bank profile in the test was measured from `graveyard.glb` by raycasting in the running game. (2026-11-17)
 
 ### 2026-11-17: Outside Kiro: fix: readable handwriting font
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (the cursive font was unreadable).
+- **Kiro feature used:** none. Made outside Kiro (the cursive font was unreadable).
 - **What happened:**
   - `--font-hand` was Homemade Apple, a looping cursive. It is now Special Elite, a worn typewriter face from Google Fonts (Apache 2.0). It is clear at 20 px and still fits the 1891 case-file mood.
   - Every place that used the hand font changes with the token: intro cards, journal pages (unless "Plain font for journal" is on), Elias's page, tombstone epitaphs, recipe notes, ending lines and walk-out captions.
@@ -1951,7 +1951,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The fallback is Courier New, then monospace, so the text stays readable while the web font loads. (2026-11-17)
 
 ### 2026-11-17: Outside Kiro: objective beacon, and grave glyphs only when digging is the objective
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (objectives were hard to find).
+- **Kiro feature used:** none. Made outside Kiro (objectives were hard to find).
 - **What happened:**
   - **Objective beacon** (`ObjectiveBeacon.tsx`, rules in `objectiveBeacon.ts`). The current objective now has a tall amber pillar of light (30 m, unlit emissive, ignores fog, no flashing). It also has a label naming it with the distance, e.g. "Crest lock · 30 m". It stands on the same point as the compass diamond and minimap marker (`guidanceStore.objective.position`), so it moves as the objective changes. It fades out from 6 m to 2 m, so it is gone once you arrive. It is hidden during the intro and while the objective has no place. When the objective is in the hut and the player is outside, the label says so ("Page · in the hut · 25 m").
   - **Grave mounds.** The orange pillar that stood over every mound during the dig tutorial is gone; the objective beacon marks the mound the tutorial points at instead. A mound's dig glyph now shows from 16 m by day only while digging is the objective. Otherwise it shows in lantern range like any other target.
@@ -1962,7 +1962,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The label uses the objective's existing marker names (Ledger, Bells, Crest lock and so on), so no new copy was written. (2026-11-17)
 
 ### 2026-11-18: Outside Kiro: recorded audio files (loader, prompt sheet, generator, converter)
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (to add narration, sound effects and music).
+- **Kiro feature used:** none. Made outside Kiro (to add narration, sound effects and music).
 - **What happened:**
   - **Loader** (`src/audio/samples.ts`, `sampleManifest.ts`). On audio unlock, the game reads `/assets/audio/manifest.json` and decodes the files it lists in the background. A Vite plugin (`tools/audio/audioManifestPlugin.mjs`) answers that request in dev and writes it into the build, so dropping a file into `public/assets/audio/<sfx|voice|ambience|music>/` is enough. A sound plays from its file when one is decoded and otherwise from its synth recipe, so files can be added a few at a time. `name-1` .. `name-N` files are variants of `name`, picked at random.
   - **Wired to files:** every synth sound id; the stubbed sounds (crafting, satchel, stair steps, page turn, throws, heartbeat, scare sounds); captioned events with no synth voice (boss death, altar, merchant, relic); enemy cues (shamblers groan from `zombie-groan-*` at jittered intervals; lurker, wailer and bloater from their own files); a recorded rain loop over the noise bed; player footsteps (`footsteps.ts`: one step per 0.8 m walked or 1.1 m sprinted, wood in the hut, stone in the chapel and catacombs, grass elsewhere); and intro narration (`voice/intro-N`, started with each card and cut by a new card, pause or skip). File-only sounds stay silent until their file exists.
@@ -1978,7 +1978,7 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Raw downloads in `tools/audio/raw/` are git-ignored; only the converted `.ogg` files are committed. (2026-11-18)
 
 ### 2026-11-18: Outside Kiro: audio on, procedural score off
-- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request.
+- **Kiro feature used:** none. Made outside Kiro.
 - **What happened:**
   - `AUDIO_ENABLED` is now `true`, because the first batch of recorded files is in (15 files, 916 KB).
   - The structure rule in `tests/progressionRules.test.ts` now also allows any `.ogg` named in the audio prompt sheet.

@@ -173,167 +173,167 @@ Common rules for all tasks:
     - Run the Finish steps for task 4; commit `stage 3 case, rite and Silas (spec 10 task 4)`
 
 - [x] 5. Stage 2: The Resurrection Men
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 5.1 Case 2 data
-    - Done outside Kiro by Claude. Fallback clues for cut 2a/2c were not added: neither task was cut
+    - Done outside Kiro. Fallback clues for cut 2a/2c were not added: neither task was cut
     - Fill `cases.ts` for Case 2: four suspects, crest years on 6 tablets, 8 watch-log entries with the 2-hour gap, 3 casts and 4 boots, surgeon's receipt, red herrings (spade with fresh clay, doctor's letter), Final_Question, Closed-case page; fallback clues for 2a and 2c
     - Extend `cases.test.ts` (also with 2a and 2c cut)
     - _Requirements: 7.1, 7.2, 19.1, 19.5, 20.1, 21.1, 21.5, 22.1, 22.4_
   - [x] 5.2 Pure rules for 2a, 2b and 2c
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Add `crestDials`, `watchOrder`, `bootMatch` to `caseMinigames.ts` with tests
     - **Property 16: Right answers accepted, wrong answers rejected** (2a, 2b, 2c)
     - _Requirements: 19.2, 19.3, 20.2, 20.3, 21.2, 21.3_
   - [x] 5.3 Minigame 2b overlay and lodge props
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Create `WatchLogMinigame.tsx` (8 entries, drag and keyboard lift/move, first-wrong marker with glyph and text) and the lodge logbook prop
     - _Requirements: 20.1-20.4, 11.9_
   - [x] 5.4 Minigame 2a overlay and crest lock (cuttable, cut order 4)
-    - Done outside Kiro by Claude. Tablets hang on the avenue railing, since a plate on the crypt front sits inside the door frame
+    - Done outside Kiro. Tablets hang on the avenue railing, since a plate on the crypt front sits inside the door frame
     - Create `CrestLockMinigame.tsx`, the sexton's niche dials at (−21.2, −52.5), the lodge note and the crypt name tablets on the existing tablet faces; solving gives the whistle and the sexton's ledger
     - If cut: keep the whistle where it is and make the sexton's ledger a found item
     - _Requirements: 19.1-19.5, 11.9_
   - [x] 5.5 Minigame 2c overlay and plaster casts (cuttable, cut order 3)
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Create `BootPrintsMinigame.tsx` and the three plaster casts at the Ames grave; boots examine views
     - If cut: the boots clue becomes a found item
     - _Requirements: 21.1-21.5, 11.9_
   - [x] 5.6 Final answer and hand-off to Stage 3
-    - Done outside Kiro by Claude. No new code: the altar and case close were already generic
+    - Done outside Kiro. No new code: the altar and case close were already generic
     - Wire the Case 2 Final_Question at the altar; on solve carry the whistle and stair into Stage 3 and move Case 2 to Closed cases
     - _Requirements: 22.1-22.5_
   - [x] 5.7 Dev hooks for Stage 2
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Add "Solve 2a/2b/2c" to the Dev_Panel
     - _Requirements: 5.3_
   - [x] 5.8 Stage 2 e2e and screenshots
-    - Done outside Kiro by Claude. Screenshot pairs case2-2a, case2-2b, case2-2c (and their -wrong) and case2-board
+    - Done outside Kiro. Screenshot pairs case2-2a, case2-2b, case2-2c (and their -wrong) and case2-board
     - Create `e2e/case2.spec.ts`: solve 2a, 2b, 2c with mouse and keyboard (wrong and right), then the right and a wrong altar answer; a keyboard-only run; skip the 2a and 2c cases when those tasks are cut
     - Save the screenshot pairs for 2a, 2b, 2c and the Case 2 board
     - _Requirements: 19.6, 19.7, 20.5, 20.6, 21.6, 21.7, 22.6, 22.7_
   - [x] 5.9 Finish
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Run the Finish steps for task 5; commit `stage 2 case and minigames (spec 10 task 5)`
 
 - [x] 6. E5: Win cutscene
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 6.1 Pure win sequence
-    - Done outside Kiro by Claude. The data is in `src/data/winCutscene.ts` (process rule: no numbers in systems/); `endingSequence.ts` now takes any timeline (`SequenceTimeline`)
+    - Done outside Kiro. The data is in `src/data/winCutscene.ts` (process rule: no numbers in systems/); `endingSequence.ts` now takes any timeline (`SequenceTimeline`)
     - Create `src/game/systems/winSequence.ts` (timeline of 15 to 20 s reusing `cameraPath.ts` and `endingSequence.ts`, skip target, reduced-motion variant) and `winSequence.test.ts`
     - _Requirements: 23.1, 23.2, 23.5_
   - [x] 6.2 Cutscene scene and win card
-    - Done outside Kiro by Claude. The graveyard model has no exit gate, so the cutscene adds one in the south fence and clips the fence open behind it; a sun disc rises over the hills. WinCard heads the run summary
+    - Done outside Kiro. The graveyard model has no exit gate, so the cutscene adds one in the south fence and clips the fence open behind it; a sun disc rises over the hills. WinCard heads the run summary
     - Create `src/scene/effects/WinCutscene.tsx` and `src/ui/menus/WinCard.tsx`: the walk down the main path and out the gates, rising sun, lifting fog, captions, Space/Enter skip, Esc pause, fades only under reduced motion or no camera shake
     - _Requirements: 23.1-23.6_
   - [x] 6.3 Flow wiring
-    - Done outside Kiro by Claude. `endingStats.ts` is new in systems (stages cleared, cases solved). `runFlow.ts` needed no change. Skipping the 44 s sunrise goes straight to the card (spec 09 item 11 asks one key to end the ending); played out, it leads into the walk
+    - Done outside Kiro. `endingStats.ts` is new in systems (stages cleared, cases solved). `runFlow.ts` needed no change. Skipping the 44 s sunrise goes straight to the card (spec 09 item 11 asks one key to end the ending); played out, it leads into the walk
     - After the Stage 3 sunrise (and the epilogue when earned) start the cutscene, then the ending card and run summary; update `startEnding.ts`, `runFlow.ts`, `endingStats.ts` for stages and cases solved
     - _Requirements: 1.4, 23.3, 23.7_
   - [x] 6.4 Dev trigger, e2e and screenshots
-    - Done outside Kiro by Claude. Screenshot pair `win-cutscene-gate-1280x720` and `-800x600`
+    - Done outside Kiro. Screenshot pair `win-cutscene-gate-1280x720` and `-800x600`
     - Add a "Play win cutscene" button; create `e2e/win-cutscene.spec.ts` (play to the end, skip with Space, skip with Enter, Esc pauses); save the gate-shot screenshot pair
     - _Requirements: 23.8, 23.9_
   - [x] 6.5 Finish
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Run the Finish steps for task 6; commit `win cutscene (spec 10 task 6)`
 
 - [x] 7. E11: Help and Short Vigil
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 7.1 Pure hunch and Short Vigil data
-    - Done outside Kiro by Claude. Data in `src/data/keeperHunch.ts`; Short Vigil also adds `startOilPct` to every mode (100 for all)
+    - Done outside Kiro. Data in `src/data/keeperHunch.ts`; Short Vigil also adds `startOilPct` to every mode (100 for all)
     - Create `keeperHunch.ts` and its test; add Short Vigil (3 Stages, 2-minute days, 100% oil) to `src/data/modes.ts`
     - **Property 20: Keeper's hunch**
     - _Requirements: 24.1, 24.4_
   - [x] 7.2 Hunch, dawn card, difficulty screen and tutorial
-    - Done outside Kiro by Claude. The flame is the HUD oil-gauge flame (the lantern has no flame in view). The Case-tab tutorial step already existed as step 8 (`openCaseTab`), so no change
+    - Done outside Kiro. The flame is the HUD oil-gauge flame (the lantern has no flame in view). The Case-tab tutorial step already existed as step 8 (`openCaseTab`), so no change
     - Lean the lantern flame toward the nearest unfound clue (shape change, obeys head bob and reduced motion); show "Clues found N/M" on the dawn card; add the Short Vigil option to the difficulty screen; add the Case-tab tutorial step
     - _Requirements: 24.2, 24.3, 24.5, 24.6_
   - [x] 7.3 Dev hooks, e2e and screenshots
-    - Done outside Kiro by Claude. Screenshot pair `dawn-card-clues-1280x720` and `-800x600`, plus `hunch-flame-right.png`; the first-Minigame time is logged to `e2e/logs/short-vigil-first-minigame.json`
+    - Done outside Kiro. Screenshot pair `dawn-card-clues-1280x720` and `-800x600`, plus `hunch-flame-right.png`; the first-Minigame time is logged to `e2e/logs/short-vigil-first-minigame.json`
     - Add "Start Short Vigil" and "Skip 2 minutes without a clue" to the Dev_Panel; create `e2e/help.spec.ts` (first Minigame within 3 minutes, logged; hunch lean after 2 minutes; the Short Vigil day length); save the dawn-card screenshot pair
     - _Requirements: 24.7, 24.8_
   - [x] 7.4 Finish
-    - Done outside Kiro by Claude
+    - Done outside Kiro
     - Run the Finish steps for task 7; commit `keeper's hunch and short vigil (spec 10 task 7)`
 
 - [x] 8. E7: Grab kill-cam
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 8.1 Pure kill-cam rules
-    - Done outside Kiro by Claude. Data in `src/data/killCam.ts`; Property 21 with fast-check
+    - Done outside Kiro. Data in `src/data/killCam.ts`; Property 21 with fast-check
     - Create `killCam.ts` (trigger by health below 25% or empty stamina and not facing, 1.2 s, 60 s cooldown, intensity table, lethal rule) and `killCam.test.ts`
     - **Property 21: Kill-cam cooldown and intensity**
     - _Requirements: 25.1-25.7_
   - [x] 8.2 Camera, effects and captions
-    - Done outside Kiro by Claude. Also `state/killCamStore.ts`, `state/killCamActions.ts` (zombie blows go through `zombieBlow`) and the HUD `GrabEdge.tsx`. Only the Brute and Lurker grab: the game has no Sprinter
+    - Done outside Kiro. Also `state/killCamStore.ts`, `state/killCamActions.ts` (zombie blows go through `zombieBlow`) and the HUD `GrabEdge.tsx`. Only the Brute and Lurker grab: the game has no Sprinter
     - Create `src/scene/effects/KillCam.tsx`; hook the camera in `FirstPersonController.tsx`; add the stinger, the "[something seizes you]" caption and the steady-edge variant; honour Scare intensity, Flashing lights and Camera shake; silhouette and dust only
     - _Requirements: 25.3-25.6, 25.8, 29.1, 29.4_
   - [x] 8.3 Kill-cam e2e
-    - Done outside Kiro by Claude. The e2e must not call `keepAlive` (it refills health); screenshots `killcam-full`, `killcam-off`, `killcam-steady-edge`
+    - Done outside Kiro. The e2e must not call `keepAlive` (it refills health); screenshots `killcam-full`, `killcam-off`, `killcam-steady-edge`
     - Add a "Trigger grab" button to the Dev_Panel; create `e2e/killcam.spec.ts` for each intensity (camera, subtitle, cooldown)
     - _Requirements: 25.9_
   - [x] 8.4 Finish
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
     - Run the Finish steps for task 8; commit `grab kill-cam (spec 10 task 8)`
 
 - [x] 9. E9: Stamina by stage and difficulty (cuttable, cut order 5)
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 9.1 Pure stamina cap
-    - Done outside Kiro by Claude. Data in `src/data/staminaCaps.ts`; `tickStamina` takes the cap; Property 22 with fast-check
+    - Done outside Kiro. Data in `src/data/staminaCaps.ts`; `tickStamina` takes the cap; Property 22 with fast-check
     - Create `staminaCap.ts` and extend `stamina.ts` (caps 100 / 90 / 80, drain ×0.8 / 1 / 1.2, current stamina clamped to the cap); write `staminaCap.test.ts`
     - **Property 22: Stamina never exceeds a cap that never rises**
     - _Requirements: 26.1-26.4_
   - [x] 9.2 Store, bar and wiring
-    - Done outside Kiro by Claude. The cap reaches the tick through `deriveTickInput`; the difficulty drain multiplies Adrenaline in `GameLoop`. The bar is the cap's share of its full length, with "max N" under it at 1rem
+    - Done outside Kiro. The cap reaches the tick through `deriveTickInput`; the difficulty drain multiplies Adrenaline in `GameLoop`. The bar is the cap's share of its full length, with "max N" under it at 1rem
     - Wire the cap into `staminaRuntime.ts` and the stamina bar (cap shown as number and length)
     - _Requirements: 26.5_
   - [x] 9.3 Stamina e2e
-    - Done outside Kiro by Claude. Screenshot `stamina-stage2-1280x720.png`
+    - Done outside Kiro. Screenshot `stamina-stage2-1280x720.png`
     - Create `e2e/stamina.spec.ts`: sprint in two Stages and assert the displayed cap
     - _Requirements: 26.6_
   - [x] 9.4 Finish
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
     - Run the Finish steps for task 9; commit `stage stamina caps (spec 10 task 9)`
 
 - [x] 10. E4: Tiered crafting (cuttable, cut order 2)
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 10.1 Tier data
-    - Done outside Kiro by Claude. Components Iron Head and Oil Wick (items, Blender models, icons); blueprints in `src/data/blueprints.ts`; §5 has an "As built" note
+    - Done outside Kiro. Components Iron Head and Oil Wick (items, Blender models, icons); blueprints in `src/data/blueprints.ts`; §5 has an "As built" note
     - Add tier, component and blueprint fields to `src/data/recipes.ts` (components such as the Iron Head; blueprints pieced from 2 clues plus a rare material); update `docs/game-design.md` §5
     - _Requirements: 27.1, 27.2_
   - [x] 10.2 Pure tiered crafting
-    - Done outside Kiro by Claude. `crafting.ts` is unchanged: `tieredCrafting.ts` wraps `canCraft`; the store reads it through `state/tieredCraft.ts`
+    - Done outside Kiro. `crafting.ts` is unchanged: `tieredCrafting.ts` wraps `canCraft`; the store reads it through `state/tieredCraft.ts`
     - Create `tieredCrafting.ts` and extend `crafting.ts` (component check, blueprint check, missing-component report); write `tieredCrafting.test.ts`
     - **Property 23: Tier damage and cost rise together**
     - _Requirements: 27.2, 27.3, 27.4_
   - [x] 10.3 Recipe book UI
-    - Done outside Kiro by Claude. Tier headings and tags, component and blueprint lines; the pinned card and the bench ghost use the tiered inputs
+    - Done outside Kiro. Tier headings and tags, component and blueprint lines; the pinned card and the bench ghost use the tiered inputs
     - Show the tier and the missing component in the recipe book; keep the flat recipes when tiers are off
     - _Requirements: 27.4, 27.5_
   - [x] 10.4 Tiered crafting e2e
-    - Done outside Kiro by Claude. Screenshots `tiered-crafting-needs-component` and `tiered-crafting-done`; the D2 bench e2e now crafts every recipe with its tiered inputs
+    - Done outside Kiro. Screenshots `tiered-crafting-needs-component` and `tiered-crafting-done`; the D2 bench e2e now crafts every recipe with its tiered inputs
     - Create `e2e/tiered-crafting.spec.ts`: craft a component then a Tier 2 weapon at the workbench
     - _Requirements: 27.6_
   - [x] 10.5 Finish
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
     - Run the Finish steps for task 10; commit `tiered crafting (spec 10 task 10)`
 
 - [x] 11. Name the Dead (cuttable, cut order 1)
-  - Done outside Kiro by Claude; see the kiro-log entry
+  - Done outside Kiro; see the kiro-log entry
   - [x] 11.1 Data and pure rules
-    - Done outside Kiro by Claude. `DEAD_NAMES` in `cases.ts` (two strangers no evidence names); tuning in `src/data/nameTheDead.ts`; Property 24 with fast-check
+    - Done outside Kiro. `DEAD_NAMES` in `cases.ts` (two strangers no evidence names); tuning in `src/data/nameTheDead.ts`; Property 24 with fast-check
     - Add the names list from each Case's evidence to `cases.ts`; create `nameTheDead.ts` (hold 3 s, damage cancels, known or unknown name) and `nameTheDead.test.ts`
     - **Property 24: Name the Dead hold**
     - _Requirements: 28.1-28.4_
   - [x] 11.2 Glowing grave, hold UI and captions
-    - Done outside Kiro by Claude. `NamedGrave.tsx` (light always mounted, dark when unused), `NameHold.tsx`, interact action `name` with its rune image; the wave director skips the sealed grave
+    - Done outside Kiro. `NamedGrave.tsx` (light always mounted, dark when unused), `NameHold.tsx`, interact action `name` with its rune image; the wave director skips the sealed grave
     - Add the glowing grave (rune plus text label), the hold ring, the caption and the +100 score; seal the grave for that wave in `waveStore.ts`
     - _Requirements: 28.1, 28.2, 28.4, 28.5_
   - [x] 11.3 Name the Dead e2e
-    - Done outside Kiro by Claude. Holds the real E key; screenshots `name-the-dead-hold` and `name-the-dead-sealed`
+    - Done outside Kiro. Holds the real E key; screenshots `name-the-dead-hold` and `name-the-dead-sealed`
     - Create `e2e/name-the-dead.spec.ts`: hold Interact at a glowing grave and assert the seal and the score
     - _Requirements: 28.6_
   - [x] 11.4 Finish
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
     - Run the Finish steps for task 11; commit `name the dead (spec 10 task 11)`
 
 - [x] 12. Final task: full automated playthrough in Short Vigil (moved from spec 09 task 3)
@@ -341,14 +341,14 @@ Common rules for all tasks:
     - Rewrite `e2e/playthrough.spec.ts`: new game in Short Vigil, play all 3 Stages (Minigames, key items, relics, Crane, Accusation) to the ending card with `page.mouse` and `page.keyboard` only; no Dev_Panel action, no teleport, no skip; god mode only to keep the fight fair
     - Assert the Objective_Tracker text at each step; log the time to the first Minigame and the total run time
     - _Requirements: 30.1-30.4, 5.7_
-    - Done outside Kiro by Claude. `e2e/support/walker.ts` (a planner over the physics colliders that walks with the real W/A/S/D keys and turns the camera with the real mouse under pointer lock) and `e2e/support/story.ts` (one function per stage). Passes in Chrome: first minigame at 13.3 s, whole run 17 min 44 s
+    - Done outside Kiro. `e2e/support/walker.ts` (a planner over the physics colliders that walks with the real W/A/S/D keys and turns the camera with the real mouse under pointer lock) and `e2e/support/story.ts` (one function per stage). Passes in Chrome: first minigame at 13.3 s, whole run 17 min 44 s
   - [x] 12.2 Fix what the playthrough finds
     - Fix every real bug the run exposes; log what is left in `docs/kiro-log.md`
     - _Requirements: 30.1, 30.3_
-    - Done outside Kiro by Claude. The lodge (shotgun, watch log, surgeon's receipt) moved inside the fence, where a player can reach it; Stage 3's hymn board, psalter, evidence and slate stay usable at night so a Short Vigil player is not stuck. What is left is in the log
+    - Done outside Kiro. The lodge (shotgun, watch log, surgeon's receipt) moved inside the fence, where a player can reach it; Stage 3's hymn board, psalter, evidence and slate stay usable at night so a Short Vigil player is not stuck. What is left is in the log
   - [x] 12.3 Finish
     - Run the Finish steps for task 12; commit `full playthrough test (spec 10 task 12)`
-    - Done outside Kiro by Claude. Left uncommitted for the user to commit
+    - Done outside Kiro. Left uncommitted for the user to commit
 
 ## Notes
 
