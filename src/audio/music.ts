@@ -5,6 +5,21 @@ import { SYNTH_MUSIC } from '../data/music'
 import type { Weights } from '../game/systems/musicMixer'
 import { getSynth, type SynthEngine } from './synth'
 
+/**
+ * The procedural score (drone, unease, tension and danger stems, plus the heartbeat) is off: the
+ * user found its constant drone too loud and grating, so it stays silent until recorded music
+ * (public/assets/audio/music, see tools/audio/prompts.mjs) replaces it. Set to `true` to hear it
+ * again. Sound effects, rain and narration are not affected.
+ */
+export const PROCEDURAL_MUSIC_ENABLED = false
+
+let musicOverride: boolean | null = null
+
+/** Test hook: force the procedural score on or off regardless of the constant. Pass null to restore. */
+export function setProceduralMusicForTests(value: boolean | null): void {
+  musicOverride = value
+}
+
 export interface MusicGraph {
   ctx: AudioContext
   /** Drone, unease, tension, danger. */
@@ -149,6 +164,7 @@ export function setMusicLevels(g: MusicGraph, stems: Weights, master: number): v
  */
 export function stepMusic(levels: { stems: Weights; master: number; frozen?: boolean }): boolean {
   try {
+    if (!(musicOverride ?? PROCEDURAL_MUSIC_ENABLED)) return false
     const engine = getSynth()
     if (!engine || engine.ctx.state !== 'running') return false
     const g = createMusicGraph(engine)

@@ -10,6 +10,7 @@ import { describe, expect, it } from 'vitest'
 import { PROGRESSION_PERSISTED, captureProgressionSave } from '../src/game/state/progressionPersistence'
 import { progressionSnapshot } from '../src/game/state/retryNight'
 import { defaultProgressionSave } from '../src/game/systems/progressionSave'
+import { AUDIO, fileNames } from '../tools/audio/prompts.mjs'
 
 // No node:fs: the app tsconfig has no node types, so sources are read as raw text via Vite.
 const raw = (g: Record<string, unknown>): Record<string, string> => g as Record<string, string>
@@ -187,6 +188,8 @@ describe('structure rule: this spec adds no binary assets', () => {
     'merchant-cart ossuary-door sabre-plinth scare-door statue-mourner vending-machine woodpile workbench'
   ).split(' ')
   for (const p of PROPS) ALLOWED.add(`models/props/${p}.glb`)
+  /** Recorded audio: only the files named in the prompt sheet (tools/audio/prompts.mjs). */
+  for (const e of AUDIO) for (const n of fileNames(e)) ALLOWED.add(`audio/${e.folder}/${n}.ogg`)
 
   it('has only the recorded .ogg, .mp3 and .glb files', () => {
     const found = Object.keys(import.meta.glob('../public/assets/**/*.{ogg,mp3,glb}'))

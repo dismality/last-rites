@@ -68,8 +68,8 @@ afterEach(() => {
 })
 
 describe('audio muted', () => {
-  it('ships muted', () => {
-    expect(AUDIO_ENABLED).toBe(false)
+  it('ships with sound on (the switch still mutes everything when set to false, below)', () => {
+    expect(AUDIO_ENABLED).toBe(true)
   })
 
   it('unlockAudio builds no engine and creates no Howl', () => {

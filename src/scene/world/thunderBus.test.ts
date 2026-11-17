@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { applyVolumes } from '../../audio/volumes'
 import { registerCombatSounds } from '../../audio/audioBoot'
-import { stepMusic, resetMusicForTests } from '../../audio/music'
+import { stepMusic, resetMusicForTests, setProceduralMusicForTests } from '../../audio/music'
 import { resetSynthForTests, setSynthForTests, SynthEngine } from '../../audio/synth'
 import { MUSIC } from '../../data/music'
 import { subscribeToType } from '../../game/events'
@@ -91,7 +91,10 @@ describe('music master while silent', () => {
     s = stepMixer(s, { layer: 0, silent: true }, MUSIC.duckFadeS + 0.1)
     expect(s.master).toBe(0)
     const { ctx } = setup()
+    // The score ships switched off (music.ts); this checks the graph it would build.
+    setProceduralMusicForTests(true)
     stepMusic({ stems: [1, 0, 0, 0], master: s.master })
+    setProceduralMusicForTests(null)
     // gains: sfx, music bus, then the music master
     expect(ctx.gainLogs[2][ctx.gainLogs[2].length - 1]).toBe(0)
   })

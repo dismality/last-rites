@@ -1,10 +1,10 @@
 // THE audio switch. Every sound the game makes (Howler, procedural synth, music, rain) is gated
 // on this one constant.
 //
-// Why it is false: audio is muted for now while the rest of the game is playtested.
-// To turn sound back on: set it to `true`. Nothing else needs to change; the audio code and the
-// volume settings are intact. Captions/subtitles do not depend on it and keep working.
-export const AUDIO_ENABLED = false
+// On since 2026-11-18 (recorded audio files arrived; it had been muted while the game was
+// playtested). Set it to `false` to silence everything again; nothing else needs to change.
+// Captions/subtitles do not depend on it and keep working.
+export const AUDIO_ENABLED = true
 
 let override: boolean | null = null
 

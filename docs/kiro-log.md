@@ -1976,3 +1976,13 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - `AUDIO_ENABLED` stays `false` (the user's playtest mute), so nothing is heard until it is set to `true`. (2026-11-18)
   - The default ElevenLabs voices are premade "George" (narrator) and "Daniel" (Elias), and can be replaced with `ELEVENLABS_VOICE_NARRATOR` and `ELEVENLABS_VOICE_ELIAS`. (2026-11-18)
   - Raw downloads in `tools/audio/raw/` are git-ignored; only the converted `.ogg` files are committed. (2026-11-18)
+
+### 2026-11-18: Outside Kiro: audio on, procedural score off
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request.
+- **What happened:**
+  - `AUDIO_ENABLED` is now `true`, because the first batch of recorded files is in (15 files, 916 KB).
+  - The structure rule in `tests/progressionRules.test.ts` now also allows any `.ogg` named in the audio prompt sheet.
+  - The user found the procedural score's constant drone too loud, so it is off until recorded music replaces it: `PROCEDURAL_MUSIC_ENABLED = false` in `music.ts`. Sound effects, rain and narration still play.
+  - Checked in headed Chrome. All five intro lines play as their cards appear. Walking on grass plays a footstep about every 0.27 s, cycling through the 4 variants. No tone generator starts by day or at night, so there is no drone. Lint, build and all 2587 unit tests pass.
+- **Decisions made unattended:**
+  - The score's code is kept and only switched off, so it can come back with one constant. (2026-11-18)

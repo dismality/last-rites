@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { SYNTH_MUSIC } from '../data/music'
-import { resetMusicForTests, stepMusic } from './music'
+import { PROCEDURAL_MUSIC_ENABLED, resetMusicForTests, setProceduralMusicForTests, stepMusic } from './music'
 import { resetSynthForTests, setSynthForTests, SynthEngine } from './synth'
 
 function fakeGain() {
@@ -82,6 +82,17 @@ describe('music driver core', () => {
   beforeEach(() => {
     resetMusicForTests()
     resetSynthForTests()
+    setProceduralMusicForTests(true)
+  })
+
+  it('ships with the procedural score off, and then builds nothing even with audio running', () => {
+    expect(PROCEDURAL_MUSIC_ENABLED).toBe(false)
+    setProceduralMusicForTests(null)
+    const ctx = setup('running')
+    const before = ctx.gains.length
+    expect(stepMusic({ stems: [1, 1, 1, 1], master: 1 })).toBe(false)
+    expect(ctx.gains.length).toBe(before)
+    expect(ctx.oscs.length).toBe(0)
   })
 
   it('builds no graph while the context is suspended, then starts when it runs', () => {
