@@ -433,3 +433,16 @@ img.hud-prompt__rune-img {
   font-style: italic;
   font-size: 1rem;
 }
+
+/* Objective beacon label (ObjectiveBeacon.tsx): what the amber pillar marks and how far it is. */
+.objective-beacon-label {
+  padding: 0.15rem 0.6rem;
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--parchment);
+  background: rgba(20, 17, 15, 0.72);
+  border: 1px solid var(--ember);
+  border-radius: 2px;
+  text-shadow: 0 1px 3px var(--ink);
+}

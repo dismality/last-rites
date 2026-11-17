@@ -67,6 +67,7 @@ import { NamedGrave } from './scene/world/NamedGrave'
 import { MaterialPickups } from './scene/world/MaterialPickups'
 import { SaltCircles } from './scene/world/SaltCircles'
 import { PinBeacons } from './scene/world/PinBeacons'
+import { ObjectiveBeacon } from './scene/world/ObjectiveBeacon'
 import { SkyAndFog } from './scene/world/SkyAndFog'
 import { ThrownItems } from './scene/world/ThrownItems'
 import { Workbench } from './scene/world/Workbench'
@@ -130,6 +131,7 @@ function GameScreen() {
           {/* After EnemyDirector so salt reads this frame's enemy positions. */}
           <SaltCircles />
           <PinBeacons />
+          <ObjectiveBeacon />
           <DustBurst />
           <KillCam />
           <CaseCollapse />
