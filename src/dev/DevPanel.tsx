@@ -9,7 +9,9 @@ import {
   completeObjective,
   giveEverything,
   giveKeyItem,
+  giveCoins,
   giveMaterial,
+  resetVendingStockDev,
   givePage,
   giveRelic,
   giveWeapon,
@@ -337,6 +339,14 @@ export function DevPanel() {
           <Row>
             <button type="button" onClick={run(giveEverything)}>
               Give everything
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(() => giveCoins())}>
+              Give 100 grave coins
+            </button>
+            <button type="button" onClick={run(resetVendingStockDev)}>
+              Reset vending stock
             </button>
           </Row>
         </Section>

@@ -57,9 +57,9 @@ describe('trees', () => {
 })
 
 describe('assets', () => {
-  it('lists all 41 item models (8 hero + 33 world, two of them the spec 10 components) under /assets and uses the local Draco path', () => {
+  it('lists all 42 item models (8 hero + 33 world, two of them the spec 10 components, + the spec 11 Brisk Draught) under /assets and uses the local Draco path', () => {
     const urls = itemModelUrls()
-    expect(urls).toHaveLength(41)
+    expect(urls).toHaveLength(42)
     for (const u of urls) expect(u).toMatch(/^\/assets\/models\/items\/[a-z-]+\.glb$/)
     expect(allModelUrls().every((u) => u.startsWith('/'))).toBe(true)
     expect(DRACO_PATH).toBe('/draco/')

@@ -45,6 +45,7 @@ import { useUiWorldStore } from './uiWorldStore'
 import { STAGE_PERSISTED, useStageStore } from './stageStore'
 import { CASE_PERSISTED, useCaseStore } from './caseStore'
 import { mergeRetry, sanitizeCaseSave } from '../systems/caseSave'
+import { useVendingStore } from './vendingStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
@@ -148,6 +149,8 @@ export const SNAPSHOT_STORES: Record<string, { store: Snapshotable; omit?: reado
   lantern: { store: useLanternStore as unknown as Snapshotable },
   map: { store: useMapStore as unknown as Snapshotable },
   pins: { store: usePinStore as unknown as Snapshotable },
+  // Spec 11 H6: today's stock goes back with the coins it was bought with.
+  vending: { store: useVendingStore as unknown as Snapshotable, omit: ['lastPurchase'] },
   spawn: { store: useSpawnStore as unknown as Snapshotable },
   uiWorld: {
     store: useUiWorldStore as unknown as Snapshotable,

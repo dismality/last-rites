@@ -16,6 +16,8 @@ import { useAccusationStore } from './accusationStore'
 import { useAchievementStore } from './achievementStore'
 import { useBossStore } from './bossStore'
 import { useRiteStore } from './riteStore'
+import { useWaitingList } from './waitingList'
+import { useVendingStore } from './vendingStore'
 import { useChapelStore } from './chapelStore'
 import { useCoinStore } from './coinStore'
 import { resetCombatTickRuntime } from './combatTick'
@@ -70,6 +72,7 @@ interface Resettable {
 
 /** Replaced wholesale with their initial state. */
 export const REPLACED_STORES = [
+  useVendingStore,
   useInventoryStore,
   useCraftingStore,
   useChapelStore,
@@ -122,6 +125,7 @@ export const KEPT_STORES: ReadonlyArray<readonly [object, string]> = [
   [useGameStore, 'screen routing; resetRun only clears its per-run flags'],
   [useIntroStore, 'newGame() calls begin() itself; `seen` outlives a run'],
   [useOverlayStore, 'menu shell flags (mode select is open while startRun runs)'],
+  [useWaitingList, 'missing art files of this session (spec 11); still missing after New Game'],
 ]
 
 export function resetRun(): void {

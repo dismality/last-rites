@@ -1895,3 +1895,36 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Spec 11's night numbers are mapped to the 3-stage design: the crawler's "night 2" and the coffin scare are the stage 2 night, the hut window scare is the stage 3 night, and the hounds come from stage 2. (2026-11-17)
   - The bestiary field notes and "What works" lines, the tell captions and the info-tip keys (one per journal tab, Pages and Closed cases included) were written for the bible from the spec; the tip texts themselves are written in task 5 from the code. (2026-11-17)
   - The test reads the bible through Vite's raw import, as the other tests in `tests/` read files, because the project has no Node types. (2026-11-17)
+
+### 2026-11-17: Outside Kiro: 11-horror-pass task 2: H6 hut vending machine
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 11-horror-pass task list Kiro wrote.
+- **What happened:**
+  - The vending machine in the hut now works, by day and at night. Walk within 2.5 m and press E to open its panel. The panel looks like the merchant's: each row has a name, a price, "N left", a one-line blurb and a Buy button. When a row runs out it shows a hatched "Sold out" card, and a refusal shows its reason as text. The panel can be used with the keyboard alone. It does not pause the world, does not protect the keeper and does not take Esc.
+  - It sells six rows: Lamp Oil, Kola Tonic, the new Brisk Draught, Bandage, and Revolver and Shotgun Cartridges. The cartridge rows show only once that gun is owned. Stock refills at dawn, is saved with the game, is part of the Retry snapshot and is cleared by New Game. A purchase pulls a handle, then the item drops into the tray. Each step plays a 3D sound at the machine: coin, handle, tray, or a refusal buzz. All four sounds have captions.
+  - Brisk Draught gives +25% move speed for 60 s. It does not stack, and next to Adrenaline the larger speed wins.
+  - New groundwork for the rest of spec 11:
+    - A registry of placeholder art (`src/data/placeholders.ts`).
+    - A Waiting_List of art files that are missing on disk.
+    - `useAssetOrPlaceholder` and `PlaceholderMesh`. A placeholder mesh shows a "PLACEHOLDER" label only in dev.
+    - The loading screen no longer stops on missing placeholder art.
+    - A test that fails when `public/assets` is over 25 MB.
+    - A test for placeholder comments.
+    - Caption coverage for the new sounds.
+    - A perf baseline, `e2e/logs/horror-perf-before.json`.
+  - Dev_Panel: "Give 100 grave coins" and "Reset vending stock". The debug hook gains `vendingState()`.
+  - `e2e/vending.spec.ts` runs in Chrome:
+    - It covers walking to the machine, opening it by day and at night, buying (the handle moves, coins and stock drop, and the Brisk Draught ring shows), refusals for coins and for a full satchel, sold out, the dawn reset, and a keyboard-only run.
+    - It takes screenshots at 1280×720 and 800×600 in `e2e/screenshots/vending/`.
+  - Lint, build and all 2549 unit tests pass. The vending, dev-panel, HUD, hut, cues, settings, smoke, items-models and stage-loop e2e specs pass.
+  - The bible's cut list now marks H6 as Built.
+- **Fixed in passing:** the items-models e2e still looked for the shotgun at the lodge's old spot. The lodge moved in the task 12 playthrough fix; the spec now uses the new spot, and its screenshot is regenerated.
+- **Waiting list (art not on disk yet; placeholders stand in):** the 5 scare faces; `crawler.glb`, `bride.glb`, `hound.glb`; `items/brisk-draught.glb` and `icons/items/brisk-draught.png`; `viewmodel/hands.glb` and `lantern.glb`; `textures/lantern-cookie.png`.
+- **Left, not fixed:** the perf baseline already has more than 150 draw calls in every scene: hut 191, grounds by day 318, Mausoleum Row 331, night wave 362. It has 2 shadow lights and frames of about 7 ms. Task 9 will need to bring the draw calls down.
+- **Decisions made unattended:**
+  - There was no asset budget script, so the 25 MB budget is a unit test. (2026-11-17)
+  - The Brisk Draught speed rule lives in `effectMods` in `effects.ts`, where Adrenaline's speed is already combined. `movement.ts` is unchanged. `ownedGuns` was already exported from `elites.ts`, so nothing was extracted. (2026-11-17)
+  - The machine's handles are merged into one brass mesh in the model, so five placeholder knobs (`handle-0` to `handle-4`) are the parts that move. (2026-11-17)
+  - The marquee light is always mounted. Its intensity is turned down when frames run long or the shadow-light count is reached, because the project's tests forbid lights that mount and unmount. (2026-11-17)
+  - The Brisk Draught icon uses the missing-icon image and is listed on the Waiting_List. (2026-11-17)
+  - Vending stock is part of the Retry snapshot, so a retried night does not refill the machine. A sold-out machine can still be opened, and its cue shows as idle. (2026-11-17)
+  - The perf spec records the baseline instead of asserting the 150 draw-call budget, which the game already exceeds. (2026-11-17)

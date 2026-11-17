@@ -92,6 +92,11 @@ import type { ItemId, ModeId, Phase } from '../game/types'
 import { input } from '../scene/player/input'
 import { lockOverride } from '../scene/player/pointerLockOverride'
 import { installFrameRecorder, type FrameRecorder } from './frameRecorder'
+import { useVendingStore } from '../game/state/vendingStore'
+import { useOverlayStore } from '../game/state/overlayStore'
+import { nearVending, resetVendingStock, vendingOwnedGuns } from '../game/state/vendingActions'
+import { visibleRows } from '../game/systems/vending'
+import { VENDING_ANCHORS } from '../data/vending'
 
 /** A rolling window long enough to cover a whole spec step. */
 const FRAME_WINDOW_MS = 30_000
@@ -386,6 +391,35 @@ const api = {
   /** Links two found clues of the active case through the real store action. */
   linkClues(a: string, b: string): string {
     return linkClues(a, b)
+  },
+  /** Spec 11 H6: the vending machine as the panel sees it (stock, visible rows, open flag, last purchase). */
+  vendingState(): {
+    open: boolean
+    stockLeft: Record<string, number>
+    visible: string[]
+    lastPurchase: { row: string; handle: number; seq: number } | null
+    coins: number
+    near: boolean
+    handleOffsets: number[]
+  } {
+    const v = useVendingStore.getState()
+    return {
+      open: useOverlayStore.getState().vendingOpen,
+      stockLeft: { ...v.stock.stockLeft },
+      visible: visibleRows(vendingOwnedGuns()).map((r) => r.id),
+      lastPurchase: v.lastPurchase ? { ...v.lastPurchase } : null,
+      coins: useProgressionStore.getState().coins,
+      near: nearVending(),
+      // How far each handle knob is pulled out now (m, model +Z), from the scene.
+      handleOffsets: VENDING_ANCHORS.handles.map((h, i) => {
+        const o = bodyRuntime.scene?.getObjectByName(`handle-${i}`)
+        return o ? Math.round((o.position.z - h[2]) * 1000) / 1000 : 0
+      }),
+    }
+  },
+  /** The Dev_Panel's "Reset vending stock" (the same action dawn runs). */
+  resetVendingStock(): void {
+    resetVendingStock()
   },
   /** Sets the Grave Coin balance through the real store action (for the hint price checks). */
   setCoins(n: number): void {

@@ -40,40 +40,48 @@ Common rules for all tasks:
     - Run the Finish steps for task 1 (docs and the new test only); commit `design bible section 12 horror pass (spec 11 task 1)` as its own commit with no code changes
     - Done outside Kiro by Claude. Left uncommitted for the user to commit
 
-- [ ] 2. H6: The hut vending machine (cuttable, cut order 6)
-  - [ ] 2.1 Foundation: Waiting_List, placeholders, asset budget and baseline perf
+- [x] 2. H6: The hut vending machine (cuttable, cut order 6)
+  - [x] 2.1 Foundation: Waiting_List, placeholders, asset budget and baseline perf
     - Create `src/data/placeholders.ts` (every expected art file of this spec as a typed row: path, kind, owner, feature, use) and add all new paths to `src/data/assets.ts`
     - Create `src/game/systems/waitingList.ts` (`register`, `list`, idempotent) and `src/game/state/waitingList.ts`; create `src/scene/assets/useAssetOrPlaceholder.ts` and `PlaceholderMesh.tsx` (label shown only with `?dev=1`)
     - Create `tests/waitingList.test.ts` (Node `fs`: declared art files missing from `public/assets/` are listed) and `tests/placeholderComments.test.ts` (every `PlaceholderMesh` use has a `// PLACEHOLDER:` comment and a registry row; no `.glb` path literal outside `assets.ts` and tests); extend the asset budget script so the sum of `public/assets` over 25 MB fails
     - Run the existing GPU perf spec (`e2e/d8-perf.spec.ts` style) once on the current build and save `e2e/logs/horror-perf-before.json` (draw calls, frame time, shadow-light count) for task 9
     - **Property 30: Waiting list is idempotent and complete**
     - _Requirements: 8.14, 8.15, 8.16, 8.18, 8.22, 3.1_
-  - [ ] 2.2 Vending data
+    - Done outside Kiro by Claude. No asset budget script existed, so `tests/assetBudget.test.ts` (with `tests/helpers/fileSizes.ts`) fails over 25 MB. The perf spec is `e2e/horror-perf.spec.ts` (in the perf project); the baseline already has draw calls over 150 in every scene (hut 191, night wave 362), 2 shadow lights and about 7 ms frames, so it records rather than asserts
+  - [x] 2.2 Vending data
     - Create `src/data/vending.ts` (`VendingRowId`, `VENDING_ROWS` with exactly the six rows of Requirement 6.3, handle ids, blurbs, `VENDING_FORBIDDEN`); add the `brisk-draught` item to `src/data/items.ts` and `src/data/effects.ts` (+25% move speed, 60 s, glyph); add the vending sounds and captions to `src/data/sounds.ts` and `captions.ts`; add the §12.6 table check to `tests/designBibleSection12.test.ts`
     - _Requirements: 6.3, 6.4, 6.12, 6.16, 8.2_
-  - [ ] 2.3 Pure vending system, Brisk Draught effect and tests
+    - Done outside Kiro by Claude. The brisk-draught icon uses the missing-icon image and is a Waiting_List row
+  - [x] 2.3 Pure vending system, Brisk Draught effect and tests
     - Create `src/game/systems/vending.ts` (`freshStock`, `visibleRows` using the shared owned-gun predicate, `canBuy`, `buy`, `resetAtDawn`, `purchaseAnimation`) reusing `coins.ts` and the satchel fit rules; add `'brisk-draught'` to `EffectId` and the speed rule in `movement.ts` (larger multiplier wins over Adrenaline); write `vending.test.ts` and extend `effects.test.ts`, `movement.test.ts`
     - Extract the owned-gun predicate from `elites.ts` into a shared helper if it is not exported yet
     - **Property 21: Vending stock never includes forbidden items**; **Property 22: Vending visibility and purchase deltas**; **Property 23: Vending refusals leave state unchanged and coins never go negative**; **Property 24: Vending dawn reset**; **Property 25: Brisk Draught does not stack**
     - Add `tests/captionCoverage.test.ts` for **Property 10: Sound and caption coverage** over a list of new sound ids that later tasks extend
     - _Requirements: 6.3, 6.4, 6.5, 6.6, 6.8, 6.9, 6.10, 6.11, 6.12, 6.13, 6.15, 6.16, 8.8_
-  - [ ] 2.4 Vending store, scene and panel
+    - Done outside Kiro by Claude. The speed rule (larger multiplier wins) lives in `effectMods` in `src/game/systems/effects.ts`, where Adrenaline's speed is already combined, so `movement.ts` and `movement.test.ts` needed no change. `ownedGuns` was already exported from `elites.ts`
+  - [x] 2.4 Vending store, scene and panel
     - Create the vending store (stock per day, saved in `gameSave.ts`, reset at dawn, cleared by New Game); create `src/scene/world/VendingMachine.tsx` at (2.83, 0, 1.85) with rotationY −PI/2, `handle-0` to `handle-4` pull animation (5 cm ±1 cm), emissive marquee, optional shadowless `marquee-light` behind a frame-budget gate; add the colliders to `hut.json` and the machine's JSON
     - Create `src/ui/menus/VendingPanel.tsx` in the merchant's style (name, price, "N left", one-sentence blurb, "Sold out" card, refusal reason text, keyboard operable with visible focus); it does not pause the sim, does not protect the player, and does not block Esc
     - Wire Interact within 2.5 m in every phase, the coin clink, handle, tray and refusal sounds with 3D audio at the machine
     - _Requirements: 6.1, 6.2, 6.6, 6.7, 6.10, 6.14, 6.16, 8.9, 8.10, 8.13_
-  - [ ] 2.5 Placeholder assets for H6
+    - Done outside Kiro by Claude. The panel is `src/ui/vending/VendingPanel.tsx`. The hut.json collider was already there. The handles are merged into the model's brass mesh, so five placeholder knobs `handle-0` to `handle-4` stand in. The marquee light is always mounted and its intensity is gated by the frame time and the shadow-light count (lights stay constant). The stock is saved and is part of the Retry snapshot; a sold-out machine stays interactable
+  - [x] 2.5 Placeholder assets for H6
     - Plain cabinet primitive (box with the real collider and invisible handle anchors) for `props/vending-machine.glb`, a bottle primitive named "Brisk Draught (placeholder)" for `items/brisk-draught.glb`, procedural Web Audio for missing sounds; each use has a `// PLACEHOLDER:` comment, a `placeholders.ts` row and a Waiting_List registration; extend the load-failure test so the machine stays fully usable
     - _Requirements: 6.17, 8.16, 8.22_
-  - [ ] 2.6 Dev hooks for the vending machine
+    - Done outside Kiro by Claude. The vending sounds are procedural like every other sound, so no audio placeholder was needed
+  - [x] 2.6 Dev hooks for the vending machine
     - Add "Give 100 grave coins" and "Reset vending stock" to the Dev_Panel through real store actions; add `vendingState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 6.2_
-  - [ ] 2.7 Vending e2e and screenshots
+    - Done outside Kiro by Claude
+  - [x] 2.7 Vending e2e and screenshots
     - Create `e2e/vending.spec.ts`: walk to the machine, open it by day and at night, buy a row (handle pulls, coins drop, stock count drops, Brisk Draught shows its effect ring), refuse for coins and for a full satchel, sold out, dawn reset; a keyboard-only run
     - Save screenshots at 1280x720 and 800x600 of the panel and the machine in the hut
     - _Requirements: 6.2, 6.6, 6.8, 6.9, 6.10, 8.21_
-  - [ ] 2.8 Finish
+    - Done outside Kiro by Claude. Screenshots are in `e2e/screenshots/vending/`
+  - [x] 2.8 Finish
     - Run the Finish steps for task 2; commit `hut vending machine (spec 11 task 2)`
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
 
 - [ ] 3. H1: Screen jumpscares (cuttable, cut order 5)
   - [ ] 3.1 Settings and screen scare data

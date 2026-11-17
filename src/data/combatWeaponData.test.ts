@@ -33,7 +33,9 @@ describe('combat weapon data matches the design bible §4', () => {
     expect(e['blessed-rounds']).toMatchObject({ durationS: 30, glyph: '✝', mods: { firearmDamage: 2 } })
     expect(e['adrenaline']).toMatchObject({ durationS: 20, glyph: '⚡', mods: { moveSpeed: 1.3, sprintDrain: 0.5 } })
     expect(e['salt-circle']).toMatchObject({ durationS: 30, glyph: '◎' })
-    expect(new Set(EFFECTS.map((x) => x.glyph)).size).toBe(3)
+    // Spec 11 H6 (§4, §14.6).
+    expect(e['brisk-draught']).toMatchObject({ durationS: 60, mods: { moveSpeed: 1.25 } })
+    expect(new Set(EFFECTS.map((x) => x.glyph)).size).toBe(EFFECTS.length)
   })
 
   it('upgrades', () => {

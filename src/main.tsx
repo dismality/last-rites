@@ -9,6 +9,7 @@ import { installCombatWatchers } from './game/state/combatWatchers'
 import { installGuidanceWatchers } from './game/state/guidanceTick'
 import { installProgressionWatchers } from './game/state/progressionEvents'
 import { installSpawnRespawn } from './game/state/spawnRespawn'
+import { installVendingWatchers } from './game/state/vendingActions'
 import { installDuskSnapshot, installMorningSnapshot } from './game/state/retryNight'
 
 import { registerCombatSounds } from './audio/audioBoot'
@@ -28,6 +29,7 @@ installAutosave()
 installMorningSnapshot()
 installRunStats()
 installSpawnRespawn()
+installVendingWatchers()
 
 // Dev only: a dynamic import behind the DEV constant, so production builds drop the hook entirely.
 if (import.meta.env.DEV) void import('./debug/debugHook').then((m) => m.installDebugHook())

@@ -153,7 +153,7 @@ test.describe('items use their Blender models', () => {
     const SPOTS = [
       { id: 'wood-axe', x: -5, z: 3.3 },
       { id: 'revolver', x: 9.2, z: 7.6 },
-      { id: 'shotgun', x: -23.8, z: -40.2 },
+      { id: 'shotgun', x: -23.8, z: -38.5 },
       { id: 'silver-sabre', x: -18.9, z: -58.1 },
     ] as const
     for (const s of SPOTS) await seen(page, `weapon:${s.id}`, s.x, s.z, `pickup-${s.id}`)

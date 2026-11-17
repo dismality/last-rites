@@ -8,6 +8,10 @@ import { isDevEnabled } from './devFlag'
 import { DEV_TOGGLE_CODE, installDevKeys } from './devKeys'
 import { useDevPanelStore } from './devPanelStore'
 import { installDev } from './installDev'
+import { giveCoins, resetVendingStockDev } from './devActions'
+import { useProgressionStore } from '../game/state/progressionStore'
+import { useVendingStore } from '../game/state/vendingStore'
+import { freshStock } from '../game/systems/vending'
 
 function press(target: EventTarget, code: string): void {
   target.dispatchEvent(Object.assign(new Event('keydown'), { code }))
@@ -100,5 +104,20 @@ describe('cheat flags', () => {
     expect(getDevCheats().panelOpen).toBe(true)
     setDevCheatFlags({ panelOpen: false })
     expect(isMenuOpen()).toBe(false)
+  })
+})
+
+// Spec 11 task 2.6: the vending machine's dev buttons go through the real stores.
+describe('vending dev actions', () => {
+  it('"Give 100 grave coins" adds 100 coins', () => {
+    useProgressionStore.getState().setCoins(7)
+    expect(giveCoins()).toContain('100')
+    expect(useProgressionStore.getState().coins).toBe(107)
+  })
+
+  it('"Reset vending stock" refills every row', () => {
+    useVendingStore.getState().setStock({ stockLeft: { ...freshStock().stockLeft, bandage: 0, 'kola-tonic': 0 } })
+    resetVendingStockDev()
+    expect(useVendingStore.getState().stock).toEqual(freshStock())
   })
 })

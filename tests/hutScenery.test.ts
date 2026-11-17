@@ -2,6 +2,7 @@
 // way from the spawn to the workbench stays clear.
 import { describe, expect, it } from 'vitest'
 import { HUT_BOXES, HUT_SURFACES, VENDING_MACHINE } from '../src/data/hutScenery'
+import { VENDING_ANCHORS, VENDING_BOX } from '../src/data/vending'
 import { BENCH_Z, POWDER_TIN_HUT } from '../src/data/cemeteryLayout'
 import { FIXED_SPAWNS, SPAWN_POINTS } from '../src/data/zones'
 
@@ -23,6 +24,28 @@ describe('hut scene JSON', () => {
     const v = box('vending')
     expect(v.center[0]).toBeCloseTo(VENDING_MACHINE.position[0], 6)
     expect(v.center[2]).toBeCloseTo(VENDING_MACHINE.position[2], 6)
+  })
+
+  // Spec 11 task 2.4 (Req 6.1): the machine's own JSON, its anchors and its box match the data.
+  it('mirrors the machine JSON anchors and box in data/vending.ts', () => {
+    const raw = Object.values(
+      import.meta.glob<string>('../public/assets/models/props/vending-machine.json', { query: '?raw', import: 'default', eager: true }),
+    )[0]
+    const json = JSON.parse(raw) as {
+      anchors: Record<string, { position: number[] }>
+      boxes: { center: number[]; half: number[] }[]
+    }
+    expect(json.anchors['marquee-light'].position).toEqual([...VENDING_ANCHORS.marqueeLight])
+    expect(json.anchors.tray.position).toEqual([...VENDING_ANCHORS.tray])
+    expect(json.anchors['coin-slot'].position).toEqual([...VENDING_ANCHORS.coinSlot])
+    VENDING_ANCHORS.handles.forEach((h, i) => expect(json.anchors[`handle-${i}`].position).toEqual([...h]))
+    expect(json.boxes[0].center).toEqual([...VENDING_BOX.center])
+    expect(json.boxes[0].half).toEqual([...VENDING_BOX.half])
+    const v = box('vending')
+    // Turned -PI/2 in the hut, so the model's x and z half extents swap.
+    expect([v.half[0], v.half[1], v.half[2]].map((x) => Math.round(x * 100) / 100).sort()).toEqual(
+      [...VENDING_BOX.half].sort(),
+    )
   })
 })
 

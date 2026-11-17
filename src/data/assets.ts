@@ -85,6 +85,30 @@ export const ZOMBIE_MODEL_URL = '/assets/models/enemies/zombie.glb'
 /** Blockier rig for the Brute and Father Crane (see docs/enemy-models.md). */
 export const BRUTE_MODEL_URL = '/assets/models/enemies/zombie-brute.glb'
 
+// --- Horror pass art (spec 11). Claude makes these in Blender; until a file lands, the game uses
+// the marked placeholder listed in data/placeholders.ts. None is preloaded except where noted.
+
+/** The three new creatures (spec 11 H2). A missing file falls back to zombie.glb, scaled and tinted. */
+export const CRAWLER_MODEL_URL = '/assets/models/enemies/crawler.glb'
+export const BRIDE_MODEL_URL = '/assets/models/enemies/bride.glb'
+export const HOUND_MODEL_URL = '/assets/models/enemies/hound.glb'
+
+/** Screen-scare faces (spec 11 H1): transparent .webp, 2048 px tall. */
+export const SCARE_FACE_IDS = ['face-zombie-1', 'face-zombie-2', 'face-crawler', 'ghost-bride-1', 'ghost-bride-2'] as const
+export type ScareFaceId = (typeof SCARE_FACE_IDS)[number]
+export const scareFaceUrl = (id: ScareFaceId): string => `/assets/scares/${id}.webp`
+
+/** First-person hands and the lantern (spec 11 H7). */
+export const HANDS_MODEL_URL = '/assets/models/viewmodel/hands.glb'
+export const LANTERN_MODEL_URL = '/assets/models/viewmodel/lantern.glb'
+/** The lantern's cage-bar cookie for SpotLight.map (spec 11 H7). */
+export const LANTERN_COOKIE_URL = '/assets/textures/lantern-cookie.png'
+
+/** The Brisk Draught bottle (spec 11 H6); the item's model path comes from items.ts and equals this. */
+export const BRISK_DRAUGHT_MODEL_URL = '/assets/models/items/brisk-draught.glb'
+/** Its 64x64 satchel icon; ITEM_ICON_URLS uses MISSING_ICON_URL until it lands. */
+export const BRISK_DRAUGHT_ICON_URL = '/assets/icons/items/brisk-draught.png'
+
 const ITEM_ICON_DIR = '/assets/icons/items'
 
 /**
@@ -131,6 +155,8 @@ export const ITEM_ICON_URLS: Readonly<Record<ItemId, string>> = {
   'silver-sabre': icon('silver-sabre'),
   'blessed-rounds': icon('blessed-rounds'),
   'kola-tonic': icon('kola-tonic'),
+  // PLACEHOLDER: /assets/icons/items/brisk-draught.png (the satchel draws its "?" box until the icon lands)
+  'brisk-draught': MISSING_ICON_URL,
   'rusted-crypt-key': icon('rusted-crypt-key'),
   'bone-whistle': icon('bone-whistle'),
   'iron-ossuary-key': icon('iron-ossuary-key'),

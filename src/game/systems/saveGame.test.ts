@@ -16,6 +16,8 @@ import type { SaveState } from './saveGame'
 import type { TutorialStepId } from '../../data/tutorialSteps'
 import type { PageNumber, RelicId } from '../types'
 import { freshCaseSave } from './caseSave'
+import { VENDING_ROWS } from '../../data/vending'
+import { freshStock } from './vending'
 
 function memoryStorage(initial?: string) {
   const data = new Map<string, string>()
@@ -114,6 +116,10 @@ const saveStateArb: fc.Arbitrary<SaveState> = fc.record({
     ],
   ),
   case: fc.constant(freshCaseSave()),
+  // Spec 11 H6: the vending machine's stock today.
+  vending: fc
+    .tuple(...VENDING_ROWS.map((r) => fc.integer({ min: 0, max: r.perDay })))
+    .map((ns) => ({ stockLeft: Object.fromEntries(VENDING_ROWS.map((r, i) => [r.id, ns[i]])) })),
   stage: fc.record({
     stage: fc.constantFrom(1 as const, 2 as const, 3 as const),
     caseSolved: fc.boolean(),
@@ -216,6 +222,12 @@ describe('saveGame new fields', () => {
       }),
       RUNS,
     )
+  })
+
+  it('loads a save from before the vending machine with a full machine (spec 11 H6)', () => {
+    const old = JSON.parse(JSON.stringify(toSaveFile(fc.sample(saveStateArb, 1)[0] as SaveState)))
+    delete old.vending
+    expect(fromSaveFile(old)?.vending).toEqual(freshStock())
   })
 
   it('Feature: 06-clarity-and-hud, Property 30: corrupt saves are rejected safely', () => {

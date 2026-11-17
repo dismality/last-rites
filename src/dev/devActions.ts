@@ -24,6 +24,7 @@ import { useBossStore } from '../game/state/bossStore'
 import { useChapelStore } from '../game/state/chapelStore'
 import { useCombatStore } from '../game/state/combatStore'
 import { useCraftingStore } from '../game/state/craftingStore'
+import { resetVendingStock } from '../game/state/vendingActions'
 import { useDoorStore } from '../game/state/doorStore'
 import { useEndingStore } from '../game/state/endingStore'
 import { useEnemyStore } from '../game/state/enemyStore'
@@ -389,6 +390,20 @@ export function givePage(page: PageNumber): string {
   // Page 3 teaches the Salt Circle, as reading it does.
   useCraftingStore.getState().applyUnlockEvent({ type: 'journalRead', page })
   return `Gave journal page ${page}`
+}
+
+/** Spec 11 H6: 100 Grave Coins through the real progression store (Dev_Panel "Give 100 grave coins"). */
+export const DEV_COIN_GIFT = 100
+export function giveCoins(n = DEV_COIN_GIFT): string {
+  const pr = useProgressionStore.getState()
+  pr.setCoins(pr.coins + n)
+  return `Gave ${n} grave coins (${pr.coins + n} now)`
+}
+
+/** Spec 11 H6: every vending row back to its per-day stock, the same action dawn runs. */
+export function resetVendingStockDev(): string {
+  resetVendingStock()
+  return 'Vending stock reset'
 }
 
 export function unlockAllRecipes(): string {

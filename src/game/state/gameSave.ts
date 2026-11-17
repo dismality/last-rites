@@ -30,6 +30,8 @@ import { queueTeleportToStore } from './playerTeleport'
 import { useUiWorldStore } from './uiWorldStore'
 import { useStageStore, STAGE_PERSISTED } from './stageStore'
 import { useWorldStore } from './worldStore'
+import { useVendingStore } from './vendingStore'
+import { freshStock } from '../systems/vending'
 
 function storage(): Storage | undefined {
   try {
@@ -83,6 +85,7 @@ export function captureSave(): SaveState {
     stage: pickStage(),
     case: pickCase(),
     pins: capturePins(),
+    vending: useVendingStore.getState().stock,
   }
 }
 
@@ -138,6 +141,7 @@ export function loadGame(): boolean {
   if (save.stage) useStageStore.setState(save.stage)
   useCaseStore.setState(save.case ?? freshCaseSave())
   usePinStore.setState({ pins: save.pins ?? [] })
+  useVendingStore.setState({ stock: save.vending ?? freshStock(), lastPurchase: null })
   syncDerivedStats()
   return true
 }

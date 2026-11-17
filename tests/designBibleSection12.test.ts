@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsection, tableOf } from './helpers/designBible'
+import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
+import { EFFECT_MAP } from '../src/data/effects'
 
 // Spec 11 task 1.2 (Req 8.2, 8.3): the horror-pass section of the design bible ("§12" in spec 11,
 // "## 14. Horror pass" in the bible) has its nine subsections, and a small parser hands later tasks
@@ -61,6 +63,35 @@ describe('the horror pass in the design bible', () => {
     const rows = tableOf(subsection(bible, '12.6'), 'Row').rows
     expect(rows).toHaveLength(6)
     expect(rows[0]).toMatchObject({ ID: '`revolver-cartridge`', Qty: '6', Price: '12', 'Per day': '2' })
+  })
+})
+
+// Spec 11 task 2.2 (Req 6.3, 8.2): §12.6 (bible §14.6) against src/data/vending.ts, row by row.
+describe('§12.6 vending machine mirrors src/data/vending.ts', () => {
+  const s = subsection(bible, '12.6')
+  const unticked = (v: string): string => v.replace(/`/g, '')
+
+  it.skipIf(s.cut)('has the same six rows in the same order', () => {
+    const rows = tableOf(s, 'Row').rows
+    expect(rows.map((r) => unticked(r.ID))).toEqual(VENDING_ROWS.map((r) => r.id))
+    rows.forEach((r, i) => {
+      const d = VENDING_ROWS[i]
+      expect(Number(r.Row), d.id).toBe(i)
+      expect(r.Item, d.id).toBe(d.name)
+      expect(Number(r.Qty), d.id).toBe(d.qty)
+      expect(Number(r.Price), d.id).toBe(d.price)
+      expect(Number(r['Per day']), d.id).toBe(d.perDay)
+      expect(r.Needs === '—' ? undefined : r.Needs.toLowerCase(), d.id).toBe(d.requiresWeapon)
+      expect(unticked(r.Handle).startsWith(`handle-${d.handle}`), d.id).toBe(true)
+    })
+  })
+
+  it.skipIf(s.cut)('names the forbidden goods, the range and the Brisk Draught numbers', () => {
+    expect(s.body).toMatch(/Never stocked:\*\* relics, key items, journal pages, recipes, clues, holy water, silver filings/)
+    for (const id of ['holy-water', 'silver-filings']) expect(VENDING_FORBIDDEN).toContain(id)
+    expect(s.body).toContain(`within ${VENDING_RANGE_M} m`)
+    expect(s.body).toContain('+25% move speed for 60 s')
+    expect(EFFECT_MAP['brisk-draught']).toMatchObject({ durationS: 60, mods: { moveSpeed: 1.25 } })
   })
 })
 

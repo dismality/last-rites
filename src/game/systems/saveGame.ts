@@ -18,6 +18,7 @@ import { STAGE_COUNT, type StageNumber } from '../../data/stages'
 import { restorePins, serializePins, type Pin } from './mapPins'
 import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 import { freshCaseSave, sanitizeCaseSave, type CaseSave } from './caseSave'
+import { freshStock, sanitizeVending, type VendingState } from './vending'
 
 export const SAVE_KEY = 'lastrites:save'
 /** Dawn and dusk autosaves live here, so they never overwrite an altar save (spec 09 F5). */
@@ -49,6 +50,8 @@ export interface SaveState {
   case?: CaseSave
   /** Map pins (spec 09 task 11l). Optional on input and on read; the loader sanitises them. */
   pins?: Pin[]
+  /** The hut vending machine's stock today (spec 11 H6). Optional on input; sanitised on read. */
+  vending?: VendingState
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
@@ -109,6 +112,7 @@ export function toSaveFile(state: SaveState): SaveFile {
       state.stage ??
       freshStageSave(Math.min(Math.max(Math.floor(state.world.nightNumber) || 1, 1), STAGE_COUNT) as StageNumber),
     case: state.case ?? freshCaseSave(),
+    vending: state.vending ?? freshStock(),
   }
 }
 
@@ -226,6 +230,8 @@ export function fromSaveFile(
     progression: raw.progression as ProgressionSave | undefined,
     // Older saves have none; bad entries are dropped one by one.
     pins: restorePins(raw.pins),
+    // Older saves have none: a full machine. Bad rows are clamped or refilled.
+    vending: sanitizeVending(raw.vending),
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,

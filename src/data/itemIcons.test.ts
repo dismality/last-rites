@@ -22,9 +22,9 @@ describe('item icons', () => {
     expect(missing).toEqual([])
   })
 
-  it('lists the items still using the placeholder (none while art is complete)', () => {
+  it('lists the items still using the placeholder (only spec 11 art still on the waiting list)', () => {
     const placeholders = ITEMS.filter((i) => ITEM_ICON_URLS[i.id] === MISSING_ICON_URL).map((i) => i.id)
-    expect(placeholders).toEqual([])
+    expect(placeholders).toEqual(['brisk-draught'])
   })
 
   it('shares one icon across the five journal pages', () => {

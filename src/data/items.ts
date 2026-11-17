@@ -164,6 +164,7 @@ export const ITEMS: readonly ItemDef[] = [
   crafted('silver-sabre', 'Silver Sabre', 'weapon'),
   crafted('blessed-rounds', 'Blessed Rounds', 'consumable'),
   crafted('kola-tonic', 'Kola Tonic', 'consumable'),
+  crafted('brisk-draught', 'Brisk Draught', 'consumable'),
 
   // Key items
   key('rusted-crypt-key', 'Rusted Crypt Key', {

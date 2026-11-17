@@ -1,0 +1,71 @@
+/* The vending panel (spec 11 H6) reuses the merchant rows; these add the name, blurb and the
+   "Sold out" card. The sold-out state is shown by text and a hatched card, never by colour alone. */
+
+.vending__row {
+  grid-template-columns: auto 1fr auto auto;
+  grid-template-areas: 'ware info meta buy';
+}
+.vending__row .merchant__ware { grid-area: ware; }
+.vending__row .vending__info { grid-area: info; }
+.vending__row .merchant__buy { grid-area: buy; }
+
+.vending__meta {
+  grid-area: meta;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.vending__subtitle {
+  margin-top: -0.4rem;
+  font-style: italic;
+}
+
+.vending__info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.vending__name {
+  font-weight: 600;
+}
+
+.vending__blurb {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.vending__sold-out {
+  padding: 0.15rem 0.5rem;
+  border: 2px dashed var(--ink);
+  background: repeating-linear-gradient(-45deg, transparent 0 6px, rgba(0, 0, 0, 0.12) 6px 8px);
+  font-family: var(--font-num);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vending__row--sold-out .merchant__ware,
+.vending__row--sold-out .vending__info {
+  opacity: 0.6;
+}
+
+/* Small screens (800x600): price and stock move under the name; Buy stays on the right. */
+@media (max-width: 860px) {
+  .vending__row {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'ware info buy'
+      'ware meta buy';
+    row-gap: 0.25rem;
+  }
+  .vending__meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.75rem;
+  }
+}

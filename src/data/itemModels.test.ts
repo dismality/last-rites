@@ -10,15 +10,17 @@ import {
   isHeldModelId,
 } from './itemModels'
 import { WEAPON_PICKUPS } from './weaponPickups'
+import { isPlaceholderPath } from './placeholders'
 import type { ItemId } from '../game/types'
 
 // Paths only: the tests have no Node typings, so the file list comes from Vite's glob.
 const files = new Set(Object.keys(import.meta.glob('../../public/assets/models/items/*.glb')))
 
 describe('item models', () => {
-  it('gives every item a model file that exists on disk', () => {
+  it('gives every item a model file that exists on disk (or a declared spec 11 placeholder)', () => {
     for (const item of ITEMS) {
       expect(item.model, `${item.id} has a model`).toBeTruthy()
+      if (isPlaceholderPath(item.model!)) continue
       expect(files.has(`../../public/${item.model}`), `${item.id} -> ${item.model}`).toBe(true)
     }
   })

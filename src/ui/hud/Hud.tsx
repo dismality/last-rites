@@ -31,6 +31,7 @@ import { AchievementToasts } from './AchievementToasts'
 import { DawnCard } from './DawnCard'
 import { DescentFade } from './DescentFade'
 import { MerchantMenu } from '../merchant/MerchantMenu'
+import { VendingPanel } from '../vending/VendingPanel'
 import { Hotbar } from '../satchel/Hotbar'
 import './hud.css'
 
@@ -92,6 +93,7 @@ export function Hud() {
       <AchievementToasts />
       <DawnCard />
       <MerchantMenu />
+      <VendingPanel />
       <DescentFade />
     </div>
   )

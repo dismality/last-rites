@@ -1188,7 +1188,7 @@ Feature freeze: **2026-11-26**. No new feature task of spec 11 starts after it. 
 
 | Priority | Feature | Subsection | Spec 11 task | Status |
 |---|---|---|---|---|
-| 1 | H6 vending machine | 14.6 | 2 | Planned |
+| 1 | H6 vending machine | 14.6 | 2 | Built |
 | 2 | H1 screen jumpscares | 14.1 | 3 | Planned |
 | 3 | H4 bats | 14.4 | 4 | Planned |
 | 4 | H5 info dots | 14.5 | 5 | Planned |

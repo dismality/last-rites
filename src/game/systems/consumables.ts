@@ -23,7 +23,7 @@ import type { CraftedItemId, EffectId } from '../types'
  * The consumable items that go through a timed-use flow.
  * Thrown / placed items (single-use) are resolved by the combat layer instead.
  */
-export type ConsumableId = 'bandage' | 'lantern-refill' | 'blessed-rounds' | 'kola-tonic'
+export type ConsumableId = 'bandage' | 'lantern-refill' | 'blessed-rounds' | 'kola-tonic' | 'brisk-draught'
 
 /**
  * Snapshot of an in-progress consumable use.  Created by `startUse`; updated
@@ -70,6 +70,7 @@ const CONSUMABLE_DURATION: Record<ConsumableId, number> = {
   // Instant: they complete on the first tick (Req 12.1, 12.2).
   'blessed-rounds': 0,
   'kola-tonic': 0,
+  'brisk-draught': 0,
 }
 
 const CONSUMABLE_EFFECT: Record<ConsumableId, ConsumableEffect> = {
@@ -77,6 +78,7 @@ const CONSUMABLE_EFFECT: Record<ConsumableId, ConsumableEffect> = {
   'lantern-refill': { healHp: 0, addFuel: (WEAPON_MAP['lantern-refill'].fuelRestore ?? 0) * 100 },
   'blessed-rounds': { healHp: 0, addFuel: 0, effect: 'blessed-rounds' },
   'kola-tonic': { healHp: 0, addFuel: 0, effect: 'adrenaline' },
+  'brisk-draught': { healHp: 0, addFuel: 0, effect: 'brisk-draught' },
 }
 
 // ---------------------------------------------------------------------------
@@ -154,7 +156,7 @@ export function cancelUse(state: ConsumableUseState): null {
  * True if the given item ID is a trackable consumable in this system.
  */
 export function isConsumable(id: CraftedItemId): id is ConsumableId {
-  return id === 'bandage' || id === 'lantern-refill' || id === 'blessed-rounds' || id === 'kola-tonic'
+  return id === 'bandage' || id === 'lantern-refill' || id === 'blessed-rounds' || id === 'kola-tonic' || id === 'brisk-draught'
 }
 
 /**

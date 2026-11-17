@@ -2,50 +2,37 @@
 // colliders, with the workbench against its back wall. The door is in the +Z wall, behind the
 // player at the start, so the first view is the bench. The box walls stay as invisible colliders
 // so every door and zombie rule is untouched; the model draws everything you see. Furniture
-// colliders (tables, stove, cot, barrels, log stack, vending machine) come from hut.json.
+// colliders (tables, stove, cot, barrels, log stack, vending machine) come from hut.json. The
+// vending machine (model, handles, panel trigger) is VendingMachine.tsx (spec 11 H6).
 // Mount inside <Physics>.
 
 import { useLayoutEffect, useRef } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type { Group } from 'three'
-import { DRACO_PATH, HUT_MODEL_URL, VENDING_MACHINE_MODEL_URL } from '../../data/assets'
+import { DRACO_PATH, HUT_MODEL_URL } from '../../data/assets'
 import { HUT, POWDER_TIN_HUT } from '../../data/cemeteryLayout'
-import { HUT_BOXES, HUT_LANTERN_LIGHT, VENDING_MACHINE } from '../../data/hutScenery'
+import { HUT_BOXES, HUT_LANTERN_LIGHT } from '../../data/hutScenery'
 import '../assets/preloadModels'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { Interactable } from './Interactable'
 import { Slab } from './buildingParts'
+import { VendingMachine } from './VendingMachine'
 
 const DOOR_HEIGHT = 2.1
 
-/** The hut and the vending machine, both drawn from their models. */
+/** The hut, drawn from its model. The vending machine is its own component (spec 11 H6). */
 function HutModels() {
   const hut = useGLTF(HUT_MODEL_URL, DRACO_PATH).scene
-  const vending = useGLTF(VENDING_MACHINE_MODEL_URL, DRACO_PATH).scene
   const hutRef = useRef<Group>(null)
-  const vendingRef = useRef<Group>(null)
 
   useLayoutEffect(() => {
-    for (const g of [hutRef.current, vendingRef.current]) {
-      g?.traverse((o) => {
-        if ('isMesh' in o) o.receiveShadow = true
-      })
-    }
-  }, [hut, vending])
+    hutRef.current?.traverse((o) => {
+      if ('isMesh' in o) o.receiveShadow = true
+    })
+  }, [hut])
 
-  return (
-    <>
-      <Clone ref={hutRef} object={hut} />
-      {/* Visual and collider only; the vending panel is spec 11 H6. */}
-      <Clone
-        ref={vendingRef}
-        object={vending}
-        position={[...VENDING_MACHINE.position]}
-        rotation={[0, VENDING_MACHINE.rotationY, 0]}
-      />
-    </>
-  )
+  return <Clone ref={hutRef} object={hut} />
 }
 
 /** Beside the powder tin on the shelf, so it is found without a search. */
@@ -78,6 +65,7 @@ export function Hut() {
   return (
     <group name="hut">
       <HutModels />
+      <VendingMachine />
       <LedgerShelfPage />
       <RigidBody type="fixed" colliders={false}>
         {/* Walls: collider only. The model draws them. */}

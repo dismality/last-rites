@@ -167,6 +167,15 @@ export const WEAPONS: WeaponDef[] = [
     durability: 1,
     effect: 'adrenaline',
   },
+  {
+    id: 'brisk-draught',
+    name: 'Brisk Draught',
+    kind: 'consumable',
+    damage: 0,
+    cooldown: null,
+    durability: 1,
+    effect: 'brisk-draught',
+  },
 ]
 
 export const WEAPON_MAP: Readonly<Record<CraftedItemId, WeaponDef>> = Object.fromEntries(

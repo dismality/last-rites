@@ -1,6 +1,8 @@
 import { useEffect, useId } from 'react'
 import { useProgress } from '@react-three/drei'
+import { isPlaceholderPath } from '../../data/placeholders'
 import { useGameStore } from '../../game/state/gameStore'
+import { registerMissingArt } from '../../game/state/waitingList'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { preloadAllModels } from '../../scene/assets/preloadModels'
 import './menus.css'
@@ -30,7 +32,14 @@ function LanternIcon() {
 /** Real asset progress from drei's loading manager; leaves for Title when done. */
 export function LoadingScreen() {
   const titleId = useId()
-  const { progress, errors, active } = useProgress()
+  const { progress, errors: allErrors, active } = useProgress()
+  // A missing spec 11 art file is not an error: the game draws its marked placeholder and lists
+  // the path in the Waiting_List (design bible §14, Req 8.22). Only other files block.
+  const waiting = allErrors.filter(isPlaceholderPath)
+  const errors = allErrors.filter((url) => !isPlaceholderPath(url))
+  useEffect(() => {
+    waiting.forEach(registerMissingArt)
+  }, [waiting])
   const setScreen = useGameStore((s) => s.setScreen)
   const flashing = useSettingsStore((s) => s.flashingLights)
 

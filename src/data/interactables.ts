@@ -26,6 +26,7 @@ export type InteractableKind =
   | 'grave-mound'
   | 'weapon-pickup'
   | 'merchant'
+  | 'vending'
   | 'barricade-door'
   | 'workbench'
   | 'named-grave'
@@ -192,6 +193,18 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     file: 'Merchant.tsx',
     endsWhen: 'every row is sold out (used up for today)',
     resetsOn: 'the next dawn deals new stock',
+  },
+  // Spec 11 H6: open by day and night; with every row sold out it stays usable, so the
+  // panel can still show its "Sold out" cards.
+  vending: {
+    kind: 'vending',
+    action: 'trade',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'VendingMachine.tsx',
+    endsWhen: 'every row on show is sold out for today',
+    resetsOn: 'the next dawn restocks every row',
   },
   'barricade-door': {
     kind: 'barricade-door',

@@ -4,8 +4,9 @@ import * as fc from 'fast-check'
 import { applyEffect, tickEffects, effectMods, withSaltEffect, effectIcons } from './effects'
 import type { ActiveEffect } from './effects'
 import type { EffectId } from '../types'
+import { EFFECT_MAP } from '../../data/effects'
 
-const ids: EffectId[] = ['blessed-rounds', 'adrenaline', 'salt-circle']
+const ids: EffectId[] = ['blessed-rounds', 'adrenaline', 'salt-circle', 'brisk-draught']
 const arbId = fc.constantFrom(...ids)
 
 describe('effects', () => {
@@ -74,7 +75,7 @@ describe('Property 21: Timed effects are unique, idempotent and non-increasing',
           list = op.kind === 'apply' ? applyEffect(list, op.id) : tickEffects(list, op.dt)
           const seen = new Set(list.map((e) => e.id))
           if (seen.size !== list.length) return false
-          if (list.some((e) => e.leftS <= 0 || e.leftS > 30)) return false
+          if (list.some((e) => e.leftS <= 0 || e.leftS > EFFECT_MAP[e.id].durationS)) return false
         }
         const once = applyEffect(list, id)
         const twice = applyEffect(once, id)
@@ -102,6 +103,46 @@ describe('Property 21: Timed effects are unique, idempotent and non-increasing',
         },
       ),
       { numRuns: 300 },
+    )
+  })
+})
+
+
+// Spec 11 task 2.3 (Req 6.12): the Brisk Draught.
+describe('brisk draught', () => {
+  it('gives +25% move speed for 60 s with its own glyph', () => {
+    expect(applyEffect([], 'brisk-draught')).toEqual([{ id: 'brisk-draught', leftS: 60 }])
+    expect(effectMods(applyEffect([], 'brisk-draught')).moveSpeed).toBe(1.25)
+    const icon = effectIcons(applyEffect([], 'brisk-draught'))[0]
+    expect(icon.glyph).not.toBe('')
+    const all = ids.reduce<ActiveEffect[]>((l, id) => applyEffect(l, id), [])
+    expect(new Set(effectIcons(all).map((i) => i.glyph)).size).toBe(ids.length)
+    expect(icon.secondsText).toBe('60s')
+  })
+
+  it('takes the larger speed multiplier with Adrenaline, not the product', () => {
+    const both = applyEffect(applyEffect([], 'brisk-draught'), 'adrenaline')
+    expect(effectMods(both).moveSpeed).toBe(1.3)
+    expect(effectMods(tickEffects(both, 20)).moveSpeed).toBe(1.25)
+  })
+
+  // Feature: 11-horror-pass, Property 25: Brisk Draught does not stack
+  it('never stacks: one entry, 60 s after each use, speed exactly 1.25 while active', () => {
+    const arbEvent = fc.oneof(fc.constant<'use'>('use'), fc.double({ min: 0, max: 30, noNaN: true }))
+    fc.assert(
+      fc.property(fc.array(arbEvent, { maxLength: 40 }), (events) => {
+        let list: ActiveEffect[] = []
+        for (const e of events) {
+          if (e === 'use') {
+            list = applyEffect(list, 'brisk-draught')
+            expect(list.find((x) => x.id === 'brisk-draught')?.leftS).toBe(60)
+          } else list = tickEffects(list, e)
+          expect(list.filter((x) => x.id === 'brisk-draught').length).toBeLessThanOrEqual(1)
+          const active = list.some((x) => x.id === 'brisk-draught')
+          expect(effectMods(list).moveSpeed).toBe(active ? 1.25 : 1)
+        }
+      }),
+      { numRuns: 200 },
     )
   })
 })

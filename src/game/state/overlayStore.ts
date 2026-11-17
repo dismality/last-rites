@@ -5,6 +5,9 @@ import type { BellPostId, CastId, MinigameId } from '../../data/cases'
 
 interface OverlayState {
   merchantOpen: boolean
+  /** The hut's vending panel (spec 11 H6). Holds the cursor; never pauses, never owns Esc. */
+  vendingOpen: boolean
+  setVendingOpen: (open: boolean) => void
   achievementsOpen: boolean
   modeSelectOpen: boolean
   /** The altar answer panel (spec 10). It owns Esc itself and never freezes the night. */
@@ -26,6 +29,8 @@ interface OverlayState {
 
 export const useOverlayStore = create<OverlayState>((set) => ({
   merchantOpen: false,
+  vendingOpen: false,
+  setVendingOpen: (vendingOpen) => set({ vendingOpen }),
   achievementsOpen: false,
   modeSelectOpen: false,
   altarPanelOpen: false,

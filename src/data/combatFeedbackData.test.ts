@@ -31,6 +31,11 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'grab-stinger-soft',
   // Spec 10 task 11 (checked in nameTheDead.test.ts)
   'name-spoken',
+  // Spec 11 (checked in tests/captionCoverage.test.ts)
+  'vending-coin',
+  'vending-handle',
+  'vending-tray',
+  'vending-refuse',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

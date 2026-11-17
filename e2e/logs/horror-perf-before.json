@@ -1,0 +1,55 @@
+{
+  "tag": "before",
+  "date": "2026-11-17",
+  "renderer": "headless Chrome, ANGLE D3D11 (GPU)",
+  "width": 1920,
+  "height": 1080,
+  "hut": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 191,
+    "triangles": 665194,
+    "lights": {
+      "total": 13,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "overDrawCallBudget": true
+  },
+  "grounds-day": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 318,
+    "triangles": 688752,
+    "lights": {
+      "total": 13,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "overDrawCallBudget": true
+  },
+  "mausoleum-row": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 331,
+    "triangles": 720766,
+    "lights": {
+      "total": 13,
+      "shadowCasting": 2,
+      "lit": 6
+    },
+    "overDrawCallBudget": true
+  },
+  "grounds-night-wave": {
+    "meanFrameMs": 7,
+    "longestFrameMs": 13.9,
+    "drawCalls": 362,
+    "triangles": 928896,
+    "lights": {
+      "total": 13,
+      "shadowCasting": 2,
+      "lit": 7
+    },
+    "overDrawCallBudget": true
+  }
+}

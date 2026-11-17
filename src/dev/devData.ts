@@ -136,6 +136,7 @@ export const CRAFTED_GIVE_IDS: readonly ItemId[] = [
   'lantern-refill',
   'blessed-rounds',
   'kola-tonic',
+  'brisk-draught',
   'revolver-cartridge',
   'shotgun-shell',
 ]

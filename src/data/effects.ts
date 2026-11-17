@@ -14,12 +14,15 @@ export const EFFECTS: readonly EffectDef[] = [
   { id: 'blessed-rounds', name: 'Blessed Rounds', durationS: 30, glyph: '✝', mods: { firearmDamage: 2 } },
   { id: 'adrenaline', name: 'Adrenaline', durationS: 20, glyph: '⚡', mods: { moveSpeed: 1.3, sprintDrain: 0.5 } },
   { id: 'salt-circle', name: 'Salt Circle', durationS: 30, glyph: '◎', mods: {} },
+  // Spec 11 H6 (§4, §14.6): with Adrenaline the larger speed multiplier wins, not the product.
+  { id: 'brisk-draught', name: 'Brisk Draught', durationS: 60, glyph: '»', mods: { moveSpeed: 1.25 } },
 ]
 
 export const EFFECT_MAP: Readonly<Record<EffectId, EffectDef>> = {
   'blessed-rounds': EFFECTS[0],
   adrenaline: EFFECTS[1],
   'salt-circle': EFFECTS[2],
+  'brisk-draught': EFFECTS[3],
 }
 
 /** At most this many effect icons are shown. */

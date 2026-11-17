@@ -120,8 +120,8 @@ describe('§4 timed effects (07)', () => {
   ] as const)('%s', (id, durationS, glyph, mods) => {
     expectFields(id, EFFECT_MAP[id], { durationS, glyph, mods })
   })
-  it('has exactly three effects', () => {
-    expect(EFFECTS.map((e) => e.id)).toEqual(['blessed-rounds', 'adrenaline', 'salt-circle'])
+  it('has the three spec 07 effects, then the spec 11 Brisk Draught', () => {
+    expect(EFFECTS.map((e) => e.id)).toEqual(['blessed-rounds', 'adrenaline', 'salt-circle', 'brisk-draught'])
   })
 })
 

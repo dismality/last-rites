@@ -11,12 +11,25 @@ import { groundPose } from '../../data/itemModels'
 import type { ItemId } from '../../game/types'
 import '../assets/preloadModels'
 import { MaterialShape } from './MaterialShape'
+import { isPlaceholderPath } from '../../data/placeholders'
+import { PlaceholderMesh } from '../assets/PlaceholderMesh'
+import { useAssetOrPlaceholder } from '../assets/useAssetOrPlaceholder'
 
 /** The model as authored (its own axes, centred on its bounding box). */
 export function ItemMesh({ item }: { item: ItemId }) {
   const path = ITEM_MAP[item].model
   if (!path) return null
-  return <LoadedItemMesh url={assetUrl(path)} />
+  const url = assetUrl(path)
+  // Spec 11 art that may not have landed yet is probed first, so a missing file never throws.
+  return isPlaceholderPath(url) ? <ProbedItemMesh url={url} name={ITEM_MAP[item].name} /> : <LoadedItemMesh url={url} />
+}
+
+function ProbedItemMesh({ url, name }: { url: string; name: string }) {
+  const status = useAssetOrPlaceholder(url)
+  if (status === 'checking') return null
+  if (status === 'present') return <LoadedItemMesh url={url} />
+  // PLACEHOLDER: /assets/models/items/brisk-draught.glb (the only spec 11 item model)
+  return <PlaceholderMesh path={url} shape="bottle" name={`${name} (placeholder)`} color="#3f6d4a" />
 }
 
 function LoadedItemMesh({ url }: { url: string }) {

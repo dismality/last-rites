@@ -66,12 +66,14 @@ export function useCinematic(): boolean {
 
 /**
  * An overlay has freed the cursor on purpose: an 08 overlay (merchant, achievements, mode select,
+ * the spec 11 vending panel,
  * dawn pick) or the Dev_Panel (its flag is always false outside dev mode).
  */
 export function isOverlayOpen(): boolean {
   const o = useOverlayStore.getState()
   return (
     o.merchantOpen ||
+    o.vendingOpen ||
     o.achievementsOpen ||
     o.modeSelectOpen ||
     o.altarPanelOpen ||

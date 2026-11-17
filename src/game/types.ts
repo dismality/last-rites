@@ -45,7 +45,7 @@ export type HeavyMeleeId = 'wood-axe' | 'silver-sabre'
 export type DoorId = 'front' | 'vestry'
 
 /** Timed effect IDs */
-export type EffectId = 'blessed-rounds' | 'adrenaline' | 'salt-circle'
+export type EffectId = 'blessed-rounds' | 'adrenaline' | 'salt-circle' | 'brisk-draught'
 
 /** Weapon upgrade IDs */
 export type UpgradeId =
@@ -88,6 +88,8 @@ export type CraftedItemId =
   | HeavyMeleeId
   | 'blessed-rounds'
   | 'kola-tonic'
+  /** Spec 11 H6: sold only by the hut's vending machine. */
+  | 'brisk-draught'
 
 /** Key item IDs — do not occupy satchel slots */
 export type KeyItemId =

@@ -37,6 +37,9 @@ import { useSpawnStore } from './spawnStore'
 import { useTombstoneStore } from './tombstoneStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
+import { useVendingStore } from './vendingStore'
+import { vendingOwnedGuns } from './vendingActions'
+import { visibleRows } from '../systems/vending'
 
 const SATCHEL_FULL = 'satchel space'
 const OPEN: CueFacts = { usedUp: false }
@@ -123,6 +126,10 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
     case 'merchant': {
       const stock = useProgressionStore.getState().stock
       return { usedUp: stock !== null && stock.rows.every((r) => r.qty <= 0) }
+    }
+    case 'vending': {
+      const { stockLeft } = useVendingStore.getState().stock
+      return { usedUp: false, idle: visibleRows(vendingOwnedGuns()).every((r) => stockLeft[r.id] <= 0) }
     }
     case 'barricade-door': {
       const door = subject as DoorId

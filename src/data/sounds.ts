@@ -31,6 +31,11 @@ export type SoundId =
   | 'grab-stinger'
   | 'grab-stinger-soft'
   | 'name-spoken'
+  // Spec 11 H6: the hut's vending machine.
+  | 'vending-coin'
+  | 'vending-handle'
+  | 'vending-tray'
+  | 'vending-refuse'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -317,6 +322,40 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.04,
     decayS: 0.7,
     layers: [noise('lowpass', 1400, 400, 0.8, 0.22), tone('sine', 110, 92, 0.12)],
+  },
+  // Spec 11 H6: the hut's vending machine, heard from the machine (3D). A bright coin clink, a
+  // sprung lever, a bottle or tin landing in the tray, and a dull refusal buzz.
+  'vending-coin': {
+    id: 'vending-coin',
+    spatial: true,
+    maxDistanceM: 12,
+    attackS: 0.002,
+    decayS: 0.35,
+    layers: [tone('sine', 2640, 2600, 0.14), tone('sine', 3960, 3900, 0.07), noise('highpass', 6000, 4000, 0.8, 0.05)],
+  },
+  'vending-handle': {
+    id: 'vending-handle',
+    spatial: true,
+    maxDistanceM: 12,
+    attackS: 0.01,
+    decayS: 0.4,
+    layers: [noise('bandpass', 900, 400, 2, 0.22), tone('triangle', 180, 120, 0.1)],
+  },
+  'vending-tray': {
+    id: 'vending-tray',
+    spatial: true,
+    maxDistanceM: 12,
+    attackS: 0.004,
+    decayS: 0.3,
+    layers: [noise('lowpass', 1800, 300, 1, 0.3), tone('sine', 140, 90, 0.16)],
+  },
+  'vending-refuse': {
+    id: 'vending-refuse',
+    spatial: true,
+    maxDistanceM: 12,
+    attackS: 0.01,
+    decayS: 0.45,
+    layers: [tone('square', 110, 108, 0.07), tone('square', 116, 114, 0.05)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {

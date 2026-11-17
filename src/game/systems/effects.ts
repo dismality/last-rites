@@ -49,7 +49,8 @@ export function effectMods(list: readonly ActiveEffect[]): EffectMods {
     if (e.leftS <= 0) continue
     const m = EFFECT_MAP[e.id].mods
     if (m.firearmDamage !== undefined) out.firearmDamage = m.firearmDamage
-    if (m.moveSpeed !== undefined) out.moveSpeed = m.moveSpeed
+    // Speed boosts do not multiply: the larger one applies (Adrenaline 1.3 over Brisk Draught 1.25).
+    if (m.moveSpeed !== undefined) out.moveSpeed = Math.max(out.moveSpeed, m.moveSpeed)
     if (m.sprintDrain !== undefined) out.sprintDrain = m.sprintDrain
   }
   return out

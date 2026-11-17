@@ -64,6 +64,10 @@ export type CaptionId =
   | 'grab-stinger'
   | 'grab-stinger-soft'
   | 'name-spoken'
+  | 'vending-coin'
+  | 'vending-handle'
+  | 'vending-tray'
+  | 'vending-refuse'
 
 export interface CaptionDef {
   id: CaptionId
@@ -198,6 +202,11 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'grab-stinger-soft', event: 'grab-stinger-soft', text: GRAB_CAPTION, minSeconds: 1.5 },
   // Spec 10 task 11: Name the Dead.
   { id: 'name-spoken', event: 'name-spoken', text: '[a name, spoken: NAME]', template: true, minSeconds: 3 },
+  // Spec 11 H6: the hut's vending machine.
+  { id: 'vending-coin', event: 'vending-coin', text: '[a coin clinks into the machine]', minSeconds: 1.5 },
+  { id: 'vending-handle', event: 'vending-handle', text: '[a brass handle clacks]', minSeconds: 1.5 },
+  { id: 'vending-tray', event: 'vending-tray', text: '[something drops into the tray]', minSeconds: 1.5 },
+  { id: 'vending-refuse', event: 'vending-refuse', text: '[the machine buzzes, refusing]', minSeconds: 1.5 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(
