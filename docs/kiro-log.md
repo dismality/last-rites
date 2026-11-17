@@ -1928,3 +1928,13 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The Brisk Draught icon uses the missing-icon image and is listed on the Waiting_List. (2026-11-17)
   - Vending stock is part of the Retry snapshot, so a retried night does not refill the machine. A sold-out machine can still be opened, and its cue shows as idle. (2026-11-17)
   - The perf spec records the baseline instead of asserting the 150 draw-call budget, which the game already exceeds. (2026-11-17)
+
+### 2026-11-17: Outside Kiro: fix: Resume and the intro's first shot
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request (two bugs found in play).
+- **What happened:**
+  - **Resume left the game paused.** On Resume, the pause menu, the cursor-release relock and the canvas click could each ask for pointer lock in the same frame. Chrome refused the overlapping requests. The fallback retry then fired a lock change with no lock, which the pause trigger read as "lock lost", so the game paused again at once. Now only one lock request is in flight at a time (`pointerLockRequest.ts`). A lock change pauses only when a lock the canvas actually held is lost (`lockChangeLosesLock` in `usePauseTriggers.ts`). Checked in headed Chrome with real pointer lock: Esc pauses, and Resume unpauses and takes the lock back.
+  - **The intro's first shot looked through the ground.** Outside the front fence the outer terrain climbs a bank: y 0 at z 44, about 5.8 at z 62. Shot 1 started at a fixed 2.5 m at z 62, about 3.3 m under the bank, and the terrain's back faces are culled, so the first second of the intro showed empty fog and a hard ground edge. Shot 1 now comes down over the bank about 2.5 m above the grass (y 8.3 at z 62 to 2.5 at z 46). A new test samples every intro camera path against the bank's measured profile and needs 1.5 m of clearance.
+  - Lint, build and all 2554 unit tests pass. The win-cutscene, screens-settings, smoke and help e2e specs pass (19 tests).
+- **Decisions made unattended:**
+  - Shot 1 moved instead of the terrain changing, so the graveyard model is untouched. (2026-11-17)
+  - The bank profile in the test was measured from `graveyard.glb` by raycasting in the running game. (2026-11-17)

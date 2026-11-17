@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest'
-import { requestPointerLockUnadjusted } from './pointerLockRequest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { lockRequestPending, requestPointerLockUnadjusted, resetLockRequest } from './pointerLockRequest'
 import { discardLookWhileOwned } from './viewOwnership'
 import { createInput } from './input'
 
@@ -10,6 +10,8 @@ const fake = (impl: (o?: unknown) => unknown) => {
 }
 
 describe('requestPointerLockUnadjusted', () => {
+  beforeEach(resetLockRequest)
+
   it('asks for unadjusted movement first and does not repeat when it works', async () => {
     const { el, calls } = fake(() => Promise.resolve())
     requestPointerLockUnadjusted(el)
@@ -48,6 +50,31 @@ describe('requestPointerLockUnadjusted', () => {
       throw new Error('no')
     })
     expect(() => requestPointerLockUnadjusted(t.el)).not.toThrow()
+  })
+
+  // Resume, the cursor relock and the canvas click can all ask in one frame. Chrome rejects the
+  // overlapping requests, and the retries fired a lock change with no lock, which paused again.
+  it('sends one request at a time and allows the next once the browser answers', async () => {
+    let answer: () => void = () => {}
+    const { el, calls } = fake(() => new Promise<void>((r) => (answer = r)))
+    requestPointerLockUnadjusted(el)
+    requestPointerLockUnadjusted(el)
+    requestPointerLockUnadjusted(el)
+    expect(calls).toHaveLength(1)
+    expect(lockRequestPending()).toBe(true)
+    answer()
+    await flush()
+    expect(lockRequestPending()).toBe(false)
+    requestPointerLockUnadjusted(el)
+    expect(calls).toHaveLength(2)
+  })
+
+  it('is free again after a refused request and its fallback', async () => {
+    const { el } = fake(() => Promise.reject(new Error('no')))
+    requestPointerLockUnadjusted(el)
+    await flush()
+    await flush()
+    expect(lockRequestPending()).toBe(false)
   })
 })
 

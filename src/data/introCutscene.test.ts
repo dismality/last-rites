@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { INTRO_END_POSE, INTRO_FADE_S, INTRO_SHOTS } from './introCutscene'
+import { samplePath } from '../game/systems/cameraPath'
 import { HUT } from './cemeteryLayout'
 import { SPAWN_YAW } from './spawn'
 import { FIXED_SPAWNS } from './zones'
@@ -65,5 +66,31 @@ describe('introCutscene data', () => {
     // Page 1 at (2.6, -1.3): forward (-sin yaw, -cos yaw) points into +X and -Z.
     expect(-Math.sin(SPAWN_YAW)).toBeGreaterThan(0)
     expect(-Math.cos(SPAWN_YAW)).toBeLessThan(0)
+  })
+
+  // The bank outside the front fence, measured from graveyard.glb along x = 0 (ground height by
+  // z). Shot 1 starts out there; at a fixed 2.5 m it began under the bank and the player saw
+  // through the back of the terrain.
+  const FRONT_BANK: readonly (readonly [number, number])[] = [
+    [44, 0], [46, 0.11], [48, 0.47], [50, 0.92], [52, 1.48], [54, 2.22],
+    [56, 3.03], [58, 3.92], [60, 4.88], [62, 5.84], [64, 6.79],
+  ]
+  const groundAt = (z: number): number => {
+    if (z <= FRONT_BANK[0][0]) return 0
+    for (let i = 1; i < FRONT_BANK.length; i++) {
+      const [z1, y1] = FRONT_BANK[i]
+      const [z0, y0] = FRONT_BANK[i - 1]
+      if (z <= z1) return y0 + ((z - z0) / (z1 - z0)) * (y1 - y0)
+    }
+    return FRONT_BANK[FRONT_BANK.length - 1][1]
+  }
+
+  it('keeps every camera at least 1.5 m above the ground, the front bank included', () => {
+    for (const s of INTRO_SHOTS) {
+      for (let k = 0; k <= 100; k++) {
+        const [, y, z] = samplePath(s.camera.position, k / 100)
+        expect(y - groundAt(z), `shot ${s.id} at ${k}%`).toBeGreaterThanOrEqual(1.5)
+      }
+    }
   })
 })

@@ -35,11 +35,14 @@ export const INTRO_SHOTS: readonly IntroShot[] = [
     id: 1,
     duration: 4,
     camera: {
+      // Outside the front fence the ground climbs a bank (y 0 at z 44, about 5.8 at z 62), so the
+      // shot comes down over it, about 2.5 m above the grass. At a fixed 2.5 m the camera started
+      // under the bank and looked through the back of the terrain.
       position: [
-        [0, 2.5, 62],
-        [0, 2.5, 56],
-        [0, 2.4, 51],
-        [0, 2.4, 46],
+        [0, 8.3, 62],
+        [0, 5.6, 56],
+        [0, 3.7, 51],
+        [0, 2.5, 46],
       ],
       target: [
         [0, 2.2, 30],

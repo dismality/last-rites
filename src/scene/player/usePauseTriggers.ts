@@ -57,14 +57,26 @@ export function handlePointerLockLost(): void {
 }
 
 /**
+ * A lock change pauses only when a lock the canvas held is gone. A refused lock request can also
+ * fire a change with no lock, and pausing on that undid Resume at once.
+ */
+export function lockChangeLosesLock(wasLocked: boolean, nowLocked: boolean): boolean {
+  return wasLocked && !nowLocked
+}
+
+/**
  * Pauses on Esc and on pointer-lock loss. Browsers swallow Esc keydown while
  * locked and just release the lock, so both paths are needed.
  */
 export function usePauseTriggers(): void {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => handlePauseKey(e.code)
+    let locked = document.pointerLockElement !== null
     const onLockChange = () => {
-      if (!document.pointerLockElement) handlePointerLockLost()
+      const now = document.pointerLockElement !== null
+      const lost = lockChangeLosesLock(locked, now)
+      locked = now
+      if (lost) handlePointerLockLost()
     }
     window.addEventListener('keydown', onKey)
     document.addEventListener('pointerlockchange', onLockChange)

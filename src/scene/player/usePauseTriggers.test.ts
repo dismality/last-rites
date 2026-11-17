@@ -3,7 +3,7 @@ import { useGameStore, useWorldStore } from '../../game/state'
 import { isMenuOpen, isSimFrozen, resumeGame, setDawnPickProbe } from '../../game/state/menuState'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { useEndingStore } from '../../game/state/endingStore'
-import { handlePauseKey, handlePointerLockLost } from './usePauseTriggers'
+import { handlePauseKey, handlePointerLockLost, lockChangeLosesLock } from './usePauseTriggers'
 
 beforeEach(() => {
   useGameStore.getState().setPaused(false)
@@ -134,5 +134,14 @@ describe('Esc on the ending screen (spec 10, Req 23.4)', () => {
       expect(useGameStore.getState().paused, stage).toBe(pauses)
     }
     useEndingStore.getState().reset()
+  })
+})
+
+describe('lock change after Resume', () => {
+  it('pauses only when a held lock is lost, not when a lock request is refused', () => {
+    expect(lockChangeLosesLock(true, false)).toBe(true)
+    expect(lockChangeLosesLock(false, false)).toBe(false)
+    expect(lockChangeLosesLock(false, true)).toBe(false)
+    expect(lockChangeLosesLock(true, true)).toBe(false)
   })
 })
