@@ -447,7 +447,7 @@ const api = {
     queueTeleport({ position: [x, y, z], yaw, pitch })
   },
   /** Where the Rapier body (feet) and the camera really are, or null when no rig is mounted. */
-  body(): { feet: [number, number, number]; camera: [number, number, number]; yaw: number } | null {
+  body(): { feet: [number, number, number]; camera: [number, number, number]; yaw: number; pitch: number } | null {
     const { body, camera } = bodyRuntime
     if (!body || !camera) return null
     const t = body.translation()
@@ -456,6 +456,8 @@ const api = {
       feet: [t.x, t.y - 0.85, t.z],
       camera: [camera.position.x, camera.position.y, camera.position.z],
       yaw: camera.rotation.y,
+      // Positive looking up (the camera's own X rotation, Euler order YXZ).
+      pitch: camera.rotation.x,
     }
   },
   /**

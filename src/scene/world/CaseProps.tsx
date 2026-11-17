@@ -138,14 +138,17 @@ function HymnTiles() {
   )
 }
 
-/** Stage 3 chapel props: by day, until the stair is open (3a solved props idle but stay). */
+/**
+ * Stage 3 chapel props, day and night (3a solved props idle but stay). The story night lasts until
+ * the rite, and the rite needs the heart behind the stair, so the board must not vanish at dusk
+ * (spec 10 task 12.2: a Short Vigil day is too short to finish 3a and 3b).
+ */
 function HymnProps() {
-  const day = useWorldStore((s) => s.phase === 'day')
   const sealed = useMysteryStore((s) => !s.mystery.gates.catacombs)
   return (
     <>
-      {day && <HymnBoardHotspot />}
-      {day && <Psalter />}
+      <HymnBoardHotspot />
+      <Psalter />
       {sealed && <HymnTiles />}
     </>
   )
@@ -277,15 +280,18 @@ function CryptOpened() {
   )
 }
 
-/** Stage 3 crypt-side props: by day the evidence and the slate; the opened crypt stays once 3b is solved. */
+/**
+ * Stage 3 crypt-side props: the evidence and the slate, day and night (the ossuary key behind 3b is
+ * needed for the rite, so they cannot wait for a morning that never comes, spec 10 task 12.2); the
+ * opened crypt stays once 3b is solved.
+ */
 function CryptProps() {
-  const day = useWorldStore((s) => s.phase === 'day')
   const solved = useCaseStore((s) => s.cases['sealed-catacombs'].minigames.includes('3b'))
   const ids = Object.keys(CASE_3_EVIDENCE_SPOTS) as Exclude<EvidenceCardId, 'dry-boots'>[]
   return (
     <>
-      {day && !solved && ids.map((id) => <EvidenceProp key={id} id={id} />)}
-      {day && <TimelineSlate />}
+      {!solved && ids.map((id) => <EvidenceProp key={id} id={id} />)}
+      <TimelineSlate />
       {solved && <CryptOpened />}
     </>
   )

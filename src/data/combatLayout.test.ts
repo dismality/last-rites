@@ -35,7 +35,7 @@ describe('bible placements', () => {
     }
   })
   it('items and spawns', () => {
-    expect(LODGE.center).toEqual([-23.8, 0, -41.5])
+    expect(LODGE.center).toEqual([-23.8, 0, -36.5])
     expect(LODGE.pickupRadius).toBe(0.9)
     expect(WOODPILE_POSITION).toEqual([-5, 0, 2])
     expect(CHAPEL_CUPBOARD_POSITION).toEqual([7.9, 0.89, 7.6])

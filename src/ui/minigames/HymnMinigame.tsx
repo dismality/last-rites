@@ -11,7 +11,6 @@ import { CAPTION_MAP } from '../../data/captions'
 import { useCaseStore } from '../../game/state/caseStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
-import { useWorldStore } from '../../game/state/worldStore'
 import { hymnTiles } from '../../game/systems/caseMinigames'
 import {
   filledCount,
@@ -64,17 +63,17 @@ export function HymnMinigame() {
     }
     useCaseStore.getState().submitMinigame('3a', true)
     const hasWhistle = useInventoryStore.getState().inventory.keyItems.includes('bone-whistle')
-    // The stair opens by day only, as at the altar itself; the whistle must be held.
-    if (hasWhistle && useWorldStore.getState().phase === 'day') {
+    // The whistle must be held. Unlike the altar spot (which answers the case at night), the board
+    // opens the stair at night too: the story night only ends with the rite, which needs the
+    // heart below (spec 10 task 12.2).
+    if (hasWhistle) {
       const r = useMysteryStore.getState().interactGate('catacombs', 'altar')
       if (r.kind === 'opened') caption('hymn-stair-open')
       return say('right', 'BELOW. You blow the whistle and the stair behind the altar opens.')
     }
     say(
       'right',
-      hasWhistle
-        ? 'BELOW. The tiles sit true. The stair waits for morning.'
-        : "BELOW. The tiles sit true. The sexton's whistle will wake the stair at the altar.",
+      "BELOW. The tiles sit true. The sexton's whistle will wake the stair at the altar.",
     )
   }
 

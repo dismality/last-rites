@@ -336,16 +336,19 @@ Common rules for all tasks:
     - Done outside Kiro by Claude. Left uncommitted for the user to commit
     - Run the Finish steps for task 11; commit `name the dead (spec 10 task 11)`
 
-- [ ] 12. Final task: full automated playthrough in Short Vigil (moved from spec 09 task 3)
-  - [ ] 12.1 Playthrough spec
+- [x] 12. Final task: full automated playthrough in Short Vigil (moved from spec 09 task 3)
+  - [x] 12.1 Playthrough spec
     - Rewrite `e2e/playthrough.spec.ts`: new game in Short Vigil, play all 3 Stages (Minigames, key items, relics, Crane, Accusation) to the ending card with `page.mouse` and `page.keyboard` only; no Dev_Panel action, no teleport, no skip; god mode only to keep the fight fair
     - Assert the Objective_Tracker text at each step; log the time to the first Minigame and the total run time
     - _Requirements: 30.1-30.4, 5.7_
-  - [ ] 12.2 Fix what the playthrough finds
+    - Done outside Kiro by Claude. `e2e/support/walker.ts` (a planner over the physics colliders that walks with the real W/A/S/D keys and turns the camera with the real mouse under pointer lock) and `e2e/support/story.ts` (one function per stage). Passes in Chrome: first minigame at 13.3 s, whole run 17 min 44 s
+  - [x] 12.2 Fix what the playthrough finds
     - Fix every real bug the run exposes; log what is left in `docs/kiro-log.md`
     - _Requirements: 30.1, 30.3_
-  - [ ] 12.3 Finish
+    - Done outside Kiro by Claude. The lodge (shotgun, watch log, surgeon's receipt) moved inside the fence, where a player can reach it; Stage 3's hymn board, psalter, evidence and slate stay usable at night so a Short Vigil player is not stuck. What is left is in the log
+  - [x] 12.3 Finish
     - Run the Finish steps for task 12; commit `full playthrough test (spec 10 task 12)`
+    - Done outside Kiro by Claude. Left uncommitted for the user to commit
 
 ## Notes
 

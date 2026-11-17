@@ -355,7 +355,7 @@ Treat him as a tragic figure who did a terrible thing, never as a joke. The rite
 |---|---|
 | Vestry door | West chapel wall, 1.4 m wide, at (7.5, 0, 9.5). Zombies stand at (6.5, 9.5) to attack it, and at (10, −2) for the front door. A waypoint `chapel-vestry` at (5.5, 0, 9.5) links to `hut` and `grounds-south`. |
 | Service Revolver | Vestry cupboard, inside the chapel at (7.9, 0.9, 7.6) |
-| Double-Barrel Shotgun | Gatekeeper's lodge at the mouth of Mausoleum Row, centre (−23.8, 0, −41.5), pickup at 0.9 m |
+| Double-Barrel Shotgun | Gatekeeper's lodge at the mouth of Mausoleum Row, just inside the grounds fence, centre (−23.8, 0, −36.5), pickup at 0.9 m **(10)** |
 | Wood Axe and woodpile | (−5.0, 0, 2.0), west of the hut |
 | Silver Sabre | The Crane crypt's front step (−18.9, 0.35, −59.3) |
 | Powder tin | Hut shelf (−1.8, 0.8, −1.0), once only; the bell tower store at (29, 0.4, −24) |
@@ -887,6 +887,7 @@ Graves were robbed for anatomy schools; iron mortsafes and watch-houses were bui
 The existing story stands: Crane sealed 31 living people in the catacombs in 1849.
 - **Minigame 3a, The Hymn Board (chapel):** the board reads 4 · 19 · 2 · 41 · 23. The vestry psalter's index lists hymns 1–60 by title. Crane's confession fragment says "What I hid, I hid beneath the Word." The first letters of those hymns spell **BELOW**. The player sets five brass letter tiles on the altar and blows the whistle, and the hidden stair opens.
 - **Minigame 3b, Elias's Last Night (Crane crypt):** six evidence cards go on a midnight-to-dawn timeline: (1) the dry boots in the hut, (2) Elias's unsent letter to the Bishop, hidden in the hut bench, (3) hearse-cart ruts at the Row gate, (4) lantern oil spilled at the crypt step, (5) fingernail marks inside the crypt door, (6) an iron hearse-pin still in the door's outer hasp. The right order replays his night in captioned beats and shows he was **sealed in alive**. Pulling the pin opens the crypt: Elias's body and the **Iron Ossuary Key**.
+- **Stage 3 at night:** the hymn board, the psalter, the evidence props and the slate stay usable at night, and the board opens the stair at night too (with the whistle held). The story night only ends with the rite, and the rite needs the heart below the stair and the ossuary key from 3b, so a player who is not done by dusk must not be stuck (spec 10 task 12.2). **(10)**
 - **The Silas reveal:** the ledger's "same careful hand" is **Josiah Vane's**, the 1849 parish undertaker, paid for 31 funerals that never happened (his name is on a ledger flyleaf in the ossuary). **Silas Vane**, his son and the dawn merchant, gave the player a **Vane & Sons receipt** with their first purchase in stage 1; the handwriting matches. Elias's letter names "the undertaker's family". Silas trades as normal at every dawn before this.
 - **Final answers at the altar (stage 3, waves running; Father Crane rises at the first):**
   1. **The rite:** place the 5 relics in the order given by Crane's confession and Elias's notes (relic placement on the altar, replacing "hold E for 45 s"). A correct order lifts the curse and the run is won. Treat it seriously (taboos).

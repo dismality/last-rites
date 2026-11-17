@@ -1863,3 +1863,22 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The lit grave is picked from the run seed, stage and wave, so Retry Night lights the same graves.
   - The glow light is always mounted (the scene's light count must stay constant) and is dark when no grave is lit.
   - A hit ends the hold until E is let go; letting go or turning to another grave starts it afresh.
+
+### 2026-11-17: Outside Kiro: 10-curse-stages task 12: full playthrough test
+- **Kiro feature used:** none. Made outside Kiro by Claude (Claude Code) at the user's request, from the 10-curse-stages task list Kiro wrote.
+- **What happened:**
+  - `e2e/playthrough.spec.ts` is rewritten. It starts a New Game in Short Vigil through the real menus and plays all 3 stages to the ending card with `page.mouse` and `page.keyboard` only. God mode (the one Dev_Panel action allowed) keeps the fights fair; there is no teleport and no skip.
+  - `e2e/support/walker.ts` reads the physics colliders, plans a route on a grid (A* and string pulling) and walks it with the real movement keys, turning the camera with real mouse moves under pointer lock. It stands near each prop, aims at it and holds E. `e2e/support/story.ts` has one function per stage: minigames are answered with real clicks, the altar answers with real select and button clicks, and Father Crane is fought with real swings.
+  - The objective tracker is checked at each step. The run passes in Chrome: the first minigame opened 13.3 s after Begin, and the whole run took 17 min 44 s, ending on the Rest card (3 of 3 stages, 3 of 3 cases, 5 relics).
+  - The debug hook's `body()` also gives the camera pitch, so the walker can aim.
+- **Bugs the run found, and fixed:**
+  - The gatekeeper's lodge (the shotgun, the watch log of 2b and the surgeon's receipt) stood outside the grounds fence and west of the avenue's invisible wall, so no player could walk to it. It is now just inside the fence at (−23.8, −36.5), still at the mouth of the Row; the receipt's zone is now the grounds.
+  - Stage 3 could not be finished in Short Vigil. The 2-minute day is too short for 3a and 3b, the hymn board, psalter, evidence and slate were day-only, and the story night only ends with the rite, which needs the heart below the stair and the ossuary key from 3b. These props now stay at night, and the board opens the stair at night too. Noted in the design bible.
+- **Left, not fixed:**
+  - In Short Vigil the objective line stays "Craft a weapon at the workbench (0/1)" all day in every stage until a weapon is crafted, so the stage's own steps never show by day. The playthrough never crafts, so it checks that line.
+  - At 1280×720 the ending card runs past the bottom of the screen; its last control is cut off.
+  - With the Rusty Shovel (15 damage) Father Crane takes about 100 hits, about 2 minutes. That may be long for a judge in Short Vigil.
+- **Decisions made unattended:**
+  - The lodge moved rather than opening a gap in the avenue's railing, so the avenue and its walls are unchanged.
+  - The fix for Stage 3 keeps its props at night rather than lengthening the day, so Short Vigil keeps its 2-minute days.
+  - Spec 09 task 3 keeps its "moved to spec 10 final task" note and stays unticked.

@@ -493,7 +493,7 @@ export const CASE_2_WATCH_SHELF: readonly WatchEntryId[] = [
 ]
 
 /** The logbook on the lodge table (top 0.8) opens minigame 2b; the shotgun lies at the table's centre. */
-export const CASE_2_LOGBOOK_POSITION = [-23.45, 0.81, -41.45] as const
+export const CASE_2_LOGBOOK_POSITION = [-23.45, 0.81, -36.45] as const
 
 /** What a print or a boot shows: tread, size and hobnails (minigame 2c). `null` size: too worn to tell. */
 export interface PrintDetails {
@@ -731,7 +731,7 @@ const CASE_2: CaseDef = {
       icon: 'read',
       redHerring: false,
       // On the lodge table (top 0.8), at the end away from the logbook.
-      found: { kind: 'walk', spot: 'mausoleum-row', position: [-24.2, 0.81, -41.55] },
+      found: { kind: 'walk', spot: 'grounds', position: [-24.2, 0.81, -36.55] },
     },
     {
       id: 'spade-fresh-clay',

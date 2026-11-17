@@ -457,9 +457,9 @@ export const CHAPEL_WINDOW_Z: readonly number[] = [-1.5, 1.5]
 export const CHAPEL_BUTTRESS_HALF_W = 0.5
 export const CHAPEL_WINDOW_HALF_W = 0.275
 
-/** Gatekeeper's lodge at the mouth of Mausoleum Row. Footprint is kept clear of the avenue crypts. */
+/** Gatekeeper's lodge at the mouth of Mausoleum Row, just inside the grounds fence so a player can walk to it (spec 10 task 12.2). */
 export const LODGE = {
-  center: [-23.8, 0, -41.5] as Vec3,
+  center: [-23.8, 0, -36.5] as Vec3,
   halfX: 1.2,
   halfZ: 1.2,
   /** Pickup radius for the shotgun. */

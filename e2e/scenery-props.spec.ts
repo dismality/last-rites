@@ -72,7 +72,7 @@ test.describe('swapped props in place (11n-d)', () => {
       { file: 'prop-scare-door', target: [-21.8, 1.1, -51], from: [-19.6, -49.5] },
       { file: 'prop-grave-mound', target: [mound![0], 0.2, mound![2]], from: [mound![0] + 2.5, mound![2] + 2.5] },
       { file: 'prop-woodpile-axe', target: [-5, 0.5, 2], from: [-7.8, 4.4] },
-      { file: 'prop-lodge-table-shotgun', target: [-23.8, 0.85, -41.5], from: [-23.8, -40.6] },
+      { file: 'prop-lodge-table-shotgun', target: [-23.8, 0.85, -36.5], from: [-23.8, -35.6] },
       { file: 'prop-sabre-plinth', target: [-18.9, 0.5, -59.3], from: [-18.9, -56.8] },
       { file: 'prop-clue-ledger-week', target: [7.6, 1, -4], from: [7.6, -1.6] },
       { file: 'prop-clue-row-statues', target: [-18.9, 0.6, -30], from: [-18.9, -27.6] },
