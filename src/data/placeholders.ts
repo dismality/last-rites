@@ -60,8 +60,8 @@ export const PLACEHOLDERS: readonly PlaceholderRow[] = [
   row(VENDING_MACHINE_MODEL_URL, 'model', 'H6', 'hut vending machine; placeholder: a plain cabinet with the real collider and handle anchors'),
   row(BRISK_DRAUGHT_MODEL_URL, 'model', 'H6', 'Brisk Draught item; placeholder: a bottle primitive "Brisk Draught (placeholder)"'),
   row(BRISK_DRAUGHT_ICON_URL, 'image', 'H6', `Brisk Draught satchel icon; placeholder: the satchel's "?" box (MISSING_ICON_URL)`),
-  row(HANDS_MODEL_URL, 'model', 'H7', "first-person hands; placeholder: today's weapon-only viewmodel"),
-  row(LANTERN_MODEL_URL, 'model', 'H7', "held lantern; placeholder: today's weapon-only viewmodel and a fixed light offset"),
+  row(HANDS_MODEL_URL, 'model', 'H7', 'first-person hands; placeholder: primitive fists and sleeves (placeholderHands.tsx)'),
+  row(LANTERN_MODEL_URL, 'model', 'H7', 'held lantern; placeholder: a primitive cage lantern in the left hand, light at a fixed offset'),
   row(LANTERN_COOKIE_URL, 'texture', 'H7', 'lantern spot light cookie; placeholder: a generated soft round texture'),
 ]
 

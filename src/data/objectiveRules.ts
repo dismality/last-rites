@@ -144,6 +144,8 @@ export type StageDayPlace =
 export interface StageDayRule {
   readonly main: string
   readonly target: number
+  /** Main line once the count reaches the target but the step still needs finishing. */
+  readonly whenCounted?: string
   readonly marker: string
   readonly place: StageDayPlace
 }
@@ -157,6 +159,8 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
     {
       main: 'Examine the three bells',
       target: 3,
+      // All three looked at is not the end: the step closes when the cut bell is named.
+      whenCounted: 'Name the cut bell at a bell post',
       marker: 'Bells',
       place: { kind: 'nearest', at: CASE_1_BELLS.map((b) => b.position) },
     },

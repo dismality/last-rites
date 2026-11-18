@@ -2160,3 +2160,17 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Dev spawn hooks: `spawnZombiesWithUids` (each uid once) and `spawnLookGroup` (four zombies, one per look), plus `api.zombieLooks()` in the debug hook. (2026-11-18)
   - The debug-hook guard test now skips test files (see above). (2026-11-18)
   - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the comment fix in `src/data/cases.ts`, which are not task 8 work. (2026-11-18)
+
+### 2026-11-18: Bell posts redesign, stand-in hands, slower footsteps, objective fixes
+- **Kiro feature used:** Outside Kiro
+- **What happened:**
+  - The bell posts screen is redrawn. Each post is a drawing of the grave and bell with clickable rope, bell and tag, a notebook of what has been looked at, and a clear "This one was cut" button.
+  - Until hands.glb and lantern.glb exist, primitive stand-ins are drawn. The right fist grips the held item, and the lantern hangs in the left hand by its ring (anchors moved to the left side).
+  - Footsteps are slower: walk stride 1.4 m (was 0.8), sprint 1.9 m (was 1.1).
+  - Objective fixes:
+    - With all three bells examined, the tracker reads "Name the cut bell at a bell post" instead of a stuck "(3/3)".
+    - Tutorial step 5 (get a weapon) now completes when the player finds a real weapon, such as the shed axe, not only by crafting one. Before, its workbench hint hung on under later objectives.
+- **What Kiro caught or sped up:** Nothing; done by hand. Lint, typecheck, all 2849 unit tests, and the case1 and hands-lantern e2e pass.
+- **Decisions made unattended:**
+  - `StageDayRule.whenCounted` is an optional main line for a counted step that still needs finishing. Only the bells step uses it. (2026-11-18)
+  - Stand-in hands and lantern are listed in `src/data/placeholders.ts` under the existing hands and lantern rows. (2026-11-18)

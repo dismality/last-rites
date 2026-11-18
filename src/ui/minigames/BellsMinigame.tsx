@@ -1,9 +1,10 @@
 // Minigame 1b, the Bell Posts (spec 10 task 3.5, Req 13). A safety-bell post stands at each of the
-// three candidate graves. Here the player turns the view round one post (bell, rope, tag), inspects
-// each side, and once all three posts are examined answers "Which bell was cut?". The verdict is the
-// pure `bellPosts` rule; a wrong post adds Doubt through the Case_Store and shows a message. A right
-// one solves 1b and the case system pins the three clue cards. Keyboard only: arrows turn, Enter
-// inspects, Tab changes post, C marks the post as the cut bell. Progress is kept in the Case_Store.
+// three candidate graves. The player looks at each post's bell, rope and tag, and once all three
+// posts are examined answers "Which bell was cut?". The verdict is the pure `bellPosts` rule; a
+// wrong post adds Doubt through the Case_Store and shows a message. A right one solves 1b and the
+// case system pins the three clue cards. Keyboard: arrows pick the part, Enter inspects, Tab changes
+// post, C marks the post as the cut bell. Mouse: click a part of the drawing or a notebook row.
+// Progress is kept in the Case_Store.
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CASE_1_BELLS, CASE_1_STONES, type BellPostDef, type BellPostId } from '../../data/cases'
 import { playPageTurn } from '../../audio/AudioManager'
@@ -14,7 +15,6 @@ import {
   cutQuestionOpen,
   cyclePost,
   facetText,
-  facetYaw,
   FACET_LABEL,
   isPostExamined,
   NO_FACETS_READ,
@@ -30,9 +30,99 @@ import type { ResultKind } from '../../game/systems/minigameShell'
 import { MinigameShell } from './MinigameShell'
 
 const CASE_ID = 'saved-by-the-bell'
-const FACET_GLYPH: Record<BellFacet, string> = { bell: '🔔', rope: '➰', tag: '🏷' }
-const FACET_CAPTION: Partial<Record<BellFacet, string>> = { tag: '[a page turns]' }
+/** Short names for the notebook rows; the buttons keep the full verbs. */
+const FACET_NOUN: Record<BellFacet, string> = { bell: 'The bell', rope: 'The rope', tag: 'The tag' }
 const stoneName = (post: BellPostDef) => CASE_1_STONES.find((s) => s.id === post.stone)?.name ?? post.stone
+const surname = (post: BellPostDef) => stoneName(post).split(' ').pop() ?? stoneName(post)
+
+/**
+ * The post drawn in ink: a grave mound and headstone, a wooden post with a cross-arm, the bell, its
+ * rope running down into the grave, and a paper tag tied to the post. A part shows what is wrong with
+ * it (a cut rope, a rusted bell) only once the player has looked at it.
+ */
+function PostDrawing({
+  post,
+  current,
+  read,
+  onPick,
+}: {
+  post: BellPostDef
+  current: BellFacet
+  read: readonly BellFacet[]
+  onPick: (f: BellFacet) => void
+}) {
+  const rusted = post.condition === 'rusted-solid' && read.includes('bell')
+  const cut = post.condition === 'rope-cut' && read.includes('rope')
+  // A post whose tag text says nothing is tied there shows only the loose string once read.
+  const bareTag = read.includes('tag') && /^No certificate/.test(post.tag)
+  const part = (f: BellFacet) =>
+    `bells__part bells__part--${f}${current === f ? ' is-current' : ''}${read.includes(f) ? ' is-read' : ''}`
+  return (
+    <svg className="bells__drawing" viewBox="0 0 240 250" aria-hidden="true">
+      {/* Ground and mound */}
+      <path className="bells__ground" d="M0 214 Q120 204 240 214 L240 250 L0 250 Z" />
+      <path className="bells__mound" d="M70 214 Q130 180 200 214 Z" />
+      {/* Headstone with the name */}
+      <path className="bells__stone" d="M150 214 L150 112 Q175 86 200 112 L200 214 Z" />
+      <text className="bells__stone-name" x="175" y="140" textAnchor="middle">
+        {surname(post).toUpperCase()}
+      </text>
+      <text className="bells__stone-rip" x="175" y="160" textAnchor="middle">
+        R.I.P.
+      </text>
+      {/* Post and cross-arm */}
+      <rect className="bells__wood" x="40" y="46" width="10" height="170" />
+      <rect className="bells__wood" x="40" y="46" width="78" height="9" />
+
+      {/* The rope: from the bell down into the grave. Cut, it ends in a clean slant with a gap. */}
+      <g className={part('rope')} onClick={() => onPick('rope')}>
+        <rect className="bells__hit" x="92" y="104" width="34" height="112" />
+        {cut ? (
+          <>
+            <path className="bells__rope" d="M109 108 L109 150 L113 156" />
+            <path className="bells__rope" d="M109 176 L113 170 M109 176 L109 205" />
+            <path className="bells__cut-mark" d="M103 152 L119 160 M103 174 L119 166" />
+          </>
+        ) : (
+          <path className="bells__rope" d="M109 108 Q112 160 109 205" />
+        )}
+      </g>
+
+      {/* The bell hanging from the cross-arm. Rusted, it is dark and pitted with no clapper swing. */}
+      <g className={part('bell')} onClick={() => onPick('bell')}>
+        <rect className="bells__hit" x="88" y="52" width="42" height="58" />
+        <line className="bells__wood-line" x1="109" y1="55" x2="109" y2="64" />
+        <path
+          className={`bells__bell${rusted ? ' bells__bell--rust' : ''}`}
+          d="M96 100 Q96 70 109 64 Q122 70 122 100 L126 104 L92 104 Z"
+        />
+        {rusted && (
+          <g className="bells__rust-pits">
+            <circle cx="102" cy="88" r="2" />
+            <circle cx="114" cy="80" r="1.6" />
+            <circle cx="117" cy="95" r="2.2" />
+            <circle cx="105" cy="98" r="1.4" />
+          </g>
+        )}
+        <circle className="bells__clapper" cx="109" cy="107" r="3.5" />
+      </g>
+
+      {/* The tag tied to the post */}
+      <g className={part('tag')} onClick={() => onPick('tag')}>
+        <rect className="bells__hit" x="8" y="98" width="46" height="56" />
+        {bareTag ? (
+          <path className="bells__string" d="M45 104 Q36 116 34 132" />
+        ) : (
+          <>
+            <path className="bells__string" d="M45 104 L30 116" />
+            <path className="bells__tag" d="M14 116 L40 112 L44 142 L18 146 Z" />
+            <path className="bells__tag-lines" d="M20 124 L38 121 M21 131 L39 128 M22 138 L34 136" />
+          </>
+        )}
+      </g>
+    </svg>
+  )
+}
 
 export function BellsMinigame() {
   const examined = useCaseStore((s) => s.cases[CASE_ID].bellsExamined)
@@ -42,7 +132,6 @@ export function BellsMinigame() {
   const [facetIndex, setFacetIndex] = useState(0)
   const [read, setRead] = useState<FacetsRead>(NO_FACETS_READ)
   const [result, setResult] = useState<{ kind: ResultKind; text: string } | null>(null)
-  const [captions, setCaptions] = useState<string[]>([])
   const view = useRef<HTMLDivElement>(null)
 
   const post = CASE_1_BELLS[postIndex]
@@ -60,31 +149,30 @@ export function BellsMinigame() {
   const goPost = (index: number) => {
     setPostIndex(index)
     setFacetIndex(0)
+    setResult(null)
     view.current?.focus()
   }
 
-  const inspect = () => {
-    if (readOf(post.id).includes(facet)) return say('info', facetText(post, facet))
-    const next = readFacet(read, post.id, facet)
+  /** Look closely at one part of the current post. What it shows goes into the notebook. */
+  const inspectFacet = (f: BellFacet) => {
+    if (readOf(post.id).includes(f)) return
+    const next = readFacet(read, post.id, f)
     setRead(next)
-    const caption = FACET_CAPTION[facet]
-    if (caption) {
-      playPageTurn()
-      setCaptions((c) => [...c, caption])
-    }
-    if (isPostExamined(next[post.id])) {
-      useCaseStore.getState().examineBell(post.id)
-      const done = useCaseStore.getState().cases[CASE_ID].bellsExamined
-      say('info', cutQuestionOpen(done) ? 'All three posts examined. Which bell was cut?' : `${facetText(post, facet)} This post is examined.`)
-    } else {
-      say('info', facetText(post, facet))
-    }
+    if (f === 'tag') playPageTurn()
+    // The verdict line under the drawing counts the posts done, so no extra message here.
+    if (isPostExamined(next[post.id])) useCaseStore.getState().examineBell(post.id)
+  }
+
+  const pick = (f: BellFacet) => {
+    setFacetIndex(BELL_FACETS.indexOf(f))
+    inspectFacet(f)
+    view.current?.focus()
   }
 
   const markCut = () => {
     if (solved) return
     const done = useCaseStore.getState().cases[CASE_ID].bellsExamined
-    if (!cutQuestionOpen(done)) return say('info', 'Examine all three bells first.')
+    if (!cutQuestionOpen(done)) return say('info', 'Examine all three posts first.')
     const verdict = bellPosts({ examined: done, cutAnswer: post.id })
     if (verdict.ok) {
       useCaseStore.getState().submitMinigame('1b', true)
@@ -106,7 +194,7 @@ export function BellsMinigame() {
       goPost(cyclePost(postIndex, e.shiftKey))
     } else if (e.code === 'Enter' && !(e.target instanceof HTMLButtonElement)) {
       e.preventDefault()
-      inspect()
+      inspectFacet(facet)
     } else if (e.code === 'KeyC') {
       e.preventDefault()
       markCut()
@@ -117,27 +205,31 @@ export function BellsMinigame() {
   const readHere = readOf(post.id)
 
   return (
-    <MinigameShell id="1b" title="The Bell Posts" captions={captions} result={result}>
+    <MinigameShell id="1b" title="The Bell Posts" result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="bells__intro">
-          Turn the view round each post, then inspect the bell, the rope and the tag. Arrow keys turn, Enter
-          inspects, Tab changes post{questionOpen ? ', C marks the cut bell' : ''}.
+          A safety bell let someone buried by mistake ring for help from below. One of these three was
+          silenced on purpose. Look at the bell, the rope and the tag on each post.
         </p>
 
         <div className="bells__posts" role="group" aria-label="Bell posts">
-          {CASE_1_BELLS.map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              className="bells__post-tab"
-              aria-pressed={i === postIndex}
-              tabIndex={-1}
-              onClick={() => goPost(i)}
-            >
-              {i === postIndex ? '◉' : '○'} {stoneName(p)}
-              {examined.includes(p.id) ? ' ✦ examined' : ''}
-            </button>
-          ))}
+          {CASE_1_BELLS.map((p, i) => {
+            const n = readOf(p.id).length
+            const done = examined.includes(p.id)
+            return (
+              <button
+                key={p.id}
+                type="button"
+                className="bells__post-tab"
+                aria-pressed={i === postIndex}
+                tabIndex={-1}
+                onClick={() => goPost(i)}
+              >
+                <span className="bells__post-name">{stoneName(p)}</span>
+                <span className="bells__post-count">{done ? '✓ examined' : `${n} of ${BELL_FACETS.length} looked at`}</span>
+              </button>
+            )
+          })}
         </div>
 
         <div
@@ -147,47 +239,61 @@ export function BellsMinigame() {
           role="group"
           aria-label={`Post at ${stoneName(post)}: ${FACET_LABEL[facet]}`}
         >
-          <div className="bells__stage" aria-hidden="true">
-            {/* The post turns a third of a turn per side; with reduced motion it just jumps. */}
-            <div className="bells__post" style={{ transform: `rotateY(${facetYaw(facetIndex)}rad)` }}>
-              <span className="bells__post-glyph">{FACET_GLYPH[facet]}</span>
-            </div>
+          <div className="bells__figure">
+            <PostDrawing post={post} current={facet} read={readHere} onPick={pick} />
+            <p className="bells__figure-label">{stoneName(post)}&rsquo;s grave</p>
           </div>
-          <p className="bells__facet">
-            <strong>
-              {FACET_GLYPH[facet]} {FACET_LABEL[facet]}
-            </strong>{' '}
-            ({facetIndex + 1} of {BELL_FACETS.length})
-          </p>
-          <p className="bells__text" aria-live="polite">
-            {readHere.includes(facet) ? facetText(post, facet) : 'Press Enter to look closely.'}
-          </p>
+
+          <div className="bells__notebook">
+            <p className="bells__notebook-head">Notes</p>
+            <ul className="bells__notes" aria-live="polite">
+              {BELL_FACETS.map((f, i) => {
+                const seen = readHere.includes(f)
+                return (
+                  <li key={f}>
+                    <button
+                      type="button"
+                      className={`bells__facet-btn${seen ? ' is-read' : ''}`}
+                      aria-pressed={i === facetIndex}
+                      tabIndex={-1}
+                      onClick={() => pick(f)}
+                    >
+                      <span className="bells__facet-label">
+                        <span aria-hidden="true">{seen ? '✓' : '·'}</span> {FACET_NOUN[f]}
+                        <span className="minigame-shell__sr"> ({FACET_LABEL[f]})</span>
+                      </span>
+                      <span className="bells__facet-note">{seen ? facetText(post, f) : `${FACET_LABEL[f]}: click, or Enter.`}</span>
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+            <button type="button" className="bells__act bells__act--quiet" tabIndex={-1} onClick={() => inspectFacet(facet)}>
+              Inspect {FACET_NOUN[facet].toLowerCase()} (Enter)
+            </button>
+          </div>
         </div>
 
-        <div className="bells__actions">
-          <div role="group" aria-label="Side of the post">
-            {BELL_FACETS.map((f, i) => (
-              <button
-                key={f}
-                type="button"
-                className="bells__facet-btn"
-                aria-pressed={i === facetIndex}
-                tabIndex={-1}
-                onClick={() => setFacetIndex(i)}
-              >
-                {readHere.includes(f) ? '✦' : '○'} {FACET_LABEL[f]}
-              </button>
-            ))}
-          </div>
-          <button type="button" className="bells__act" tabIndex={-1} onClick={inspect}>
-            Inspect (Enter)
-          </button>
-          <button type="button" className="bells__act" tabIndex={-1} disabled={solved || !questionOpen} onClick={markCut}>
-            Which bell was cut? This one (C)
+        <div className="bells__verdict">
+          <p className={`bells__verdict-text${solved ? ' bells__solved' : ''}`}>
+            {solved
+              ? `✓ ${PINNED_NOTE}`
+              : questionOpen
+                ? `Which bell was cut? Pick its post above, then name it.`
+                : `Examine all three posts to name the cut bell (${examined.length} of ${POST_IDS.length} done).`}
+          </p>
+          <button
+            type="button"
+            className="bells__act bells__act--main"
+            tabIndex={-1}
+            disabled={solved || !questionOpen}
+            onClick={markCut}
+          >
+            This one was cut: {surname(post)} (C)
           </button>
         </div>
 
-        {solved && <p className="bells__solved">✦ {PINNED_NOTE}</p>}
+        <p className="bells__keys">Arrows pick a part · Enter inspects · Tab changes post · C names the cut bell</p>
       </div>
     </MinigameShell>
   )

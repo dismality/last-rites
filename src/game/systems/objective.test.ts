@@ -454,6 +454,8 @@ describe('selectObjective in story stages (spec 10)', () => {
     expect(st(2, [done, done, open]).main).toBe('Compare the boot prints (0/1)')
     expect(st(2, [done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
     expect(st(1, [done, { count: 2, done: false }]).main).toBe('Examine the three bells (2/3)')
+    // All three examined but the cut bell not yet named: say what is left, not a stuck 3/3.
+    expect(st(1, [done, { count: 3, done: false }]).main).toBe('Name the cut bell at a bell post')
     expect(st(3, [done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
     // The weapon rule keeps the step on its second line; night keeps the curse line.
     const armed = selectObjective({

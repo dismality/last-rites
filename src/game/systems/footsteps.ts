@@ -9,8 +9,8 @@ import { zoneAt } from './zoneAt'
 export type StepSurface = 'grass' | 'stone' | 'wood'
 
 /** Ground covered per footstep (m) when walking; sprint strides are longer. */
-export const STEP_LENGTH_M = 0.8
-export const SPRINT_STEP_LENGTH_M = 1.1
+export const STEP_LENGTH_M = 1.4
+export const SPRINT_STEP_LENGTH_M = 1.9
 /** Movement smaller than this in a frame is a nudge (a push or a wall slide), not walking. */
 const MIN_FRAME_MOVE_M = 0.0005
 

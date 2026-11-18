@@ -109,9 +109,7 @@ export const readObjectiveInput = (): ObjectiveInput => {
       craneAlive: craneFighting(useBossStore.getState().boss),
     },
     // Rule 12 (spec 09, F1): only the starting shovel counts as "no weapon yet".
-    needsWeapon: !inv.slots.some(
-      (s) => ITEM_MAP[s.item]?.kind === 'weapon' && s.item !== 'rusty-shovel',
-    ),
+    needsWeapon: !hasRealWeapon(),
     progress: {
       page1Read: mystery.pages.has(1),
       cryptKey: inv.keyItems.includes('rusted-crypt-key'),
@@ -247,6 +245,12 @@ const nextHintNear = (was: boolean, x: number, z: number): boolean => {
   return hintNear(was, { x, z }, { x: target[0], z: target[2] })
 }
 
+/** Rule 12 (spec 09, F1): only the starting shovel counts as "no weapon yet". */
+const hasRealWeapon = (): boolean =>
+  useInventoryStore
+    .getState()
+    .inventory.slots.some((s) => ITEM_MAP[s.item]?.kind === 'weapon' && s.item !== 'rusty-shovel')
+
 const completeAction = (action: TutorialAction): void => {
   const store = useGuidanceStore.getState()
   const next = markActionDone(store.tutorialDone, action)
@@ -284,6 +288,9 @@ export const tickGuidance = (dt: number): void => {
   useGuidanceStore.setState(patch)
 
   if (isWalkComplete(walk)) completeAction('walk')
+  // Step 5 asks for a weapon. Finding one (the axe in the shed) does the job as well as crafting
+  // one, so the workbench hint must not hang on under later objectives.
+  if (hasRealWeapon()) completeAction('craft')
   tickHunch(step)
   refreshGuidance()
 }

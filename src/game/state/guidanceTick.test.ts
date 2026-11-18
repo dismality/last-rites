@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { emit } from '../events'
 import { useGuidanceStore } from './guidanceStore'
+import { useInventoryStore } from './inventoryStore'
 import { installGuidanceWatchers, tickGuidance } from './guidanceTick'
 import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
@@ -57,6 +58,16 @@ describe('guidanceTick', () => {
   it('opening the Case tab completes step 8 (Req 10.5)', () => {
     emit({ type: 'caseTabOpened' })
     expect([...useGuidanceStore.getState().tutorialDone]).toEqual([8])
+  })
+
+  it('finding a real weapon completes the craft step; the starting shovel does not', () => {
+    at(0, 0)
+    tickGuidance(1 / 60) // only the starting shovel
+    expect(useGuidanceStore.getState().tutorialDone.has(5)).toBe(false)
+    const inv = useInventoryStore.getState().inventory
+    useInventoryStore.getState().setInventory({ ...inv, slots: [...inv.slots, { item: 'wood-axe', qty: 1 }] })
+    tickGuidance(1 / 60)
+    expect(useGuidanceStore.getState().tutorialDone.has(5)).toBe(true)
   })
 
   it('walking 3 m completes step 1', () => {

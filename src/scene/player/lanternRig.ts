@@ -4,10 +4,13 @@
 import { initialLanternHand } from '../../game/systems/lanternHand'
 import type { GripClass } from '../../data/viewmodel'
 
-/** Where the lantern hangs, in camera space (metres). 6.4 moves the glass anchor onto the hand model. */
+/**
+ * Where the lantern hangs, in camera space (metres). It is in the left hand, the weapon in the
+ * right, so the glass anchor sits on the left of the view and the belt hook on the left hip.
+ */
 export const LANTERN_ANCHORS = {
-  glass: [0.22, -0.2, -0.4],
-  belt: [0.26, -0.5, -0.12],
+  glass: [-0.24, -0.2, -0.42],
+  belt: [-0.26, -0.5, -0.12],
 } as const
 
 /** Live hand state; the viewmodel (task 6.4) writes it, the light reads it. */
@@ -15,7 +18,7 @@ export const lanternHandRuntime = { hand: initialLanternHand() }
 
 
 /** Where the lantern hangs from its strap during a throw or heavy swing, in camera space (metres). */
-export const LANTERN_STRAP_POSITION = [0.2, -0.38, -0.26] as const
+export const LANTERN_STRAP_POSITION = [-0.2, -0.38, -0.26] as const
 
 /**
  * What the light rig did on its last frame, for the Debug_Hook (`lanternLightState`). Written by

@@ -1,5 +1,5 @@
 // First-person hands and lantern models (spec 11 H7, tasks 6.4 and 6.5). Each file is probed first;
-// a missing one is listed in the Waiting_List and today's weapon-only viewmodel stands in (Req 7.7).
+// a missing one is listed in the Waiting_List and primitive stand-ins are drawn (placeholderHands.tsx).
 // The boundary catches a file that is present but broken.
 import { Component, Suspense, useEffect, useMemo, useRef, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
@@ -11,6 +11,7 @@ import { GRIP_CLIPS, HANDS_CLIPS, VIEWMODEL_TIMING } from '../../data/viewmodel'
 import { registerMissingArt } from '../../game/state/waitingList'
 import { useAssetOrPlaceholder } from '../assets/useAssetOrPlaceholder'
 import { handsRuntime, lanternHandRuntime } from './lanternRig'
+import { PlaceholderLantern, PlaceholderRightHand } from './placeholderHands'
 
 /** Renders nothing if its child throws (a missing or broken model file). Boundaries must be classes. */
 class AssetBoundary extends Component<{ path: string; children: ReactNode }, { failed: boolean }> {
@@ -81,7 +82,8 @@ function LanternModel() {
 
 export function ViewmodelHands() {
   const status = useAssetOrPlaceholder(HANDS_MODEL_URL)
-  // PLACEHOLDER: /assets/models/viewmodel/hands.glb (nothing is drawn: the weapon-only viewmodel is the stand-in)
+  // PLACEHOLDER: /assets/models/viewmodel/hands.glb (primitive stand-in hands in placeholderHands.tsx)
+  if (status === 'missing') return <PlaceholderRightHand />
   if (status !== 'present') return null
   return (
     <AssetBoundary path={HANDS_MODEL_URL}>
@@ -94,7 +96,8 @@ export function ViewmodelHands() {
 
 export function ViewmodelLantern() {
   const status = useAssetOrPlaceholder(LANTERN_MODEL_URL)
-  // PLACEHOLDER: /assets/models/viewmodel/lantern.glb (nothing is drawn; the light keeps its fixed camera offset from LANTERN_ANCHORS)
+  // PLACEHOLDER: /assets/models/viewmodel/lantern.glb (a primitive stand-in lantern in the left hand, placeholderHands.tsx)
+  if (status === 'missing') return <PlaceholderLantern />
   if (status !== 'present') return null
   return (
     <AssetBoundary path={LANTERN_MODEL_URL}>

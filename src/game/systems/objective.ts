@@ -268,7 +268,7 @@ const stageDayObjective = (i: ObjectiveInput): Objective | null => {
     place.kind === 'point' ? place.at : place.kind === 'nearest' ? nearest(place.at, i.playerPos) : nearest(i.relicSites, i.playerPos)
   const o: Objective = {
     rule: (6 + at) as ObjectiveRuleId,
-    main: cut(`${rule.main} (${count}/${rule.target})`),
+    main: cut(count >= rule.target && rule.whenCounted ? rule.whenCounted : `${rule.main} (${count}/${rule.target})`),
     second: cut(ruleDef(6).second?.replace('{clock}', formatClock(i.secondsLeft)) ?? ''),
     marker: rule.marker,
   }

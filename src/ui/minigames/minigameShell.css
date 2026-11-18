@@ -121,12 +121,10 @@
 .ledger__solved { margin: 0.6rem 0 0; font-weight: 600; }
 @media (max-width: 900px) { .ledger__spread { gap: 2.5rem; } }
 
-/* Minigame 1b: the bell posts. Sides and states carry glyphs and words, never colour alone. */
-.bells__intro { margin: 0 0 0.5rem; font-size: 1.05rem; }
-.bells__posts, .bells__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.bells__actions { margin-top: 0.75rem; align-items: center; }
+/* Minigame 1b: the bell posts. Parts and states carry marks and words, never colour alone. */
+.bells__intro { margin: 0 0 0.75rem; font-size: 1.05rem; line-height: 1.6; }
+.bells__posts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
 .bells__post-tab, .bells__facet-btn, .bells__act {
-  padding: 0.35rem 0.8rem;
   font: inherit;
   font-family: var(--font-body);
   font-size: 1rem;
@@ -136,26 +134,87 @@
   border-radius: 3px;
   cursor: pointer;
 }
-.bells__post-tab[aria-pressed='true'], .bells__facet-btn[aria-pressed='true'] { background: rgba(20, 17, 15, 0.14); font-weight: 700; }
-.bells__act:disabled { opacity: 0.5; cursor: default; }
-.bells__act:last-child { margin-left: auto; }
-.bells__view { margin-top: 0.75rem; padding: 0.5rem 1rem; border: 2px double var(--parchment-dark); border-radius: 3px; }
-.bells__stage { display: flex; justify-content: center; perspective: 400px; height: 5rem; }
-.bells__post {
-  display: grid;
-  place-items: center;
-  width: 4rem;
-  height: 4rem;
-  font-size: 2.2rem;
-  border: 2px solid var(--ink);
-  border-radius: 50% 50% 4px 4px;
-  transition: transform 200ms ease-out;
+.bells__post-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.4rem 0.8rem;
+  line-height: 1.3;
+  border-width: 1px;
+  border-color: var(--parchment-dark);
 }
-.bells__post-glyph { display: inline-block; }
-@media (prefers-reduced-motion: reduce) { .bells__post { transition: none; } }
-.bells__facet { margin: 0.25rem 0 0; }
-.bells__text { margin: 0; min-height: 3.6em; }
-.bells__solved { margin: 0.6rem 0 0; font-weight: 600; }
+.bells__post-tab:hover { border-color: var(--ink); }
+.bells__post-tab[aria-pressed='true'] { border: 2px solid var(--ink); background: rgba(20, 17, 15, 0.1); }
+.bells__post-name { font-size: 1.1rem; font-weight: 700; }
+.bells__post-count { font-size: 0.9rem; opacity: 0.8; }
+
+.bells__view {
+  display: grid;
+  grid-template-columns: minmax(13rem, 18rem) 1fr;
+  gap: 1.25rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: 2px double var(--parchment-dark);
+  border-radius: 3px;
+  background: rgba(255, 248, 230, 0.25);
+}
+@media (max-width: 720px) { .bells__view { grid-template-columns: 1fr; } }
+.bells__figure { margin: 0; text-align: center; }
+.bells__figure-label { margin: 0.1rem 0 0; font-family: var(--font-body); font-size: 0.95rem; font-style: italic; }
+
+/* The drawing: ink lines on parchment. */
+.bells__drawing { display: block; width: 100%; max-width: 18rem; margin: 0 auto; }
+.bells__ground { fill: #9c8a64; }
+.bells__mound { fill: #7d6a48; }
+.bells__stone { fill: #b9b2a2; stroke: var(--ink); stroke-width: 2; }
+.bells__stone-name { font-family: var(--font-body); font-size: 13px; font-weight: 700; fill: var(--ink); letter-spacing: 1px; }
+.bells__stone-rip { font-family: var(--font-body); font-size: 11px; fill: var(--ink); opacity: 0.7; }
+.bells__wood { fill: #6b4a2e; stroke: var(--ink); stroke-width: 1.5; }
+.bells__wood-line { stroke: var(--ink); stroke-width: 2; }
+.bells__bell { fill: #c89b45; stroke: var(--ink); stroke-width: 2; }
+.bells__bell--rust { fill: #7b3e1e; }
+.bells__rust-pits circle { fill: #3e1d0c; }
+.bells__clapper { fill: var(--ink); }
+.bells__rope { fill: none; stroke: #8a6a3a; stroke-width: 3; stroke-linecap: round; }
+.bells__cut-mark { stroke: var(--blood); stroke-width: 2; }
+.bells__string { stroke: var(--ink); stroke-width: 1.2; fill: none; }
+.bells__tag { fill: #efe4c4; stroke: var(--ink); stroke-width: 1.5; }
+.bells__tag-lines { stroke: var(--ink); stroke-width: 1; opacity: 0.6; }
+.bells__hit { fill: transparent; stroke: none; }
+.bells__part { cursor: pointer; }
+.bells__part .bells__hit { rx: 6px; }
+.bells__part:hover .bells__hit { fill: rgba(232, 145, 58, 0.12); }
+/* The part being looked at: a dashed ember ring round it (the notebook row says which, in words). */
+.bells__part.is-current .bells__hit { stroke: var(--ember); stroke-width: 2.5; stroke-dasharray: 5 3; fill: rgba(232, 145, 58, 0.15); }
+
+.bells__notebook { display: flex; flex-direction: column; gap: 0.4rem; min-width: 0; }
+.bells__notebook-head { margin: 0; font-family: var(--font-heading); font-size: 1.15rem; }
+.bells__notes { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+.bells__facet-btn {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  line-height: 1.45;
+  border-width: 1px;
+  border-color: var(--parchment-dark);
+  border-left-width: 4px;
+}
+.bells__facet-btn:hover { border-color: var(--ink); }
+.bells__facet-btn[aria-pressed='true'] { border-color: var(--ember-dim); border-left-color: var(--ember); background: rgba(232, 145, 58, 0.1); }
+.bells__facet-label { display: block; font-weight: 700; }
+.bells__facet-note { display: block; font-family: var(--font-journal, var(--font-body)); font-size: 1rem; }
+.bells__facet-btn:not(.is-read) .bells__facet-note { font-family: var(--font-body); font-style: italic; opacity: 0.7; }
+.bells__act { padding: 0.35rem 0.9rem; }
+.bells__act--quiet { align-self: flex-start; border-width: 1px; font-size: 0.95rem; }
+.bells__act:disabled { opacity: 0.45; cursor: default; }
+
+.bells__verdict { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 0.75rem; }
+.bells__verdict-text { flex: 1 1 18rem; margin: 0; font-family: var(--font-body); font-size: 1.05rem; line-height: 1.4; }
+.bells__act--main { padding: 0.5rem 1.1rem; font-weight: 700; border-width: 2px; }
+.bells__act--main:not(:disabled):hover { border-color: var(--ember); }
+.bells__solved { font-weight: 700; }
+.bells__keys { margin: 0.5rem 0 0; font-family: var(--font-body); font-size: 0.9rem; opacity: 0.75; }
 
 /* Minigame 3a: the hymn board. The chosen tile carries a ▸ mark and a thick border, not colour alone. */
 .hymn__intro { margin: 0 0 0.5rem; font-size: 1.05rem; }
