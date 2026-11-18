@@ -129,5 +129,18 @@ export const SCREEN_SCARE_REDUCED_STING_GAIN = 0.5
 export const SCREEN_SCARE_OFF_SUBTITLE_S = 3
 
 /** The text on the flat rectangle that stands in for a missing face image (spec 11 Req 1.20). */
+/**
+ * The stand-in face while the painted images are missing: the developer's hand-drawn grinning face
+ * at full contrast, in six differently lit frames (tools/scares/makeFlicker.py). Cycling them in an
+ * uneven order makes the face flicker as if alive. Flashing lights off holds the steady frame 0.
+ */
+export const SCARE_FLICKER = {
+  frameUrls: [0, 1, 2, 3, 4, 5].map((i) => `/assets/scares/flicker/frame-${i}.webp`),
+  /** How long each step of the sequence shows (ms). */
+  frameMs: 45,
+  /** Frame index per step; uneven on purpose, with dark gutters (2) and flares (1, 5). */
+  sequence: [5, 0, 1, 0, 2, 3, 0, 1, 1, 2, 0, 4, 0, 3, 5, 2, 0, 1, 2, 2, 0, 3, 1, 0],
+} as const
+
 export const placeholderFaceLabel = (id: ScareFaceId): string => `PLACEHOLDER ${id}`
 

@@ -8,6 +8,8 @@ import { CapsuleCollider, RigidBody, useRapier, type RapierRigidBody } from '@re
 import type { KinematicCharacterController } from '@dimforge/rapier3d-compat'
 import { useGameStore, useMapStore, usePlayerStore, useSettingsStore } from '../../game/state'
 import { useCombatStore } from '../../game/state/combatStore'
+import { useCreatureStore } from '../../game/state/creatureStore'
+import { crawlerHoldMult } from '../../game/systems/crawler'
 import { useEffectStore } from '../../game/state/effectStore'
 import { getDevCheats } from '../../game/state/devCheats'
 import { takePlayerPush } from '../../game/state/playerPush'
@@ -156,7 +158,9 @@ export function FirstPersonController({ spawn = [0, 0.05, 0] }: Props) {
       slowFactor(scareRuntime.slowLeft) *
       effectMods(useEffectStore.getState().effects).moveSpeed *
       aimMoveMult(weaponRuntime.aiming) *
-      blockMoveMultiplier(live.blocking)
+      blockMoveMultiplier(live.blocking) *
+      // A crawler on the leg: pinned at first, then dragged along slowly until it dies.
+      crawlerHoldMult(useCreatureStore.getState().crawlers.map((e) => e.c))
     scareRuntime.slowLeft = Math.max(0, scareRuntime.slowLeft - dt)
     scareRuntime.shakeAge += dt
     const walk = moveVelocity(look.yaw, snap.forward, snap.strafe, speed)

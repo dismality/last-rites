@@ -13,6 +13,7 @@ import {
   deferredDelayMs,
   holdDuration,
   initialScreenScareState,
+  flickerFrame,
   jitterScale,
   phaseAt,
   phaseProgress,
@@ -304,5 +305,19 @@ describe('worldBrightnessAt', () => {
   })
   it('never dims without the dim effect', () => {
     expect(worldBrightnessAt(tl, tl.inMs + 100, false)).toBe(1)
+  })
+})
+
+describe('flickerFrame', () => {
+  const seq = [5, 0, 1, 2]
+  it('steps through the sequence every frameMs and wraps; holds the calm frame 0 when not flickering', () => {
+    fc.assert(
+      fc.property(fc.double({ min: 0, max: 5000, noNaN: true }), (t) => {
+        expect(flickerFrame(t, seq, 45, true)).toBe(seq[Math.floor(t / 45) % seq.length])
+        expect(flickerFrame(t, seq, 45, false)).toBe(0)
+      }),
+      { numRuns: 100 },
+    )
+    expect(flickerFrame(Number.NaN, seq, 45, true)).toBe(0)
   })
 })

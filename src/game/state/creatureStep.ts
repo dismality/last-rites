@@ -12,10 +12,11 @@ import {
   HOUND,
   HOUND_PACKS_MAX,
   LANTERN_CONE_HALF_DEG,
+  CRAWLER_LATCH_LINE,
 } from '../../data/creatures'
 import { HUT } from '../../data/cemeteryLayout'
 import { ZONE_BOUNDS } from '../../data/zones'
-import { subscribeToType } from '../events'
+import { emit, subscribeToType } from '../events'
 import { createRng, type Rng } from '../rng'
 import { markSeen } from '../systems/bestiary'
 import {
@@ -227,8 +228,14 @@ export function stepCreatures(dt: number, rng: Rng = Math.random): void {
         if (ev.type === 'burst' && faceTriggerApplies(r.crawler, { ...p, fx: facing.x, fz: facing.z })) {
           queueScreenScare('crawler')
         }
+      } else if (ev.type === 'bite') {
+        // Already latched: the bite lands at once.
+        emitCombatSound('crawler-grab', soundAt(r.crawler, CREATURE_SOUND_Y.crawler))
+        applyGuarded(ev.damage, hpNow())
       } else {
         emitCombatSound('crawler-grab', soundAt(r.crawler, CREATURE_SOUND_Y.crawler))
+        // It has the leg now: say once how to get free.
+        emit({ type: 'subtitleShown', text: CRAWLER_LATCH_LINE, duration: CRAWLER.latchPinS + CRAWLER.latchBiteS, force: true })
         // The grab lands once the face starts to leave (or at once if no face is coming).
         const floor = hpAtEvent
         deferOrApply('crawler', () => applyGuarded(ev.damage, floor))
@@ -238,7 +245,8 @@ export function stepCreatures(dt: number, rng: Rng = Math.random): void {
     const emergedS = emerged ? e.emergedS + dt : 0
     // Only an emerged crawler can be seen: a hidden one under a mound must not reach the Bestiary.
     if (emerged) seen = markSeen(seen, 'crawler', p, r.crawler, false)
-    if (emergedS > CREATURE_LIFETIME_S.crawlerEmerged) continue
+    // A crawler holding the leg never sinks back: the player has to kill it.
+    if (emergedS > CREATURE_LIFETIME_S.crawlerEmerged && r.crawler.latchedS === null) continue
     crawlers.push({ ...e, c: r.crawler, emergedS, hpAtEvent })
   }
 

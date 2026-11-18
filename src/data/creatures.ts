@@ -30,7 +30,17 @@ export const CRAWLER = {
    * aiming at a crawler on the ground hits it. A heavy swing is always downward.
    */
   downSwingPitchRad: -0.35,
+  /** A landed grab latches onto the leg: the player cannot move at all for this long (s). */
+  latchPinS: 2.5,
+  /** After the pin the player drags it along at this share of their speed, until it dies. */
+  latchDragMult: 0.35,
+  /** While latched it bites for `latchBiteDamage` every `latchBiteS` seconds. */
+  latchBiteS: 3,
+  latchBiteDamage: 4,
 } as const
+
+/** Shown once when a crawler latches on, so the player knows how to get free. */
+export const CRAWLER_LATCH_LINE = '[it has your leg: look down and strike it]'
 
 export const BRIDE = {
   /** Seen only inside the lantern cone, or this close (m). */

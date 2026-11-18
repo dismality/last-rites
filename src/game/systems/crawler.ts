@@ -1,6 +1,8 @@
 // Pale Crawler rules (spec 11 H2). Pure TypeScript: no React, three.js or Howler imports.
 // A crawler lies hidden under a grave mound or broken coffin until the player is within 2 m,
 // bursts out, warns (a soil shiver, 0.5 to 1.5 s), then grabs for 8. One grab per 1.5 s.
+// A grab that lands latches onto the leg: the player is pinned, then slowed, and bitten every few
+// seconds until the crawler dies. A latched crawler stays at the player's feet.
 
 import { CRAWLER } from '../../data/creatures'
 import { createRng, type Rng } from '../rng'
@@ -38,6 +40,8 @@ export interface CrawlerState {
   grabCooldown: number
   /** Seconds left of the warning before the grab lands; null while no warning runs. */
   tellLeft: number | null
+  /** Seconds it has held the player's leg; null while it is not latched. */
+  latchedS: number | null
 }
 
 export interface CrawlerPlayer extends Vec2 {
@@ -50,9 +54,11 @@ export type CrawlerEvent =
   | { type: 'burst' }
   | { type: 'tell'; lead: number }
   | { type: 'grab'; damage: number }
+  /** A bite while latched (no warning: it already has the leg). */
+  | { type: 'bite'; damage: number }
 
 export function createCrawler(spot: Vec2): CrawlerState {
-  return { phase: 'hidden', x: spot.x, z: spot.z, grabCooldown: 0, tellLeft: null }
+  return { phase: 'hidden', x: spot.x, z: spot.z, grabCooldown: 0, tellLeft: null, latchedS: null }
 }
 
 const dist = (a: Vec2, b: Vec2): number => Math.hypot(a.x - b.x, a.z - b.z)
@@ -76,6 +82,18 @@ export function stepCrawler(
     return { crawler: { ...next, phase: 'emerged', tellLeft: lead }, events }
   }
 
+  // Latched: hold on at the player's feet and bite on a timer, whatever the player does.
+  if (c.latchedS !== null) {
+    const hold = CRAWLER.grabReachM * 0.5
+    const k = d > 1e-6 ? hold / d : 0
+    next = { ...next, x: player.x + (c.x - player.x) * k, z: player.z + (c.z - player.z) * k, latchedS: c.latchedS + step }
+    if (next.grabCooldown <= 0) {
+      events.push({ type: 'bite', damage: CRAWLER.latchBiteDamage })
+      next = { ...next, grabCooldown: CRAWLER.latchBiteS }
+    }
+    return { crawler: next, events }
+  }
+
   // Emerged: drag towards the player, stopping short of standing on them.
   if (d > CRAWLER.grabReachM * 0.5) {
     const k = Math.min(CRAWLER.crawlSpeedMps * step, d - CRAWLER.grabReachM * 0.5) / d
@@ -96,12 +114,26 @@ export function stepCrawler(
   if (left > 0) return { crawler: { ...next, tellLeft: left }, events }
   if (dist(next, player) <= CRAWLER.grabReachM) {
     events.push({ type: 'grab', damage: CRAWLER.grabDamage })
-    next = { ...next, tellLeft: null, grabCooldown: CRAWLER.grabCooldownS }
+    // The grab latches on; the first bite waits a full bite interval.
+    next = { ...next, tellLeft: null, grabCooldown: CRAWLER.latchBiteS, latchedS: 0 }
   } else {
     // The player got away: the grab misses and the crawler warns again.
     next = { ...next, tellLeft: null }
   }
   return { crawler: next, events }
+}
+
+/**
+ * How much of the player's speed the crawlers leave them: 0 while one is still pinning them (its
+ * first `latchPinS` seconds), `latchDragMult` while one is latched after that, otherwise 1.
+ */
+export function crawlerHoldMult(crawlers: readonly Pick<CrawlerState, 'latchedS'>[]): number {
+  let mult = 1
+  for (const c of crawlers) {
+    if (c.latchedS === null) continue
+    mult = Math.min(mult, c.latchedS < CRAWLER.latchPinS ? 0 : CRAWLER.latchDragMult)
+  }
+  return mult
 }
 
 /** A heavy chop, or any swing made while looking down at the ground, is a downward swing. */

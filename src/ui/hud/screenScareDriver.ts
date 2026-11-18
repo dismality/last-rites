@@ -1,18 +1,19 @@
 // The per-frame driver of a screen jumpscare (spec 11 H1), split out of ScreenScare.tsx so the
 // timing and the sting depend on the scare alone and never on what stands on screen: a face image
-// and the drawn stand-in face (scareFaces.tsx) that replaces it when the file is missing are driven
+// and the flickering hand-drawn stand-in that replaces it when the file is missing are driven
 // by the very same code (Req 1.20, 8.16). It only writes `style` on the elements it is handed.
 import {
   releaseScreenScareDuck,
   startScreenScareAudio,
   stopScreenScareAudio,
 } from '../../audio/screenScareAudio'
-import { SCARE_SETS } from '../../data/screenScares'
+import { SCARE_FLICKER, SCARE_SETS } from '../../data/screenScares'
 import { isSimFrozen } from '../../game/state/menuState'
 import { endScreenScare } from '../../game/state/screenScareActions'
 import { resetScreenScareRuntime, screenScareRuntime } from '../../game/state/screenScareStore'
 import { simClock } from '../../game/state/simClock'
 import {
+  flickerFrame,
   jitterScale,
   phaseAt,
   phaseProgress,
@@ -30,6 +31,8 @@ const CHROMA_PX = 5
 /** The part of an element the driver touches. */
 export interface StyledElement {
   style: { transform: string; opacity: string; filter: string }
+  /** The flicker face reads `data-frame` to pick which lit frame shows. */
+  dataset?: { frame?: string }
 }
 
 export interface FlashElement {
@@ -156,6 +159,10 @@ export function driveScreenScare(
       face.style.transform = `translate(-50%, ${y * 100}%) scale(${scale})`
       face.style.opacity = String(opacity)
       face.style.filter = filter
+      // Sim time drives the frame too, so a paused scare holds still on one frame.
+      if (face.dataset) {
+        face.dataset.frame = String(flickerFrame(t, SCARE_FLICKER.sequence, SCARE_FLICKER.frameMs, fx.chromatic))
+      }
     }
 
     if (phase === 'done' || t >= timelineLengthMs(timeline)) {

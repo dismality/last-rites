@@ -173,6 +173,16 @@ export function worldBrightnessAt(t: ScareTimeline, tMs: number, dim: boolean): 
 }
 
 /** Image scale from a 0..1 noise sample, bounded to [1.00, 1.04]. */
+/**
+ * Which flicker frame shows `tMs` into a scare: the sequence stepped every `frameMs`, wrapping.
+ * Not flickering (flashing lights off or a reduced scare): always the calm frame 0.
+ */
+export function flickerFrame(tMs: number, sequence: readonly number[], frameMs: number, flicker: boolean): number {
+  if (!flicker || sequence.length === 0 || !(frameMs > 0) || !Number.isFinite(tMs)) return 0
+  const step = Math.floor(Math.max(0, tMs) / frameMs) % sequence.length
+  return sequence[step]
+}
+
 export function jitterScale(noise01: number): number {
   return SCREEN_SCARE_SCALE_MIN + (SCREEN_SCARE_SCALE_MAX - SCREEN_SCARE_SCALE_MIN) * clamp01(noise01)
 }

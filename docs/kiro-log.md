@@ -2197,3 +2197,15 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The `dead` voice falls back to the ElevenLabs premade "Clyde"; `ELEVENLABS_VOICE_DEAD` overrides it. Voices may carry their own `settings`. (2026-11-18)
   - Creature sound files are named after their cue ids, which `voiceCue` plays before the synth tell. (2026-11-18)
   - The fill fades linearly to twice the light radius, the same reach as the lantern's spot. (2026-11-18)
+
+
+### 2026-11-18: Hand-drawn flickering scare face; crawler latches onto the leg
+- **Kiro feature used:** Outside Kiro
+- **What happened:**
+  - The screen jumpscare's stand-in face is now the developer's own drawing (`tools/scares/source-face.png`), made 100% contrast and turned into six lit frames by `tools/scares/makeFlicker.py`. The frames are white, red, dim, chromatic split, green and flash, in `public/assets/scares/flicker/`. The scare driver cycles them on sim time in an uneven order (`SCARE_FLICKER`, `flickerFrame`), so the face flickers and holds still when paused. With Flashing lights off, or at Reduced, the calm white frame 0 shows steadily. The drawn SVG faces from earlier today are removed.
+  - Pale Crawler: a grab that lands now latches onto the leg. The player cannot move for 2.5 s, then drags it along at 35% speed. It bites for 4 every 3 s, stays at the player's feet, and never sinks back while latched. Only killing it frees the player. A subtitle says "[it has your leg: look down and strike it]".
+- **What Kiro caught or sped up:** Nothing; done by hand. Lint, typecheck, all 2854 unit tests and the creatures, screen-scares and killcam e2e pass.
+- **Decisions made unattended:**
+  - Latched bites are a separate `bite` event, so the rule "no grab without a full warning" still holds for grabs. (2026-11-18)
+  - Looking is not locked while pinned, so the player can look down and swing at it. (2026-11-18)
+  - Latch state is not saved; a loaded crawler starts unlatched. (2026-11-18)

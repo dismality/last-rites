@@ -5,6 +5,7 @@ import { createRng } from '../rng'
 import type { AttackKind } from './combat'
 import {
   crawlerHit,
+  crawlerHoldMult,
   swingIsDownward,
   createCrawler,
   faceTriggerApplies,
@@ -128,5 +129,45 @@ describe('swingIsDownward', () => {
       { numRuns: 100 },
     )
     expect(swingIsDownward(false, Number.NaN)).toBe(false)
+  })
+})
+
+describe('crawler latch', () => {
+  const latchOnto = (player: { x: number; z: number }) => {
+    const rng = createRng(4)
+    let c = createCrawler({ x: 0, z: 0 })
+    for (let i = 0; i < 400 && c.latchedS === null; i++) c = stepCrawler(c, player, DT, rng).crawler
+    return { c, rng }
+  }
+
+  it('a landed grab latches on, pins the player, then slows them until it dies', () => {
+    const latched = latchOnto({ x: 1, z: 0 })
+    let c = latched.c
+    const rng = latched.rng
+    expect(c.latchedS).toBe(0)
+    expect(crawlerHoldMult([c])).toBe(0)
+    // It follows the player at their feet, even as they drag themselves away.
+    let bites = 0
+    for (let i = 0; i < Math.ceil((CRAWLER.latchPinS + CRAWLER.latchBiteS) / DT); i++) {
+      const r = stepCrawler(c, { x: 1 + i * 0.01, z: 0 }, DT, rng)
+      c = r.crawler
+      bites += r.events.filter((e) => e.type === 'bite').length
+      expect(r.events.some((e) => e.type === 'grab' || e.type === 'tell')).toBe(false)
+    }
+    expect(Math.hypot(c.x - (1 + 0.01 * (Math.ceil((CRAWLER.latchPinS + CRAWLER.latchBiteS) / DT) - 1)), c.z)).toBeCloseTo(CRAWLER.grabReachM * 0.5, 5)
+    expect(crawlerHoldMult([c])).toBe(CRAWLER.latchDragMult)
+    expect(bites).toBe(1)
+  })
+
+  it('leaves full speed with no crawler latched, and takes the strongest hold', () => {
+    fc.assert(
+      fc.property(fc.array(fc.option(fc.double({ min: 0, max: 30, noNaN: true }), { nil: null }), { maxLength: 6 }), (held) => {
+        const m = crawlerHoldMult(held.map((latchedS) => ({ latchedS })))
+        const latched = held.filter((h): h is number => h !== null)
+        const want = latched.length === 0 ? 1 : latched.some((h) => h < CRAWLER.latchPinS) ? 0 : CRAWLER.latchDragMult
+        expect(m).toBe(want)
+      }),
+      { numRuns: 100 },
+    )
   })
 })

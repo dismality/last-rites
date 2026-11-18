@@ -6,14 +6,13 @@
 // the effects `resolveScareFx` allowed when the scare began (the frame loop is in screenScareDriver.ts). `pointer-events: none`, aria-hidden.
 import { useEffect, useRef, useState, type Ref } from 'react'
 import { scareFaceUrl, type ScareFaceId } from '../../data/assets'
-import { SCARE_SETS, SCREEN_SCARE_HEIGHT_VH, placeholderFaceLabel } from '../../data/screenScares'
+import { SCARE_FLICKER, SCARE_SETS, SCREEN_SCARE_HEIGHT_VH, placeholderFaceLabel } from '../../data/screenScares'
 import { useScreenScareStore } from '../../game/state/screenScareStore'
 import { registerMissingArt } from '../../game/state/waitingList'
 import { type ActiveScare } from '../../game/systems/screenScares'
-import { DrawnScareFace } from './scareFaces'
 import { driveScreenScare } from './screenScareDriver'
 import './ScreenScare.css'
-/** The face: the image, or a drawn stand-in face once the file is missing or fails to decode. */
+/** The face: the image, or the flickering hand-drawn stand-in once the file is missing or fails to decode. */
 function ScareFace({ id, edge, failed, onFailed, faceRef }: {
   id: ScareFaceId
   edge: 'top' | 'bottom'
@@ -32,8 +31,12 @@ function ScareFace({ id, edge, failed, onFailed, faceRef }: {
         style={style}
         data-testid="screen-scare-placeholder"
         data-label={placeholderFaceLabel(id)}
+        data-frame="0"
       >
-        <DrawnScareFace id={id} />
+        {/* Every frame is loaded up front; the driver's data-frame picks the one that shows. */}
+        {SCARE_FLICKER.frameUrls.map((src, i) => (
+          <img key={src} className="screen-scare__frame" data-i={i} src={src} alt="" draggable={false} />
+        ))}
       </div>
     )
   }
