@@ -101,12 +101,14 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 | `sfx/relic-placed.ogg` | sfx | small metal object set on a stone altar, resonant clink | 1 s | yes |
 | `sfx/merchant-arrive.ogg` | sfx | horse drawn cart creaking to a stop, harness jingle | 3 s | yes |
 | `sfx/merchant-leave.ogg` | sfx | horse drawn cart rolling away on gravel, fading | 3 s | yes |
+| `sfx/crow-caw.ogg ×3` | sfx | single crow cawing from a bare tree, harsh and hoarse, outdoors at a distance, autumn | 1.5 s | yes |
+| `sfx/bell-all-souls.ogg` | sfx | single toll of a small village church bell far away across fields at night, muffled by distance and mist, long fading ring | 5 s | yes |
 
 ## Ambience loops
 
 | File | Kind | Prompt or line | Length | Played |
 |---|---|---|---|---|
-| `ambience/wind-night.ogg` | sfx | cold night wind over an open graveyard, low and steady, seamless loop (loop) | 30 s | not yet |
+| `ambience/wind-night.ogg` | sfx | cold autumn wind through bare branches over an open graveyard, low and steady, dry leaves stirring, seamless loop (loop) | 30 s | yes |
 | `ambience/day-birds-crows.ogg` | sfx | grey morning in a country graveyard, distant crows, faint wind, seamless loop (loop) | 30 s | not yet |
 | `ambience/hut-interior.ogg` | sfx | inside a small wooden hut, iron stove crackling, roof creaks, rain outside, seamless loop (loop) | 30 s | not yet |
 | `ambience/catacombs-drip.ogg` | sfx | stone catacombs, slow water drips, low room tone, distant settling stone, seamless loop (loop) | 30 s | not yet |

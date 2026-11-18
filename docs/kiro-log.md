@@ -2017,3 +2017,29 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - The All Hallows' Eve files (`App.tsx`, `skyPalette.ts`, `allHallows*`, autumn scene components, `audio/prompts.test.ts`, `tools/audio/*`, `docs/audio-prompts.md`) were not staged. Reason: they belong to another change, not task 3. (2026-11-18)
   - The `playBuffer` and `playVoice` `direct` parameter in `synth.ts` and `samples.ts` was committed with task 3. Reason: the sting uses it to bypass the ducked SFX bus. (2026-11-18)
+
+### 2026-11-18: Outside Kiro: All Hallows' Eve dressing (design bible §15)
+- **Kiro feature used:** none. Made outside Kiro.
+- **What happened:**
+  - **Turnip lanterns:** 8 carved turnips with candle-lit faces and a warm pool on the ground (hut step, readable headstones, oak-hollow grave, chapel path). Three draw calls, no real lights.
+  - **Autumn leaves:** one instanced mesh of 160 leaves (80 on Low graphics) blowing in a box around the camera, kept out of interiors.
+  - **Palette:** warmer amber dusk, violet-tinged night (`skyPalette.ts`).
+  - **Harvest moon:** a large amber moon and halo behind the chapel, fading by phase and under storms.
+  - **Sound:** a wind bed (noise stand-in until the file exists), crows by day and a distant All Souls bell at night. New prompts `crow-caw` (3 variants) and `bell-all-souls`; `wind-night` reworded and wired; a new `--batch halloween` in the generator; `docs/audio-prompts.md` regenerated.
+  - Pure rules in `systems/allHallows.ts` with 16 tests, including 4 fast-check properties (flame swing, leaves in the box, moon easing, crows and bell by phase).
+- **Decisions made unattended:**
+  - Crows and the bell have no subtitles: they are ambience, and the accessibility steering asks for subtitles on important sounds. (2026-11-18)
+  - The moon disc does not move the shadow-casting moon light, which stays where it was, so day shadows are unchanged. (2026-11-18)
+  - Each lantern's face points +Z (turned slightly per lantern), so a few are seen side-on from some paths. (2026-11-18)
+
+### 2026-11-12: 11-horror-pass task 4.6: Dev hooks for bats
+- **Kiro feature used:** spec task
+- **What happened:** The Dev_Panel gained "Teleport next to a bat" (6 m from the nearest perched bat, through `teleportTo`) and "Fire a shot" (emits the real `firearmFired` event the bat step reads). The debug hook gained `batState()`, `teleportNextToBat()` and `fireShot()`. `devMode.test.ts` covers the day case, the 6 m stand-off, and a shot sending the bat off through `stepBats`.
+- **What Kiro caught or sped up:** Reusing the vending and screen-scare dev-hook pattern kept the change to four files.
+
+### 2026-11-18: Outside Kiro: player walkthrough
+- **Kiro feature used:** none. Made outside Kiro.
+- **What happened:** Added `docs/walkthrough.md`, a numbered guide from the first morning to the ending: a spoiler-free "how to play" part, then each stage's puzzles, clue links and final answers, and a one-table answer sheet. The README links it under the play link.
+- **Decisions made unattended:**
+  - Every answer and position was taken from the game data (`src/data/cases.ts`, `relics.ts`, `zones.ts`, `objectiveRules.ts`), not the design docs, where they differ. For example, the Elias timeline puts the hearse-pin before the nail marks, as the data does. (2026-11-18)
+  - Spec 11 features still in progress (bats and later) are not in it yet; it needs a check after the 26 Nov feature freeze. (2026-11-18)

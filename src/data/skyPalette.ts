@@ -15,9 +15,10 @@ export interface SkyLook {
 
 export const SKY_LOOKS: Readonly<Record<Phase, SkyLook>> = {
   day: { sky: '#6a7d8f', ambientColor: '#b8c4d0', ambientIntensity: 0.9, moonIntensity: 0.3 },
-  dusk: { sky: '#8b3a1f', ambientColor: '#c07a58', ambientIntensity: 0.45, moonIntensity: 0.2 },
+  // All Hallows' Eve (design bible §15): a warmer amber dusk, then a cold night with a violet cast.
+  dusk: { sky: '#9a4618', ambientColor: '#cc8650', ambientIntensity: 0.45, moonIntensity: 0.2 },
   // Night keeps a faint rim so the path never goes fully black (horror-design rule).
-  night: { sky: '#0a0c12', ambientColor: '#4a5a80', ambientIntensity: 0.12, moonIntensity: 0.25 },
+  night: { sky: '#0d0b16', ambientColor: '#50548a', ambientIntensity: 0.12, moonIntensity: 0.25 },
   dawn: { sky: '#4a5560', ambientColor: '#8a95a5', ambientIntensity: 0.4, moonIntensity: 0.2 },
 }
 

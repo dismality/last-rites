@@ -56,6 +56,8 @@ import { Viewmodel } from './scene/player/Viewmodel'
 import { ScareProps } from './scene/scares/ScareProps'
 import { ScareStager } from './scene/scares/ScareStager'
 import { ScareZoneVolumes } from './scene/scares/ScareZoneVolumes'
+import { Bats } from './scene/world/Bats'
+import { BelfryFlock } from './scene/world/BelfryFlock'
 import { Cemetery } from './scene/world/Cemetery'
 import { Chapel } from './scene/world/Chapel'
 import { ClueSpots } from './scene/world/ClueSpots'
@@ -68,6 +70,10 @@ import { MaterialPickups } from './scene/world/MaterialPickups'
 import { SaltCircles } from './scene/world/SaltCircles'
 import { PinBeacons } from './scene/world/PinBeacons'
 import { ObjectiveBeacon } from './scene/world/ObjectiveBeacon'
+import { AutumnLeaves } from './scene/world/AutumnLeaves'
+import { HarvestMoon } from './scene/world/HarvestMoon'
+import { TurnipLanterns } from './scene/world/TurnipLanterns'
+import { AutumnAmbience } from './scene/audio/AutumnAmbience'
 import { SkyAndFog } from './scene/world/SkyAndFog'
 import { ThrownItems } from './scene/world/ThrownItems'
 import { Workbench } from './scene/world/Workbench'
@@ -94,6 +100,9 @@ function GameScreen() {
         <SkyAndFog />
         {/* After SkyAndFog so rain and lightning adjust the lights and fog it set this frame. */}
         <Weather />
+        {/* All Hallows' Eve dressing (design bible §15). */}
+        <HarvestMoon />
+        <AutumnLeaves />
         <GameLoop>
           <FirstPersonController />
           {/* After the controller so the intro path wins the camera while it plays. */}
@@ -109,6 +118,8 @@ function GameScreen() {
           <MaterialPickups />
           <GraveMounds />
           <NamedGrave />
+          <TurnipLanterns />
+          <AutumnAmbience />
           <Workbench />
           <EnemyDirector />
           {/* After EnemyDirector so music reads this frame's nearest zombie. */}
@@ -121,6 +132,8 @@ function GameScreen() {
           <ScareZoneVolumes />
           <ScareProps />
           <ScareStager />
+          <Bats />
+          <BelfryFlock />
           <MeleeAttack />
           {/* After EnemyDirector so shots and uses read this frame's enemy positions. */}
           <WeaponController />

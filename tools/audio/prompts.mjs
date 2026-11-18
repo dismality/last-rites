@@ -118,8 +118,12 @@ export const AUDIO = [
   sfx('merchant-arrive', 'horse drawn cart creaking to a stop, harness jingle', 3),
   sfx('merchant-leave', 'horse drawn cart rolling away on gravel, fading', 3),
 
+  // ── All Hallows' Eve (design bible §15) ──────────────────────────────────────
+  sfx('crow-caw', 'single crow cawing from a bare tree, harsh and hoarse, outdoors at a distance, autumn', 1.5, { variants: 3, batch: 'halloween' }),
+  sfx('bell-all-souls', 'single toll of a small village church bell far away across fields at night, muffled by distance and mist, long fading ring', 5, { batch: 'halloween' }),
+
   // ── Ambience loops ───────────────────────────────────────────────────────────
-  amb('wind-night', 'cold night wind over an open graveyard, low and steady, seamless loop', 30, { wired: false }),
+  amb('wind-night', 'cold autumn wind through bare branches over an open graveyard, low and steady, dry leaves stirring, seamless loop', 30, { wired: true, batch: 'halloween' }),
   amb('day-birds-crows', 'grey morning in a country graveyard, distant crows, faint wind, seamless loop', 30, { wired: false }),
   amb('hut-interior', 'inside a small wooden hut, iron stove crackling, roof creaks, rain outside, seamless loop', 30, { wired: false }),
   amb('catacombs-drip', 'stone catacombs, slow water drips, low room tone, distant settling stone, seamless loop', 30, { wired: false }),
@@ -154,10 +158,11 @@ export const AUDIO = [
   say('walkout-3', 'narrator', 'The lane is empty. You do not look back.', { wired: false, source: 'walkout:2' }),
 ]
 
-/** Batches the generator understands: --batch first, sfx, voice, ambience, music, all. */
+/** Batches the generator understands: --batch first, halloween, sfx, voice, ambience, music, all. */
 export function inBatch(entry, batch) {
   if (batch === 'all') return true
   if (batch === 'first') return entry.batch === 'first'
+  if (batch === 'halloween') return entry.batch === 'halloween'
   if (batch === 'voice') return entry.kind === 'voice'
   if (batch === 'music') return entry.kind === 'music'
   if (batch === 'ambience') return entry.folder === 'ambience'

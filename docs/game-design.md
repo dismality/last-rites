@@ -1196,3 +1196,13 @@ Feature freeze: **2026-11-26**. No new feature task of spec 11 starts after it. 
 | 6 | H2 new creatures and H3 zombie looks | 14.2, 14.3 | 7, 8 | Planned |
 
 This section, the waiting list and the shared rules are never cut.
+
+## 15. All Hallows' Eve dressing
+
+The game is set in October 1891, so the grounds dress for Allhallowtide. This is look and sound only: it changes no rule, number or objective. Tuning lives in `src/data/allHallows.ts`; the rules are pure functions in `src/game/systems/allHallows.ts`.
+
+- **Turnip lanterns.** Carved turnips with a candle inside: the 1890s British and Irish jack-o'-lantern, not a pumpkin. Two flank the hut step and six sit at the foot of the readable headstones, the oak-hollow grave and the chapel path. Each throws a warm pool of light on the ground; there are no real lights (light budget). The flame flickers by slow and quick waves, never in step with its neighbours, and barely moves with Flashing lights off.
+- **Autumn leaves.** About 160 brown, orange and rust leaves (half on Low graphics) fall, tumble and skate across the ground on a north-west wind with slow gusts, harder in a storm. They follow the camera in a 26 m box and never appear inside the hut, the chapel or the crypts.
+- **Palette.** Dusk is a warmer amber; night is cold with a faint violet cast. The night still keeps its rim of light (horror-design rule).
+- **Harvest moon.** A big, low amber moon with a halo, about 9° across, behind the chapel as you walk to its door from the hut. It rises through dusk, is full at night, fades at dawn, is gone by day and is only a smudge under storm cloud. The chapel, trees and walls in front of it hide it.
+- **Sound.** A wind bed through the bare branches all day, loudest at night and muffled indoors (filtered noise until `ambience/wind-night.ogg` exists). Crows call from the trees every 12 to 30 s by day, dusk and dawn, never at night. Through the night, every 70 to 130 s, a far-off village bell tolls three times for All Souls, small and muffled, so it is never mistaken for the chapel's dusk bell. Crows and the bell are recorded only (`--batch halloween` in `tools/audio`). They are ambience, not important sounds, so they have no subtitles.

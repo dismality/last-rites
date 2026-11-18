@@ -3,6 +3,7 @@
 // game really asks for.
 import { describe, expect, it } from 'vitest'
 import { AUDIO, fileNames, inBatch } from '../../tools/audio/prompts.mjs'
+import { AUTUMN_SOUNDS } from '../data/allHallows'
 import { INTRO_SHOTS } from '../data/introCutscene'
 import { JOURNAL_PAGES } from '../data/journal'
 import { ENDINGS } from '../data/endings'
@@ -48,9 +49,15 @@ describe('audio prompt sheet', () => {
       'page-turn', 'heartbeat', 'throw', 'flask-shatter', 'bomb-fuse', 'bomb-blast', 'trap-spring', 'salt-place',
       'stone-grind', 'wind-gust', 'door-creak', 'door-slam', 'soil-crumble', 'hand-grab', 'whisper-keeper', 'breath-behind',
       'bloater-gurgle', 'lurker-breath', 'wailer-wail', 'crane-censer',
+      ...Object.values(AUTUMN_SOUNDS),
       ...INTRO_SHOTS.map((_, i) => `intro-${i + 1}`),
     ])
     for (const e of AUDIO.filter((a) => a.wired)) expect(asked.has(e.name), e.name).toBe(true)
+  })
+
+  it('has a halloween batch with the wind, three crows and the bell', () => {
+    const n = AUDIO.filter((e) => inBatch(e, 'halloween')).flatMap(fileNames)
+    expect(n.sort()).toEqual(['bell-all-souls', 'crow-caw-1', 'crow-caw-2', 'crow-caw-3', 'wind-night'])
   })
 
   it('has a first batch of about fifteen files', () => {
