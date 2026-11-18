@@ -2209,3 +2209,15 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Latched bites are a separate `bite` event, so the rule "no grab without a full warning" still holds for grabs. (2026-11-18)
   - Looking is not locked while pinned, so the player can look down and swing at it. (2026-11-18)
   - Latch state is not saved; a loaded crawler starts unlatched. (2026-11-18)
+
+
+### 2026-11-18: All played audio generated; strange distant noises; volume per category
+- **Kiro feature used:** Outside Kiro
+- **What happened:**
+  - Generated the 74 missing files the game plays (new `played` batch in `tools/audio/generate.mjs`), with the developer's go-ahead. 94 of 121 files now exist. The rest are not played yet: journal and ending narration, unused ambience loops, and music.
+  - Strange distant noises (`src/data/strangeNoises.ts`, rules in `src/game/systems/strangeNoises.ts`, driver `src/scene/audio/StrangeNoises.tsx`) are atmosphere only. A far-off train, a music box, a child's laugh, an organ chord, knocks, a dog, a hand bell, chains, a piano note, whistling, a pocket watch at your ear and an owl. One every 70 to 170 s at dusk and night, 2.5 times rarer by day, never the same twice running, each with a subtitle. Prompts are the new `strange` batch (12 files, `ambience/strange-*.ogg`).
+  - Volume per category: new Ambience, Voice and Strange noises sliders beside Master, Music and Sound effects ("SFX volume" renamed). Two new audio buses, `ambience` and `voice`. Recordings pick their bus by folder (`busForPath`). The wind bed, rain, crows and the far bell move to ambience. A screen scare ducks every bus.
+- **What Kiro caught or sped up:** Nothing; done by hand. Lint, typecheck, all unit tests and the settings and scare-settings e2e pass.
+- **Decisions made unattended:**
+  - Defaults: Ambience 80, Voice 90, Strange noises 60. At 0 the strange noises stop entirely. (2026-11-18)
+  - A strange noise with no file plays nothing and shows no subtitle. (2026-11-18)

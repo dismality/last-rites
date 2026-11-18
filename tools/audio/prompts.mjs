@@ -136,6 +136,20 @@ export const AUDIO = [
   sfx('crow-caw', 'single crow cawing from a bare tree, harsh and hoarse, outdoors at a distance, autumn', 1.5, { variants: 3, batch: 'halloween' }),
   sfx('bell-all-souls', 'single toll of a small village church bell far away across fields at night, muffled by distance and mist, long fading ring', 5, { batch: 'halloween' }),
 
+  // ── Strange distant noises (src/data/strangeNoises.ts): atmosphere only ──────
+  sfx('strange-train', 'a steam train passing far away across open fields at night, rails clattering, one long mournful whistle, slowly fading out', 9, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-music-box', 'a small old music box playing a few slow notes of a lullaby, slightly out of tune, winding down and stopping', 6, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-child-laugh', 'a single small child giggling far away in the dark, echoing faintly', 2.5, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-organ', 'one low church organ chord played inside an empty stone chapel, long echo dying away', 6, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-knocks', 'three slow knocks on a heavy wooden door, distant, then silence', 3, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-dog-howl', 'a lone farm dog howling far away across the moor at night, long and mournful', 4, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-hand-bell', 'a small hand bell rung slowly three times far away, like a funeral procession', 4, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-chains', 'heavy iron chains dragged slowly across stone somewhere distant', 4, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-piano', 'one out of tune piano key struck in an empty house far away, long decay', 4, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-whistling', 'a man whistling a slow old folk tune far away in the dark, then stopping suddenly mid-note', 5, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-pocket-watch', 'an old pocket watch ticking loudly very close to the ear, then stopping', 4, { folder: 'ambience', batch: 'strange' }),
+  sfx('strange-owl', 'a barn owl screeching once in dark trees, harsh and close', 2, { folder: 'ambience', batch: 'strange' }),
+
   // ── Ambience loops ───────────────────────────────────────────────────────────
   amb('wind-night', 'cold autumn wind through bare branches over an open graveyard, low and steady, dry leaves stirring, seamless loop', 30, { wired: true, batch: 'halloween' }),
   amb('day-birds-crows', 'grey morning in a country graveyard, distant crows, faint wind, seamless loop', 30, { wired: false }),
@@ -178,6 +192,8 @@ export function inBatch(entry, batch) {
   if (batch === 'first') return entry.batch === 'first'
   if (batch === 'halloween') return entry.batch === 'halloween'
   if (batch === 'scares') return entry.batch === 'scares'
+  if (batch === 'played') return entry.wired === true
+  if (batch === 'strange') return entry.batch === 'strange'
   if (batch === 'voice') return entry.kind === 'voice'
   if (batch === 'music') return entry.kind === 'music'
   if (batch === 'ambience') return entry.folder === 'ambience'

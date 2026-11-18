@@ -37,7 +37,7 @@ function buildGraph(engine: SynthEngine): WindGraph | null {
       source.connect(lowpass)
       lowpass.connect(gain)
     }
-    gain.connect(engine.sfx)
+    gain.connect(engine.ambience)
     source.start()
     return { engine, source, gain, file: recorded !== null }
   } catch {
@@ -102,13 +102,14 @@ export function playCrow(listenerX: number, listenerZ: number, angle: number, di
     { x: listenerX + Math.cos(angle) * distanceM, y: 6, z: listenerZ + Math.sin(angle) * distanceM },
     AUTUMN_AMBIENCE.crowVolume,
     60,
+    'ambience',
   )
 }
 
 /** One toll of the far-off village bell. */
 export function playAllSoulsBell(): void {
   const [x, y, z] = AUTUMN_AMBIENCE.bellPosition
-  playRecorded(AUTUMN_SOUNDS.bell, { x, y, z }, AUTUMN_AMBIENCE.bellVolume, AUTUMN_AMBIENCE.bellMaxDistanceM)
+  playRecorded(AUTUMN_SOUNDS.bell, { x, y, z }, AUTUMN_AMBIENCE.bellVolume, AUTUMN_AMBIENCE.bellMaxDistanceM, 'ambience')
 }
 
 /** Test hook: drop the wind graph and forget the last level. */

@@ -1,4 +1,5 @@
-// Volume wiring (Req 23.9): master -> Howler's global volume, SFX and music -> their buses.
+// Volume wiring (Req 23.9): master -> Howler's global volume; sound effects, music, ambience and
+// voices -> their buses. The strange-noises slider is read when one plays (strangeNoises.ts).
 // Settings are 0..100; buses take 0..1.
 
 import { Howler } from 'howler'
@@ -10,6 +11,8 @@ export interface VolumeSettings {
   masterVolume: number
   musicVolume: number
   sfxVolume: number
+  ambienceVolume: number
+  voiceVolume: number
 }
 
 const unit = (v: number): number => (Number.isFinite(v) ? Math.min(1, Math.max(0, v / 100)) : 0)
@@ -28,25 +31,31 @@ export function applyVolumes(s: VolumeSettings): void {
     const synth = getSynth()
     synth?.setBusGain('sfx', on ? unit(s.sfxVolume) : 0)
     synth?.setBusGain('music', on ? unit(s.musicVolume) : 0)
+    synth?.setBusGain('ambience', on ? unit(s.ambienceVolume) : 0)
+    synth?.setBusGain('voice', on ? unit(s.voiceVolume) : 0)
   } catch {
     // buses not ready
   }
 }
 
-/** Apply now and on every change of the three volumes. Returns the unsubscribe. */
-export function installVolumes(): () => void {
-  const read = (): VolumeSettings => {
-    const st = useSettingsStore.getState()
-    return { masterVolume: st.masterVolume, musicVolume: st.musicVolume, sfxVolume: st.sfxVolume }
+const KEYS = ['masterVolume', 'musicVolume', 'sfxVolume', 'ambienceVolume', 'voiceVolume'] as const
+
+/** The volume fields of the settings. */
+export function readVolumes(): VolumeSettings {
+  const st = useSettingsStore.getState()
+  return {
+    masterVolume: st.masterVolume,
+    musicVolume: st.musicVolume,
+    sfxVolume: st.sfxVolume,
+    ambienceVolume: st.ambienceVolume,
+    voiceVolume: st.voiceVolume,
   }
-  applyVolumes(read())
+}
+
+/** Apply now and on every change of a volume. Returns the unsubscribe. */
+export function installVolumes(): () => void {
+  applyVolumes(readVolumes())
   return useSettingsStore.subscribe((state, prev) => {
-    if (
-      state.masterVolume !== prev.masterVolume ||
-      state.musicVolume !== prev.musicVolume ||
-      state.sfxVolume !== prev.sfxVolume
-    ) {
-      applyVolumes(read())
-    }
+    if (KEYS.some((k) => state[k] !== prev[k])) applyVolumes(readVolumes())
   })
 }

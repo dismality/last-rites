@@ -120,7 +120,7 @@ describe('music driver core', () => {
     stepMusic({ stems: [1, 0.5, 0, 1], master: 2 })
     const peaks = SYNTH_MUSIC.stemPeaks
     // gains: sfx, music bus, master, then the four stems
-    expect(ctx.gains.slice(2, 7).map((g) => g.calls[g.calls.length - 1])).toEqual([
+    expect(ctx.gains.slice(4, 9).map((g) => g.calls[g.calls.length - 1])).toEqual([
       1,
       peaks[0],
       peaks[1] * 0.5,

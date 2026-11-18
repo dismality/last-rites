@@ -91,7 +91,7 @@ describe('audio muted', () => {
   it('mutes Howler and zeroes the buses, leaving the stored settings alone', () => {
     const { ctx, gains } = fakeCtx()
     setSynthForTests(new SynthEngine(ctx as unknown as AudioContext, {} as AudioNode))
-    applyVolumes({ masterVolume: 80, musicVolume: 60, sfxVolume: 80 })
+    applyVolumes({ masterVolume: 80, musicVolume: 60, sfxVolume: 80, ambienceVolume: 80, voiceVolume: 90 })
     expect(howler.mute).toHaveBeenLastCalledWith(true)
     expect(howler.volume).toHaveBeenLastCalledWith(0)
     expect(gains[0].value).toBe(0)

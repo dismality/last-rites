@@ -21,6 +21,9 @@ const VOLUME_RAMP_S = 0.05
 const SILENT_WAV =
   'data:audio/wav;base64,UklGRiYAAABXQVZFZm10IBAAAAABAAEAQB8AAIA+AAACABAAZGF0YQIAAAAAAA=='
 
+/** The volume buses, one per slider under Master. */
+export type AudioBus = 'sfx' | 'music' | 'ambience' | 'voice'
+
 export interface Voice {
   stop: () => void
 }
@@ -34,6 +37,10 @@ export interface SoundPosition {
 export class SynthEngine {
   readonly sfx: GainNode
   readonly music: GainNode
+  /** Wind, rain, crows, the far bell and the strange distant noises. */
+  readonly ambience: GainNode
+  /** Narration and spoken lines. */
+  readonly voice: GainNode
   private voices: Voice[] = []
   private noise: AudioBuffer | null = null
 
@@ -43,8 +50,12 @@ export class SynthEngine {
   ) {
     this.sfx = ctx.createGain()
     this.music = ctx.createGain()
+    this.ambience = ctx.createGain()
+    this.voice = ctx.createGain()
     this.sfx.connect(destination)
     this.music.connect(destination)
+    this.ambience.connect(destination)
+    this.voice.connect(destination)
   }
 
   get voiceCount(): number {
@@ -64,12 +75,17 @@ export class SynthEngine {
   }
 
   /** Smoothly set a bus level (0..1). */
-  setBusGain(bus: 'sfx' | 'music', value: number): void {
-    const node = bus === 'sfx' ? this.sfx : this.music
+  setBusGain(bus: AudioBus, value: number): void {
+    const node = this.busNode(bus)
     const v = Math.min(1, Math.max(0, Number.isFinite(value) ? value : 0))
     const now = this.ctx.currentTime
     node.gain.cancelScheduledValues(now)
     node.gain.setTargetAtTime(v, now, VOLUME_RAMP_S)
+  }
+
+  /** The gain node of a bus. */
+  busNode(bus: AudioBus): GainNode {
+    return bus === 'music' ? this.music : bus === 'ambience' ? this.ambience : bus === 'voice' ? this.voice : this.sfx
   }
 
   /** Cut the oldest voices until there is room for one more. */
@@ -91,6 +107,8 @@ export class SynthEngine {
     maxDistanceM = 40,
     /** Skip the sfx bus (and so its ducking); the caller applies the SFX volume itself. */
     direct = false,
+    /** Which volume bus the recording plays on (sound effects unless told otherwise). */
+    bus: AudioBus = 'sfx',
   ): Voice | null {
     this.makeRoom()
     const { ctx } = this
@@ -113,7 +131,7 @@ export class SynthEngine {
       nodes.push(panner)
       tail = panner
     }
-    tail.connect(direct ? this.destination : this.sfx)
+    tail.connect(direct ? this.destination : this.busNode(bus))
     let stopped = false
     const voice: Voice = {
       stop: () => {

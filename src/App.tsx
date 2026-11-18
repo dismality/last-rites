@@ -75,6 +75,7 @@ import { AutumnLeaves } from './scene/world/AutumnLeaves'
 import { HarvestMoon } from './scene/world/HarvestMoon'
 import { TurnipLanterns } from './scene/world/TurnipLanterns'
 import { AutumnAmbience } from './scene/audio/AutumnAmbience'
+import { StrangeNoises } from './scene/audio/StrangeNoises'
 import { SkyAndFog } from './scene/world/SkyAndFog'
 import { ThrownItems } from './scene/world/ThrownItems'
 import { Workbench } from './scene/world/Workbench'
@@ -121,6 +122,7 @@ function GameScreen() {
           <NamedGrave />
           <TurnipLanterns />
           <AutumnAmbience />
+          <StrangeNoises />
           <Workbench />
           <EnemyDirector />
           <Creatures />

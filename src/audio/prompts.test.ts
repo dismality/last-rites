@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest'
 import { AUDIO, fileNames, inBatch } from '../../tools/audio/prompts.mjs'
 import { AUTUMN_SOUNDS } from '../data/allHallows'
+import { STRANGE_NOISES, strangeNoiseFile } from '../data/strangeNoises'
 import { INTRO_SHOTS } from '../data/introCutscene'
 import { JOURNAL_PAGES } from '../data/journal'
 import { ENDINGS } from '../data/endings'
@@ -52,6 +53,7 @@ describe('audio prompt sheet', () => {
       // Enemy cue ids: voiceCue plays a file named after the cue before its synth tell.
       'brute-grunt', 'brute-step', 'crawler-shiver', 'bride-hum', 'hound-growl',
       ...Object.values(AUTUMN_SOUNDS),
+      ...STRANGE_NOISES.map((n) => strangeNoiseFile(n.id)),
       ...INTRO_SHOTS.map((_, i) => `intro-${i + 1}`),
     ])
     for (const e of AUDIO.filter((a) => a.wired)) expect(asked.has(e.name), e.name).toBe(true)
@@ -67,6 +69,12 @@ describe('audio prompt sheet', () => {
     const whisper = n.find((e) => e.name === 'whisper-keeper')
     expect(whisper?.kind).toBe('voice')
     expect(whisper?.text?.toLowerCase()).toContain('kee')
+  })
+
+  it('has a strange batch with one ambience file per strange noise', () => {
+    const n = AUDIO.filter((e) => inBatch(e, 'strange'))
+    expect(n.map((e) => e.name).sort()).toEqual(STRANGE_NOISES.map((s) => strangeNoiseFile(s.id)).sort())
+    expect(n.every((e) => e.folder === 'ambience' && e.wired && !e.loop)).toBe(true)
   })
 
   it('has a halloween batch with the wind, three crows and the bell', () => {

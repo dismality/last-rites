@@ -261,6 +261,12 @@ export interface Settings {
   musicVolume: number
   /** SFX volume (0–100) */
   sfxVolume: number
+  /** Ambience volume (0–100): wind, rain, crows, the far bell */
+  ambienceVolume: number
+  /** Voice volume (0–100): narration and spoken lines */
+  voiceVolume: number
+  /** Strange distant noises (0–100); 0 turns them off */
+  strangeVolume: number
   /** Gamma / brightness adjustment (0.8–1.4) */
   brightness: number
   /** Show numeric values alongside visual indicators in the HUD */

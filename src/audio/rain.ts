@@ -50,7 +50,7 @@ function buildGraph(engine: SynthEngine): RainGraph | null {
       highpass.connect(bandpass)
       bandpass.connect(gain)
     }
-    gain.connect(engine.sfx)
+    gain.connect(engine.ambience)
     source.start()
     return { engine, source, gain, file: recorded !== null }
   } catch {

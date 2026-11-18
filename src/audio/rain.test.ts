@@ -80,7 +80,7 @@ function setup() {
   const engine = new SynthEngine(f.ctx, { connect() {} } as unknown as AudioNode)
   setSynthForTests(engine)
   // The rain gain is the third gain made, after the sfx and music buses.
-  return { ...f, engine, rainGain: () => f.gains[2] }
+  return { ...f, engine, rainGain: () => f.gains[4] }
 }
 
 afterEach(() => {
@@ -89,7 +89,7 @@ afterEach(() => {
 })
 
 describe('rain noise', () => {
-  it('builds a looped noise graph with the specified filters on the sfx bus', () => {
+  it('builds a looped noise graph with the specified filters on the ambience bus', () => {
     const { filters, sources, engine, rainGain } = setup()
     setRainLevel(1)
     expect(sources).toHaveLength(1)
@@ -100,7 +100,7 @@ describe('rain noise', () => {
     expect(hp?.frequency.value).toBe(500)
     expect(bp?.frequency.value).toBe(2400)
     expect(bp?.Q.value).toBe(0.5)
-    expect(rainGain().connected).toContain(engine.sfx)
+    expect(rainGain().connected).toContain(engine.ambience)
   })
 
   it('fades the level to gain 0.22 over 3 s', () => {
@@ -124,12 +124,12 @@ describe('rain noise', () => {
     expect(lastRamp(rainGain().gain.ramps)?.value).toBeCloseTo(RAIN_NOISE.gain)
   })
 
-  it('sends the sound through the sfx bus so SFX and master volume apply', () => {
+  it('sends the sound through the ambience bus so Ambience and master volume apply', () => {
     const { engine, rainGain } = setup()
     setRainLevel(1)
     engine.setBusGain('sfx', 0.5)
     // The bus is the only path out; its gain scales the bed and Howler's master gain sits after it.
-    expect(rainGain().connected).toEqual([engine.sfx])
+    expect(rainGain().connected).toEqual([engine.ambience])
   })
 
   it('is silent and safe when the context is missing, and keeps the level', () => {

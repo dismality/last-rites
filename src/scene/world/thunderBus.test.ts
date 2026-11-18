@@ -62,7 +62,7 @@ afterEach(() => {
 describe('thunder on the sfx bus', () => {
   it('plays through the sfx bus, which follows the SFX volume', () => {
     const { ctx, engine } = setup()
-    applyVolumes({ masterVolume: 100, musicVolume: 60, sfxVolume: 40 })
+    applyVolumes({ masterVolume: 100, musicVolume: 60, sfxVolume: 40, ambienceVolume: 80, voiceVolume: 90 })
     const off = registerCombatSounds()
     playThunder(true, { cameraShake: true, scareIntensity: 'full' }, () => {})
     off()
@@ -95,7 +95,7 @@ describe('music master while silent', () => {
     setProceduralMusicForTests(true)
     stepMusic({ stems: [1, 0, 0, 0], master: s.master })
     setProceduralMusicForTests(null)
-    // gains: sfx, music bus, then the music master
-    expect(ctx.gainLogs[2][ctx.gainLogs[2].length - 1]).toBe(0)
+    // gains: sfx, music, ambience and voice buses, then the music master
+    expect(ctx.gainLogs[4][ctx.gainLogs[4].length - 1]).toBe(0)
   })
 })

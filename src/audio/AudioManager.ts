@@ -12,14 +12,14 @@ import type { StepSurface } from '../game/systems/footsteps'
 import { isAudioEnabled } from './audioEnabled'
 import { hasSample, playSample } from './samples'
 import { getSynth, playSound } from './synth'
-import type { SoundPosition, Voice } from './synth'
+import type { AudioBus, SoundPosition, Voice } from './synth'
 
 /** Play a recorded file by name (no synth fallback). Returns its stop handle, or null if silent. */
-export function playRecorded(name: string, at?: SoundPosition, volume = 1, maxDistanceM = 40): Voice | null {
+export function playRecorded(name: string, at?: SoundPosition, volume = 1, maxDistanceM = 40, bus?: AudioBus): Voice | null {
   if (!isAudioEnabled()) return null
   const engine = getSynth()
   if (!engine) return null
-  return playSample(engine, name, at, volume, maxDistanceM)
+  return playSample(engine, name, at, volume, maxDistanceM, false, bus)
 }
 
 // ---------------------------------------------------------------------------

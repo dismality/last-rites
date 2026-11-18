@@ -49,7 +49,10 @@ const SLIDERS: ReadonlyArray<{ key: RangeSetting; label: string; step: number }>
   { key: 'mouseSensitivity', label: 'Mouse sensitivity', step: 0.1 },
   { key: 'masterVolume', label: 'Master volume', step: 1 },
   { key: 'musicVolume', label: 'Music volume', step: 1 },
-  { key: 'sfxVolume', label: 'SFX volume', step: 1 },
+  { key: 'sfxVolume', label: 'Sound effects volume', step: 1 },
+  { key: 'ambienceVolume', label: 'Ambience volume (wind, rain, crows)', step: 1 },
+  { key: 'voiceVolume', label: 'Voice volume (narration)', step: 1 },
+  { key: 'strangeVolume', label: 'Strange noises volume (0 turns them off)', step: 1 },
   { key: 'brightness', label: 'Brightness (gamma)', step: 0.05 },
 ]
 

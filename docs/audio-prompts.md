@@ -113,6 +113,18 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 
 | File | Kind | Prompt or line | Length | Played |
 |---|---|---|---|---|
+| `ambience/strange-train.ogg` | sfx | a steam train passing far away across open fields at night, rails clattering, one long mournful whistle, slowly fading out | 9 s | yes |
+| `ambience/strange-music-box.ogg` | sfx | a small old music box playing a few slow notes of a lullaby, slightly out of tune, winding down and stopping | 6 s | yes |
+| `ambience/strange-child-laugh.ogg` | sfx | a single small child giggling far away in the dark, echoing faintly | 2.5 s | yes |
+| `ambience/strange-organ.ogg` | sfx | one low church organ chord played inside an empty stone chapel, long echo dying away | 6 s | yes |
+| `ambience/strange-knocks.ogg` | sfx | three slow knocks on a heavy wooden door, distant, then silence | 3 s | yes |
+| `ambience/strange-dog-howl.ogg` | sfx | a lone farm dog howling far away across the moor at night, long and mournful | 4 s | yes |
+| `ambience/strange-hand-bell.ogg` | sfx | a small hand bell rung slowly three times far away, like a funeral procession | 4 s | yes |
+| `ambience/strange-chains.ogg` | sfx | heavy iron chains dragged slowly across stone somewhere distant | 4 s | yes |
+| `ambience/strange-piano.ogg` | sfx | one out of tune piano key struck in an empty house far away, long decay | 4 s | yes |
+| `ambience/strange-whistling.ogg` | sfx | a man whistling a slow old folk tune far away in the dark, then stopping suddenly mid-note | 5 s | yes |
+| `ambience/strange-pocket-watch.ogg` | sfx | an old pocket watch ticking loudly very close to the ear, then stopping | 4 s | yes |
+| `ambience/strange-owl.ogg` | sfx | a barn owl screeching once in dark trees, harsh and close | 2 s | yes |
 | `ambience/wind-night.ogg` | sfx | cold autumn wind through bare branches over an open graveyard, low and steady, dry leaves stirring, seamless loop (loop) | 30 s | yes |
 | `ambience/day-birds-crows.ogg` | sfx | grey morning in a country graveyard, distant crows, faint wind, seamless loop (loop) | 30 s | not yet |
 | `ambience/hut-interior.ogg` | sfx | inside a small wooden hut, iron stove crackling, roof creaks, rain outside, seamless loop (loop) | 30 s | not yet |

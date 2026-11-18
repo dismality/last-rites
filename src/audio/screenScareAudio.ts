@@ -9,7 +9,7 @@ import { useSettingsStore } from '../game/state/settingsStore'
 import { isAudioEnabled } from './audioEnabled'
 import { playSample } from './samples'
 import { getSynth, type Voice } from './synth'
-import { applyVolumes } from './volumes'
+import { applyVolumes, readVolumes } from './volumes'
 
 const STING_ID = 'screen-scare-sting'
 
@@ -19,9 +19,8 @@ let ducked = false
 function restoreBuses(): void {
   if (!ducked) return
   ducked = false
-  const s = useSettingsStore.getState()
   // setBusGain eases over about 50 ms per time constant, so the buses are back within 250 ms.
-  applyVolumes({ masterVolume: s.masterVolume, musicVolume: s.musicVolume, sfxVolume: s.sfxVolume })
+  applyVolumes(readVolumes())
 }
 
 const unit = (v: number): number => (Number.isFinite(v) ? Math.min(1, Math.max(0, v / 100)) : 0)
@@ -40,6 +39,8 @@ export function startScreenScareAudio(stingGain: number): void {
     const keep = 1 - SCREEN_SCARE_DUCK
     engine.setBusGain('sfx', unit(s.sfxVolume) * keep)
     engine.setBusGain('music', unit(s.musicVolume) * keep)
+    engine.setBusGain('ambience', unit(s.ambienceVolume) * keep)
+    engine.setBusGain('voice', unit(s.voiceVolume) * keep)
     ducked = true
     // Straight to the master: the ducked SFX bus would mute the sting, so the SFX setting is
     // applied here instead and the sting is never changed by the duck or its release.

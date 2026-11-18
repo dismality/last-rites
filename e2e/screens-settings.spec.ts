@@ -143,7 +143,10 @@ test('settings show the documented defaults, save on change and keep them after 
   await expect(dialog.getByLabel('Mouse sensitivity')).toHaveValue('1')
   await expect(dialog.getByLabel('Master volume')).toHaveValue('80')
   await expect(dialog.getByLabel('Music volume')).toHaveValue('60')
-  await expect(dialog.getByLabel('SFX volume')).toHaveValue('80')
+  await expect(dialog.getByLabel('Sound effects volume')).toHaveValue('80')
+  await expect(dialog.getByLabel('Ambience volume (wind, rain, crows)')).toHaveValue('80')
+  await expect(dialog.getByLabel('Voice volume (narration)')).toHaveValue('90')
+  await expect(dialog.getByLabel('Strange noises volume (0 turns them off)')).toHaveValue('60')
   await expect(dialog.getByLabel('Brightness (gamma)')).toHaveValue('1')
 
   await dialog.getByLabel('Scare intensity').selectOption('reduced')

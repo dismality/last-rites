@@ -6,7 +6,7 @@
 //
 // No runtime import of synth.ts (it imports this file): the engine is passed in.
 
-import type { SoundPosition, SynthEngine, Voice } from './synth'
+import type { AudioBus, SoundPosition, SynthEngine, Voice } from './synth'
 import { indexSamples, MANIFEST_FILE, parseManifest, pickSample, type SampleIndex } from './sampleManifest'
 
 const EMPTY: SampleIndex = { byName: new Map() }
@@ -76,6 +76,11 @@ export function hasSample(name: string): boolean {
 }
 
 /** A decoded file for `name` (a random variant), or null when none is ready yet. */
+/** The bus a file plays on by its folder: voice/ and ambience/ have their own sliders. */
+export function busForPath(path: string): AudioBus {
+  return path.startsWith('voice/') ? 'voice' : path.startsWith('ambience/') ? 'ambience' : 'sfx'
+}
+
 export function sampleBuffer(name: string): AudioBuffer | null {
   const path = pickSample(index, name, random())
   return path ? (buffers.get(path) ?? null) : null
@@ -92,11 +97,14 @@ export function playSample(
   volume = 1,
   maxDistanceM = 40,
   direct = false,
+  /** Force a bus; otherwise the file's folder picks it. */
+  bus?: AudioBus,
 ): Voice | null {
   try {
-    const buffer = sampleBuffer(name)
-    if (!buffer) return null
-    return engine.playBuffer(buffer, at, volume, maxDistanceM, direct)
+    const path = pickSample(index, name, random())
+    const buffer = path ? (buffers.get(path) ?? null) : null
+    if (!buffer || !path) return null
+    return engine.playBuffer(buffer, at, volume, maxDistanceM, direct, bus ?? busForPath(path))
   } catch {
     return null
   }

@@ -16,6 +16,9 @@ export const SETTINGS_RANGES = {
   masterVolume: { min: 0, max: 100 },
   musicVolume: { min: 0, max: 100 },
   sfxVolume: { min: 0, max: 100 },
+  ambienceVolume: { min: 0, max: 100 },
+  voiceVolume: { min: 0, max: 100 },
+  strangeVolume: { min: 0, max: 100 },
   brightness: { min: 0.8, max: 1.4 },
 } as const
 
@@ -66,6 +69,9 @@ export const DEFAULT_SETTINGS: Settings = {
   masterVolume: 80,
   musicVolume: 60,
   sfxVolume: 80,
+  ambienceVolume: 80,
+  voiceVolume: 90,
+  strangeVolume: 60,
   brightness: 1.0,
   accessibleHUD: false,
   tutorialPrompts: true,
