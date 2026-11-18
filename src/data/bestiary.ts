@@ -20,7 +20,7 @@ export const BESTIARY: readonly BestiaryEntry[] = [
     name: 'Pale Crawler',
     fieldNote:
       'It waits under mounds and broken coffins and drags itself out when you pass. Its body is too low for a level swing.',
-    whatWorks: 'Swing down, shoot it, or burn it with a lantern trap.',
+    whatWorks: 'Look down at it and swing, or chop with a heavy swing; shoot it, or burn it with a lantern trap.',
   },
   {
     id: 'bride',

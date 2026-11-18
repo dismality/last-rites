@@ -49,10 +49,24 @@ describe('audio prompt sheet', () => {
       'page-turn', 'heartbeat', 'throw', 'flask-shatter', 'bomb-fuse', 'bomb-blast', 'trap-spring', 'salt-place',
       'stone-grind', 'wind-gust', 'door-creak', 'door-slam', 'soil-crumble', 'hand-grab', 'whisper-keeper', 'breath-behind',
       'bloater-gurgle', 'lurker-breath', 'wailer-wail', 'crane-censer',
+      // Enemy cue ids: voiceCue plays a file named after the cue before its synth tell.
+      'brute-grunt', 'brute-step', 'crawler-shiver', 'bride-hum', 'hound-growl',
       ...Object.values(AUTUMN_SOUNDS),
       ...INTRO_SHOTS.map((_, i) => `intro-${i + 1}`),
     ])
     for (const e of AUDIO.filter((a) => a.wired)) expect(asked.has(e.name), e.name).toBe(true)
+  })
+
+  it('has a scares batch: every scare and creature sound, and a spoken "keeper"', () => {
+    const n = AUDIO.filter((e) => inBatch(e, 'scares'))
+    const names = n.map((e) => e.name)
+    for (const want of ['whisper-keeper', 'breath-behind', 'door-slam', 'hand-grab', 'screen-scare-sting', 'crawler-shiver', 'bride-hum', 'hound-growl', 'lurker-breath', 'wailer-wail']) {
+      expect(names, want).toContain(want)
+    }
+    expect(n.every((e) => e.wired)).toBe(true)
+    const whisper = n.find((e) => e.name === 'whisper-keeper')
+    expect(whisper?.kind).toBe('voice')
+    expect(whisper?.text?.toLowerCase()).toContain('kee')
   })
 
   it('has a halloween batch with the wind, three crows and the bell', () => {

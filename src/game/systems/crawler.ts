@@ -104,6 +104,11 @@ export function stepCrawler(
   return { crawler: next, events }
 }
 
+/** A heavy chop, or any swing made while looking down at the ground, is a downward swing. */
+export function swingIsDownward(heavy: boolean, pitch: number): boolean {
+  return heavy || (Number.isFinite(pitch) && pitch <= CRAWLER.downSwingPitchRad)
+}
+
 /**
  * A level swing passes over a crawler (0 damage, a miss); a downward swing, a bullet or trap fire
  * hits for the attack's normal damage.

@@ -8,7 +8,7 @@ import { ENEMY_MAP } from '../../data/enemies'
 import { BRIDE } from '../../data/creatures'
 import { brideDamage, type BrideDamageSource } from '../systems/bride'
 import { meleeHits, DEFAULT_MELEE_ARC_DEG, DEFAULT_MELEE_RANGE_M, type AttackKind, type CombatEnemy, type Vec2 } from '../systems/combat'
-import { crawlerHit } from '../systems/crawler'
+import { crawlerHit, swingIsDownward } from '../systems/crawler'
 import { spawnNumbers } from '../systems/damageNumbers'
 import { useCreatureStore } from './creatureStore'
 import { useFeedbackStore } from './feedbackStore'
@@ -86,7 +86,7 @@ export function hitCreature(
 }
 
 /** A melee swing: emerged crawlers and the drawn bride inside the swing cone. */
-export function meleeCreatures(origin: Vec2, dir: Vec2, damage: number, heavy: boolean, source: BrideDamageSource): CreatureHitResult[] {
+export function meleeCreatures(origin: Vec2, dir: Vec2, damage: number, heavy: boolean, source: BrideDamageSource, pitch = 0): CreatureHitResult[] {
   const st = useCreatureStore.getState()
   const candidates = st.crawlers
     .filter((c) => c.c.phase === 'emerged')
@@ -95,7 +95,7 @@ export function meleeCreatures(origin: Vec2, dir: Vec2, damage: number, heavy: b
     candidates.push({ uid: BRIDE_HP_KEY, type: 'bride', hp: 1, pos: { x: st.bride.x, z: st.bride.z } })
   }
   const ids = meleeHits(origin, dir, DEFAULT_MELEE_ARC_DEG, DEFAULT_MELEE_RANGE_M, candidates)
-  const kind: AttackKind = heavy ? 'melee-down' : 'melee-horizontal'
+  const kind: AttackKind = swingIsDownward(heavy, pitch) ? 'melee-down' : 'melee-horizontal'
   return ids.map((id) =>
     hitCreature(id === BRIDE_HP_KEY ? { kind: 'bride' } : { kind: 'crawler', id }, kind, source, damage),
   )

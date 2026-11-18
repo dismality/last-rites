@@ -204,13 +204,15 @@ export function MeleeAttack() {
         },
         h && h.kind === 'heavy' ? { knockdownS: h.knockdownS } : {},
       )
-      // Crawlers and the bride are not zombies: a heavy chop is a downward swing, a light one level.
+      // Crawlers and the bride are not zombies: a heavy chop, or a swing while looking down, is a
+      // downward swing; a light swing looking ahead is level and passes over a crawler.
       const creatureHits = meleeCreatures(
         { x: player.position[0], z: player.position[2] },
         forwardFromYaw(player.yaw),
         damage,
         cur.heavy?.kind === 'heavy',
         cur.weapon === 'silver-sabre' ? 'silver-sabre' : 'other',
+        player.pitch,
       )
       if (creatureHits.some((c) => !c.miss && !c.noEffect)) playMeleeHit()
       if (result.hitUids.length === 0) return

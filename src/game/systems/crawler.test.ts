@@ -5,6 +5,7 @@ import { createRng } from '../rng'
 import type { AttackKind } from './combat'
 import {
   crawlerHit,
+  swingIsDownward,
   createCrawler,
   faceTriggerApplies,
   pickCrawlerSpots,
@@ -114,5 +115,18 @@ describe('faceTriggerApplies', () => {
     expect(faceTriggerApplies({ x: 0, z: 1.4 }, player)).toBe(true)
     expect(faceTriggerApplies({ x: 0, z: 1.6 }, player)).toBe(false)
     expect(faceTriggerApplies({ x: 0, z: -1 }, player)).toBe(false)
+  })
+})
+
+describe('swingIsDownward', () => {
+  it('a heavy swing is always downward; a light one only while looking down far enough', () => {
+    fc.assert(
+      fc.property(fc.double({ min: -1.5, max: 1.5, noNaN: true }), (pitch) => {
+        expect(swingIsDownward(true, pitch)).toBe(true)
+        expect(swingIsDownward(false, pitch)).toBe(pitch <= CRAWLER.downSwingPitchRad)
+      }),
+      { numRuns: 100 },
+    )
+    expect(swingIsDownward(false, Number.NaN)).toBe(false)
   })
 })

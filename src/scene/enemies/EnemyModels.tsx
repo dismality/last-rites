@@ -38,6 +38,10 @@ import {
   zombieColdFill,
 } from './zombieMaterial'
 import { EliteMarks } from './EliteMarks'
+import { applyLanternFill, lanternFillUniforms } from './lanternFill'
+import { lanternLightRuntime } from '../player/lanternRig'
+import { lanternRadius } from '../../game/systems/lantern'
+import { useLanternStore } from '../../game/state/lanternStore'
 
 const FADE_S = 0.15
 const MAX_DT = 0.1
@@ -137,6 +141,8 @@ function tintedMaterial(
       // Only a faint cold fill (no warm glow): the lantern stays the only warm light on the skin.
       const [er, eg, eb] = textured ? texturedColdFill([r, g, b]) : zombieColdFill([r, g, b])
       std.emissive?.setRGB(er, eg, eb, THREE.SRGBColorSpace)
+      // The fill only shows where the lantern reaches; in the dark a zombie is as dark as the rest.
+      applyLanternFill(std)
     }
     cache.set(key, m)
   }
@@ -342,6 +348,15 @@ export function EnemyModels() {
   // Crane's corpse outlives his store entry long enough to fade.
   const [ghosts, setGhosts] = useState<readonly { uid: string; type: EnemyId }[]>([])
   const tints = useMemo<TintCache>(() => new Map(), [])
+
+  // One write a frame for every zombie skin: the fill centres on the player's lantern.
+  useFrame(({ camera }) => {
+    const u = lanternFillUniforms
+    u.uFillOrigin.value.copy(camera.position)
+    u.uFillOn.value = lanternLightRuntime.beam ? 1 : 0
+    // The spot reaches twice the light radius (Lantern.tsx); the fill fades out over the same span.
+    u.uFillReach.value = lanternRadius(useLanternStore.getState().fuel) * 2
+  })
 
   // Primitive string key: the list only re-renders when zombies appear or vanish, not every tick.
   const key = useEnemyStore((s) => s.enemies.map((e) => `${e.uid}|${e.type}`).join(','))

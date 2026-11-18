@@ -25,6 +25,11 @@ export const CRAWLER = {
   crawlSpeedMps: 1.2,
   lungeSpeedMps: 6,
   lungeS: 0.6,
+  /**
+   * Looking this far down (radians, negative is down) turns a light swing into a downward one, so
+   * aiming at a crawler on the ground hits it. A heavy swing is always downward.
+   */
+  downSwingPitchRad: -0.35,
 } as const
 
 export const BRIDE = {

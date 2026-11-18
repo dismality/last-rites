@@ -10,9 +10,10 @@ import { SCARE_SETS, SCREEN_SCARE_HEIGHT_VH, placeholderFaceLabel } from '../../
 import { useScreenScareStore } from '../../game/state/screenScareStore'
 import { registerMissingArt } from '../../game/state/waitingList'
 import { type ActiveScare } from '../../game/systems/screenScares'
+import { DrawnScareFace } from './scareFaces'
 import { driveScreenScare } from './screenScareDriver'
 import './ScreenScare.css'
-/** The face: the image, or the labelled flat rectangle once the file is missing or fails to decode. */
+/** The face: the image, or a drawn stand-in face once the file is missing or fails to decode. */
 function ScareFace({ id, edge, failed, onFailed, faceRef }: {
   id: ScareFaceId
   edge: 'top' | 'bottom'
@@ -25,8 +26,14 @@ function ScareFace({ id, edge, failed, onFailed, faceRef }: {
   if (failed) {
     // PLACEHOLDER: /assets/scares/face-zombie-1.webp (every face id has its own row in data/placeholders.ts)
     return (
-      <div ref={faceRef as Ref<HTMLDivElement>} className={`${className} screen-scare__placeholder`} style={style} data-testid="screen-scare-placeholder">
-        {placeholderFaceLabel(id)}
+      <div
+        ref={faceRef as Ref<HTMLDivElement>}
+        className={`${className} screen-scare__placeholder`}
+        style={style}
+        data-testid="screen-scare-placeholder"
+        data-label={placeholderFaceLabel(id)}
+      >
+        <DrawnScareFace id={id} />
       </div>
     )
   }

@@ -5,7 +5,7 @@
 //   node tools/audio/generate.mjs --batch first
 //
 // Options:
-//   --batch <first|halloween|sfx|voice|ambience|music|all>   which files (default: first)
+//   --batch <first|halloween|scares|sfx|voice|ambience|music|all>   which files (default: first)
 //   --only <name>        just this entry, e.g. --only zombie-groan (all its variants)
 //   --force              make it again even if the file already exists
 //   --dry-run            list what would be made and roughly how much text; no key needed
@@ -15,7 +15,7 @@
 //
 // Raw downloads go to tools/audio/raw/<folder>/<name>.mp3 (not committed); convert.mjs turns them
 // into public/assets/audio/<folder>/<name>.ogg, which the game picks up on its own.
-// Optional voices: ELEVENLABS_VOICE_NARRATOR, ELEVENLABS_VOICE_ELIAS (voice ids from your
+// Optional voices: ELEVENLABS_VOICE_NARRATOR, ELEVENLABS_VOICE_ELIAS, ELEVENLABS_VOICE_DEAD (voice ids from your
 // ElevenLabs Voices page). Without them two premade voices are used.
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
@@ -55,7 +55,7 @@ function chosen(args) {
     return e
   }
   const list = AUDIO.filter((e) => inBatch(e, args.batch))
-  if (list.length === 0) throw new Error(`Unknown batch "${args.batch}". Use first, halloween, sfx, voice, ambience, music or all.`)
+  if (list.length === 0) throw new Error(`Unknown batch "${args.batch}". Use first, halloween, scares, sfx, voice, ambience, music or all.`)
   return list
 }
 
@@ -109,7 +109,7 @@ async function makeVoice(entry, key) {
   return post(`/v1/text-to-speech/${id}?output_format=mp3_44100_128`, key, {
     text: entry.text,
     model_id: 'eleven_multilingual_v2',
-    voice_settings: { stability: 0.55, similarity_boost: 0.75, style: 0.25, speed: 0.9 },
+    voice_settings: v.settings ?? { stability: 0.55, similarity_boost: 0.75, style: 0.25, speed: 0.9 },
   })
 }
 
@@ -149,6 +149,8 @@ function sheet() {
     `**Narrator voice:** ${VOICES.narrator.describe}.`,
     '',
     `**Elias's voice:** ${VOICES.elias.describe}.`,
+    '',
+    `**The dead's voice** (the whispered "keeper"): ${VOICES.dead.describe}.`,
     '',
     '"Not played yet" files are listed so the set is complete; the game does not use them yet.',
     '',

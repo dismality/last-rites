@@ -15,6 +15,8 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 
 **Elias's voice:** Tired English man in his fifties, hoarse, frightened but careful, half whispering.
 
+**The dead's voice** (the whispered "keeper"): A dead man speaking from the dark, a dry rasping whisper, slow, breathy, barely voiced.
+
 "Not played yet" files are listed so the set is complete; the game does not use them yet.
 
 ## First batch
@@ -60,6 +62,9 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 | `sfx/brute-step.ogg` | sfx | very heavy undead footstep thudding on earth, low | 0.7 s | yes |
 | `sfx/lurker-breath.ogg` | sfx | something crouched in the dark breathing slowly, wet rasping breath | 2.5 s | yes |
 | `sfx/wailer-wail.ogg` | sfx | ghostly undead woman wailing, distant, long reverb, chilling | 3.5 s | yes |
+| `sfx/crawler-shiver.ogg` | sfx | grave soil shivering and a wet clicking from just under the ground, something crawling up | 2 s | yes |
+| `sfx/bride-hum.ogg` | sfx | a dead woman faintly humming a slow lullaby in the dark, cold breath, distant and close at once | 3 s | yes |
+| `sfx/hound-growl.ogg` | sfx | low wet growl of a starved rotting dog in the dark, close, threatening | 2 s | yes |
 | `sfx/elite-arrival.ogg` | sfx | horror sting, low brass swell and a deep hit, something powerful has arrived | 2.5 s | yes |
 | `sfx/boss-rise.ogg` | sfx | undead priest rising from a crypt, stone cracking, deep choir drone, rumble | 4 s | yes |
 | `sfx/crane-censer.ogg` | sfx | iron censer swinging on a chain, creak and clink, smoky | 1.5 s | yes |
@@ -68,13 +73,13 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 | `sfx/hand-grab.ogg` | sfx | rotting hand bursting out of grave soil and grabbing, dirt crumbling, wet | 1.2 s | yes |
 | `sfx/grab-stinger.ogg` | sfx | sudden horror jump scare sting, violin screech and low impact | 1.5 s | yes |
 | `sfx/grab-stinger-soft.ogg` | sfx | soft horror sting, muted string swell, unsettling | 1.5 s | yes |
+| `sfx/screen-scare-sting.ogg` | sfx | sudden horror jump scare, sharp noise burst, a low body thud and a falling human scream, very close | 1.5 s | yes |
 | `sfx/door-creak.ogg` | sfx | old wooden door creaking open slowly, rusty hinges | 2.5 s | yes |
 | `sfx/door-slam.ogg` | sfx | heavy wooden door slamming shut in a stone building, echo | 1.2 s | yes |
 | `sfx/stone-grind.ogg` | sfx | heavy stone slab grinding and scraping open | 2.5 s | yes |
 | `sfx/soil-crumble.ogg` | sfx | grave soil shifting and crumbling, dirt trickling | 1.5 s | yes |
 | `sfx/wind-gust.ogg` | sfx | cold wind gust through dead trees, sudden, whistling | 3 s | yes |
 | `sfx/breath-behind.ogg` | sfx | slow raspy breath right behind the listener, very close, intimate | 2 s | yes |
-| `sfx/whisper-keeper.ogg` | sfx | unintelligible ghostly whispers of several voices, close, left and right | 3 s | yes |
 | `sfx/heartbeat.ogg` | sfx | single heavy heartbeat thump, low, muffled | 0.8 s | yes |
 | `sfx/thunder-close.ogg` | sfx | close thunder crack and long rumble | 4 s | yes |
 | `sfx/thunder-far.ogg` | sfx | distant rolling thunder | 4 s | yes |
@@ -129,6 +134,7 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 
 | File | Kind | Prompt or line | Length | Played |
 |---|---|---|---|---|
+| `voice/whisper-keeper.ogg` | voice | *dead:* ...keeeper... |  | yes |
 | `voice/page-1.ogg` | voice | *elias:* Third night at Hollowmere and I have stopped pretending it is the foxes. The graves along the north row were not dug from above. The soil is pushed up and outward, as though something had been trying to leave. I checked the dates against the parish ledger and they do not agree. Someone has been tidying the truth. I will keep the lantern lit. |  | not yet |
 | `voice/page-2.ogg` | voice | *elias:* Found this beneath the Marsh family stone, wrapped in oilcloth. The ledger records thirty-one burials in a single week of 1849, and not one death certificate among them. Thirty-one graves, and I have dug beside half of them. They are empty. Whoever was laid here did not stay, or was never laid here at all. |  | not yet |
 | `voice/page-3.ogg` | voice | *elias:* The Crane crypt gave up a fragment in the priest’s own hand. "They were not dead. God forgive me, they were not yet dead, and I could not bear the fever to spread." He sealed them below the chapel and wrote them into the ledger as buried. At the foot of the page is a ring of salt and a note: grave salt and holy water, drawn as a circle, and nothing foul will cross it. I have copied it out. Further down, smudged: "What I hid, I hid beneath the Word." He prayed first, then rang the bell, then named the smallest of them, then covered the rest, and last he sealed the heart away. |  | not yet |

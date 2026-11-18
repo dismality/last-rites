@@ -2183,3 +2183,17 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** Nothing; done by hand. All 2849 unit tests, typecheck and lint pass.
 - **Decisions made unattended:**
   - Footstep strides grew by the same 1.5x (walk 2.1 m, sprint 2.85 m), so the step rate stays about 2.1 a second. (2026-11-18)
+
+
+### 2026-11-18: Scare and creature sounds, drawn scare faces, crawler hits, zombies dark without the lantern
+- **Kiro feature used:** Outside Kiro
+- **What happened:**
+  - Audio prompts: a new `scares` batch (`node tools/audio/generate.mjs --batch scares`, 20 files) covers every scare and creature sound. New prompts for `crawler-shiver`, `bride-hum`, `hound-growl` and `screen-scare-sting`. `whisper-keeper` is now a spoken line ("...keeeper...") in a new `dead` voice instead of wordless whispers.
+  - Screen jumpscares with no face image show a drawn SVG face (two zombies, the crawler, two brides; `src/ui/hud/scareFaces.tsx`) in place of the labelled "PLACEHOLDER" box.
+  - Crawlers: a light swing made while looking down (pitch at or below `CRAWLER.downSwingPitchRad`) counts as a downward swing and hits. Before, only a heavy swing did, and nothing told the player. Bestiary note and bible §12.2 row updated.
+  - Zombie skins' cold self-fill now scales with the lantern (`src/scene/enemies/lanternFill.ts`): full at the player, none past the lantern's reach or while it is out. Before, zombies glowed blue-grey in the dark.
+- **What Kiro caught or sped up:** Nothing; done by hand. Lint, typecheck and all 2851 unit tests pass.
+- **Decisions made unattended:**
+  - The `dead` voice falls back to the ElevenLabs premade "Clyde"; `ELEVENLABS_VOICE_DEAD` overrides it. Voices may carry their own `settings`. (2026-11-18)
+  - Creature sound files are named after their cue ids, which `voiceCue` plays before the synth tell. (2026-11-18)
+  - The fill fades linearly to twice the light radius, the same reach as the lantern's spot. (2026-11-18)

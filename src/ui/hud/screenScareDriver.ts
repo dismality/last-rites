@@ -1,6 +1,6 @@
 // The per-frame driver of a screen jumpscare (spec 11 H1), split out of ScreenScare.tsx so the
 // timing and the sting depend on the scare alone and never on what stands on screen: a face image
-// and the "PLACEHOLDER face-..." rectangle that replaces it when the file is missing are driven
+// and the drawn stand-in face (scareFaces.tsx) that replaces it when the file is missing are driven
 // by the very same code (Req 1.20, 8.16). It only writes `style` on the elements it is handed.
 import {
   releaseScreenScareDuck,

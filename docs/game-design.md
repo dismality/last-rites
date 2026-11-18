@@ -1036,7 +1036,7 @@ Data: `src/data/enemies.ts` (`EnemyId`, `ENEMY_MAP`, `ENEMY_LOOKS`) and `src/dat
 
 | Bestiary | Field note (at most 200 characters) | What works |
 |---|---|---|
-| `crawler` | It waits under mounds and broken coffins and drags itself out when you pass. Its body is too low for a level swing. | Swing down, shoot it, or burn it with a lantern trap. |
+| `crawler` | It waits under mounds and broken coffins and drags itself out when you pass. Its body is too low for a level swing. | Look down at it and swing, or chop with a heavy swing; shoot it, or burn it with a lantern trap. |
 | `bride` | A drifting bride seen only in your lantern's light. She cannot wound you, but her touch drinks your oil. | Holy water, the silver sabre, Blessed Rounds; she cannot cross salt. Lead passes through. |
 | `hound` | They hunt in twos and threes, circling out of reach until one darts in. | A gunshot or a lantern flare scatters them; guns and heavy swings bring them down. |
 

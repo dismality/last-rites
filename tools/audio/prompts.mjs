@@ -23,6 +23,14 @@ export const VOICES = {
     // ElevenLabs premade "Daniel" (British, measured). Replace via the env variable.
     fallbackId: 'onwK4e9ZLuTAKqWW03F9',
   },
+  dead: {
+    describe: 'A dead man speaking from the dark, a dry rasping whisper, slow, breathy, barely voiced',
+    env: 'ELEVENLABS_VOICE_DEAD',
+    // ElevenLabs premade "Clyde" (gravelly, older). Replace via the env variable with a whisper voice.
+    fallbackId: '2EiwWnXFnvU5JabPnv8n',
+    // Low stability and high style push the read toward a ragged whisper.
+    settings: { stability: 0.25, similarity_boost: 0.6, style: 0.7, speed: 0.75 },
+  },
 }
 
 const sfx = (name, prompt, seconds, extra = {}) => ({ kind: 'sfx', folder: 'sfx', name, prompt, seconds, wired: true, ...extra })
@@ -65,31 +73,37 @@ export const AUDIO = [
   sfx('salt-place', 'handful of coarse salt poured onto stone in a circle, grainy hiss', 1.2),
 
   // ── Enemies ──────────────────────────────────────────────────────────────────
-  sfx('bloater-gurgle', 'bloated corpse gurgling, wet bubbling stomach, disgusting, slow', 2.5),
+  sfx('bloater-gurgle', 'bloated corpse gurgling, wet bubbling stomach, disgusting, slow', 2.5, { batch: 'scares' }),
   sfx('bloater-hiss', 'swollen corpse hissing gas as it swells, wet hiss', 1.2),
   sfx('bloater-burst', 'bloated corpse bursting, wet splatter and gas pop', 1.2),
-  sfx('brute-grunt', 'huge undead man grunting, deep angry growl, close', 1.2),
-  sfx('brute-step', 'very heavy undead footstep thudding on earth, low', 0.7),
-  sfx('lurker-breath', 'something crouched in the dark breathing slowly, wet rasping breath', 2.5),
-  sfx('wailer-wail', 'ghostly undead woman wailing, distant, long reverb, chilling', 3.5),
+  sfx('brute-grunt', 'huge undead man grunting, deep angry growl, close', 1.2, { batch: 'scares' }),
+  sfx('brute-step', 'very heavy undead footstep thudding on earth, low', 0.7, { batch: 'scares' }),
+  sfx('lurker-breath', 'something crouched in the dark breathing slowly, wet rasping breath', 2.5, { batch: 'scares' }),
+  sfx('wailer-wail', 'ghostly undead woman wailing, distant, long reverb, chilling', 3.5, { batch: 'scares' }),
+  // Spec 11 creatures: named by their cue id, so the file plays in place of the synth tell.
+  sfx('crawler-shiver', 'grave soil shivering and a wet clicking from just under the ground, something crawling up', 2, { batch: 'scares' }),
+  sfx('bride-hum', 'a dead woman faintly humming a slow lullaby in the dark, cold breath, distant and close at once', 3, { batch: 'scares' }),
+  sfx('hound-growl', 'low wet growl of a starved rotting dog in the dark, close, threatening', 2, { batch: 'scares' }),
   sfx('elite-arrival', 'horror sting, low brass swell and a deep hit, something powerful has arrived', 2.5),
   sfx('boss-rise', 'undead priest rising from a crypt, stone cracking, deep choir drone, rumble', 4),
   sfx('crane-censer', 'iron censer swinging on a chain, creak and clink, smoky', 1.5),
   sfx('censer-chain', 'heavy iron chain rattling and swinging', 1),
   sfx('boss-death', 'undead priest collapsing to dust, long fading moan and falling stone', 4),
-  sfx('hand-grab', 'rotting hand bursting out of grave soil and grabbing, dirt crumbling, wet', 1.2),
+  sfx('hand-grab', 'rotting hand bursting out of grave soil and grabbing, dirt crumbling, wet', 1.2, { batch: 'scares' }),
 
   // ── Scares ───────────────────────────────────────────────────────────────────
-  sfx('grab-stinger', 'sudden horror jump scare sting, violin screech and low impact', 1.5),
-  sfx('grab-stinger-soft', 'soft horror sting, muted string swell, unsettling', 1.5),
-  sfx('door-creak', 'old wooden door creaking open slowly, rusty hinges', 2.5),
-  sfx('door-slam', 'heavy wooden door slamming shut in a stone building, echo', 1.2),
-  sfx('stone-grind', 'heavy stone slab grinding and scraping open', 2.5),
-  sfx('soil-crumble', 'grave soil shifting and crumbling, dirt trickling', 1.5),
-  sfx('wind-gust', 'cold wind gust through dead trees, sudden, whistling', 3),
-  sfx('breath-behind', 'slow raspy breath right behind the listener, very close, intimate', 2),
-  sfx('whisper-keeper', 'unintelligible ghostly whispers of several voices, close, left and right', 3),
-  sfx('heartbeat', 'single heavy heartbeat thump, low, muffled', 0.8),
+  sfx('grab-stinger', 'sudden horror jump scare sting, violin screech and low impact', 1.5, { batch: 'scares' }),
+  sfx('grab-stinger-soft', 'soft horror sting, muted string swell, unsettling', 1.5, { batch: 'scares' }),
+  sfx('screen-scare-sting', 'sudden horror jump scare, sharp noise burst, a low body thud and a falling human scream, very close', 1.5, { batch: 'scares' }),
+  sfx('door-creak', 'old wooden door creaking open slowly, rusty hinges', 2.5, { batch: 'scares' }),
+  sfx('door-slam', 'heavy wooden door slamming shut in a stone building, echo', 1.2, { batch: 'scares' }),
+  sfx('stone-grind', 'heavy stone slab grinding and scraping open', 2.5, { batch: 'scares' }),
+  sfx('soil-crumble', 'grave soil shifting and crumbling, dirt trickling', 1.5, { batch: 'scares' }),
+  sfx('wind-gust', 'cold wind gust through dead trees, sudden, whistling', 3, { batch: 'scares' }),
+  sfx('breath-behind', 'slow raspy breath right behind the listener, very close, intimate', 2, { batch: 'scares' }),
+  // The whisper-name scare: a dead voice saying the word, matching its subtitle '"...keeper..."'.
+  say('whisper-keeper', 'dead', '...keeeper...', { wired: true, batch: 'scares' }),
+  sfx('heartbeat', 'single heavy heartbeat thump, low, muffled', 0.8, { batch: 'scares' }),
   sfx('thunder-close', 'close thunder crack and long rumble', 4),
   sfx('thunder-far', 'distant rolling thunder', 4),
   sfx('toll', 'single deep church bell toll, long ring', 5),
@@ -163,6 +177,7 @@ export function inBatch(entry, batch) {
   if (batch === 'all') return true
   if (batch === 'first') return entry.batch === 'first'
   if (batch === 'halloween') return entry.batch === 'halloween'
+  if (batch === 'scares') return entry.batch === 'scares'
   if (batch === 'voice') return entry.kind === 'voice'
   if (batch === 'music') return entry.kind === 'music'
   if (batch === 'ambience') return entry.folder === 'ambience'
