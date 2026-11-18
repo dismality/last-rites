@@ -11,7 +11,9 @@ describe('Lantern light count stays fixed', () => {
   it('turns the beam off with intensity 0 and skips the shadow redraw while dark', () => {
     expect(source).toMatch(/spot\.current\.intensity = beam \? SPOT_PEAK \* k : 0/)
     expect(source).toMatch(/fill\.current\.intensity = beam \? FILL_PEAK \* k : 0/)
-    expect(source).toMatch(/ember\.current\.intensity = on && empty \? EMBER_INTENSITY \* wave : 0/)
+    expect(source).toMatch(
+      /ember\.current\.intensity = on && empty && !beam \? EMBER_INTENSITY : 0/,
+    )
     expect(source).toMatch(/spot\.current\.shadow\.autoUpdate = beam/)
   })
 })

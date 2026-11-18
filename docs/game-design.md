@@ -1168,7 +1168,7 @@ Models: `public/assets/models/viewmodel/hands.glb` (clips Grip-Pistol, Grip-Haft
 | Bride within 8 m | Light ×0.7 |
 | Flashing lights off | Changes slower than 1 Hz; no step over 10% of base per frame |
 | Low graphics | No cookie; the spot keeps its shadow |
-| Bloom | Flame and glass only |
+| Bloom | The flame and glass glow through the scene's existing global bloom (threshold 1): both are drawn in HDR so they cross it. Other emissives (windows, turnip lanterns) bloom as they did before. **As built (task 6.7):** a selective bloom limited to the flame and glass doubled frame time (6.9 to 11-13 ms by day, 8.5 to 18.6 ms in the night wave at 1080p), so the "flame and glass only" wording is relaxed to this. Frame time is back to the baseline (6.9 ms, `e2e/logs/lantern-perf-after.json`). |
 
 Range and brightness follow the oil (8 m full, 2 m empty, §11 Lantern), times the flicker signal; the flame scale and glass glow follow the same signal in the same frame. This light replaces today's lantern light, so the scene keeps at most 4 shadow-casting lights; GPU perf is measured before the first code task and after the last.
 

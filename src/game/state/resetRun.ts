@@ -20,6 +20,7 @@ import { useWaitingList } from './waitingList'
 import { useVendingStore } from './vendingStore'
 import { useBatStore } from './batStore'
 import { resetBatRuntime } from './batStep'
+import { useLanternHandStore } from './lanternHandStore'
 import { resetScreenScareRuntime, useScreenScareStore } from './screenScareStore'
 import { resetScreenScareQueue } from './screenScareQueue'
 import { useChapelStore } from './chapelStore'
@@ -79,6 +80,7 @@ export const REPLACED_STORES = [
   useBatStore,
   useVendingStore,
   useScreenScareStore,
+  useLanternHandStore,
   useInventoryStore,
   useCraftingStore,
   useChapelStore,
@@ -143,7 +145,14 @@ export function resetRun(): void {
   clearNightState()
   // Achievements and the Endless best are not run state, so only the toasts are cleared.
   useAchievementStore.getState().resetSession()
-  useGameStore.setState({ paused: false, taken: false, examining: false, journalOpen: false, mapOpen: false, satchelOpen: false })
+  useGameStore.setState({
+    paused: false,
+    taken: false,
+    examining: false,
+    journalOpen: false,
+    mapOpen: false,
+    satchelOpen: false,
+  })
   useOverlayStore.getState().setAltarPanelOpen(false)
   useOverlayStore.getState().setMinigameOpen(null)
 

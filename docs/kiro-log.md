@@ -2094,3 +2094,25 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Left `src/data/cases.ts` unstaged: its change is a comment-only edit not part of task 5. (2026-11-18)
   - Did not stage `.kiro/specs/11-horror-pass/tasks.md` or `tasks.meta.json`: the orchestrator owns task status. (2026-11-18)
   - Staged `package.json`, `package-lock.json` and `vitest.config.ts` because task 5.3's component test needs the jsdom and testing-library dev dependencies. (2026-11-18)
+
+### 2026-11-20: 11-horror-pass task 6.4: Viewmodel hands
+- **Kiro feature used:** spec task / MCP (context7 for drei `useAnimations`)
+- **What happened:** The viewmodel now drives the `lanternHand.ts` state machine into `lanternHandRuntime`, loads `hands.glb` and `lantern.glb` behind an error boundary, plays grip and Lantern-Hold clips, and shows the hook caption once per run. Lag and sprint-drop rules went into a pure `lanternSway.ts` with tests.
+- **What Kiro caught or sped up:** Missing model files render nothing instead of crashing, and the belt/strap light anchor still works without them.
+### 2026-11-18: 11-horror-pass task 6.6: Hands and lantern e2e, screenshots and perf
+- **Kiro feature used:** spec task
+- **What happened:** Added `viewmodelState()` and `lanternLightState()` to the Debug_Hook (the light rig mirrors its last frame into `lanternLightRuntime`). Wrote `e2e/hands-lantern.spec.ts`, which checks the grip class of each weapon, the belt lantern and its once-per-run caption, the shadow and cookie (and Low graphics dropping the cookie), low oil and oil out, and Flashing lights off. All 5 tests pass, and screenshots are in `e2e/screenshots/hands-lantern/`. Ran the GPU perf spec on HEAD in a temporary `git worktree` and on the working tree, saving `e2e/logs/lantern-perf-before.json` and `lantern-perf-after.json`.
+- **What Kiro caught or sped up:** The Flashing-lights-off check found two one-frame jumps at 0 oil in `Lantern.tsx`. The flare used full brightness instead of the current level, and the 1.5 m ember radius cut the level by 25%. The beam now continues from the 2 m floor, and with Flashing lights off it lasts as long as the 1 s fade. The perf run found a real frame-time regression: 6.9 → 11–13 ms by day and 8.5 → 18.6 ms in the night wave. Shadow lights stayed at 2. The likely cause is `SelectiveBloom` re-rendering the scene, but this is not yet confirmed.
+
+### 2026-11-18: 11-horror-pass task 6: Hands and a realistic lantern light (Finish, 6.7)
+- **Kiro feature used:** spec task / Playwright GPU perf spec
+- **What happened:** Before finishing, fixed the frame-time regression found in 6.6. Swapping `SelectiveBloom` back to the global `Bloom` (threshold 1) cut the day scenes from 11-13 ms to 8.3 ms, and removing the `<Selection>` wrapper and the `<Select>` in `Lantern.tsx` brought them to 6.9 ms, the same as HEAD. The night wave went 18.6 → 11.5 → 6.9 ms. The flame colour and the glass emissive colour are now scaled above 1 (HDR) so the global bloom picks them up. `BLOOM_LIGHT_STANDIN` was removed. `e2e/logs/lantern-perf-after.json` was re-measured (shadow lights stay at 2). The "Maximum update depth exceeded" console errors came from the `Selection` wrapper: they are gone, with 0 in the perf run and the hands-lantern run. Lint, build, 338 test files (2745 tests) and the 5 `e2e/hands-lantern.spec.ts` tests pass.
+- **What Kiro caught or sped up:** The process-rule tests flagged `lanternCookie.ts` as a system without a test file; added `lanternCookie.test.ts`. Mid-measurement, a perf run with the default tag overwrote `lantern-perf-before.json`; it was restored from the figures printed earlier in the session (they match 6.6's recorded values).
+- **Decisions made unattended:**
+  - Bloom is global again, with the flame and glass pushed into HDR, instead of a selective bloom. Reason: the selective pass plus its `Selection` wrapper cost 4 to 10 ms a frame at 1080p, over the 45 fps floor's headroom, and global bloom gives the baseline frame time. Req 7.16 ("flame and glass only") is relaxed: other emissives bloom as before. Written in design bible §14.7. (2026-11-18)
+  - Hook caption kept in `src/data/lanternLight.ts` rather than `captions.ts`, because it is not a sound event. (2026-11-18)
+  - The hook caption is only spent (marked shown) when subtitles are on. (2026-11-18)
+  - The viewmodel error boundary is a class component, since React has no functional error boundaries. (2026-11-18)
+  - With Flashing lights off, the oil-out uses a 1 s fade instead of the 0.3 s flare. (2026-11-18)
+  - The glass emissive colour gets a ×4 boost rather than raising `glassBase`, so `signalToGlass` and its tests keep their meaning. The glass is 35% opaque, so it blooms only weakly; the flame carries the glow. (2026-11-18)
+  - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the one-line comment fix in `src/data/cases.ts`. The task files also carry status changes for tasks 4 and 5, and the comment fix is not part of task 6. (2026-11-18)

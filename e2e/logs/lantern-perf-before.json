@@ -1,0 +1,56 @@
+{
+  "tag": "before",
+  "date": "2026-11-18",
+  "renderer": "headless Chrome, ANGLE D3D11 (GPU)",
+  "width": 1920,
+  "height": 1080,
+  "hut": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 208,
+    "triangles": 666458,
+    "lights": {
+      "total": 14,
+      "shadowCasting": 2,
+      "lit": 7
+    },
+    "overDrawCallBudget": true
+  },
+  "grounds-day": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 339,
+    "triangles": 694400,
+    "lights": {
+      "total": 14,
+      "shadowCasting": 2,
+      "lit": 7
+    },
+    "overDrawCallBudget": true
+  },
+  "mausoleum-row": {
+    "meanFrameMs": 6.9,
+    "longestFrameMs": 7.1,
+    "drawCalls": 352,
+    "triangles": 726414,
+    "lights": {
+      "total": 14,
+      "shadowCasting": 2,
+      "lit": 7
+    },
+    "overDrawCallBudget": true
+  },
+  "grounds-night-wave": {
+    "meanFrameMs": 8.5,
+    "longestFrameMs": 14,
+    "drawCalls": 397,
+    "triangles": 943172,
+    "lights": {
+      "total": 14,
+      "shadowCasting": 2,
+      "lit": 8
+    },
+    "overDrawCallBudget": true
+  },
+  "note": "Spec 11 task 6.6. HEAD d0c248d (before the H7 lantern changes), measured in a temporary git worktree (dev server on port 5174, same public assets, same scenes and 1920x1080, same GPU). Draw calls recorded, not asserted (baseline already over 150)."
+}

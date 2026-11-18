@@ -42,6 +42,8 @@ export interface ProgressionSave {
   storm: { active: boolean }
   /** Spec 11 H1: the screen scare cooldown and the scripted moments already used. */
   screenScare: ScreenScareSave
+  /** Spec 11 H7: the belt-hook caption has been shown this run. */
+  lanternHookCaptionShown: boolean
 }
 
 /** Sim time (s) of the last screen scare start, and the scripted moments that have played. */
@@ -80,6 +82,7 @@ export function defaultProgressionSave(): ProgressionSave {
     stats: parseStats(undefined),
     storm: { active: false },
     screenScare: { lastStartSim: null, used: [] },
+    lanternHookCaptionShown: false,
   }
 }
 
@@ -195,5 +198,6 @@ export function sanitizeProgression(raw: unknown, ctx: ProgressionSaveContext): 
     stats: parseStats(raw.stats),
     storm: { active: isObj(raw.storm) && raw.storm.active === true },
     screenScare: sanitizeScreenScare(raw.screenScare),
+    lanternHookCaptionShown: raw.lanternHookCaptionShown === true,
   }
 }

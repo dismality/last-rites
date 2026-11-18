@@ -23,6 +23,8 @@ import {
   TRIGGER_SETS,
 } from '../src/data/screenScares'
 import { scareFaceUrl } from '../src/data/assets'
+import { LANTERN_HOOK_CAPTION, LANTERN_LIGHT } from '../src/data/lanternLight'
+import { GRIP_TABLE, HANDS_CLIPS, VIEWMODEL_TIMING, type GripWeaponId } from '../src/data/viewmodel'
 
 // Spec 11 task 1.2 (Req 8.2, 8.3): the horror-pass section of the design bible ("§12" in spec 11,
 // "## 14. Horror pass" in the bible) has its nine subsections, and a small parser hands later tasks
@@ -216,6 +218,53 @@ describe('§12.5 info dots mirror src/data/infoTips.ts', () => {
   it.skipIf(s.cut)('states the hint prices and the vending machine', () => {
     expect(INFO_TIPS['hud-hints']).toContain(`${HINT_COSTS[0]}, then ${HINT_COSTS[1]}, then ${HINT_COSTS[2]}`)
     expect(INFO_TIPS['hud-coins']).toMatch(/vending machine/i)
+  })
+})
+
+// Spec 11 task 6.1 (Req 7.1, 7.2, 7.5, 7.9, 7.11 to 7.14, 8.2): §12.7 (bible §14.7) against
+// src/data/lanternLight.ts and src/data/viewmodel.ts.
+describe('§12.7 hands and lantern light mirror the data', () => {
+  const s = subsection(bible, '12.7')
+  const unticked = (v: string): string => v.replace(/`/g, '')
+  const nums = (v: string): number[] => (v.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)
+  const hands = (name: string): string => tableOf(s, 'Hands').rows.find((r) => r.Hands === name)!.Value
+  const light = (name: string): string => tableOf(s, 'Light').rows.find((r) => r.Light === name)!.Value
+
+  it.skipIf(s.cut)('has the same grip table', () => {
+    const rows = tableOf(s, 'Weapon').rows
+    expect(rows.map((r) => unticked(r.Weapon))).toEqual(Object.keys(GRIP_TABLE))
+    for (const r of rows) expect(r.Grip.toLowerCase(), r.Weapon).toBe(GRIP_TABLE[unticked(r.Weapon) as GripWeaponId])
+  })
+
+  it.skipIf(s.cut)('names the clips of the hands model', () => {
+    for (const clip of Object.values(HANDS_CLIPS)) expect(s.body, clip).toContain(clip)
+  })
+
+  it.skipIf(s.cut)('has the same hand timings', () => {
+    expect(nums(hands('Grip switch'))[0]).toBe(VIEWMODEL_TIMING.gripBlendS)
+    expect(nums(hands('Lantern sway lag'))[0]).toBe(VIEWMODEL_TIMING.swayLagS * 1000)
+    expect(nums(hands('Lantern sway lag'))[1]).toBe(VIEWMODEL_TIMING.swayLagToleranceS * 1000)
+    expect(nums(hands('Sprint drop')).slice(0, 2)).toEqual([...VIEWMODEL_TIMING.sprintDropM])
+    expect(nums(hands('Shotgun'))).toEqual(expect.arrayContaining([...VIEWMODEL_TIMING.beltLightDownDeg, VIEWMODEL_TIMING.beltReturnS]))
+    expect(nums(hands('Throw or heavy swing (axe, sabre)')).pop()).toBe(VIEWMODEL_TIMING.strapCatchS)
+    expect(hands('Belt caption')).toContain(`"${LANTERN_HOOK_CAPTION}"`)
+  })
+
+  it.skipIf(s.cut)('has the same light numbers', () => {
+    const L = LANTERN_LIGHT
+    expect(light('Spot')).toContain(`shadow map ${L.shadowMap}`)
+    expect(nums(light('Fill'))[0]).toBe(L.fillRadius)
+    expect(light('Colour')).toContain(L.color)
+    expect(light('Colour')).toContain(L.lowOilColor)
+    expect(nums(light('Colour'))).toContain(L.lowOilBelow)
+    expect(nums(light('Breathing')).slice(0, 2)).toEqual([...L.breathHz])
+    expect(nums(light('Gutters')).slice(0, 2)).toEqual([...L.gutterHz])
+    expect(nums(light('Dips'))[0]).toBe(L.dipMax * 100)
+    expect(nums(light('Low oil (below 15%)'))[0]).toBe(L.lowOilGutterMult)
+    expect(nums(light('Sprint or gust'))[0]).toBe(L.moveGutterMult)
+    expect(nums(light('Oil at 0'))[0]).toBe(L.flareS)
+    expect(nums(light('Bride within 8 m'))[0]).toBe(1 - L.brideDim)
+    expect(nums(light('Flashing lights off'))).toEqual([L.flashingOffMaxHz, L.flashingOffMaxStep * 100])
   })
 })
 

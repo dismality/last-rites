@@ -53,7 +53,7 @@ describe('progressionStore', () => {
 
   it('the persisted list names every saved field', () => {
     // Plus the screen scare state of spec 11, saved with the progression but held in its own store.
-    const saved = [...PROGRESSION_PERSISTED, 'screenScare'].sort()
+    const saved = [...PROGRESSION_PERSISTED, 'screenScare', 'lanternHookCaptionShown'].sort()
     expect(saved).toEqual(Object.keys(defaultProgressionSave()).sort())
     expect(Object.keys(captureProgressionSave()).sort()).toEqual(saved)
   })

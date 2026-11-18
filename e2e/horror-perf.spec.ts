@@ -7,6 +7,9 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 // The default is "before". Draw calls, mean and longest frame time and the shadow-light count are
 // saved to e2e/logs/horror-perf-<tag>.json. Uses the machine's GPU (playwright.config.ts).
 const TAG = process.env.HORROR_PERF === 'after' ? 'after' : 'before'
+// Task 6.6 measures the H7 lantern on the same scenes under its own name (PERF_LOG=lantern writes
+// e2e/logs/lantern-perf-<tag>.json), leaving the task 2 baseline untouched.
+const LOG = process.env.PERF_LOG === 'lantern' ? 'lantern' : 'horror'
 const SIZE = { width: 1920, height: 1080 }
 
 interface Stop {
@@ -87,6 +90,6 @@ test(`horror pass GPU benchmark (${TAG})`, async ({ page }) => {
   }
   mkdirSync('e2e/logs', { recursive: true })
   const out = { tag: TAG, date: new Date().toISOString().slice(0, 10), renderer: 'headless Chrome, ANGLE D3D11 (GPU)', ...SIZE, ...result }
-  writeFileSync(`e2e/logs/horror-perf-${TAG}.json`, JSON.stringify(out, null, 2))
+  writeFileSync(`e2e/logs/${LOG}-perf-${TAG}.json`, JSON.stringify(out, null, 2))
   console.log(JSON.stringify(out))
 })

@@ -1,0 +1,56 @@
+{
+    "tag":  "after",
+    "date":  "2026-11-18",
+    "renderer":  "headless Chrome, ANGLE D3D11 (GPU)",
+    "width":  1920,
+    "height":  1080,
+    "hut":  {
+                "meanFrameMs":  6.9,
+                "longestFrameMs":  7.1,
+                "drawCalls":  211,
+                "triangles":  666962,
+                "lights":  {
+                               "total":  14,
+                               "shadowCasting":  2,
+                               "lit":  7
+                           },
+                "overDrawCallBudget":  true
+            },
+    "grounds-day":  {
+                        "meanFrameMs":  6.9,
+                        "longestFrameMs":  7.1,
+                        "drawCalls":  342,
+                        "triangles":  694904,
+                        "lights":  {
+                                       "total":  14,
+                                       "shadowCasting":  2,
+                                       "lit":  7
+                                   },
+                        "overDrawCallBudget":  true
+                    },
+    "mausoleum-row":  {
+                          "meanFrameMs":  6.9,
+                          "longestFrameMs":  7.1,
+                          "drawCalls":  353,
+                          "triangles":  726478,
+                          "lights":  {
+                                         "total":  14,
+                                         "shadowCasting":  2,
+                                         "lit":  7
+                                     },
+                          "overDrawCallBudget":  true
+                      },
+    "grounds-night-wave":  {
+                               "meanFrameMs":  6.9,
+                               "longestFrameMs":  7.1,
+                               "drawCalls":  394,
+                               "triangles":  956620,
+                               "lights":  {
+                                              "total":  14,
+                                              "shadowCasting":  2,
+                                              "lit":  8
+                                          },
+                               "overDrawCallBudget":  true
+                           },
+    "note":  "Spec 11 task 6.7. Same scenes, 1920x1080 and GPU as lantern-perf-before.json. Task 6.6 measured 11.3 / 13.0 / 13.1 / 18.6 ms with SelectiveBloom inside a Selection wrapping the Canvas. Global Bloom inside the Selection wrapper measured 8.4 / 8.3 / 8.4 / 11.5 ms. Now: global Bloom (threshold 1), no Selection, flame and glass in HDR. Draw calls recorded, not asserted."
+}

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { CAPTIONS } from '../src/data/captions'
+import { LANTERN_HOOK_CAPTION, LANTERN_HOOK_CAPTION_S } from '../src/data/lanternLight'
 import { SOUND_RECIPES, type SoundId } from '../src/data/sounds'
 
 // Spec 11 Req 6.16 and 8.8: every new sound of the horror pass has a caption that stays at least
@@ -43,5 +44,12 @@ describe('spec 11 sound and caption coverage', () => {
       expect(SOUND_RECIPES[id].spatial, id).toBe(true)
       expect(SOUND_RECIPES[id].maxDistanceM, id).toBeGreaterThan(0)
     }
+  })
+
+  // Task 6, H7: the belt-hook caption is not a sound event; it is shown once per run by the hand
+  // state machine, from its own constant, and has to meet the same 1.5 s floor.
+  it('keeps the lantern hook caption on screen for at least 1.5 s', () => {
+    expect(LANTERN_HOOK_CAPTION.trim()).toBe('Lantern hooked to your belt')
+    expect(LANTERN_HOOK_CAPTION_S).toBeGreaterThanOrEqual(1.5)
   })
 })

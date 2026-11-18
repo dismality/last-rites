@@ -53,6 +53,29 @@ import { isHeldWeaponId } from './viewmodelWeaponGeometry'
 import { HELD_GRIPS, HELD_ORIGIN, fitScale, type HeldGrip } from '../../data/itemModels'
 import { ITEM_MAP } from '../../data/items'
 import { ItemMesh } from '../world/ItemModel'
+import { emit } from '../../game/events'
+import { LANTERN_HOOK_CAPTION_S } from '../../data/lanternLight'
+import { GRIP_TABLE, VIEWMODEL_TIMING, type GripWeaponId } from '../../data/viewmodel'
+import { gripFor } from '../../game/systems/gripClass'
+import {
+  beginLanternAction,
+  endLanternAction,
+  equipWeapon,
+  hookCaption,
+  stepLanternHand,
+} from '../../game/systems/lanternHand'
+import { lagToward, sprintDrop, type Vec3Tuple } from '../../game/systems/lanternSway'
+import { useLanternHandStore } from '../../game/state/lanternHandStore'
+import { useProjectileStore } from '../../game/state/projectileStore'
+import {
+  LANTERN_ANCHORS,
+  LANTERN_STRAP_POSITION,
+  handsRuntime,
+  lanternHandRuntime,
+} from './lanternRig'
+import { ViewmodelHands, ViewmodelLantern } from './ViewmodelHands'
+
+const NO_ITEM = 'none'
 
 /** Longest edge of a held non-weapon item (m): big enough to read, small enough to clear the view. */
 const HELD_ITEM_MAX_EDGE_M = 0.2
@@ -294,6 +317,11 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
   const sway = useRef<SwayState>(SWAY_REST)
   const bob = useRef<BobState>({ phase: 0, amplitude: 0 })
   const lastLook = useRef<{ yaw: number; pitch: number } | null>(null)
+  const lanternGroup = useRef<THREE.Group>(null)
+  const lanternPos = useRef<Vec3Tuple>(LANTERN_ANCHORS.glass)
+  const equippedFor = useRef<string | null>(null)
+  const throwLeftS = useRef(0)
+  const thrownCount = useRef(0)
 
   useFrame((state, rawDelta) => {
     const settings = useSettingsStore.getState()
@@ -341,6 +369,70 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
       g.rotation.set(-lowered * SWAP_LOWER_TILT - sw.rotX - wp.rotX, 0, sw.rotZ + wp.rotZ)
     }
 
+    // Lantern hand (Req 7.3 to 7.8). The state machine runs with or without the models, because
+    // the light anchor (belt or glass) follows it.
+    {
+      const shownId: string = swap.current.shown ?? NO_ITEM
+      let hand = lanternHandRuntime.hand
+      if (equippedFor.current !== shownId) {
+        equippedFor.current = shownId
+        hand = equipWeapon(hand, shownId)
+        if (shownId in GRIP_TABLE) handsRuntime.grip = gripFor(shownId as GripWeaponId)
+      }
+      const live = useCombatStore.getState().live
+      const thrown = useProjectileStore.getState().thrown.length
+      if (thrown > thrownCount.current) {
+        throwLeftS.current = VIEWMODEL_TIMING.throwActionS
+        handsRuntime.throwSerial += 1
+      }
+      thrownCount.current = thrown
+      throwLeftS.current = Math.max(0, throwLeftS.current - dt)
+      const heavyCharging =
+        live.charge !== null && (shownId === 'wood-axe' || shownId === 'silver-sabre')
+      const wantAction = throwLeftS.current > 0 || heavyCharging
+      if (wantAction && !hand.acting) hand = beginLanternAction(hand)
+      else if (!wantAction && hand.acting) hand = endLanternAction(hand)
+      hand = stepLanternHand(hand, dt)
+
+      const prevMode = lanternHandRuntime.hand.mode
+      if (hand.mode !== prevMode) {
+        const store = useLanternHandStore.getState()
+        // The flag is only spent when the caption can be read, so it is not lost with Subtitles off.
+        if (settings.subtitles) {
+          const cap = hookCaption(store.hookCaptionShown, prevMode, hand.mode)
+          if (cap.text !== null) {
+            store.setHookCaptionShown(cap.shown)
+            emit({ type: 'subtitleShown', text: cap.text, duration: LANTERN_HOOK_CAPTION_S })
+          }
+        }
+      }
+      lanternHandRuntime.hand = hand
+
+      const lg = lanternGroup.current
+      if (lg) {
+        const snap = input.peek()
+        const sprinting = snap.sprint && (snap.forward !== 0 || snap.strafe !== 0)
+        let target: Vec3Tuple
+        if (hand.mode === 'belt') target = LANTERN_ANCHORS.belt
+        else if (hand.mode === 'strap') target = LANTERN_STRAP_POSITION
+        else {
+          const [gx, gy, gz] = LANTERN_ANCHORS.glass
+          // With Head bob off the hand holds still: no look sway or bob, only the sprint drop.
+          const bobbing = settings.headBob
+          const b = viewmodelBob(bob.current)
+          target = [
+            gx + (bobbing ? sway.current.x + b.x : 0),
+            gy +
+              (bobbing ? sway.current.y + b.y : 0) -
+              sprintDrop(sprinting, settings.headBob, bob.current.amplitude),
+            gz,
+          ]
+        }
+        lanternPos.current = lagToward(lanternPos.current, target, dt, VIEWMODEL_TIMING.swayLagS)
+        lg.position.set(...lanternPos.current)
+      }
+    }
+
     // Muzzle flash: age the queued shots, drop spent ones, light the newest as a quad.
     const profile = muzzleProfile(settings.flashingLights)
     const events = weaponRuntime.muzzleEvents
@@ -381,7 +473,11 @@ export function Viewmodel({ weaponState: weaponStateProp = null }: ViewmodelProp
       {/* The portal scene gets none of the world's lights, so give it a faint warm key. */}
       <ambientLight intensity={0.6} color="#9fb3c8" />
       <directionalLight position={[0.5, 1, 1]} intensity={1.2} color="#e8913a" />
+      <group ref={lanternGroup} name="viewmodel-lantern">
+        <ViewmodelLantern />
+      </group>
       <group ref={rig} name="viewmodel">
+        <ViewmodelHands />
         <group ref={itemGroup}>
           <ViewmodelMesh item={shownItem} muzzleRef={muzzleRef} />
           {cracked && <CrackOverlay opacity={opacity} />}

@@ -58,6 +58,12 @@ import { useDigStore } from '../game/state/digStore'
 import { useInteractionStore } from '../game/state/interactionStore'
 import { useUiWorldStore } from '../game/state/uiWorldStore'
 import { useLanternStore } from '../game/state/lanternStore'
+import { useLanternHandStore } from '../game/state/lanternHandStore'
+import { waitingPaths } from '../game/state/waitingList'
+import { hotbarItem } from '../game/systems/satchel'
+import { gripFor } from '../game/systems/gripClass'
+import { GRIP_TABLE, type GripWeaponId } from '../data/viewmodel'
+import { handsRuntime, lanternHandRuntime, lanternLightRuntime } from '../scene/player/lanternRig'
 import { applyDamage } from '../game/systems/combat'
 import { coinDrop } from '../game/systems/coins'
 import { killReports } from '../game/systems/killReports'
@@ -423,6 +429,61 @@ const api = {
         return o ? Math.round((o.position.z - h[2]) * 1000) / 1000 : 0
       }),
     }
+  },
+  /** Spec 11 H7: the first-person hands as the viewmodel sees them (held item, grip class, lantern hand mode, caption flag). */
+  viewmodelState(): {
+    equipped: string | null
+    /** The grip class the hands are set to now (follows the shown weapon, after the swap). */
+    grip: string
+    /** The grip class the table gives the equipped weapon, or null for a non-grip item. */
+    gripExpected: string | null
+    lanternMode: string
+    acting: boolean
+    shotgunEquipped: boolean
+    hookCaptionShown: boolean
+    throwSerial: number
+    /** Art paths still missing (the weapon-only viewmodel and generated cookie stand in). */
+    missingArt: string[]
+  } {
+    const inv = useInventoryStore.getState()
+    const equipped = inv.equippedSlot === null ? null : hotbarItem(inv.inventory, inv.equippedSlot)
+    const hand = lanternHandRuntime.hand
+    return {
+      equipped,
+      grip: handsRuntime.grip,
+      gripExpected: equipped !== null && equipped in GRIP_TABLE ? gripFor(equipped as GripWeaponId) : null,
+      lanternMode: hand.mode,
+      acting: hand.acting,
+      shotgunEquipped: hand.shotgunEquipped,
+      hookCaptionShown: useLanternHandStore.getState().hookCaptionShown,
+      throwSerial: handsRuntime.throwSerial,
+      missingArt: [...waitingPaths()],
+    }
+  },
+  /** Spec 11 H7: the lantern light rig as of its last frame (flicker signal, intensities, colour, anchor, cookie, shadow). */
+  lanternLightState(): {
+    on: boolean
+    fuel: number
+    signal: number
+    gutterAmp: number
+    color: string
+    lowPass: boolean
+    beam: boolean
+    zeroAge: number | null
+    spotIntensity: number
+    fillIntensity: number
+    emberIntensity: number
+    flameScale: number
+    glassEmissive: number
+    anchor: 'glass' | 'belt'
+    spotPosition: [number, number, number]
+    hasCookie: boolean
+    castsShadow: boolean
+    shadowMapSize: number
+    shadowAutoUpdate: boolean
+  } {
+    const l = useLanternStore.getState()
+    return { on: l.on, fuel: l.fuel, ...lanternLightRuntime, spotPosition: [...lanternLightRuntime.spotPosition] }
   },
   /** Spec 11 H4: the bats as the step sees them (phase, box and head yaw per bat, chitter clock). */
   batState(): {
