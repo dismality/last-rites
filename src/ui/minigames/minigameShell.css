@@ -346,6 +346,7 @@
 .crest__turn { min-width: 3rem; padding: 0.15rem 0.6rem; font: inherit; font-size: 1rem; color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 3px; cursor: pointer; }
 .crest__turn:disabled { opacity: 0.5; cursor: default; }
 .crest__tablets { margin-top: 0.75rem; }
+.crest__demo-note { margin: 0 0 0.4rem; font-size: 0.85rem; font-style: italic; opacity: 0.75; }
 .crest__tablets ul { margin: 0; padding-left: 1.2rem; line-height: 1.5; }
 .crest__tablet-glyph { display: inline-block; width: 1.4rem; text-align: center; font-size: 1.2rem; }
 

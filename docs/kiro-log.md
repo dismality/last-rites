@@ -2174,3 +2174,12 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - `StageDayRule.whenCounted` is an optional main line for a counted step that still needs finishing. Only the bells step uses it. (2026-11-18)
   - Stand-in hands and lantern are listed in `src/data/placeholders.ts` under the existing hands and lantern rows. (2026-11-18)
+
+### 2026-11-18: Player speed 1.5x; Crest Lock demo note
+- **Kiro feature used:** Outside Kiro
+- **What happened:**
+  - Walk speed is now 4.5 m/s (was 3.0) and sprint 8.25 m/s (was 5.5), at the developer's request. Bible §11 table updated.
+  - The Crest Lock's tablet list gains a line saying it is a demo aid; in the full game the years are read from the crypt tablets and kept in the journal.
+- **What Kiro caught or sped up:** Nothing; done by hand. All 2849 unit tests, typecheck and lint pass.
+- **Decisions made unattended:**
+  - Footstep strides grew by the same 1.5x (walk 2.1 m, sprint 2.85 m), so the step rate stays about 2.1 a second. (2026-11-18)

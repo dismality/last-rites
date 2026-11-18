@@ -273,7 +273,7 @@ The recipe book shows the tier and any missing component. If E4 is cut, the flat
 | Stat | Value |
 |---|---|
 | Health | 100 (regenerates only via bandage or the altar) |
-| Walk / sprint speed | 3.0 / 5.5 m/s |
+| Walk / sprint speed | 4.5 / 8.25 m/s |
 | Stamina | 100; sprint drains 20/s, regenerates 15/s after 1 s. **(10)** Max stamina 100 / 90 / 80 by stage 1 / 2 / 3, and sprint drain ×0.8 on Easy, ×1 on Normal, ×1.2 on Hard. The stamina bar shows the cap. The cap never rises between stages, and stamina never exceeds it. A cap that shrinks mid-run lowers current stamina to the cap. Endless Survival uses 100 and ×1. |
 | Lantern fuel | 100%; no drain by day or at dawn **(09)**, 1% per 3 s at dusk and by night |
 | Lantern radius | 8 m at 100% fuel, scaling down to 2 m at 0% |

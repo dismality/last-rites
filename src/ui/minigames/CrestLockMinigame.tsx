@@ -124,6 +124,10 @@ export function CrestLockMinigame() {
 
         <section className="crest__tablets" aria-label="Crypt name tablets on Mausoleum Row">
           <h3 className="hymn__heading">The crypt name tablets, as read on the Row</h3>
+          <p className="crest__demo-note">
+            Demo aid: in the full game this list is not shown here. Each year is read from the tablet on its crypt and
+            noted in the journal. It is kept here so the demo can be finished quickly.
+          </p>
           <ul>
             {CASE_2_CREST_LOCK.tablets.map((t) => (
               <li key={t.family}>

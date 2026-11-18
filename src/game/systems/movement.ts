@@ -1,8 +1,8 @@
 // Pure movement maths for the first-person controller (no three.js / React).
 // Conventions: yaw 0 looks down -Z; positive yaw turns left (counter-clockwise from above).
 
-export const WALK_SPEED = 3.0
-export const SPRINT_SPEED = 5.5
+export const WALK_SPEED = 4.5
+export const SPRINT_SPEED = 8.25
 export const MAX_PITCH = (85 * Math.PI) / 180
 /** Radians of rotation per pixel of mouse travel at sensitivity 1.0. */
 export const RADIANS_PER_PIXEL = 0.0022
