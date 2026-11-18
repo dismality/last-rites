@@ -7,6 +7,7 @@ import { graveBurstRuntime } from '../../scene/effects/graveBurstRuntime'
 import { meleeRuntime } from '../../scene/player/meleeRuntime'
 import { useBossStore } from './bossStore'
 import { useChapelStore } from './chapelStore'
+import { useCreatureStore } from './creatureStore'
 import { useCombatStore } from './combatStore'
 import { useDoorStore } from './doorStore'
 import { useEffectStore } from './effectStore'
@@ -34,6 +35,8 @@ export function clearNightState(): void {
   meleeRuntime.dustQueue.length = 0
   graveBurstRuntime.queue.length = 0
   useEnemyStore.getState().setEnemies([])
+  // The night's crawlers, bride and hound packs; the Bestiary's seen set stays.
+  useCreatureStore.getState().clearNight()
   useBossStore.getState().reset()
   useFeedbackStore.getState().clear()
   useCombatStore.getState().resetLive()

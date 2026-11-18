@@ -7,6 +7,7 @@ import { CONTRACTS, CONTRACTS_PER_DAWN } from '../../data/contracts'
 import { DAWN_UPGRADES, OFFER_SIZE } from '../../data/dawnUpgrades'
 import { FIXED_ROWS, MERCHANT_ROWS, POOL_ROWS } from '../../data/merchant'
 import { MODE_IDS } from '../../data/modes'
+import { normalizeSeen } from './bestiary'
 import { SCRIPTED_MOMENTS } from '../../data/screenScares'
 import type { Inventory, ModeId } from '../types'
 import { parseStats, type RunStats } from './runStats'
@@ -44,6 +45,8 @@ export interface ProgressionSave {
   screenScare: ScreenScareSave
   /** Spec 11 H7: the belt-hook caption has been shown this run. */
   lanternHookCaptionShown: boolean
+  /** Spec 11 H2: the creatures the player has seen (the Bestiary page), in the order first seen. */
+  creaturesSeen: string[]
 }
 
 /** Sim time (s) of the last screen scare start, and the scripted moments that have played. */
@@ -83,6 +86,7 @@ export function defaultProgressionSave(): ProgressionSave {
     storm: { active: false },
     screenScare: { lastStartSim: null, used: [] },
     lanternHookCaptionShown: false,
+    creaturesSeen: [],
   }
 }
 
@@ -199,5 +203,6 @@ export function sanitizeProgression(raw: unknown, ctx: ProgressionSaveContext): 
     storm: { active: isObj(raw.storm) && raw.storm.active === true },
     screenScare: sanitizeScreenScare(raw.screenScare),
     lanternHookCaptionShown: raw.lanternHookCaptionShown === true,
+    creaturesSeen: [...normalizeSeen(raw.creaturesSeen)],
   }
 }

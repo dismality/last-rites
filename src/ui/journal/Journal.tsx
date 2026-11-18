@@ -21,6 +21,7 @@ import {
 import { escClosesOverlay } from '../../game/systems/journalPause'
 import type { PageNumber } from '../../game/types'
 import { NamedItemIcon } from '../satchel/NamedItemIcon'
+import { Bestiary } from './Bestiary'
 import { CaseBoard } from './CaseBoard'
 import { ClosedCases } from './ClosedCases'
 import { ContractsTab } from './ContractsTab'
@@ -37,6 +38,7 @@ const TABS = [
   { id: 'relics', label: 'Relics' },
   { id: 'contracts', label: 'Contracts' },
   { id: 'map', label: 'Map' },
+  { id: 'creatures', label: 'Creatures' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
@@ -201,6 +203,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
     relics: null,
     contracts: null,
     map: null,
+    creatures: null,
   })
 
   const running = useWorldStore((s) => s.phase !== 'day')
@@ -288,6 +291,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
           {tab === 'relics' && <RelicsTab />}
           {tab === 'contracts' && <ContractsTab />}
           {tab === 'map' && <JournalMap />}
+          {tab === 'creatures' && <Bestiary />}
         </div>
         <button type="button" className="journal__close" onClick={onClose}>
           Close journal (J)

@@ -3,6 +3,10 @@ import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsecti
 import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
 import { EFFECT_MAP } from '../src/data/effects'
 import { BAT } from '../src/data/bats'
+import { CUE_SUBTITLES, ENEMY_LOOKS, ENEMY_MAP } from '../src/data/enemies'
+import { BRIDE, CRAWLER, CREATURE_SOUNDS, CREATURE_TELL_S, HOUND, BESTIARY_SEEN_RADIUS_M } from '../src/data/creatures'
+import { BESTIARY, FIELD_NOTE_MAX } from '../src/data/bestiary'
+import { CAPTION_MAP, type CaptionId } from '../src/data/captions'
 import { HINT_COSTS } from '../src/data/cases'
 import { INFO_TIPS, INFO_TIP_KEYS } from '../src/data/infoTips'
 import {
@@ -265,6 +269,78 @@ describe('§12.7 hands and lantern light mirror the data', () => {
     expect(nums(light('Oil at 0'))[0]).toBe(L.flareS)
     expect(nums(light('Bride within 8 m'))[0]).toBe(1 - L.brideDim)
     expect(nums(light('Flashing lights off'))).toEqual([L.flashingOffMaxHz, L.flashingOffMaxStep * 100])
+  })
+})
+
+// Spec 11 task 7.1 (Req 2.1, 2.14, 2.15, 2.18, 3.7, 8.2): §12.2 (bible §14.2) against
+// src/data/enemies.ts, creatures.ts and bestiary.ts.
+describe('§12.2 new creatures mirror the data', () => {
+  const s = subsection(bible, '12.2')
+  const unticked = (v: string): string => v.replace(/`/g, '')
+  const nums = (v: string): number[] => (v.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)
+  const trait = (name: string): string => tableOf(s, 'Trait').rows.find((r) => r.Trait === name)!.Value
+  const ids = ['crawler', 'bride', 'hound'] as const
+
+  it.skipIf(s.cut)('has the same enemy rows', () => {
+    const rows = tableOf(s, 'ID').rows
+    expect(rows.map((r) => unticked(r.ID))).toEqual([...ids])
+    for (const r of rows) {
+      const d = ENEMY_MAP[unticked(r.ID) as (typeof ids)[number]]
+      expect(r.Name, d.id).toBe(d.name)
+      expect(Number(r.HP), d.id).toBe(d.hp)
+      expect(nums(r.Speed)[0], d.id).toBe(d.speed)
+      expect(nums(r.Damage)[0], d.id).toBe(d.damage)
+    }
+    // The bride never joins waves or elites; the type system keeps her out of WaveEnemyId.
+    const bride = tableOf(s, 'ID').rows.find((r) => unticked(r.ID) === 'bride')!
+    expect([bride.Waves, bride.Elites]).toEqual(['Never', 'Never'])
+  })
+
+  it.skipIf(s.cut)('has four looks per new id', () => {
+    for (const id of ids) expect(ENEMY_LOOKS[id].variants, id).toHaveLength(4)
+  })
+
+  it.skipIf(s.cut)('has the same crawler, bride and hound traits', () => {
+    expect(nums(trait('Crawler spots per stage 2 night')).slice(0, 2)).toEqual([CRAWLER.spotsMin, CRAWLER.spotsMax])
+    expect(nums(trait('Crawler burst range'))[0]).toBe(CRAWLER.burstRangeM)
+    expect(nums(trait('Crawler face range'))[0]).toBe(CRAWLER.faceRangeM)
+    expect(nums(trait('Crawler grab cooldown'))[0]).toBe(CRAWLER.grabCooldownS)
+    expect(Number(tableOf(s, 'ID').rows[0].Damage.match(/\d+/)![0])).toBe(CRAWLER.grabDamage)
+    expect(CRAWLER.lungeSpeedMps).toBe(6)
+    expect(nums(trait('Bride visible'))[0]).toBe(BRIDE.revealRadiusM)
+    expect(nums(trait('Bride oil drain'))[0]).toBe(BRIDE.drainPoints)
+    expect(nums(trait('Bride return')).slice(0, 2)).toEqual([BRIDE.respawnMinS, BRIDE.respawnMaxS])
+    expect(nums(trait('Bride alive'))[0]).toBe(BRIDE.maxAlive)
+    expect(nums(trait('Bride lantern'))[0]).toBe(BRIDE.lanternDimNearM)
+    expect(nums(trait('Bride lantern'))).toContain(1 - BRIDE.lanternDim)
+    expect(nums(trait('Bride lantern'))).toContain(BRIDE.lanternFadeMinS)
+    expect(nums(trait('Hound pack')).slice(0, 2)).toEqual([HOUND.packMin, HOUND.packMax])
+    expect(nums(trait('Hound circle')).slice(0, 2)).toEqual([HOUND.circleMinM, HOUND.circleMaxM])
+    expect(nums(trait('Hound darts'))[0]).toBe(HOUND.dartGapS)
+    expect(nums(trait('Hound scatter')).slice(0, 2)).toEqual([HOUND.scatterRadiusM, HOUND.scatterS])
+    expect(nums(trait('Seen (bestiary)'))[0]).toBe(BESTIARY_SEEN_RADIUS_M)
+  })
+
+  it.skipIf(s.cut)('has the same tells and captions, 0.5 to 1.5 s ahead', () => {
+    expect([CREATURE_TELL_S.min, CREATURE_TELL_S.max]).toEqual([0.5, 1.5])
+    for (const r of tableOf(s, 'Creature').rows.filter((x) => x.Tell !== undefined)) {
+      const id = unticked(r.Creature) as (typeof ids)[number]
+      const cap = CAPTION_MAP[CREATURE_SOUNDS[id].tell as CaptionId]
+      expect(r.Caption, id).toBe(cap.text)
+      expect(cap.text, id).toBe(CUE_SUBTITLES[ENEMY_MAP[id].audio])
+    }
+  })
+
+  it.skipIf(s.cut)('has the same bestiary notes', () => {
+    const rows = tableOf(s, 'Bestiary').rows
+    expect(rows.map((r) => unticked(r.Bestiary))).toEqual(BESTIARY.map((e) => e.id))
+    rows.forEach((r, i) => {
+      const e = BESTIARY[i]
+      expect(r['Field note (at most 200 characters)'], e.id).toBe(e.fieldNote)
+      expect(r['What works'], e.id).toBe(e.whatWorks)
+      expect(e.fieldNote.length, e.id).toBeLessThanOrEqual(FIELD_NOTE_MAX)
+      expect(e.whatWorks.length, e.id).toBeGreaterThan(0)
+    })
   })
 })
 

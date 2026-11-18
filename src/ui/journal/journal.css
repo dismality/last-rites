@@ -345,3 +345,12 @@
   .case-curse__fill { transition: none; }
   .clue-card--selected { transform: translate(-50%, -50%) rotate(0deg); }
 }
+
+/* Creatures page (spec 11 H2). Cards stack, so 800x600 only scrolls inside the panel. */
+.bestiary__list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.bestiary__card { display: flex; gap: 0.75rem; align-items: flex-start; padding: 0.6rem; border: 1px solid var(--parchment-dark); }
+.bestiary__sketch { flex: 0 0 8rem; width: 8rem; height: 8rem; object-fit: contain; }
+.bestiary__sketch--none { display: flex; align-items: center; justify-content: center; text-align: center; border: 1px dashed var(--parchment-dark); font-style: italic; font-size: 1rem; padding: 0.4rem; box-sizing: border-box; }
+.bestiary__words { flex: 1 1 auto; min-width: 0; }
+.bestiary__note, .bestiary__works { margin: 0 0 0.4rem; font-size: 1.05rem; line-height: 1.5; }
+@media (max-width: 640px) { .bestiary__card { flex-direction: column; } }

@@ -40,6 +40,13 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'screen-scare-sting',
   'screen-scare-off-zombie',
   'screen-scare-off-ghost',
+  // Spec 11 H2 (checked in tests/captionCoverage.test.ts)
+  'crawler-tell',
+  'crawler-grab',
+  'bride-tell',
+  'bride-touch',
+  'hound-tell',
+  'hound-bite',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

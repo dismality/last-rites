@@ -29,7 +29,13 @@ import {
   forceScreenScare,
   teleportNextToBat,
   fireShot,
+  spawnCrawlerAmbush,
+  spawnBrideDev,
+  spawnHoundPack,
 } from '../dev/devActions'
+import { useCreatureStore } from '../game/state/creatureStore'
+import { meleeCreatures, shotCreatures } from '../game/state/creatureDamage'
+import { forwardFromYaw } from '../game/systems/melee'
 import { useBatStore } from '../game/state/batStore'
 import { batPerchPoint } from '../game/state/batStep'
 import { triggerScreenScare } from '../game/state/screenScareActions'
@@ -206,7 +212,7 @@ function releaseLater(code: string, ms: number): Promise<void> {
   })
 }
 
-const api = {
+export const api = {
   /** Starts a run in `mode`, skipping the title, mode select and intro, and runs without pointer lock. */
   startRun(mode: ModeId = 'normal'): void {
     beginMode(mode)
@@ -518,6 +524,71 @@ const api = {
       })),
       perched: s.entries.filter((e) => e.bat.phase === 'perched').length,
     }
+  },
+  /** Spec 11 H2: the creatures as the step sees them (crawlers, the bride, hound packs, the seen set). */
+  creatureState(): {
+    seededNight: number | null
+    simTime: number
+    crawlers: { id: string; phase: string; x: number; z: number; wave: boolean }[]
+    bride: { alive: boolean; x: number; z: number; returnIn: number; visible: boolean; dim: number; bend: number }
+    packs: { id: string; size: number; hounds: { x: number; z: number }[] }[]
+    seen: string[]
+  } {
+    const s = useCreatureStore.getState()
+    return {
+      seededNight: s.seededNight,
+      simTime: s.simTime,
+      crawlers: s.crawlers.map((e) => ({ id: e.id, phase: e.c.phase, x: e.c.x, z: e.c.z, wave: e.wave })),
+      bride: {
+        alive: s.bride.alive,
+        x: s.bride.x,
+        z: s.bride.z,
+        returnIn: s.bride.returnIn,
+        visible: s.brideVisible,
+        dim: s.brideDim,
+        bend: s.brideBend,
+      },
+      packs: s.packs.map((e) => ({
+        id: e.id,
+        size: e.pack.hounds.length,
+        hounds: e.pack.hounds.map((h) => ({ x: h.x, z: h.z })),
+      })),
+      seen: [...s.seen],
+    }
+  },
+  /** The Dev_Panel's "Spawn crawler ambush". */
+  spawnCrawlerAmbush(): string {
+    return spawnCrawlerAmbush()
+  },
+  /** The Dev_Panel's "Spawn bride". */
+  spawnBride(): string {
+    return spawnBrideDev()
+  },
+  /**
+   * Spec 11 H2 (Req 2.4, 2.5, 2.10, 2.11): the attack the player's swing or shot makes, through the
+   * same functions MeleeAttack and fireHeld call. Skips only the swing timing and the aim camera.
+   */
+  creatureAttack(
+    mode: 'light' | 'heavy' | 'lead' | 'blessed' | 'sabre',
+    damage = 15,
+  ): { damage: number; miss: boolean; noEffect: boolean; killed: boolean }[] {
+    const p = usePlayerStore.getState()
+    const origin = { x: p.position[0], z: p.position[2] }
+    const dir = forwardFromYaw(p.yaw)
+    if (mode === 'light' || mode === 'heavy' || mode === 'sabre') {
+      return meleeCreatures(origin, dir, damage, mode !== 'light', mode === 'sabre' ? 'silver-sabre' : 'other')
+    }
+    const r = shotCreatures(origin, dir, damage, mode === 'lead' ? 'lead' : 'blessed-rounds')
+    return r ? [r] : []
+  },
+  /** Remaining HP of damaged creatures and the count of no-effect cues (lead on the bride). */
+  creatureHp(): { hp: Record<string, number>; noEffectCount: number } {
+    const s = useCreatureStore.getState()
+    return { hp: { ...s.hp }, noEffectCount: s.noEffectCount }
+  },
+  /** The Dev_Panel's "Spawn hound pack". */
+  spawnHoundPack(): string {
+    return spawnHoundPack()
   },
   /** The Dev_Panel's "Teleport next to a bat". */
   teleportNextToBat(): string {

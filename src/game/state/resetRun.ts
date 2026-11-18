@@ -20,6 +20,8 @@ import { useWaitingList } from './waitingList'
 import { useVendingStore } from './vendingStore'
 import { useBatStore } from './batStore'
 import { resetBatRuntime } from './batStep'
+import { useCreatureStore } from './creatureStore'
+import { resetCreatureRuntime } from './creatureStep'
 import { useLanternHandStore } from './lanternHandStore'
 import { resetScreenScareRuntime, useScreenScareStore } from './screenScareStore'
 import { resetScreenScareQueue } from './screenScareQueue'
@@ -78,6 +80,7 @@ interface Resettable {
 /** Replaced wholesale with their initial state. */
 export const REPLACED_STORES = [
   useBatStore,
+  useCreatureStore,
   useVendingStore,
   useScreenScareStore,
   useLanternHandStore,
@@ -167,6 +170,7 @@ export function resetRun(): void {
   resetScreenScareRuntime()
   resetScreenScareQueue()
   resetBatRuntime()
+  resetCreatureRuntime()
   meleeRuntime.shakeAge = Infinity
   meleeRuntime.dustQueue.length = 0
   gasRuntime.queue.length = 0

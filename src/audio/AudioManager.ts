@@ -122,6 +122,9 @@ const CUE_SOUND: Readonly<Partial<Record<AudioCueId, SoundId>>> = {
   'brute-grunt': 'brute-grunt',
   'bloater-gurgle': 'bloater-hiss',
   'crane-censer': 'censer-chain',
+  'crawler-shiver': 'crawler-tell',
+  'bride-hum': 'bride-tell',
+  'hound-growl': 'hound-tell',
 }
 
 /** Recorded file name per cue when it differs from the cue id (shamblers groan: zombie-groan-1..4). */

@@ -20,6 +20,7 @@ import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 import { freshCaseSave, sanitizeCaseSave, type CaseSave } from './caseSave'
 import { freshStock, sanitizeVending, type VendingState } from './vending'
 import { sanitizeBatSave, type BatSave } from './batSave'
+import { sanitizeCreatureSave, type CreatureSave } from './creatureSave'
 import { GRAVEYARD_COLLIDERS } from '../../data/graveyardColliders'
 
 export const SAVE_KEY = 'lastrites:save'
@@ -56,6 +57,8 @@ export interface SaveState {
   vending?: VendingState
   /** The bats of the night (spec 11 H4). Optional on input; sanitised on read. */
   bats?: BatSave
+  /** The crawlers and the bride of the night (spec 11 H2). Optional on input; sanitised on read. */
+  creatures?: CreatureSave
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
@@ -118,6 +121,7 @@ export function toSaveFile(state: SaveState): SaveFile {
     case: state.case ?? freshCaseSave(),
     vending: state.vending ?? freshStock(),
     ...(state.bats ? { bats: state.bats } : {}),
+    ...(state.creatures ? { creatures: state.creatures } : {}),
   }
 }
 
@@ -239,6 +243,8 @@ export function fromSaveFile(
     vending: sanitizeVending(raw.vending),
     // Older saves have none: no bats until the next night starts.
     ...(raw.bats === undefined ? {} : { bats: sanitizeBatSave(raw.bats, GRAVEYARD_COLLIDERS.length) }),
+    // Older saves have none: no crawlers or bride until the next night starts.
+    ...(raw.creatures === undefined ? {} : { creatures: sanitizeCreatureSave(raw.creatures) }),
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,

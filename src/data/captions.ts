@@ -75,6 +75,12 @@ export type CaptionId =
   | 'screen-scare-off-zombie'
   | 'screen-scare-off-ghost'
   | 'bat-chitter'
+  | 'crawler-tell'
+  | 'crawler-grab'
+  | 'bride-tell'
+  | 'bride-touch'
+  | 'hound-tell'
+  | 'hound-bite'
 
 export interface CaptionDef {
   id: CaptionId
@@ -220,6 +226,13 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'screen-scare-off-ghost', event: 'screen-scare-off-ghost', text: '[a ghostly face drops in from above]', minSeconds: 3 },
   // Spec 11 H4: bible §14.4 asks for at least 2 s.
   { id: 'bat-chitter', event: 'bat-chitter', text: '[a bat chitters nearby]', minSeconds: 2 },
+  // Spec 11 H2 (bible §14.2): each tell and each attack is captioned.
+  { id: 'crawler-tell', event: 'crawler-tell', text: '[soil shivers, a wet click]', minSeconds: 2 },
+  { id: 'crawler-grab', event: 'crawler-grab', text: '[a pale hand grabs]', minSeconds: 2 },
+  { id: 'bride-tell', event: 'bride-tell', text: '[a cold breath, faint humming]', minSeconds: 2 },
+  { id: 'bride-touch', event: 'bride-touch', text: '[a cold touch, the lantern gutters]', minSeconds: 2 },
+  { id: 'hound-tell', event: 'hound-tell', text: '[a growl from the dark]', minSeconds: 2 },
+  { id: 'hound-bite', event: 'hound-bite', text: '[snarling, teeth snap]', minSeconds: 2 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

@@ -133,6 +133,7 @@ const validSave: fc.Arbitrary<ProgressionSave> = fc
       storm: { active: r.storm },
       screenScare: { lastStartSim: r.scareStart, used: r.scareUsed },
       lanternHookCaptionShown: r.scareStart === null,
+      creaturesSeen: r.scareStart === null ? [] : ['crawler', 'hound'],
     }
   })
 
@@ -161,6 +162,7 @@ describe('sanitizeProgression', () => {
       storm: ['x', { active: 'yes' }, 5],
       screenScare: ['x', 5, { lastStartSim: 'x', used: 'y' }],
       lanternHookCaptionShown: ['x', 1, null],
+      creaturesSeen: ['x', 5, [1, 'ghost'], null],
     }
     const keys = Object.keys(junk) as (keyof ProgressionSave)[]
     fc.assert(

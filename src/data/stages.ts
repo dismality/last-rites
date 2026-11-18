@@ -115,4 +115,4 @@ export const COLLAPSE_DUST_PUFFS = 3
 /** A single puff per zombie when Camera shake or Flashing lights is off (or motion is reduced). */
 export const COLLAPSE_DUST_PUFFS_CALM = 1
 /** Relative threat of each enemy, used to compare waves. */
-export const WAVE_STRENGTH_WEIGHT = { shambler: 1, wailer: 2, lurker: 2, bloater: 3, brute: 6 } as const
+export const WAVE_STRENGTH_WEIGHT = { shambler: 1, wailer: 2, lurker: 2, bloater: 3, brute: 6, crawler: 2, hound: 3 } as const

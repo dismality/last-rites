@@ -11,6 +11,7 @@ import { useDigStore } from '../game/state/digStore'
 import { useNameTheDeadStore } from '../game/state/nameTheDeadStore'
 import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '../game/state'
 import { stepBats } from '../game/state/batStep'
+import { stepCreatures } from '../game/state/creatureStep'
 import { tickCombat } from '../game/state/combatTick'
 import { tickControlHints } from '../game/state/controlHintState'
 import { tickGuidance } from '../game/state/guidanceTick'
@@ -109,7 +110,9 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       tickGuidance(STEP)
       // After the enemy and scare steps (their components run each frame): screen scares last.
       tickScreenScareQueue(playScareTelegraph)
-      // Spec 11 H4: no creature step exists yet, so the bats come after the enemy and scare steps.
+      // Spec 11 H2: the creatures step first, so a trigger fired this tick sees this tick's
+      // positions; the bats follow it.
+      stepCreatures(STEP)
       stepBats(STEP)
       tickControlHints(
         STEP,

@@ -18,6 +18,7 @@ import {
 } from '../../game/state'
 import { releaseHeavy } from '../../game/state/combatActions'
 import { emitCombatSound } from '../../game/state/combatSounds'
+import { meleeCreatures } from '../../game/state/creatureDamage'
 import { useCombatStore } from '../../game/state/combatStore'
 import { isSimFrozen } from '../../game/state/menuState'
 import { useToastStore } from '../../game/state/toastStore'
@@ -203,6 +204,15 @@ export function MeleeAttack() {
         },
         h && h.kind === 'heavy' ? { knockdownS: h.knockdownS } : {},
       )
+      // Crawlers and the bride are not zombies: a heavy chop is a downward swing, a light one level.
+      const creatureHits = meleeCreatures(
+        { x: player.position[0], z: player.position[2] },
+        forwardFromYaw(player.yaw),
+        damage,
+        cur.heavy?.kind === 'heavy',
+        cur.weapon === 'silver-sabre' ? 'silver-sabre' : 'other',
+      )
+      if (creatureHits.some((c) => !c.miss && !c.noEffect)) playMeleeHit()
       if (result.hitUids.length === 0) return
       // Dead zombies stay in the list for the AI task to play the death; hp 0 excludes them from further hits.
       const before = useEnemyStore.getState().enemies

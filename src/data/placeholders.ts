@@ -14,6 +14,7 @@ import {
   LANTERN_COOKIE_URL,
   LANTERN_MODEL_URL,
   SCARE_FACE_IDS,
+  bestiarySketchUrl,
   VENDING_MACHINE_MODEL_URL,
   propModelUrl,
   scareFaceUrl,
@@ -49,6 +50,9 @@ export const PLACEHOLDERS: readonly PlaceholderRow[] = [
   row(CRAWLER_MODEL_URL, 'model', 'H2', 'Pale Crawler; placeholder: zombie.glb scaled and tinted'),
   row(BRIDE_MODEL_URL, 'model', 'H2', 'Hollow Bride; placeholder: zombie.glb scaled and tinted'),
   row(HOUND_MODEL_URL, 'model', 'H2', 'Corpse Hound; placeholder: zombie.glb scaled and tinted'),
+  ...(['crawler', 'bride', 'hound'] as const).map((id) =>
+    row(bestiarySketchUrl(id), 'image', 'H2', `Bestiary sketch of the ${id}; placeholder: the text card "Sketch not drawn yet"`),
+  ),
   row(propModelUrl('bat-perched'), 'model', 'H4', 'perched bat; placeholder: a small dark ellipsoid'),
   row(propModelUrl('bat-flying'), 'model', 'H4', 'flying bat; placeholder: a small dark ellipsoid'),
   row(VENDING_MACHINE_MODEL_URL, 'model', 'H6', 'hut vending machine; placeholder: a plain cabinet with the real collider and handle anchors'),

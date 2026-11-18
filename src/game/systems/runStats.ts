@@ -1,4 +1,4 @@
-﻿// Run statistics shown after an ending (Req 6.2). Pure and immutable.
+// Run statistics shown after an ending (Req 6.2). Pure and immutable.
 
 import { STAGE_COUNT } from '../../data/stages'
 import { ENEMIES, type EnemyId } from '../../data/enemies'
@@ -132,6 +132,9 @@ const KILL_LABELS: Readonly<Record<EnemyId, string>> = {
   bloater: 'Bloaters',
   brute: 'Brutes',
   'father-crane': 'Father Crane',
+  crawler: 'Pale Crawlers',
+  bride: 'Hollow Brides',
+  hound: 'Corpse Hounds',
 }
 
 /** Every row of Req 3.5; an empty run shows 0 (and 0:00, 0%). */

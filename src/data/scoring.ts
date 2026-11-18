@@ -1,7 +1,8 @@
 // Score numbers mirrored from docs/game-design.md §12 "Score and combo".
 import type { WaveEnemyId } from './enemies'
 
-export const KILL_POINTS: Readonly<Record<WaveEnemyId, number>> = {
+// The spec 11 creatures have no score row in bible §12, so a kill of one scores nothing (score.ts ignores unknown ids).
+export const KILL_POINTS: Readonly<Record<Exclude<WaveEnemyId, 'crawler' | 'hound'>, number>> = {
   shambler: 10,
   wailer: 25,
   lurker: 30,

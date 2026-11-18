@@ -11,6 +11,12 @@ import {
   MELEE_RANGE_M,
 } from '../../data/balance'
 
+/**
+ * How a hit reached its target. The Pale Crawler (spec 11) is too low for a level swing, so it
+ * reads this to tell a horizontal swing from a downward one.
+ */
+export type AttackKind = 'melee-horizontal' | 'melee-down' | 'bullet' | 'fire'
+
 export interface Vec2 {
   x: number
   z: number

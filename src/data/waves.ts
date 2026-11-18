@@ -6,7 +6,9 @@ import { fogOfLadderRow } from './stages'
 
 export type NightNumber = 1 | 2 | 3 | 4 | 5
 
-export type WaveComposition = Record<WaveEnemyId, number>
+/** The five original kinds always have a count; crawlers and hounds (spec 11) are optional extras (0 when absent). */
+export type WaveComposition = Record<Exclude<WaveEnemyId, 'crawler' | 'hound'>, number> &
+  Partial<Record<'crawler' | 'hound', number>>
 
 export interface NightDef {
   night: NightNumber
@@ -82,6 +84,20 @@ export const WAVE_ADDITIONS: Readonly<Record<NightNumber, readonly Partial<WaveC
   5: [NONE, NONE, NONE, { bloater: 2, brute: 1 }, { bloater: 2, brute: 1 }],
 }
 
+
+/**
+ * Spec 11 optional extras (docs/game-design.md section 14.2), indexed by wave: Corpse Hounds join from the
+ * stage 2 rows and one Pale Crawler comes late in rows 4 and 5. Only added, so no wave shrinks and
+ * every row's last wave has at least the hounds and crawlers of the row before. The Hollow Bride
+ * is never in a wave. Kept apart from WAVE_ADDITIONS, which pins the spec 07 column.
+ */
+export const WAVE_EXTRAS: Readonly<Record<NightNumber, readonly Pick<WaveComposition, 'crawler' | 'hound'>[]>> = {
+  1: [],
+  2: [],
+  3: [{}, {}, { hound: 2 }],
+  4: [{ hound: 2 }, { hound: 2 }, { hound: 3 }, { hound: 3, crawler: 1 }],
+  5: [{}, {}, { hound: 3 }, { hound: 3, crawler: 1 }, { hound: 3, crawler: 1 }],
+}
 /** Additions for a night; empty outside nights 1..5. */
 export function waveAdditions(night: number): readonly Partial<WaveComposition>[] {
   return WAVE_ADDITIONS[night as NightNumber] ?? []
@@ -91,7 +107,15 @@ export const NIGHTS: readonly NightDef[] = BASE_NIGHTS.map((n) => ({
   ...n,
   waves: n.waves.map((w, i) => {
     const add = waveAdditions(n.night)[i] ?? NONE
-    return { ...w, bloater: w.bloater + (add.bloater ?? 0), brute: w.brute + (add.brute ?? 0) }
+    const extra = WAVE_EXTRAS[n.night][i] ?? {}
+    return {
+      ...w,
+      bloater: w.bloater + (add.bloater ?? 0),
+      brute: w.brute + (add.brute ?? 0),
+      // Optional extras appear only on the waves that have them.
+      ...(extra.crawler ? { crawler: extra.crawler } : {}),
+      ...(extra.hound ? { hound: extra.hound } : {}),
+    }
   }),
 }))
 
@@ -106,5 +130,5 @@ export const NIGHT_MAP: Readonly<Record<NightNumber, NightDef>> = Object.fromEnt
 
 /** Total enemies a wave spawns. */
 export function waveSize(w: WaveComposition): number {
-  return w.shambler + w.wailer + w.lurker + w.bloater + w.brute
+  return w.shambler + w.wailer + w.lurker + w.bloater + w.brute + (w.crawler ?? 0) + (w.hound ?? 0)
 }

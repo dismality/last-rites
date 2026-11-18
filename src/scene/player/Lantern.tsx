@@ -21,6 +21,7 @@ import { LANTERN_GLARE_FULL_M, LANTERN_RADIUS_MAX_M, LANTERN_RADIUS_MIN_M } from
 import { LANTERN_FLICKER, LANTERN_LIGHT } from '../../data/lanternLight'
 import { useGameStore, useLanternStore, useSettingsStore } from '../../game/state'
 import { useIntroStore } from '../../game/state/introStore'
+import { useCreatureStore } from '../../game/state/creatureStore'
 import { lanternIntensity, lanternRadius, wallGlareScale } from '../../game/systems/lantern'
 import { COOKIE_PLACEHOLDER_SIZE, softRoundCookie } from '../../game/systems/lanternCookie'
 import { registerMissingArt } from '../../game/state/waitingList'
@@ -45,6 +46,8 @@ const EMBER_INTENSITY = 1.2
 const FILL_AHEAD_M = 0.3
 /** How fast the wall-glare dim follows the probe (per second); ~0.1 s to settle. */
 const GLARE_EASE_PER_S = 10
+/** Sideways lean of the flame at full bride bend (m); a small, steady shift, no flicker. */
+const FLAME_BEND_M = 0.03
 const FLAME_RADIUS = 0.025
 // Bloom is the scene's global threshold-1 pass (cheap). The flame and glass are pushed above 1 in HDR so they
 // glow; a selective bloom pass cost about 4 ms a frame at 1080p (spec 11 task 6.7).
@@ -195,7 +198,10 @@ export function Lantern() {
     const flareWindowS = params.current.p.lowPass ? LANTERN_FLICKER.fadeOutS : LANTERN_LIGHT.flareS
     const flaring = on && zeroAge !== null && zeroAge < flareWindowS
     const beam = on && (!empty || flaring)
-    const k = level * m * glare.current
+    // A Hollow Bride within 8 m dims the light by 30% (eased, slew-limited in creatureStep) and
+    // bends the flame away from her (Req 2.16).
+    const { brideDim, brideBend } = useCreatureStore.getState()
+    const k = level * m * glare.current * brideDim
     if (spot.current) {
       spot.current.position.set(ax, ay, az)
       spot.current.color.copy(colorScratch)
@@ -220,7 +226,7 @@ export function Lantern() {
 
     // Flame and glass from the same value in the same frame (Req 7.11).
     if (flame.current) {
-      flame.current.position.set(ax, ay, az)
+      flame.current.position.set(ax + brideBend * FLAME_BEND_M, ay, az)
       flame.current.scale.setScalar(beam ? signalToFlame(m) : 0)
     }
     if (glass.current) {

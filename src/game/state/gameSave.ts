@@ -34,6 +34,8 @@ import { useVendingStore } from './vendingStore'
 import { freshStock } from '../systems/vending'
 import { captureBatSave, useBatStore } from './batStore'
 import { freshBatSave } from '../systems/batSave'
+import { captureCreatureSave, useCreatureStore } from './creatureStore'
+import { freshCreatureSave } from '../systems/creatureSave'
 
 function storage(): Storage | undefined {
   try {
@@ -89,6 +91,7 @@ export function captureSave(): SaveState {
     pins: capturePins(),
     vending: useVendingStore.getState().stock,
     bats: captureBatSave(),
+    creatures: captureCreatureSave(),
   }
 }
 
@@ -146,6 +149,7 @@ export function loadGame(): boolean {
   usePinStore.setState({ pins: save.pins ?? [] })
   useVendingStore.setState({ stock: save.vending ?? freshStock(), lastPurchase: null })
   useBatStore.getState().restore(save.bats ?? freshBatSave())
+  useCreatureStore.getState().restore(save.creatures ?? freshCreatureSave())
   syncDerivedStats()
   return true
 }

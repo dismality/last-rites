@@ -51,6 +51,9 @@ describe('info tips data', () => {
     const ids = journalTabIds()
     expect(ids.length).toBeGreaterThan(0)
     for (const id of ids) expect(INFO_TIP_KEYS).toContain(`journal-${id}`)
+    // Spec 11 H2: the Creatures page is a journal tab with its own tip.
+    expect(ids).toContain('creatures')
+    expect(INFO_TIP_KEYS).toContain('hud-bestiary')
   })
 
   it('the coins tip mentions the vending machine', () => {

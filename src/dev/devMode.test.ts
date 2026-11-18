@@ -14,7 +14,19 @@ import { isDevEnabled } from './devFlag'
 import { DEV_TOGGLE_CODE, installDevKeys } from './devKeys'
 import { useDevPanelStore } from './devPanelStore'
 import { installDev } from './installDev'
-import { fireShot, forceScreenScare, giveCoins, resetVendingStockDev, teleportNextToBat } from './devActions'
+import {
+  fireShot,
+  forceScreenScare,
+  giveCoins,
+  resetVendingStockDev,
+  spawnBrideDev,
+  spawnCrawlerAmbush,
+  spawnHoundPack,
+  teleportNextToBat,
+} from './devActions'
+import { HOUND_PACKS_MAX } from '../data/creatures'
+import { stepCreatures } from '../game/state/creatureStep'
+import { useCreatureStore } from '../game/state/creatureStore'
 import { triggerScreenScare } from '../game/state/screenScareActions'
 import { useScreenScareStore } from '../game/state/screenScareStore'
 import { initialScreenScareState } from '../game/systems/screenScares'
@@ -172,6 +184,45 @@ describe('bat dev actions', () => {
     expect(useBatStore.getState().entries.some((e) => e.bat.phase === 'fleeing')).toBe(true)
     off()
     offCount()
+  })
+})
+
+// Spec 11 task 7.6: the creature buttons add to the real creature store and the real step runs them.
+describe('creature dev actions', () => {
+  beforeEach(() => {
+    resetRun()
+    useCreatureStore.getState().clearNight()
+    useWorldStore.setState({ phase: 'night', nightNumber: 2 })
+    usePlayerStore.setState({ position: [1000, 0, 1000], yaw: 0 })
+  })
+
+  it('"Spawn crawler ambush" hides a crawler 3 m ahead that bursts when the player is near', () => {
+    expect(spawnCrawlerAmbush()).toContain('Crawler')
+    const [c] = useCreatureStore.getState().crawlers
+    expect(c.c.phase).toBe('hidden')
+    expect(Math.hypot(c.c.x - 1000, c.c.z - 1000)).toBeCloseTo(3, 5)
+    usePlayerStore.setState({ position: [c.c.x, 0, c.c.z] })
+    for (let i = 0; i < 120; i++) stepCreatures(1 / 60, () => 0.5)
+    expect(useCreatureStore.getState().crawlers.some((e) => e.c.phase !== 'hidden')).toBe(true)
+  })
+
+  it('"Spawn bride" brings her in at stage 2 and refuses at stage 1 or when she is here', () => {
+    useWorldStore.setState({ nightNumber: 1 })
+    expect(spawnBrideDev()).toContain('stage 2')
+    expect(useCreatureStore.getState().bride.alive).toBe(false)
+    useWorldStore.setState({ nightNumber: 2 })
+    expect(spawnBrideDev()).toContain('Bride')
+    expect(useCreatureStore.getState().bride.alive).toBe(true)
+    expect(spawnBrideDev()).toContain('already')
+  })
+
+  it('"Spawn hound pack" adds a pack of 3 and stops at the pack limit', () => {
+    for (let i = 0; i < HOUND_PACKS_MAX; i++) spawnHoundPack()
+    const { packs } = useCreatureStore.getState()
+    expect(packs).toHaveLength(HOUND_PACKS_MAX)
+    expect(packs.every((p) => p.pack.hounds.length === 3)).toBe(true)
+    expect(spawnHoundPack()).toContain('Too many')
+    expect(useCreatureStore.getState().packs).toHaveLength(HOUND_PACKS_MAX)
   })
 })
 

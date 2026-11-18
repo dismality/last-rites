@@ -1041,6 +1041,7 @@ Data: `src/data/enemies.ts` (`EnemyId`, `ENEMY_MAP`, `ENEMY_LOOKS`) and `src/dat
 | `hound` | They hunt in twos and threes, circling out of reach until one darts in. | A gunshot or a lantern flare scatters them; guns and heavy swings bring them down. |
 
 Unseen creatures show no name and no sketch. Tuning changes to the wave tables are logged in `docs/kiro-log.md`; a wave is never smaller than the one before and the alive caps (12 / 16 / 20) hold.
+- **As built (spec 11 task 7):** wave extras live in `WAVE_EXTRAS` (`src/data/waves.ts`), added on top of the older columns. Hounds per wave: row 3 waves 1 to 3: 0, 0, 2; row 4 waves 1 to 4: 2, 2, 3, 3 plus 1 crawler in the last wave; row 5 waves 1 to 5: 0, 0, 3, 3, 3 plus 1 crawler in each of the last 2 waves. Rows 1 and 2 are unchanged. Wave strength weights: crawler 2, hound 3. The final-rite assault wave grows from 15 to 19. Largest composition: stage 2 has 16 (the cap), stage 3 has 19 (cap 20). An emerged crawler sinks back after 25 s and a hound pack leaves after 45 s (`CREATURE_LIFETIME_S`), so unkillable leftovers never hold the alive cap. Coin drops: crawler 1 coin at 50%, hound 2 coins always. A downward swing is any heavy swing (`melee-down`); a light swing is `melee-horizontal` and passes over a crawler.
 
 ### 14.3 Zombie looks (11, H3)
 | Contract | Value |

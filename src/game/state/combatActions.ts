@@ -35,6 +35,7 @@ import type { CraftedItemId, DoorId, FirearmId, HeavyMeleeId, ItemId, UpgradeId 
 import { useDoorStore } from './doorStore'
 import { useToastStore } from './toastStore'
 import { emitCombatSound } from './combatSounds'
+import { shotCreatures } from './creatureDamage'
 import { useCombatStore } from './combatStore'
 import { useEffectStore } from './effectStore'
 import { useEnemyStore } from './enemyStore'
@@ -177,6 +178,14 @@ export function fireHeld(input: FireInput): FireResult {
       elite: e.elite,
     })
   }
+  // Crawlers and the bride sit outside the zombie list. Bullets are lead, so the bride shrugs them
+  // off unless the rounds are blessed (Req 2.10, 2.11).
+  shotCreatures(
+    { x: input.origin.x, z: input.origin.z },
+    { x: input.aim.x, z: input.aim.z },
+    stats.damage * stats.pellets * (blessed ? 2 : 1),
+    blessed ? 'blessed-rounds' : 'lead',
+  )
   emit({ type: 'firearmFired', weapon, hit: hits.length > 0 })
 
   const settings = useSettingsStore.getState()

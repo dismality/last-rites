@@ -203,7 +203,7 @@ describe('structure rule: Save and Retry share one progression field list', () =
   it('PROGRESSION_PERSISTED, the save defaults and the Retry snapshot name the same fields', () => {
     const listed = [...PROGRESSION_PERSISTED].sort()
     // The screen scare state (spec 11) is saved with the progression but is not a store field, and Retry keeps it.
-    const saved = [...listed, 'screenScare', 'lanternHookCaptionShown'].sort()
+    const saved = [...listed, 'screenScare', 'lanternHookCaptionShown', 'creaturesSeen'].sort()
     expect(Object.keys(defaultProgressionSave()).sort()).toEqual(saved)
     expect(Object.keys(captureProgressionSave()).sort()).toEqual(saved)
     expect(Object.keys(progressionSnapshot.getState()).sort()).toEqual(listed)

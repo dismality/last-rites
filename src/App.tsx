@@ -63,6 +63,7 @@ import { Chapel } from './scene/world/Chapel'
 import { ClueSpots } from './scene/world/ClueSpots'
 import { FixedSpawns } from './scene/world/FixedSpawns'
 import { Tombstones } from './scene/world/Tombstones'
+import { Creatures } from './scene/enemies/Creatures'
 import { LanternTraps } from './scene/world/LanternTraps'
 import { GraveMounds } from './scene/world/GraveMounds'
 import { NamedGrave } from './scene/world/NamedGrave'
@@ -122,6 +123,7 @@ function GameScreen() {
           <AutumnAmbience />
           <Workbench />
           <EnemyDirector />
+          <Creatures />
           {/* After EnemyDirector so music reads this frame's nearest zombie. */}
           <MusicDriver />
           <Merchant />

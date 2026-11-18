@@ -30,6 +30,11 @@ import {
   statsAfterClear,
 } from '../../game/systems/waveDirection'
 import { graveBurstRuntime } from '../effects/graveBurstRuntime'
+import { creatureLiveCount } from '../../game/state/creatureStore'
+import { queueWaveCreatures } from '../../game/state/creatureStep'
+
+/** Spawns that become creatures rather than zombies. */
+const isCreatureSpawn = (type: string): boolean => type === 'crawler' || type === 'hound'
 
 const MAX_DT = 0.1
 
@@ -83,7 +88,9 @@ export function WaveDirector() {
       playerPos: { x: player[0], z: player[2] },
       // A grave named and sealed this wave stays shut (Req 28.2).
       graves: openGraves(WAVE_GRAVES, useWaveStore.getState().sealed, waves.waveIndex),
-      liveCount: enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length,
+      // Emerged crawlers and hounds count in the alive caps (12 / 16 / 20) like any zombie.
+      liveCount:
+        enemies.filter((e) => e.state !== 'dying' && e.state !== 'dead').length + creatureLiveCount(),
       rng: rng.current,
       eliteRng: eliteRng.current,
       eliteChance: eliteChanceFor(mode),
@@ -122,14 +129,17 @@ export function WaveDirector() {
     }
 
     if (r.spawns.length > 0) {
+      // Crawlers and hounds are not zombies: they go to the creature store (spec 11 H2).
+      const zombies = r.spawns.filter((s) => !isCreatureSpawn(s.type))
+      queueWaveCreatures(r.spawns.filter((s) => isCreatureSpawn(s.type)))
       useEnemyStore
         .getState()
         .setEnemies([
           ...useEnemyStore.getState().enemies,
-          ...r.spawns.map((s) => createWaveEnemy(`z-${uid.current++}`, s, mode, waves.night ?? 1)),
+          ...zombies.map((s) => createWaveEnemy(`z-${uid.current++}`, s, mode, waves.night ?? 1)),
         ])
-      r.spawns.forEach((s) => graveBurstRuntime.queue.push({ x: s.x, z: s.z }))
-      for (const s of r.spawns) {
+      zombies.forEach((s) => graveBurstRuntime.queue.push({ x: s.x, z: s.z }))
+      for (const s of zombies) {
         const at = { x: s.x, y: 0, z: s.z }
         if (s.elite) emitCombatSound('elite-arrival', at)
         if (s.type === 'brute') emitCombatSound('brute-grunt', at)

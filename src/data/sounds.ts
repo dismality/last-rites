@@ -40,6 +40,13 @@ export type SoundId =
   | 'screen-scare-sting'
   // Spec 11 H4: a perched bat's chitter.
   | 'bat-chitter'
+  // Spec 11 H2: the new creatures' tells and attacks.
+  | 'crawler-tell'
+  | 'crawler-grab'
+  | 'bride-tell'
+  | 'bride-touch'
+  | 'hound-tell'
+  | 'hound-bite'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -379,6 +386,55 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.005,
     decayS: 0.35,
     layers: [tone('square', 5200, 6400, 0.05), tone('triangle', 4200, 5400, 0.05), noise('highpass', 7000, 6000, 1, 0.04)],
+  },
+  // Spec 11 H2: tells and attacks of the new creatures, all heard from the creature (3D).
+  'crawler-tell': {
+    id: 'crawler-tell',
+    spatial: true,
+    maxDistanceM: 14,
+    attackS: 0.02,
+    decayS: 0.6,
+    layers: [noise('lowpass', 700, 300, 1, 0.25), tone('square', 1800, 900, 0.06)],
+  },
+  'crawler-grab': {
+    id: 'crawler-grab',
+    spatial: true,
+    maxDistanceM: 16,
+    attackS: 0.005,
+    decayS: 0.4,
+    layers: [noise('bandpass', 1200, 500, 2, 0.35), tone('sine', 120, 60, 0.3)],
+  },
+  'bride-tell': {
+    id: 'bride-tell',
+    spatial: true,
+    maxDistanceM: 18,
+    attackS: 0.3,
+    decayS: 1.2,
+    layers: [noise('highpass', 2500, 1500, 0.8, 0.12), tone('sine', 330, 294, 0.08), tone('sine', 392, 349, 0.06)],
+  },
+  'bride-touch': {
+    id: 'bride-touch',
+    spatial: true,
+    maxDistanceM: 16,
+    attackS: 0.01,
+    decayS: 0.9,
+    layers: [noise('highpass', 3000, 800, 0.8, 0.3), tone('sine', 880, 220, 0.12)],
+  },
+  'hound-tell': {
+    id: 'hound-tell',
+    spatial: true,
+    maxDistanceM: 28,
+    attackS: 0.08,
+    decayS: 0.9,
+    layers: [tone('sawtooth', 95, 70, 0.3), noise('lowpass', 600, 250, 1.5, 0.2)],
+  },
+  'hound-bite': {
+    id: 'hound-bite',
+    spatial: true,
+    maxDistanceM: 20,
+    attackS: 0.005,
+    decayS: 0.35,
+    layers: [noise('bandpass', 1500, 600, 1.5, 0.4), tone('sawtooth', 220, 110, 0.25)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {

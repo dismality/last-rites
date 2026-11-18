@@ -16,6 +16,13 @@ const SPEC_11_SOUNDS: readonly SoundId[] = [
   'screen-scare-sting',
   // Task 4, H4 bats.
   'bat-chitter',
+  // Task 7, H2 creature tells and attacks.
+  'crawler-tell',
+  'crawler-grab',
+  'bride-tell',
+  'bride-touch',
+  'hound-tell',
+  'hound-bite',
 ]
 /** The ones heard from a world position. */
 const SPEC_11_WORLD_SOUNDS: readonly SoundId[] = [
@@ -24,6 +31,12 @@ const SPEC_11_WORLD_SOUNDS: readonly SoundId[] = [
   'vending-tray',
   'vending-refuse',
   'bat-chitter',
+  'crawler-tell',
+  'crawler-grab',
+  'bride-tell',
+  'bride-touch',
+  'hound-tell',
+  'hound-bite',
 ]
 
 describe('spec 11 sound and caption coverage', () => {

@@ -2116,3 +2116,35 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - With Flashing lights off, the oil-out uses a 1 s fade instead of the 0.3 s flare. (2026-11-18)
   - The glass emissive colour gets a Ã—4 boost rather than raising `glassBase`, so `signalToGlass` and its tests keep their meaning. The glass is 35% opaque, so it blooms only weakly; the flame carries the glow. (2026-11-18)
   - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the one-line comment fix in `src/data/cases.ts`. The task files also carry status changes for tasks 4 and 5, and the comment fix is not part of task 6. (2026-11-18)
+
+### 2026-11-18: 11-horror-pass task 7.3: Creature stores, scene components and wave wiring
+- **Kiro feature used:** spec task / steering (architecture rules, mcp-usage)
+- **What happened:** Added `creatureStore`, `creatureStep` (`stepCreatures`, called before `stepBats` in `GameLoop`), the pure `creatureSave`, and the `Crawler`, `Bride`, `Hound` components with `CreatureModel`/`creatureRig` (zombie model, scaled and tinted, while the creature files are missing). `WaveDirector` now sends wave `crawler` and `hound` spawns to the creature store (hounds in packs of 2 to 3, at most 2 packs) and counts them in the alive caps. Crawlers and the bride are saved in the world save (`creatures`), the seen set in the progression save (`creaturesSeen`, kept by Retry, cleared by New Game).
+- **What Kiro caught or sped up:** The process-rule tests flagged `creatureSave.ts` without a test file, and the progression field-list tests flagged the new `creaturesSeen` field. The React compiler lint rejected a closure-based rig, so the rig became a class.
+- **Decisions made unattended:**
+  - Player damage to crawlers, the bride and hounds is not wired yet (Req 2.4, 2.5, 2.10, 2.11 are not in task 7.3). To keep a wave's alive cap from filling with creatures nobody can kill, an emerged crawler sinks back after 25 s and a hound pack leaves after 45 s (`CREATURE_LIFETIME_S` in `src/data/creatures.ts`). Reason: waves count them as alive. (2026-11-18)
+  - Hound packs are not saved (like a fleeing bat they have no saved path); crawlers and the bride are. (2026-11-18)
+  - The bride is blocked by the chapel and hut rectangles as solid boxes, so she cannot enter the chapel at all. (2026-11-18)
+  - Crawlers are seeded from night 2 onward (not only night 2) so Endless nights keep them. (2026-11-18)
+  - The 1 HP floor applies per event: a grab or bite that starts when the player already has 1 HP is a new event and can kill (hurtGuard's rule). (2026-11-18)
+
+### 2026-11-19: 11-horror-pass task 7.4: creature screen scares, lantern and Bestiary
+- **Kiro feature used:** spec task
+- **What happened:** The crawler burst and the bride touch now queue the bottom zombie-face and top ghost-face scares, and the grab or oil drain waits for the scare's out start or in end (rule in `systems/creatureScare.ts`, applied at once when no scare is coming). The lantern rig reads the bride dim and bend. New Creatures journal tab (`ui/journal/Bestiary.tsx`) with its info dot and a "Sketch not drawn yet" card.
+- **What Kiro caught or sped up:** The existing creature tests passed unchanged because the crawler stood beside the player, not in front; new tests cover front, behind and the cooldown skip.
+
+### 2026-11-19: 11-horror-pass task 7: New creatures (Pale Crawler, Hollow Bride, Corpse Hound)
+- **Kiro feature used:** spec task / PBT / steering (architecture rules, mcp-usage)
+- **What happened:** Tasks 7.1 to 7.8 added the creature data and pure systems (crawler, bride, hounds, tells, hurt guard, bestiary), stores and scene components, the screen-scare and lantern wiring, the Creatures page, placeholders on the zombie model, dev hooks, player damage to creatures (`creatureDamage.ts`, called from `MeleeAttack` and `combatActions`) and `e2e/creatures.spec.ts` (7 tests at 1280x720 and 800x600). Lint, build, 350 vitest files (2824 tests) and the creatures e2e pass.
+- **What Kiro caught or sped up:** The wave, caption, progression-field and process-rule tests flagged each place the new ids had to be added; `tests/designBibleSection12.test.ts` now checks the §14.2 table against `src/data/`.
+- **Wave-table tuning (bible §14.2 "As built"):**
+  - New `WAVE_EXTRAS` in `src/data/waves.ts`, added only (no wave shrinks). Hounds per wave: row 3: 0, 0, 2; row 4: 2, 2, 3, 3 plus 1 crawler in the last wave; row 5: 0, 0, 3, 3, 3 plus 1 crawler in each of the last 2 waves. Rows 1 and 2 unchanged.
+  - `WAVE_STRENGTH_WEIGHT` gains crawler 2 and hound 3.
+  - The final-rite assault wave grew from 15 to 19. Largest composition: stage 2 is 16 (equal to the cap of 16), stage 3 is 19 (cap 20).
+- **Decisions made unattended:**
+  - Emerged crawlers sink back after 25 s and hound packs leave after 45 s (`CREATURE_LIFETIME_S`), because waves count them as alive and nothing else removes them. (2026-11-18)
+  - Grave coin rows, not in the bible: crawler 1 coin at 50%, hound 2 coins always. (2026-11-19)
+  - Combat wiring added in 7.7 (`creatureDamage.ts`): melee and shots reach crawlers and the bride; lead does nothing to the bride, Blessed Rounds and the Silver Sabre do. (2026-11-19)
+  - A heavy swing counts as `melee-down` and hits a crawler; a light swing is `melee-horizontal` and misses it. (2026-11-19)
+  - Creature kills score nothing (no row in the bible); `KILL_POINTS` excludes crawler and hound. (2026-11-18)
+  - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the comment fix in `src/data/cases.ts`, which are not task 7 work. (2026-11-19)

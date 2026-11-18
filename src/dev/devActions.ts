@@ -27,6 +27,11 @@ import { useCraftingStore } from '../game/state/craftingStore'
 import { resetVendingStock } from '../game/state/vendingActions'
 import { batPerchPoint } from '../game/state/batStep'
 import { useBatStore } from '../game/state/batStore'
+import { useCreatureStore, type CrawlerEntry, type PackEntry } from '../game/state/creatureStore'
+import { HOUND_PACKS_MAX } from '../data/creatures'
+import { createCrawler } from '../game/systems/crawler'
+import { spawnBride } from '../game/systems/bride'
+import { createPack } from '../game/systems/hounds'
 import { setDevCheatFlags } from '../game/state/devCheats'
 import { triggerScreenScare } from '../game/state/screenScareActions'
 import { useDoorStore } from '../game/state/doorStore'
@@ -460,6 +465,51 @@ export function teleportNextToBat(): string {
 export function fireShot(): string {
   emit({ type: 'firearmFired', weapon: 'revolver', hit: false })
   return 'Fired a shot'
+}
+
+/** Where the dev creatures appear: a crawler right ahead, the bride and hounds a bit further. */
+const CRAWLER_AHEAD_M = 3
+const BRIDE_AHEAD_M = 8
+
+/**
+ * Spec 11 H2: a hidden Pale Crawler 3 m ahead of the player, as an ambush the creature step
+ * runs (it bursts when the player walks within 2 m). Creatures belong to the night: by day
+ * the step clears them again.
+ */
+export function spawnCrawlerAmbush(): string {
+  const p = usePlayerStore.getState()
+  const f = forwardFromYaw(p.yaw)
+  const at = { x: p.position[0] + f.x * CRAWLER_AHEAD_M, z: p.position[2] + f.z * CRAWLER_AHEAD_M }
+  const entry: CrawlerEntry = { id: `dev-crawler-${uid++}`, c: createCrawler(at), emergedS: 0, wave: true, hpAtEvent: 0 }
+  useCreatureStore.setState((s) => ({ crawlers: [...s.crawlers, entry] }))
+  return `Crawler ambush ${CRAWLER_AHEAD_M} m ahead (walk toward it)`
+}
+
+/** Spec 11 H2: the Hollow Bride through the real `spawnBride`, so the stage 2 rule and "only one" still hold. */
+export function spawnBrideDev(): string {
+  const p = usePlayerStore.getState()
+  const f = forwardFromYaw(p.yaw)
+  const st = useCreatureStore.getState()
+  const stage = useWorldStore.getState().nightNumber
+  const next = spawnBride(
+    { ...st.bride, returnIn: 0 },
+    { stage },
+    { x: p.position[0] + f.x * BRIDE_AHEAD_M, z: p.position[2] + f.z * BRIDE_AHEAD_M },
+  )
+  if (st.bride.alive) return 'The bride is already here'
+  if (!next.alive) return 'The bride comes from stage 2 on'
+  useCreatureStore.setState({ bride: next })
+  return `The Hollow Bride appears ${BRIDE_AHEAD_M} m ahead`
+}
+
+/** Spec 11 H2: a pack of 3 Corpse Hounds around the player (the creature step only keeps HOUND_PACKS_MAX). */
+export function spawnHoundPack(): string {
+  const st = useCreatureStore.getState()
+  if (st.packs.length >= HOUND_PACKS_MAX) return 'Too many hound packs already'
+  const [px, , pz] = usePlayerStore.getState().position
+  const pack: PackEntry = { id: `dev-pack-${uid++}`, pack: createPack({ x: px, z: pz }, 3, Math.random), hpAtEvent: 0 }
+  useCreatureStore.setState({ packs: [...st.packs, pack] })
+  return 'A pack of 3 hounds circles in'
 }
 
 export function unlockAllRecipes(): string {

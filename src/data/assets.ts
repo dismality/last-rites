@@ -98,6 +98,9 @@ export const SCARE_FACE_IDS = ['face-zombie-1', 'face-zombie-2', 'face-crawler',
 export type ScareFaceId = (typeof SCARE_FACE_IDS)[number]
 export const scareFaceUrl = (id: ScareFaceId): string => `/assets/scares/${id}.webp`
 
+/** Hand-drawn Bestiary sketch of a new creature (spec 11 H2); a missing file shows a text card. */
+export const bestiarySketchUrl = (id: 'crawler' | 'bride' | 'hound'): string => `/assets/bestiary/${id}.webp`
+
 /** First-person hands and the lantern (spec 11 H7). */
 export const HANDS_MODEL_URL = '/assets/models/viewmodel/hands.glb'
 export const LANTERN_MODEL_URL = '/assets/models/viewmodel/lantern.glb'

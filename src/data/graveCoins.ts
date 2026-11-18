@@ -10,6 +10,9 @@ export const COIN_DROPS: Readonly<Record<WaveEnemyId, { amount: number; chance: 
   lurker: { amount: 2, chance: 1 },
   bloater: { amount: 2, chance: 1 },
   brute: { amount: 5, chance: 1 },
+  // Spec 11: not in the bible tables; set between the Shambler and the Lurker.
+  crawler: { amount: 1, chance: 0.5 },
+  hound: { amount: 2, chance: 1 },
 }
 
 /** Paid on top of the type's drop, even when a Shambler's roll fails. */

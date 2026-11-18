@@ -15,7 +15,8 @@ import {
 import type { StageNumber } from '../../data/stages'
 import { createRng } from '../rng'
 import { doorAttackerCount } from './barricade'
-import { aliveCap } from './stageWaves'
+import { ELITE } from '../../data/elites'
+import { aliveCap, stageWaveComposition } from './stageWaves'
 import {
   createWaveState,
   eligibleGraves,
@@ -156,7 +157,7 @@ describe('elites and door attackers in waves', () => {
   it('resets the per-wave state at every wave start', () => {
     expect(startNight(2)).toMatchObject({ eliteSpawned: false, attackersLeft: 1 })
     expect(startNight(1).attackersLeft).toBe(1) // floor(4 / 3), no night-2 minimum
-    expect(startRiteAssault()).toMatchObject({ eliteSpawned: false, attackersLeft: 5 })
+    expect(startRiteAssault()).toMatchObject({ eliteSpawned: false, attackersLeft: 6 })
   })
 
   it('assigns Door_Attackers only to shamblers and brutes', () => {
@@ -389,5 +390,61 @@ describe('wave director properties', () => {
       }),
       { numRuns: 20 },
     )
+  })
+})
+
+describe('Property 12: wave and elite tables stay on the curve (spec 11)', () => {
+  // Feature: 11-horror-pass, Property 12: Wave and elite tables stay on the curve
+  // **Validates: Requirements 2.6, 2.17**
+  const stageArb = fc.constantFrom<StageNumber>(1, 2, 3)
+  // The ladder's own waves per stage: the part of a night the tables (not the escalation rule) define.
+  const LADDER_WAVES: Record<StageNumber, number> = { 1: 6, 2: 7, 3: 5 }
+
+  it('never shrinks, never holds a bride, and the ladder waves fit the alive cap', () => {
+    fc.assert(
+      fc.property(stageArb, fc.integer({ min: 1, max: 40 }), (stage, index) => {
+        const prev = stageWaveComposition(stage, index - 1)
+        const cur = stageWaveComposition(stage, index)
+        expect(waveSize(cur)).toBeGreaterThanOrEqual(waveSize(prev))
+        for (const k of ['shambler', 'wailer', 'lurker', 'bloater', 'brute', 'crawler', 'hound'] as const) {
+          expect(cur[k] ?? 0).toBeGreaterThanOrEqual(prev[k] ?? 0)
+        }
+        expect(Object.keys(cur)).not.toContain('bride')
+        expect(expandWave(cur)).not.toContain('bride')
+        if (index < LADDER_WAVES[stage]) expect(waveSize(cur)).toBeLessThanOrEqual(aliveCap(stage))
+      }),
+      { numRuns: 100 },
+    )
+  })
+
+  it('keeps the alive caps at 12 / 16 / 20 and never rolls a crawler, hound or bride as an elite', () => {
+    expect([1, 2, 3].map((s) => aliveCap(s as StageNumber))).toEqual([12, 16, 20])
+    expect(ELITE.eligible).not.toContain('bride')
+    expect(ELITE.eligible).not.toContain('crawler')
+    expect(ELITE.eligible).not.toContain('hound')
+  })
+
+  it('adds hounds only from the stage 2 rows, and crawlers only late in rows 4 and 5', () => {
+    expect(NIGHTS.filter((n) => n.night <= 2).flatMap((n) => n.waves).every((w) => !w.hound && !w.crawler)).toBe(true)
+    expect(NIGHT_MAP[3].waves.map((w) => w.hound ?? 0)).toEqual([0, 0, 2])
+    expect(NIGHT_MAP[4].waves.map((w) => w.crawler ?? 0)).toEqual([0, 0, 0, 1])
+  })
+
+  it('ladder rows only increase: each row last wave has at least the previous row of every kind', () => {
+    const last = (n: NightNumber) => NIGHT_MAP[n].waves[NIGHT_MAP[n].waves.length - 1]
+    for (const n of [2, 3, 4, 5] as const) {
+      const a = last((n - 1) as NightNumber)
+      const b = last(n)
+      for (const k of ['shambler', 'wailer', 'lurker', 'bloater', 'brute', 'crawler', 'hound'] as const) {
+        expect(b[k] ?? 0, 'row ' + n + ' ' + k).toBeGreaterThanOrEqual(a[k] ?? 0)
+      }
+    }
+  })
+
+  it('expands crawlers and hounds into the spawn queue', () => {
+    const q = expandWave({ shambler: 1, wailer: 0, lurker: 0, bloater: 0, brute: 0, crawler: 1, hound: 2 })
+    expect(q.filter((t) => t === 'hound')).toHaveLength(2)
+    expect(q).toContain('crawler')
+    expect(waveSize({ shambler: 1, wailer: 0, lurker: 0, bloater: 0, brute: 0, crawler: 1, hound: 2 })).toBe(4)
   })
 })

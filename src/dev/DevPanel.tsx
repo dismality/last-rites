@@ -12,6 +12,9 @@ import {
   giveCoins,
   forceScreenScare,
   teleportNextToBat,
+  spawnCrawlerAmbush,
+  spawnBrideDev,
+  spawnHoundPack,
   fireShot,
   giveMaterial,
   resetVendingStockDev,
@@ -396,6 +399,17 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(() => forceScreenScare('ghost'))}>
               Force screen scare: ghost face
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(spawnCrawlerAmbush)}>
+              Spawn crawler ambush
+            </button>
+            <button type="button" onClick={run(spawnBrideDev)}>
+              Spawn bride
+            </button>
+            <button type="button" onClick={run(spawnHoundPack)}>
+              Spawn hound pack
             </button>
           </Row>
           <Row>

@@ -132,7 +132,7 @@ function bankCoins(amount: number): void {
 
 /** Drops the kill's coins as a pile at the zombie, or at the player's feet if it is gone. */
 function dropCoins(uid: string, enemy: EnemyId, elite: boolean): void {
-  if (enemy === 'father-crane') return
+  if (enemy === 'father-crane' || enemy === 'bride') return
   const pr = useProgressionStore.getState()
   const night = useWorldStore.getState().nightNumber
   const amount = coinDrop(

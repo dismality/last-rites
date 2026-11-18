@@ -21,6 +21,9 @@ describe('enemy data', () => {
       'bloater',
       'brute',
       'father-crane',
+      'crawler',
+      'bride',
+      'hound',
     ])
     expect(ENEMY_MAP.shambler).toMatchObject({ hp: 60, speed: 1.4, damage: 10, attackRange: 1.2 })
     expect(ENEMY_MAP.lurker).toMatchObject({ hp: 90, speed: 6, damage: 20 })

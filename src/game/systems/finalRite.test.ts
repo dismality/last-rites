@@ -96,7 +96,8 @@ describe('credits and rite assault', () => {
     const w = startRiteAssault()
     expect(w.phase).toBe('active')
     expect(w.night).toBe(5)
-    // 8 shamblers, 2 wailers, 2 lurkers, plus 2 bloaters and 1 brute added by spec 07.
-    expect(w.pending).toHaveLength(15)
+    // 8 shamblers, 2 wailers, 2 lurkers, plus 2 bloaters and 1 brute added by spec 07,
+    // and 3 hounds and 1 crawler added by spec 11 (WAVE_EXTRAS).
+    expect(w.pending).toHaveLength(19)
   })
 })

@@ -19,7 +19,7 @@ import {
 } from '../../data/stages'
 import { NIGHT_MAP, type WaveComposition } from '../../data/waves'
 
-const KINDS = ['shambler', 'wailer', 'lurker', 'bloater', 'brute'] as const
+const KINDS = ['shambler', 'wailer', 'lurker', 'bloater', 'brute', 'crawler', 'hound'] as const
 
 /** Which ladder row a wave draws from, and where that row's use of the ladder begins. */
 function rowFor(stage: StageNumber, waveIndex: number): { row: LadderRow; start: number; isLast: boolean } {
@@ -55,14 +55,18 @@ export function stageWaveComposition(stage: StageNumber, waveIndex: number): Wav
   const out = rawComposition(stage, 0)
   for (let n = 1; n <= last; n++) {
     const w = rawComposition(stage, n)
-    for (const k of KINDS) out[k] = Math.max(out[k], w[k])
+    for (const k of KINDS) {
+      const most = Math.max(out[k] ?? 0, w[k] ?? 0)
+      // Optional extras stay absent until a wave asks for them, so older compositions compare equal.
+      if (most > 0 || k in out) out[k] = most
+    }
   }
   return out
 }
 
-/** Weighted threat of a wave: shambler 1, wailer 2, lurker 2, bloater 3, brute 6. */
+/** Weighted threat of a wave: shambler 1, wailer 2, lurker 2, bloater 3, brute 6, crawler 2, hound 3. */
 export function waveStrength(c: WaveComposition): number {
-  return KINDS.reduce((sum, k) => sum + c[k] * WAVE_STRENGTH_WEIGHT[k], 0)
+  return KINDS.reduce((sum, k) => sum + (c[k] ?? 0) * WAVE_STRENGTH_WEIGHT[k], 0)
 }
 
 /** Most zombies alive at once in a stage; queued spawns wait for room. */

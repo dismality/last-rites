@@ -103,7 +103,9 @@ export function createWaveState(): WaveState {
 export function expandWave(w: WaveComposition): EnemyId[] {
   const q: EnemyId[] = []
   for (let i = 0; i < w.lurker; i++) q.push('lurker')
+  for (let i = 0; i < (w.crawler ?? 0); i++) q.push('crawler')
   for (let i = 0; i < w.shambler; i++) q.push('shambler')
+  for (let i = 0; i < (w.hound ?? 0); i++) q.push('hound')
   for (let i = 0; i < w.brute; i++) q.push('brute')
   for (let i = 0; i < w.bloater; i++) q.push('bloater')
   for (let i = 0; i < w.wailer; i++) q.push('wailer')
