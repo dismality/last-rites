@@ -2057,3 +2057,40 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The belfry flock is labelled Property 31 in its tests, as the spec numbers it, though it sits under task 4. (2026-11-18)
   - `src/debug/debugHook.ts` fails `prettier --check`, as it did at HEAD. It was left unformatted so the commit does not mix a reformat of earlier work with this task. (2026-11-18)
   - The e2e headstone-only screenshot filter was kept; it still avoids plinths in the shots. (2026-11-18)
+
+### 2026-11-18: 11-horror-pass task 5.3: InfoDot component and Escape handling
+- **Kiro feature used:** spec task
+- **What happened:** Added `InfoDot.tsx`, `InfoDot.css` and `infoDotState.ts` in `src/ui/theme/`. The pause listener is bubble-phase and the overlays are capture-phase, so a window capture listener installed at module load closes an open tooltip and stops Esc before either sees it. Added a jsdom testing-library test (dev deps `@testing-library/react`, `@testing-library/dom`, `jsdom`; `.test.tsx` added to the vitest include).
+- **What Kiro caught or sped up:** `npm run build` failed on `infoTips.test.ts` (task 5.2) because it used `node:fs`; switched it to a `?raw` import like the other tests.
+
+### 2026-11-18: 11-horror-pass task 5.4: Place the dots
+- **Kiro feature used:** spec task
+- **What happened:** Added `InfoDot` to the journal (one dot beside the tab strip, keyed to the open tab), the case board (title, clues pinned, Curse meter, Hints, Grave Coins), the objective tracker's Curse meter, the lantern gauge, the stamina bar, the big map, the satchel, the workbench recipe book, the rite panel (relics), and the merchant and vending coin lines. Added `.info-row` and `.journal-tabs-row` to `InfoDot.css`. Lint, build and the unit suite (331 files, 2707 tests) pass.
+- **What Kiro caught or sped up:** Nothing failed. No browser check at 800x600 was run here; task 5.5's e2e covers it.
+- **Decisions made unattended:**
+  - The journal dot sits beside the tab strip, not inside a tab, because a button inside a `role="tab"` button is invalid. It follows the open tab, which keeps the `journal-*` keys one-to-one with the tabs. (2026-11-18)
+  - No `journal-creatures` dot, since the Creatures tab arrives in task 7; `hud-bestiary` is also left to task 7. (2026-11-18)
+  - Headings that label a dialog (`aria-labelledby`) get the dot as a sibling in an `.info-row`, so the dialog's name does not gain the dot's label. (2026-11-18)
+  - The stamina dot renders only while the bar is visible (it fades out after 1 s of rest), so it never takes focus while hidden. This makes it hard to reach by keyboard; the stamina tip is the least reachable of the set. (2026-11-18)
+  - The lantern dot sits inside the oil gauge, so it adds no new block to `.hud-corner` and the health bar, gauge and hint panel keep their layout. `placeTooltip` already avoids `.hud-corner > *`. (2026-11-18)
+  - `hud-relics` is on the rite panel and `hud-map` on the big map; `hud-clues` is on the case board's "Clues pinned" line. These are the nearest existing panels for those topics. (2026-11-18)
+
+### 2026-11-18: 11-horror-pass task 5.5: Info dots e2e and screenshots
+- **Kiro feature used:** spec task / Playwright e2e
+- **What happened:** Added `e2e/info-dots.spec.ts` (journal hover and Tab per tab at 800x600 with Plain font, HUD oil and stamina dots, Esc closes the tooltip then pauses, setting off removes dots and Tab stops, satchel dot on focus). Screenshots at 1280x720 and 800x600 are in `e2e/screenshots/info-dots/`.
+- **What Kiro caught or sped up:** The spec found a real bug: the stamina bar has `transform: translateX(-50%)`, which made the tooltip's `position: fixed` relative to the bar and pushed it 2.8 px past the viewport edge. `InfoDot` now portals the tooltip to `document.body`. `setSetting` in the debug hook now accepts `showInfoDots`.
+- **Decisions made unattended:**
+  - While playing, Tab is the satchel key and is blocked from moving focus, and in the satchel Tab closes it. So HUD and satchel dots take focus through `locator.focus()`, and Tab order is tested in the journal, where it works.
+  - The "Esc again pauses" check runs on the HUD (by day); in the journal the first Esc is checked not to pause.
+  - The journal tab names are matched exactly ("Case" vs "Closed cases").
+  - Screenshots were taken with the journal Pages and Case tabs, the oil dot and the satchel dot open.
+  - Nothing committed or pushed (task 5.6 commits).
+
+### 2026-11-18: 11-horror-pass task 5.6: Finish (info dots)
+- **Kiro feature used:** spec task
+- **What happened:** Ran `npm run lint` (clean), `npm run build` (passes; only the existing chunk-size warning), `npm test -- --run` (331 files, 2707 tests pass) and `e2e/info-dots.spec.ts` (4 passed). Committed task 5 as `info dots (spec 11 task 5)`.
+- **What Kiro caught or sped up:** No failures in the Finish run. The unrelated comment edit in `src/data/cases.ts` (§13 to §15) was left out of the commit, as were the spec `tasks.md` and `tasks.meta.json` status files, which the orchestrator updates.
+- **Decisions made unattended:**
+  - Left `src/data/cases.ts` unstaged: its change is a comment-only edit not part of task 5. (2026-11-18)
+  - Did not stage `.kiro/specs/11-horror-pass/tasks.md` or `tasks.meta.json`: the orchestrator owns task status. (2026-11-18)
+  - Staged `package.json`, `package-lock.json` and `vitest.config.ts` because task 5.3's component test needs the jsdom and testing-library dev dependencies. (2026-11-18)

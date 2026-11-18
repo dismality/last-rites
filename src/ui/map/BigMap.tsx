@@ -2,6 +2,7 @@
 // Same sheet and drawing code as the Journal map, drawn under a zoom and pan transform, with the
 // marks, pins and quill kept at a fixed screen size. Mouse: wheel zoom, drag pan, click to pin.
 // Keyboard: arrows move a cursor, Enter pins, Delete removes, 1-3 select, +/- zoom, Esc or M close.
+import { InfoDot } from '../theme/InfoDot'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { PLAYABLE_BOUNDS } from '../../data/cemeteryLayout'
 import { iconUrl } from '../../data/assets'
@@ -458,7 +459,10 @@ function BigMapBody({ onClose }: { onClose: () => void }) {
         onContextMenu={onContextMenu}
       />
       <section className="bigmap__panel bigmap__panel--help" aria-label="Map help">
-        <h2 className="bigmap__title">Hollowmere</h2>
+        <div className="info-row">
+          <h2 className="bigmap__title">Hollowmere</h2>
+          <InfoDot tipKey="hud-map" label="About the map" />
+        </div>
         <p>Wheel zooms. Drag pans. Click to drop a pin.</p>
         <p>Keys: arrows, Enter, Delete, 1 to 3, + and −.</p>
         {phase !== 'day' && <p className="bigmap__night">The world is still running. M closes the map.</p>}

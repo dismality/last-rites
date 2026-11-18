@@ -6,6 +6,7 @@ import { useSettingsStore } from '../../game/state/settingsStore'
 import { composeSecondLine } from '../../game/systems/objective'
 import { CurseMeter } from './CurseMeter'
 import { PinnedRecipe } from './PinnedRecipe'
+import { InfoDot } from '../theme/InfoDot'
 import './objectiveTracker.css'
 
 /** Countdown and prompt refresh once per second (Req 3.7, 3.8, 3.9). */
@@ -49,7 +50,12 @@ export function ObjectiveTracker() {
         </span>
       </div>
       {second !== '' && <p className="hud-objective__second">{second}</p>}
-      {objective.curse && <CurseMeter value={objective.curse.value} max={objective.curse.max} />}
+      {objective.curse && (
+        <div className="info-row">
+          <CurseMeter value={objective.curse.value} max={objective.curse.max} />
+          <InfoDot tipKey="hud-curse" label="About the Curse meter" />
+        </div>
+      )}
       <PinnedRecipe />
     </div>
   )

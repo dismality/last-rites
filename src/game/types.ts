@@ -279,6 +279,8 @@ export interface Settings {
   plainJournalFont: boolean
   /** Low graphics: turns off ambient occlusion and the moon's shadows (design bible §12, tech.md budget) */
   lowGraphics: boolean
+  /** Small "i" info dots with how-to-play tooltips (spec 11 H5, design bible §14.5) */
+  showInfoDots: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

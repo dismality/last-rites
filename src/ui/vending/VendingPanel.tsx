@@ -2,6 +2,7 @@
 // never pauses the world, never protects the keeper and does not own Esc: MenuDialog gets no
 // onEscape, so Esc reaches the pause menu (Req 6.7). Keyboard: Tab through the rows, Enter or
 // Space buys, each control has a visible focus ring.
+import { InfoDot } from '../theme/InfoDot'
 import { useEffect, useState } from 'react'
 import { useCombatStore } from '../../game/state/combatStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -47,6 +48,7 @@ export function VendingPanel() {
       <p className="menu__text vending__subtitle">{view.subtitle}</p>
       <p className="menu__text merchant__coins" data-testid="vending-coins">
         {view.coinsText}
+        <InfoDot tipKey="hud-coins" label="About Grave Coins" />
       </p>
       <ul className="merchant__rows" aria-label="Machine rows">
         {view.rows.map((r) => (

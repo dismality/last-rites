@@ -4,6 +4,7 @@
 // Keyboard: arrows move between pockets (roving tabindex), 1-4 bind the focused
 // stack to that hotbar slot, Backspace clears its binding, Delete drops it, Esc closes.
 // Outside the overlay the same number keys equip the bound item.
+import { InfoDot } from '../theme/InfoDot'
 import { useEffect, useRef, useState } from 'react'
 import { playSatchelCreak } from '../../audio/AudioManager'
 import { ITEM_MAP } from '../../data/items'
@@ -167,7 +168,10 @@ export function Satchel() {
   return (
     <div className="satchel" role="dialog" aria-modal="true" aria-label="Satchel">
       <div className="satchel__bag">
-        <h2 className="satchel__title">Satchel</h2>
+        <div className="info-row">
+          <h2 className="satchel__title">Satchel</h2>
+          <InfoDot tipKey="hud-satchel" label="About the satchel" />
+        </div>
         <ul className="satchel__grid" role="grid" aria-label="Satchel pockets">
           {Array.from({ length: cellCount }, (_, i) => {
             const stack = slots[i]

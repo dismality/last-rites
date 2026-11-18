@@ -25,6 +25,8 @@ import { CaseBoard } from './CaseBoard'
 import { ClosedCases } from './ClosedCases'
 import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
+import { InfoDot } from '../theme/InfoDot'
+import type { InfoTipKey } from '../../data/infoTips'
 import './journal.css'
 
 const TABS = [
@@ -241,6 +243,7 @@ function JournalBody({ onClose }: { onClose: () => void }) {
             ✦ The world is still moving. Esc pauses.
           </p>
         )}
+        <div className="journal-tabs-row">
         <div className="journal-tabs" role="tablist" aria-label="Journal sections" onKeyDown={onTabKey}>
           {TABS.map((t) => (
             <button
@@ -266,6 +269,11 @@ function JournalBody({ onClose }: { onClose: () => void }) {
               )}
             </button>
           ))}
+        </div>
+        <InfoDot
+          tipKey={`journal-${tab}` as InfoTipKey}
+          label={`About the ${TABS.find((t) => t.id === tab)?.label ?? tab} section`}
+        />
         </div>
         <div
           id="journal-panel"

@@ -1,6 +1,7 @@
 // Journal "Case" tab: a cork board of pinned clue cards joined by red string, the case's
 // Final_Question, and the hint tiers. Rules live in the case systems and caseStore; this file
 // only reads them and calls store actions. The question is filled here by day and given at the altar.
+import { InfoDot } from '../theme/InfoDot'
 import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { caseOfStage } from '../../data/cases'
 import { useCaseStore } from '../../game/state/caseStore'
@@ -124,12 +125,17 @@ export function CaseBoard() {
   return (
     <section className="case-board" aria-label={`Case: ${def.title}`}>
       <header className="case-board__head">
-        <h3 className="case-board__title">{def.title}</h3>
+        <div className="info-row">
+          <h3 className="case-board__title">{def.title}</h3>
+          <InfoDot tipKey="hud-case-board" label="About the case board" />
+        </div>
         <p className="case-board__clues">
           Clues pinned: {shown.length} of {def.clues.length}
+          <InfoDot tipKey="hud-clues" label="About clues" />
         </p>
         <div className="case-curse" role="img" aria-label={curse.label}>
           <span className="case-curse__label">{curse.label}</span>
+          <InfoDot tipKey="hud-curse" label="About the Curse meter" />
           <span className="case-curse__bar" aria-hidden="true">
             <span className="case-curse__fill" style={{ width: `${curse.fraction * 100}%` }} />
           </span>
@@ -205,8 +211,14 @@ export function CaseBoard() {
       </div>
 
       <div className="case-hints">
-        <h4 className="case-final__title">Hints</h4>
-        <p className="case-hints__coins">Grave Coins: {coins}</p>
+        <div className="info-row">
+          <h4 className="case-final__title">Hints</h4>
+          <InfoDot tipKey="hud-hints" label="About hints" />
+        </div>
+        <p className="case-hints__coins">
+          Grave Coins: {coins}
+          <InfoDot tipKey="hud-coins" label="About Grave Coins" />
+        </p>
         <ol className="case-hints__list">
           {hints.map((h) => (
             <li key={h.tier} className={`case-hint case-hint--${h.state}`}>

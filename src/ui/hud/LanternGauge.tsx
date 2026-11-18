@@ -6,6 +6,7 @@ import { easeLean, flameLean, flameSkewDeg } from '../../game/systems/keeperHunc
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { flameBrightness, flameSize, gutterActive, oilLabel } from '../../game/systems/lanternGauge'
 import { LANTERN_FLICKER_BELOW } from '../../data/balance'
+import { InfoDot } from '../theme/InfoDot'
 import './LanternGauge.css'
 
 const FLAME_BASE = 56
@@ -119,6 +120,7 @@ export function LanternGauge() {
       >
         {label}
       </span>
+      <InfoDot tipKey="hud-oil" label="About lantern oil" />
     </div>
   )
 }

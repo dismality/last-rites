@@ -37,6 +37,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     showControlHints: current.showControlHints,
     plainJournalFont: current.plainJournalFont,
     lowGraphics: current.lowGraphics,
+    showInfoDots: current.showInfoDots,
     bindings: current.bindings,
   }
 }

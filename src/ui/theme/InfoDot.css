@@ -1,0 +1,62 @@
+.info-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-left: 0.4rem;
+  padding: 0;
+  border: 1px solid var(--parchment-dark);
+  border-radius: 50%;
+  background: var(--ink-mid);
+  color: var(--parchment);
+  font-family: var(--font-num);
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1;
+  cursor: help;
+  vertical-align: middle;
+  pointer-events: auto;
+}
+
+.info-dot:hover {
+  border-color: var(--ember);
+}
+
+.info-dot:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 2px;
+}
+
+.info-dot__tip {
+  position: fixed;
+  z-index: 1000;
+  max-width: 18rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--parchment-dark);
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.35;
+  text-align: left;
+  font-style: normal;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+/* A heading or meter with its dot beside it, so the dot never changes the heading's accessible name. */
+.info-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Journal: the tab strip and the dot for the open section share a row. */
+.journal-tabs-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}

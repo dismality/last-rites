@@ -24,6 +24,7 @@ type BooleanSetting =
   | 'showControlHints'
   | 'plainJournalFont'
   | 'lowGraphics'
+  | 'showInfoDots'
 type RangeSetting = keyof typeof SETTINGS_RANGES
 
 const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
@@ -40,6 +41,7 @@ const TOGGLES: ReadonlyArray<{ key: BooleanSetting; label: string }> = [
   { key: 'showControlHints', label: 'Show control hints' },
   { key: 'plainJournalFont', label: 'Plain font for journal (easier to read than handwriting)' },
   { key: 'lowGraphics', label: 'Low graphics (no ambient occlusion or moon shadows)' },
+  { key: 'showInfoDots', label: 'Show info dots (how-to-play tips)' },
 ]
 
 const SLIDERS: ReadonlyArray<{ key: RangeSetting; label: string; step: number }> = [

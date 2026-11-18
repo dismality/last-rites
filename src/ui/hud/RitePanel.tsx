@@ -2,6 +2,7 @@
 // confession, one select and one button per empty place. Everything works by keyboard (Tab,
 // arrow keys on a select, Enter on the button); Esc steps back. Like the answer panel it never
 // freezes the night. Reads stores and calls `riteStore.place`; the rules are in systems/rite.ts.
+import { InfoDot } from '../theme/InfoDot'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { RELICS, RELIC_MAP, RITE_ORDER, RITE_STEP_LINES } from '../../data/relics'
 import { useBossStore } from '../../game/state/bossStore'
@@ -94,9 +95,12 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
   return (
     <div className={`altar-panel ${lockedFor > 0 ? 'altar-panel--locked' : 'altar-panel--ready'}`} onKeyDown={trapTab}>
       <div ref={root} className="altar-panel__sheet" role="dialog" aria-modal="true" aria-labelledby="rite-panel-title">
+        <div className="info-row">
         <h2 id="rite-panel-title" className="altar-panel__title">
           The Rite of Rest
         </h2>
+        <InfoDot tipKey="hud-relics" label="About relics" />
+        </div>
         <p className="altar-panel__case">Lay the relics in the order Crane confessed. Relics held: {held}/5</p>
 
         <ol className="rite-panel__slots">

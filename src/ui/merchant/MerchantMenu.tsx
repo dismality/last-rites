@@ -1,3 +1,4 @@
+import { InfoDot } from '../theme/InfoDot'
 import { useEffect, useState } from 'react'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { closeMerchant } from '../../game/state/progressionActions'
@@ -37,7 +38,10 @@ export function MerchantMenu() {
       <h2 id="merchant-title" className="menu__title">
         {view.title}
       </h2>
-      <p className="menu__text merchant__coins">{view.coinsText}</p>
+      <p className="menu__text merchant__coins">
+        {view.coinsText}
+        <InfoDot tipKey="hud-coins" label="About Grave Coins" />
+      </p>
       <ul className="merchant__rows" aria-label="Wares">
         {view.rows.map((r) => (
           <li key={r.id} className="merchant__row">

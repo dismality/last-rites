@@ -7,6 +7,7 @@ import { useProgressionStore } from '../../game/state/progressionStore'
 import { useStageStore } from '../../game/state/stageStore'
 import { MODES } from '../../data/modes'
 import { STAMINA_MAX } from '../../data/balance'
+import { InfoDot } from '../theme/InfoDot'
 import { capFraction, staminaCap } from '../../game/systems/staminaCap'
 
 /** How long the bar lingers after stamina stops draining. */
@@ -65,6 +66,7 @@ export function StaminaBar() {
       <span className="hud-stamina__cap" data-testid="stamina-cap">
         max {cap}
       </span>
+      {visible && <InfoDot tipKey="hud-stamina" label="About stamina" />}
     </div>
   )
 }

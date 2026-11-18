@@ -41,6 +41,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   showControlHints: fc.boolean(),
   plainJournalFont: fc.boolean(),
   lowGraphics: fc.boolean(),
+  showInfoDots: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -88,6 +89,28 @@ describe('settings persistence', () => {
       ),
       { numRuns: 200 },
     )
+  })
+
+  // Feature: 11-horror-pass, Property 20: Settings round trip
+  it('round-trips jumpscares and showInfoDots together (property)', () => {
+    // **Validates: Requirements 5.2, 5.12**
+    fc.assert(
+      fc.property(settingsArb, (s) => {
+        const storage = memoryStorage()
+        saveSettings(s, storage)
+        const loaded = loadSettings(storage)
+        expect(loaded.jumpscares).toBe(s.jumpscares)
+        expect(loaded.showInfoDots).toBe(s.showInfoDots)
+        expect(loaded).toEqual(s)
+      }),
+      { numRuns: 100 },
+    )
+  })
+
+  it('defaults showInfoDots on and treats a missing or invalid value as on', () => {
+    expect(DEFAULT_SETTINGS.showInfoDots).toBe(true)
+    expect(loadSettings(memoryStorage(JSON.stringify({ fov: 80 }))).showInfoDots).toBe(true)
+    expect(loadSettings(memoryStorage(JSON.stringify({ showInfoDots: 'no' }))).showInfoDots).toBe(true)
   })
 
   it('defaults jumpscares to full and loads an old save without the field as full', () => {

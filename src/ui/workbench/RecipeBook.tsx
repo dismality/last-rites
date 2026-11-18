@@ -19,6 +19,7 @@
   - Missing quantities are announced via aria-live on the entry.
 */
 
+import { InfoDot } from '../theme/InfoDot'
 import { bookRecipes, canCraftTiered } from '../../game/systems/tieredCrafting'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { MODES } from '../../data/modes'
@@ -463,9 +464,12 @@ export function RecipeBook() {
       <div className="recipe-book__spine" aria-hidden="true" />
 
       <div className="recipe-book__inner">
+        <div className="info-row">
         <h2 id={titleId} className="recipe-book__title">
           Workbench Formulae
         </h2>
+        <InfoDot tipKey="hud-recipes" label="About recipes" />
+        </div>
         <div className="recipe-book__divider" aria-hidden="true">
           ✦ · · ✦ · · ✦
         </div>

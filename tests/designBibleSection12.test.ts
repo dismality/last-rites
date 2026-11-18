@@ -3,6 +3,8 @@ import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsecti
 import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
 import { EFFECT_MAP } from '../src/data/effects'
 import { BAT } from '../src/data/bats'
+import { HINT_COSTS } from '../src/data/cases'
+import { INFO_TIPS, INFO_TIP_KEYS } from '../src/data/infoTips'
 import {
   SCARE_SETS,
   SCREEN_SCARE_COOLDOWN_S,
@@ -189,6 +191,31 @@ describe('§12.4 bats mirror src/data/bats.ts', () => {
     expect(nums(value('Belfry flock (optional)')).slice(0, 2)).toEqual([f.min, f.max])
     expect(nums(value('Belfry flock (optional)'))[2]).toBe(f.maxS)
     expect(nums(value('Belfry flock (optional)'))[3]).toBe(f.frameBudgetMs)
+  })
+})
+
+// Spec 11 task 5.1 (Req 5.1, 5.7, 5.8, 5.11, 8.2): §12.5 (bible §14.5) against src/data/infoTips.ts.
+describe('§12.5 info dots mirror src/data/infoTips.ts', () => {
+  const s = subsection(bible, '12.5')
+  const unticked = (v: string): string => v.replace(/`/g, '')
+
+  it.skipIf(s.cut)('lists the same keys in the same order', () => {
+    const keys = tableOf(s, 'Key').rows.map((r) => unticked(r.Key))
+    expect(keys).toEqual([...INFO_TIP_KEYS])
+  })
+
+  it.skipIf(s.cut)('gives every key a tip of at most 2 sentences', () => {
+    for (const key of INFO_TIP_KEYS) {
+      const tip = INFO_TIPS[key]
+      expect(tip.length, key).toBeGreaterThan(0)
+      const sentences = tip.split(/[.!?](?:\s+|$)/).filter((x) => x.trim() !== '')
+      expect(sentences.length, key).toBeLessThanOrEqual(2)
+    }
+  })
+
+  it.skipIf(s.cut)('states the hint prices and the vending machine', () => {
+    expect(INFO_TIPS['hud-hints']).toContain(`${HINT_COSTS[0]}, then ${HINT_COSTS[1]}, then ${HINT_COSTS[2]}`)
+    expect(INFO_TIPS['hud-coins']).toMatch(/vending machine/i)
   })
 })
 

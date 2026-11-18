@@ -34,6 +34,7 @@ type BooleanKey =
   | 'showControlHints'
   | 'plainJournalFont'
   | 'lowGraphics'
+  | 'showInfoDots'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -49,6 +50,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'showControlHints',
   'plainJournalFont',
   'lowGraphics',
+  'showInfoDots',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -73,6 +75,7 @@ export const DEFAULT_SETTINGS: Settings = {
   showControlHints: true,
   plainJournalFont: false,
   lowGraphics: false,
+  showInfoDots: true,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',
