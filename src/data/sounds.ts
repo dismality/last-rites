@@ -38,6 +38,8 @@ export type SoundId =
   | 'vending-refuse'
   // Spec 11 H1: the screen-scare sting.
   | 'screen-scare-sting'
+  // Spec 11 H4: a perched bat's chitter.
+  | 'bat-chitter'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -368,6 +370,15 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.002,
     decayS: 1.1,
     layers: [noise('highpass', 5000, 1500, 0.8, 0.7), tone('sine', 70, 38, 0.8), tone('sawtooth', 880, 420, 0.3)],
+  },
+  // Spec 11 H4: a perched bat's high, dry chitter, heard from the bat (3D).
+  'bat-chitter': {
+    id: 'bat-chitter',
+    spatial: true,
+    maxDistanceM: 18,
+    attackS: 0.005,
+    decayS: 0.35,
+    layers: [tone('square', 5200, 6400, 0.05), tone('triangle', 4200, 5400, 0.05), noise('highpass', 7000, 6000, 1, 0.04)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {

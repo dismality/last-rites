@@ -27,7 +27,11 @@ import {
   unsolvedMinigames,
   triggerGrab,
   forceScreenScare,
+  teleportNextToBat,
+  fireShot,
 } from '../dev/devActions'
+import { useBatStore } from '../game/state/batStore'
+import { batPerchPoint } from '../game/state/batStep'
 import { triggerScreenScare } from '../game/state/screenScareActions'
 import { screenScareRuntime, useScreenScareStore } from '../game/state/screenScareStore'
 import { useKillCamStore } from '../game/state/killCamStore'
@@ -419,6 +423,48 @@ const api = {
         return o ? Math.round((o.position.z - h[2]) * 1000) / 1000 : 0
       }),
     }
+  },
+  /** Spec 11 H4: the bats as the step sees them (phase, box and head yaw per bat, chitter clock). */
+  batState(): {
+    seededNight: number | null
+    simTime: number
+    lastChitter: number | null
+    bats: {
+      phase: string
+      boxIndex: number
+      t: number
+      yaw: number
+      restYaw: number
+      previousBox: number | null
+      /** The perch point (top face of the box), so a spec can aim the camera at the bat. */
+      at: [number, number, number]
+    }[]
+    perched: number
+  } {
+    const s = useBatStore.getState()
+    return {
+      seededNight: s.seededNight,
+      simTime: s.simTime,
+      lastChitter: s.lastChitter,
+      bats: s.entries.map((e) => ({
+        phase: e.bat.phase,
+        boxIndex: e.bat.boxIndex,
+        t: e.bat.t,
+        yaw: e.bat.yaw,
+        restYaw: e.bat.restYaw,
+        previousBox: e.bat.previousBox,
+        at: [...batPerchPoint(e.bat.boxIndex)] as [number, number, number],
+      })),
+      perched: s.entries.filter((e) => e.bat.phase === 'perched').length,
+    }
+  },
+  /** The Dev_Panel's "Teleport next to a bat". */
+  teleportNextToBat(): string {
+    return teleportNextToBat()
+  },
+  /** The Dev_Panel's "Fire a shot" (the firearmFired event the bats read). */
+  fireShot(): string {
+    return fireShot()
   },
   /** Spec 11 H1: the screen scare as the overlay sees it (active scare, cooldown clock, used moments). */
   screenScareState(): {

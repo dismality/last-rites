@@ -13,9 +13,17 @@ const SPEC_11_SOUNDS: readonly SoundId[] = [
   'vending-refuse',
   // Task 3, H1 screen scare sting (the Off subtitles are silent caption events, 3 s each).
   'screen-scare-sting',
+  // Task 4, H4 bats.
+  'bat-chitter',
 ]
 /** The ones heard from a world position. */
-const SPEC_11_WORLD_SOUNDS: readonly SoundId[] = ['vending-coin', 'vending-handle', 'vending-tray', 'vending-refuse']
+const SPEC_11_WORLD_SOUNDS: readonly SoundId[] = [
+  'vending-coin',
+  'vending-handle',
+  'vending-tray',
+  'vending-refuse',
+  'bat-chitter',
+]
 
 describe('spec 11 sound and caption coverage', () => {
   // Feature: 11-horror-pass, Property 10: Sound and caption coverage

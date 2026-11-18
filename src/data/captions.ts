@@ -74,6 +74,7 @@ export type CaptionId =
   | 'screen-scare-sting'
   | 'screen-scare-off-zombie'
   | 'screen-scare-off-ghost'
+  | 'bat-chitter'
 
 export interface CaptionDef {
   id: CaptionId
@@ -217,6 +218,8 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'screen-scare-sting', event: 'screen-scare-sting', text: '[a scream, close and sudden]', minSeconds: 1.5 },
   { id: 'screen-scare-off-zombie', event: 'screen-scare-off-zombie', text: '[a pale face lunges at you from below]', minSeconds: 3 },
   { id: 'screen-scare-off-ghost', event: 'screen-scare-off-ghost', text: '[a ghostly face drops in from above]', minSeconds: 3 },
+  // Spec 11 H4: bible §14.4 asks for at least 2 s.
+  { id: 'bat-chitter', event: 'bat-chitter', text: '[a bat chitters nearby]', minSeconds: 2 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

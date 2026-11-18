@@ -1,5 +1,10 @@
 {
-  "pbtResults": {},
+  "pbtResults": {
+    "4.2 Pure bat systems and tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1794960952915
+    }
+  },
   "executionHistory": {
     "3.1 Settings and screen scare data": [
       {
@@ -95,6 +100,109 @@
         "executionId": "c3c9dcb6-f792-4a52-b373-df51c7f1f5c8",
         "chatSessionId": "sess_a2116af0-3e82-4f80-ac63-45d880bef21d",
         "timestamp": 1794960602712
+      },
+      {
+        "executionId": "c3c9dcb6-f792-4a52-b373-df51c7f1f5c8",
+        "chatSessionId": "sess_a2116af0-3e82-4f80-ac63-45d880bef21d",
+        "timestamp": 1794960744748
+      }
+    ],
+    "3. H1: Screen jumpscares (cuttable, cut order 5)": [
+      {
+        "executionId": "c3c9dcb6-f792-4a52-b373-df51c7f1f5c8",
+        "chatSessionId": "sess_a2116af0-3e82-4f80-ac63-45d880bef21d",
+        "timestamp": 1794960744811
+      }
+    ],
+    "4.1 Bat data": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794960761592
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794960853346
+      }
+    ],
+    "4.2 Pure bat systems and tests": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794960856114
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794960963504
+      }
+    ],
+    "4.3 Bats in the scene": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794960966203
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961290519
+      }
+    ],
+    "4.4 Belfry flock (optional on budget)": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961293299
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961419572
+      }
+    ],
+    "4.5 Placeholder assets for H4": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961422325
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961485578
+      }
+    ],
+    "4.6 Dev hooks for bats": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961486004
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961572069
+      }
+    ],
+    "4.7 Bats e2e and screenshots": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794961572500
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794963402247
+      }
+    ],
+    "4.8 Finish": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794963402554
       }
     ]
   }

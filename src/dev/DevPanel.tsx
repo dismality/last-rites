@@ -11,6 +11,8 @@ import {
   giveKeyItem,
   giveCoins,
   forceScreenScare,
+  teleportNextToBat,
+  fireShot,
   giveMaterial,
   resetVendingStockDev,
   givePage,
@@ -394,6 +396,14 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(() => forceScreenScare('ghost'))}>
               Force screen scare: ghost face
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(teleportNextToBat)}>
+              Teleport next to a bat
+            </button>
+            <button type="button" onClick={run(fireShot)}>
+              Fire a shot
             </button>
           </Row>
           <Row>

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsection, tableOf } from './helpers/designBible'
 import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
 import { EFFECT_MAP } from '../src/data/effects'
+import { BAT } from '../src/data/bats'
 import {
   SCARE_SETS,
   SCREEN_SCARE_COOLDOWN_S,
@@ -157,6 +158,37 @@ describe('§12.1 screen jumpscares mirror src/data/screenScares.ts', () => {
       const row = tableOf(s, 'Trigger').rows.find((r) => unticked(r.Trigger) === m.id)!
       expect(row['Gameplay effect'], m.id).toMatch(/Once per save/)
     }
+  })
+})
+
+// Spec 11 task 4.1 (Req 4.1, 4.3, 4.6 to 4.9, 4.12, 8.2): §12.4 (bible §14.4) against src/data/bats.ts.
+describe('§12.4 bats mirror src/data/bats.ts', () => {
+  const s = subsection(bible, '12.4')
+  const value = (name: string): string => tableOf(s, 'Bats').rows.find((r) => r.Bats === name)!.Value
+  const nums = (v: string): number[] => (v.match(/\d+(?:\.\d+)?/g) ?? []).map(Number)
+
+  it.skipIf(s.cut)('has the same counts, heights, ranges and angles', () => {
+    expect(nums(value('Perched per night')).slice(0, 2)).toEqual([BAT.perchedMin, BAT.perchedMax])
+    expect(nums(value('Perch boxes')).slice(0, 2)).toEqual([BAT.boxHeightMinM, BAT.boxHeightMaxM])
+    expect(nums(value('Watch range'))[0]).toBe(BAT.watchRangeM)
+    expect(nums(value('Turn limit'))[0]).toBe(BAT.maxYawDeg)
+  })
+
+  it.skipIf(s.cut)('has the same timings', () => {
+    expect(nums(value('Ease time constant'))[0]).toBe(BAT.easeS)
+    expect(nums(value('Ease time constant'))[1]).toBe(BAT.restWithinS)
+    expect(nums(value('Take-off')).slice(0, 2)).toEqual([BAT.takeoffM, BAT.gunRangeM])
+    expect(nums(value('Flaps'))[0]).toBe(BAT.flapsPerS)
+    expect(nums(value('Flight')).slice(0, 2)).toEqual([BAT.flightS, BAT.fadeS])
+    expect(nums(value('Return'))[0]).toBe(BAT.returnS)
+    expect(nums(value('Chitter'))[0]).toBe(BAT.chitterGapS)
+  })
+
+  it.skipIf(s.cut)('has the same belfry flock', () => {
+    const f = BAT.belfryFlock
+    expect(nums(value('Belfry flock (optional)')).slice(0, 2)).toEqual([f.min, f.max])
+    expect(nums(value('Belfry flock (optional)'))[2]).toBe(f.maxS)
+    expect(nums(value('Belfry flock (optional)'))[3]).toBe(f.frameBudgetMs)
   })
 })
 

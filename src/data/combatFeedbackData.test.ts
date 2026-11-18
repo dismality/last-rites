@@ -36,6 +36,7 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'vending-handle',
   'vending-tray',
   'vending-refuse',
+  'bat-chitter',
   'screen-scare-sting',
   'screen-scare-off-zombie',
   'screen-scare-off-ghost',

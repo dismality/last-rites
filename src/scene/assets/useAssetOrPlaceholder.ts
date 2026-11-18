@@ -13,7 +13,8 @@ export type AssetStatus = 'checking' | 'present' | 'missing'
 const probes = new Map<string, Promise<boolean>>()
 const known = new Map<string, boolean>()
 
-function probe(url: string): Promise<boolean> {
+/** Exported for tests: asks once per URL and registers a missing file in the Waiting_List. */
+export function probe(url: string): Promise<boolean> {
   let p = probes.get(url)
   if (!p) {
     p = fetch(url, { method: 'HEAD' })

@@ -32,6 +32,8 @@ import { useStageStore, STAGE_PERSISTED } from './stageStore'
 import { useWorldStore } from './worldStore'
 import { useVendingStore } from './vendingStore'
 import { freshStock } from '../systems/vending'
+import { captureBatSave, useBatStore } from './batStore'
+import { freshBatSave } from '../systems/batSave'
 
 function storage(): Storage | undefined {
   try {
@@ -86,6 +88,7 @@ export function captureSave(): SaveState {
     case: pickCase(),
     pins: capturePins(),
     vending: useVendingStore.getState().stock,
+    bats: captureBatSave(),
   }
 }
 
@@ -142,6 +145,7 @@ export function loadGame(): boolean {
   useCaseStore.setState(save.case ?? freshCaseSave())
   usePinStore.setState({ pins: save.pins ?? [] })
   useVendingStore.setState({ stock: save.vending ?? freshStock(), lastPurchase: null })
+  useBatStore.getState().restore(save.bats ?? freshBatSave())
   syncDerivedStats()
   return true
 }

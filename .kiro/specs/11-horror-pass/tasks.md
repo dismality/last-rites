@@ -83,7 +83,7 @@ Common rules for all tasks:
     - Run the Finish steps for task 2; commit `hut vending machine (spec 11 task 2)`
     - Done outside Kiro. Left uncommitted for the user to commit
 
-- [ ] 3. H1: Screen jumpscares (cuttable, cut order 5)
+- [x] 3. H1: Screen jumpscares (cuttable, cut order 5)
   - [x] 3.1 Settings and screen scare data
     - Add `jumpscares` (`full | reduced | off`, default `full`, invalid stored value loads as `full`) and its Settings menu control next to Scare intensity (keyboard operable, visible focus) in `types.ts`, `settings.ts` and `Settings.tsx`
     - Create `src/data/screenScares.ts` (cooldown 180 s, in 70 ms, out 250 ms, hold 550 to 800 ms, 85 vh, image sets, `SCRIPTED_MOMENTS` for the coffin on night 2, the hut west window on night 3 and the ossuary grille); add the sting sounds and captions; add the §12.1 check to `tests/designBibleSection12.test.ts`
@@ -115,39 +115,39 @@ Common rules for all tasks:
     - Create `e2e/screen-scares.spec.ts`: each face set at Full and at Reduced (image height 85% ±1 px, correct edge, flash and dim only at Full), Off shows only the subtitle, cooldown skip, held in the journal, Esc pauses mid-scare
     - Save screenshots at 1280x720 and 800x600 for each set at Full and at Reduced
     - _Requirements: 1.1, 1.3, 1.9, 1.10, 1.12, 1.13, 8.11, 8.21_
-  - [-] 3.8 Finish
+  - [x] 3.8 Finish
     - Run the Finish steps for task 3; commit `screen jumpscares (spec 11 task 3)`
 
 - [~] 4. H4: Bats that watch you (cuttable, cut order 4)
-  - [ ] 4.1 Bat data
+  - [x] 4.1 Bat data
     - Create `src/data/bats.ts` (`BAT` constants: 8 to 12 perched, box height 0.6 to 1.6 m, watch range 14 m, max yaw 120°, ease 0.4 s, takeoff 3 m, gun range 10 m, flight 6 s, fade 1 s, return 120 s, chitter gap 20 s, 8 flaps per s, belfry flock 15 to 20 for at most 10 s); add the chitter sound and caption; add the §12.4 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 4.1, 4.3, 4.6, 4.7, 4.8, 4.9, 4.12, 8.2_
-  - [~] 4.2 Pure bat systems and tests
+  - [x] 4.2 Pure bat systems and tests
     - Create `src/game/systems/batPerches.ts` (`qualifyingBoxes`, `choosePerches`) and `bats.ts` (perched, fleeing and gone state machine, `headYaw` with clamp and ease, `chitterAllowed`) with `batPerches.test.ts` and `bats.test.ts`; add the import-boundary test that `bats.ts` imports neither `playerHealth` nor `screenScares`
     - **Property 16: Bat perch selection**; **Property 17: Bat head turn**; **Property 18: Bat state machine**
     - Extend `tests/captionCoverage.test.ts` with the chitter
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.6, 4.7, 4.8, 4.9, 4.10, 4.11, 8.18_
-  - [ ] 4.3 Bats in the scene
+  - [x] 4.3 Bats in the scene
     - Create `src/scene/world/Bats.tsx` using instanced meshes (at most 6 draw calls for bats): perch on `graveyard-colliders.json` boxes at night start in every stage, head and eyes turn on Y, emissive eyes and no light, swap to the flying model on the same frame, wing flap at 8 per s, curved flee path, fade out, return after 120 s on a different free box; 3D chitter with caption; no health damage and no screen scare; perched bats beyond 40 m skip updates
     - Wire `stepBats` into `GameLoop.tsx` after the creature step; store state in the world save
     - _Requirements: 4.1, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 4.11, 8.13, 8.14_
-  - [ ] 4.4 Belfry flock (optional on budget)
+  - [x] 4.4 Belfry flock (optional on budget)
     - Create `src/scene/world/BelfryFlock.tsx`: one `InstancedMesh` of 15 to 20 bats with the wing flap in the vertex shader, started when the dusk bell rings, gone within 10 s, skipped when the rolling frame-time average is above 22 ms; no camera shake when Camera shake is off, steady emissive when Flashing lights is off
     - _Requirements: 4.12, 4.13, 4.14, 8.6, 8.7_
-  - [ ] 4.5 Placeholder assets for H4
+  - [x] 4.5 Placeholder assets for H4
     - Dark ellipsoid primitives for `props/bat-perched.glb` and `props/bat-flying.glb` (labelled in dev), registered in the Waiting_List with `// PLACEHOLDER:` comments and `placeholders.ts` rows; test that the game runs with both missing
     - _Requirements: 4.15, 8.16, 8.22_
-  - [ ] 4.6 Dev hooks for bats
+  - [x] 4.6 Dev hooks for bats
     - Add "Teleport next to a bat" and "Fire a shot" to the Dev_Panel through real actions; add `batState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 4.7_
-  - [ ] 4.7 Bats e2e and screenshots
+  - [x] 4.7 Bats e2e and screenshots
     - Create `e2e/bats.spec.ts`: at night 8 to 12 bats are perched, the head turns within 14 m, a bat takes off within 3 m or on a shot within 10 m and is gone after about 7 s, no health change, the flock at dusk
     - Save screenshots at 1280x720 and 800x600 of a perched bat turning and of the same bat taking off
     - _Requirements: 4.1, 4.3, 4.7, 4.8, 4.11, 4.12, 8.21_
-  - [ ] 4.8 Finish
+  - [-] 4.8 Finish
     - Run the Finish steps for task 4; commit `watching bats (spec 11 task 4)`
 
-- [ ] 5. H5: Info dots (cuttable, cut order 3)
+- [~] 5. H5: Info dots (cuttable, cut order 3)
   - [ ] 5.1 Settings and info tip data
     - Add `showInfoDots` (default On, saved) to `types.ts`, `settings.ts` and `Settings.tsx` (keyboard operable, visible focus)
     - Create `src/data/infoTips.ts` (`INFO_TIP_KEYS`, `INFO_TIPS`) for every journal section (list derived from the journal tab data) and the HUD panels: case board, clues, Curse meter, hints, map, recipes, satchel, relics, lantern oil, stamina, Bestiary and coins; write each tip from the current code (check hint prices in `caseHints.ts`, the map key in `data/controls.ts`, the pin limit, and when the case can be answered), at most 2 sentences about how to play, with the coins tip mentioning the vending machine; add the §12.5 check to `tests/designBibleSection12.test.ts`

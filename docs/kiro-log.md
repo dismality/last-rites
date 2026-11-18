@@ -2043,3 +2043,17 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Every answer and position was taken from the game data (`src/data/cases.ts`, `relics.ts`, `zones.ts`, `objectiveRules.ts`), not the design docs, where they differ. For example, the Elias timeline puts the hearse-pin before the nail marks, as the data does. (2026-11-18)
   - Spec 11 features still in progress (bats and later) are not in it yet; it needs a check after the 26 Nov feature freeze. (2026-11-18)
+
+### 2026-11-18: 11-horror-pass task 4.7: Bats e2e and screenshots
+- **Kiro feature used:** spec task
+- **What happened:** Added `e2e/bats.spec.ts` (3 tests, all passing). It checks 8 to 12 perched bats at night, the head turning within 14 m, take-off on a shot within 10 m and on walking within 3 m, gone about 7 s after the shot, no health change and no screen scare, and the belfry flock at the dusk bell, gone within 10 s. Screenshots of one bat perched and turning, then taking off, are saved at 1280x720 and 800x600 in `e2e/screenshots/bats/`. `batState()` on the Debug_Hook now also reports each bat's perch point.
+- **What Kiro caught or sped up:** The first screenshots showed no bat. Bats can perch on the wide plinth of a Celtic cross (collider box 316), whose shaft has no collider of its own, so the bat sits inside the stone. Reported as a perch-selection defect; the screenshots use a headstone bat. The flock test showed the 22 ms frame-budget gate skipping a flock rung right after the run starts (startup hitch frames), so the test lets normal frames fill the window first.
+### 2026-11-18: 11-horror-pass task 4.8: Finish (watching bats)
+- **Kiro feature used:** spec task
+- **What happened:** Ran lint, build, the unit suite (329 files, 2688 tests) and `e2e/bats.spec.ts` (3 passing). Fixed the Celtic cross perch bug: `qualifyingBoxes` now drops a box when another raised box stands over its top face within `BAT.headroomM` (0.8 m), so plinth 316 at (-24, 0.84, 18) is never chosen. Boxes now carry an optional `rotY`, and two unit tests cover the plinth with and without its shaft. Committed as `watching bats (spec 11 task 4)`.
+- **What Kiro caught or sped up:** Lint failed on `BelfryFlock.tsx` (react-hooks/immutability: the frame loop mutated memoised GPU objects), fixed by reaching them through a ref. `tests/processRules.test.ts` flagged the flock's 0.8 and 0.4 size numbers duplicated from data; they are now `BAT.belfryFlock.sizeMin` and `sizeSpread`. The e2e test wrongly required every bat to be perched after the teleport, when a bat passed within 3 m had legitimately left; it now checks the chosen bat only.
+- **Decisions made unattended:**
+  - Perch rule is data-driven and geometric, not a hard-coded list: a box is rejected when a higher-starting box covers its centre and begins less than `headroomM` above its top. Boxes starting at the same level do not count, so Property 16 (which compares against `qualifyingBoxes`) and the band-edge tests stay valid. (2026-11-18)
+  - The belfry flock is labelled Property 31 in its tests, as the spec numbers it, though it sits under task 4. (2026-11-18)
+  - `src/debug/debugHook.ts` fails `prettier --check`, as it did at HEAD. It was left unformatted so the commit does not mix a reformat of earlier work with this task. (2026-11-18)
+  - The e2e headstone-only screenshot filter was kept; it still avoids plinths in the shots. (2026-11-18)

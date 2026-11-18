@@ -19,6 +19,8 @@ import { restorePins, serializePins, type Pin } from './mapPins'
 import { freshStageSave, migrateSave, type StageSave } from './stageSave'
 import { freshCaseSave, sanitizeCaseSave, type CaseSave } from './caseSave'
 import { freshStock, sanitizeVending, type VendingState } from './vending'
+import { sanitizeBatSave, type BatSave } from './batSave'
+import { GRAVEYARD_COLLIDERS } from '../../data/graveyardColliders'
 
 export const SAVE_KEY = 'lastrites:save'
 /** Dawn and dusk autosaves live here, so they never overwrite an altar save (spec 09 F5). */
@@ -52,6 +54,8 @@ export interface SaveState {
   pins?: Pin[]
   /** The hut vending machine's stock today (spec 11 H6). Optional on input; sanitised on read. */
   vending?: VendingState
+  /** The bats of the night (spec 11 H4). Optional on input; sanitised on read. */
+  bats?: BatSave
 }
 
 /** JSON shape: identical, except the mystery Sets become arrays. */
@@ -113,6 +117,7 @@ export function toSaveFile(state: SaveState): SaveFile {
       freshStageSave(Math.min(Math.max(Math.floor(state.world.nightNumber) || 1, 1), STAGE_COUNT) as StageNumber),
     case: state.case ?? freshCaseSave(),
     vending: state.vending ?? freshStock(),
+    ...(state.bats ? { bats: state.bats } : {}),
   }
 }
 
@@ -232,6 +237,8 @@ export function fromSaveFile(
     pins: restorePins(raw.pins),
     // Older saves have none: a full machine. Bad rows are clamped or refilled.
     vending: sanitizeVending(raw.vending),
+    // Older saves have none: no bats until the next night starts.
+    ...(raw.bats === undefined ? {} : { bats: sanitizeBatSave(raw.bats, GRAVEYARD_COLLIDERS.length) }),
     mystery: {
       ...m,
       craneRested: m.craneRested ?? false,

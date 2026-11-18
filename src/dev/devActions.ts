@@ -25,6 +25,8 @@ import { useChapelStore } from '../game/state/chapelStore'
 import { useCombatStore } from '../game/state/combatStore'
 import { useCraftingStore } from '../game/state/craftingStore'
 import { resetVendingStock } from '../game/state/vendingActions'
+import { batPerchPoint } from '../game/state/batStep'
+import { useBatStore } from '../game/state/batStore'
 import { setDevCheatFlags } from '../game/state/devCheats'
 import { triggerScreenScare } from '../game/state/screenScareActions'
 import { useDoorStore } from '../game/state/doorStore'
@@ -421,6 +423,43 @@ export function forceScreenScare(face: 'zombie' | 'ghost'): string {
   } finally {
     setDevCheatFlags({ forceScreenScare: false })
   }
+}
+
+/** Far enough to stay perched (take-off is 3 m), near enough to be watched (range 14 m). */
+const BAT_STANDOFF_M = 6
+
+/**
+ * Spec 11 H4: stands the player 6 m from the nearest perched bat, facing it, so the head turn
+ * can be seen. Needs a night with bats seeded.
+ */
+export function teleportNextToBat(): string {
+  const [px, , pz] = usePlayerStore.getState().position
+  let best: { at: readonly [number, number, number]; d: number } | null = null
+  for (const e of useBatStore.getState().entries) {
+    if (e.bat.phase !== 'perched') continue
+    const at = batPerchPoint(e.bat.boxIndex)
+    const d = Math.hypot(px - at[0], pz - at[2])
+    if (best === null || d < best.d) best = { at, d }
+  }
+  if (!best) return 'No perched bat (bats appear at night)'
+  const [bx, , bz] = best.at
+  // Come in from the side the player is already on; straight +Z when standing on the bat.
+  const dx = best.d > 0.01 ? (px - bx) / best.d : 0
+  const dz = best.d > 0.01 ? (pz - bz) / best.d : 1
+  const x = bx + dx * BAT_STANDOFF_M
+  const z = bz + dz * BAT_STANDOFF_M
+  // Same yaw convention as the objective teleport: 0 looks toward -Z, positive turns toward -X.
+  teleportTo(x, z, Math.atan2(-(bx - x), -(bz - z)))
+  return `Teleported next to a bat (${BAT_STANDOFF_M} m)`
+}
+
+/**
+ * Spec 11 H4: a gunshot on the same `firearmFired` event the real guns emit, which is what the
+ * bat step reads. It spends no ammo and needs no gun.
+ */
+export function fireShot(): string {
+  emit({ type: 'firearmFired', weapon: 'revolver', hit: false })
+  return 'Fired a shot'
 }
 
 export function unlockAllRecipes(): string {
