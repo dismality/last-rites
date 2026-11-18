@@ -15,6 +15,7 @@ import {
   spawnCrawlerAmbush,
   spawnBrideDev,
   spawnHoundPack,
+  spawnLookGroup,
   fireShot,
   giveMaterial,
   resetVendingStockDev,
@@ -236,6 +237,9 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(spawnOneOfEach)}>
               One of each (+ elites)
+            </button>
+            <button type="button" onClick={run(spawnLookGroup)}>
+              Spawn look group
             </button>
             <button type="button" onClick={run(spawnCrane)}>
               Spawn Father Crane

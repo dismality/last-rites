@@ -1047,7 +1047,7 @@ Unseen creatures show no name and no sketch. Tuning changes to the wave tables a
 | Contract | Value |
 |---|---|
 | Models | `public/assets/models/enemies/zombie.glb`, `zombie-brute.glb`, `crawler.glb`, `bride.glb`, `hound.glb`, paths only in `src/data/assets.ts` |
-| Clips | Idle, Walk, Run, Crawl, Attack, Lunge, Threaten, HitReact, Death; the hound and the Bride use their own movement clip in place of Crawl |
+| Clips | Idle, Walk, Run, Crawl, Attack, Lunge, Threaten, HitReact, Death; the hound (`Gallop`) and the Bride (`Glide`) use their own movement clip in place of Crawl |
 | Missing clip | Idle, with one warning per model and clip |
 | Missing model | Base `zombie.glb` |
 | Variants | `look-0` to `look-3`, one shown at a time, picked from the spawn uid (FNV-1a hash, mod 4) |

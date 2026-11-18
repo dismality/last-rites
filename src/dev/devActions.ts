@@ -57,6 +57,7 @@ import { killReports } from '../game/systems/killReports'
 import { addItem } from '../game/systems/inventory'
 import { initialBoss } from '../game/systems/bossDirector'
 import { spawnMultipliers } from '../game/systems/modes'
+import { lookIndex } from '../game/systems/lookVariant'
 import { clearedRoute } from '../game/systems/waveDirection'
 import { expandWave, nightPlan } from '../game/systems/waves'
 import { stageWaveComposition } from '../game/systems/stageWaves'
@@ -315,6 +316,49 @@ const EACH_TYPES: readonly { type: EnemyId; elite: boolean }[] = [
 export function spawnOneOfEach(): string {
   addEnemies(EACH_TYPES.map((e, i) => make(e.type, ringAround(i, EACH_TYPES.length, EACH_RING_M), e.elite)))
   return `Spawned ${EACH_TYPES.length} enemies (elites included)`
+}
+
+const LOOK_ROW_AHEAD_M = 4
+const LOOK_ROW_SPACING_M = 1.3
+
+/**
+ * Spec 11 task 8.5: Shamblers with the given uids in a row ahead of the keeper, through the real
+ * enemy store. A uid already on the field is skipped, so the same uid never spawns twice.
+ */
+export function spawnZombiesWithUids(uids: readonly string[]): string {
+  const store = useEnemyStore.getState()
+  const fresh = uids.filter((u, i) => uids.indexOf(u) === i && !store.enemies.some((e) => e.uid === u))
+  const p = usePlayerStore.getState()
+  const f = forwardFromYaw(p.yaw)
+  // Sideways unit vector so the row fans across the view.
+  const side = { x: -f.z, z: f.x }
+  const { mode, night } = modeAndNight()
+  const m = spawnMultipliers(mode, night, false)
+  const made = fresh.map((u, i) => {
+    const off = (i - (fresh.length - 1) / 2) * LOOK_ROW_SPACING_M
+    const pos = {
+      x: p.position[0] + f.x * LOOK_ROW_AHEAD_M + side.x * off,
+      z: p.position[2] + f.z * LOOK_ROW_AHEAD_M + side.z * off,
+    }
+    return createEnemy(u, 'shambler', pos, m)
+  })
+  addEnemies(made)
+  return `Spawned ${made.length} zombie(s) with uids ${fresh.join(', ')}`
+}
+
+/** One Shambler per look variant (uids found by the same hash the models use), in a row ahead. */
+export function spawnLookGroup(): string {
+  const uids: string[] = []
+  for (let want = 0; want < 4; want++) {
+    for (let n = 0; ; n++) {
+      const candidate = `dev-look-${want}-${n}`
+      if (lookIndex(candidate) === want) {
+        uids.push(candidate)
+        break
+      }
+    }
+  }
+  return spawnZombiesWithUids(uids)
 }
 
 /** Damages every living enemy through the melee rules and reports the kills as a swing would. */

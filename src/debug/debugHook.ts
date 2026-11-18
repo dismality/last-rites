@@ -32,7 +32,10 @@ import {
   spawnCrawlerAmbush,
   spawnBrideDev,
   spawnHoundPack,
+  spawnLookGroup,
+  spawnZombiesWithUids,
 } from '../dev/devActions'
+import { lookIndex } from '../game/systems/lookVariant'
 import { useCreatureStore } from '../game/state/creatureStore'
 import { meleeCreatures, shotCreatures } from '../game/state/creatureDamage'
 import { forwardFromYaw } from '../game/systems/melee'
@@ -585,6 +588,32 @@ export const api = {
   creatureHp(): { hp: Record<string, number>; noEffectCount: number } {
     const s = useCreatureStore.getState()
     return { hp: { ...s.hp }, noEffectCount: s.noEffectCount }
+  },
+  /** Spec 11 task 8.5: Shamblers with known uids, ahead of the keeper (real enemy store). */
+  spawnZombiesWithUids(uids: string[]): string {
+    return spawnZombiesWithUids(uids)
+  },
+  /** Spec 11 task 8.5: the Dev_Panel's "Spawn look group" (one Shambler per look). */
+  spawnLookGroup(): string {
+    return spawnLookGroup()
+  },
+  /**
+   * Spec 11 task 8.5: each zombie's look. `look` is the pure `lookIndex(uid)`; `meshes` lists the
+   * meshes in its model with their own visible flag, or null while no model is in the scene.
+   */
+  zombieLooks(): { uid: string; look: number; meshes: { name: string; visible: boolean }[] | null }[] {
+    const root = bodyRuntime.scene
+    return useEnemyStore.getState().enemies.map((e) => {
+      const group: THREE.Object3D | undefined = root?.getObjectByName(`zombie-${e.uid}`)
+      let meshes: { name: string; visible: boolean }[] | null = null
+      if (group) {
+        meshes = []
+        group.traverse((o) => {
+          if ((o as THREE.Mesh).isMesh) meshes!.push({ name: o.name, visible: o.visible })
+        })
+      }
+      return { uid: e.uid, look: lookIndex(e.uid), meshes }
+    })
   },
   /** The Dev_Panel's "Spawn hound pack". */
   spawnHoundPack(): string {

@@ -192,6 +192,29 @@ export const ENEMY_CAPSULE = { radiusM: 0.35, downHeightM: 0.5 } as const
 /** Model heights in metres (docs/enemy-models.md). */
 export const ENEMY_MODEL_HEIGHT = { zombie: 1.75, brute: 1.95 } as const
 
+/** Clip names every enemy model is expected to carry (spec 11 H3, design bible §14.3). */
+export const COMMON_CLIPS = ['Idle', 'Walk', 'Run', 'Attack', 'Lunge', 'Threaten', 'HitReact', 'Death'] as const
+
+/** The model files of the enemy rigs, by the keys of `ENEMY_MODEL_HEIGHT` plus the three new creatures. */
+export type EnemyModelId = 'zombie' | 'brute' | 'crawler' | 'bride' | 'hound'
+
+/**
+ * The movement clip that takes Crawl's place on a model. The hound and the bride move in their own
+ * way, so they carry Gallop and Glide instead of Crawl; every other model carries Crawl.
+ */
+export const MOVEMENT_CLIP: Readonly<Record<EnemyModelId, 'Crawl' | 'Gallop' | 'Glide'>> = {
+  zombie: 'Crawl',
+  brute: 'Crawl',
+  crawler: 'Crawl',
+  bride: 'Glide',
+  hound: 'Gallop',
+}
+
+/** The nine clips a model is expected to have: the common eight plus its movement clip. */
+export function expectedClips(model: EnemyModelId): readonly string[] {
+  return [...COMMON_CLIPS, MOVEMENT_CLIP[model]]
+}
+
 /** One of the four hand-made variants (look-0 to look-3); a tint applies only when given. */
 export interface EnemyLookVariant {
   tint?: string

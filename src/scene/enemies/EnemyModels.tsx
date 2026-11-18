@@ -24,6 +24,10 @@ import { ELITE } from '../../data/elites'
 import { useEnemyStore } from '../../game/state'
 import { isSimFrozen } from '../../game/state/menuState'
 import type { AIEnemy } from '../../game/systems/enemyAI'
+import { lookIndex, lookMeshName, lookTint, resolveClip, visibleMeshNames } from '../../game/systems/lookVariant'
+import { registerMissingArt } from '../../game/state/waitingList'
+import { lookMeshWaitingKey } from '../../data/placeholders'
+import { useAssetOrPlaceholder } from '../assets/useAssetOrPlaceholder'
 import '../assets/preloadModels'
 import { CraneProps } from './CraneProps'
 import {
@@ -101,8 +105,15 @@ function enemyByUid(uid: string): AIEnemy | undefined {
 /** Clones share materials, so each enemy type gets its own tinted copy (made once). */
 type TintCache = Map<string, THREE.Material>
 
-function tintedMaterial(cache: TintCache, type: EnemyId, src: THREE.Material): THREE.Material {
-  const key = `${type}:${src.uuid}`
+function tintedMaterial(
+  cache: TintCache,
+  type: EnemyId,
+  src: THREE.Material,
+  tintHex: string | undefined,
+): THREE.Material {
+  // No tint defined: the file's own material stays as it is (spec 11 Req 3.5, 3.9).
+  if (tintHex === undefined) return src
+  const key = `${type}:${tintHex}:${src.uuid}`
   let m = cache.get(key)
   if (!m) {
     // Cloned so the shared GLTF material is never mutated (docs/enemy-models.md).
@@ -110,7 +121,7 @@ function tintedMaterial(cache: TintCache, type: EnemyId, src: THREE.Material): T
     const std = m as THREE.MeshStandardMaterial
     if (std.color) {
       const base = std.color.getRGB({ r: 0, g: 0, b: 0 } as THREE.RGB, THREE.SRGBColorSpace)
-      const tint = new THREE.Color(ENEMY_LOOKS[type].tint).getRGB(
+      const tint = new THREE.Color(tintHex).getRGB(
         { r: 0, g: 0, b: 0 } as THREE.RGB,
         THREE.SRGBColorSpace,
       )
@@ -142,12 +153,14 @@ interface ZombieProps {
   type: EnemyId
   scene: THREE.Group
   clips: readonly THREE.AnimationClip[]
+  /** Model url, named in the missing-clip warning. */
+  modelUrl: string
   tints: TintCache
   /** Called once Father Crane's corpse has finished fading. */
   onFaded?: (uid: string) => void
 }
 
-function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
+function Zombie({ uid, type, scene, clips, modelUrl, tints, onFaded }: ZombieProps) {
   const outer = useRef<THREE.Group>(null)
   const inner = useRef<THREE.Group>(null)
 
@@ -156,16 +169,31 @@ function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
     const ownMaterials: THREE.Material[] = []
     // Plain .clone() would leave every copy sharing one skeleton.
     const obj = SkeletonUtils.clone(scene)
+    // One look per uid: show that look-N mesh (or the base when the file lacks it), hide the rest.
+    const index = lookIndex(uid)
+    const tint = lookTint(ENEMY_LOOKS[type], index)
+    const meshNames: string[] = []
+    obj.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) meshNames.push(o.name)
+    })
+    const visible = visibleMeshNames(meshNames, index)
+    // PLACEHOLDER: /assets/models/enemies/zombie.glb (look-0 to look-3; also zombie-brute.glb): the base mesh stands in
+    const wanted = lookMeshName(index)
+    if (!meshNames.includes(wanted)) {
+      // After render: the Waiting_List is a store, and this runs inside a memo.
+      queueMicrotask(() => registerMissingArt(lookMeshWaitingKey(modelUrl, wanted)))
+    }
     obj.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (!mesh.isMesh) return
+      mesh.visible = visible.has(mesh.name)
       if (type === 'father-crane') {
-        const m = tintedMaterial(tints, type, mesh.material as THREE.Material).clone()
+        const m = tintedMaterial(tints, type, mesh.material as THREE.Material, tint).clone()
         m.transparent = true
         ownMaterials.push(m)
         mesh.material = m
       } else {
-        mesh.material = tintedMaterial(tints, type, mesh.material as THREE.Material)
+        mesh.material = tintedMaterial(tints, type, mesh.material as THREE.Material, tint)
       }
       // Bind-pose bounds are wrong once the rig falls or lunges.
       mesh.frustumCulled = false
@@ -173,10 +201,11 @@ function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
       mesh.castShadow = false
     })
     return { root: obj, ownMaterials }
-  }, [scene, tints, type])
+  }, [scene, tints, type, uid, modelUrl])
 
   const mixer = useMemo(() => new THREE.AnimationMixer(root), [root])
   const clipByName = useMemo(() => new Map(clips.map((c) => [c.name, c])), [clips])
+  const clipNames = useMemo(() => clips.map((c) => c.name), [clips])
 
   const current = useRef<{ clip: ClipName; mode: PlayMode; action: THREE.AnimationAction } | null>(
     null,
@@ -232,7 +261,7 @@ function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
     i.scale.set(bx * k, by * k, bz * k)
 
     const pick = pickClip(e, speed.current > MOVING_SPEED)
-    const want = clipByName.has(pick.clip) ? pick.clip : 'Idle'
+    const want = resolveClip(pick.clip, clipNames, modelUrl) as ClipName
     const cur = current.current
     if (!cur || cur.clip !== want || cur.mode !== pick.mode) {
       const clip = clipByName.get(want)
@@ -294,7 +323,8 @@ function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
   })
 
   return (
-    <group ref={outer}>
+    // The name lets the Debug_Hook find a zombie's meshes by uid.
+    <group ref={outer} name={`zombie-${uid}`}>
       <group ref={inner}>
         <primitive object={root} />
         {type === 'father-crane' && <CraneProps fade={propFade} />}
@@ -305,7 +335,10 @@ function Zombie({ uid, type, scene, clips, tints, onFaded }: ZombieProps) {
 
 export function EnemyModels() {
   const zombie = useGLTF(ZOMBIE_MODEL_URL)
-  const brute = useGLTF(BRUTE_MODEL_URL)
+  // A brute file that is absent or fails to load falls back to zombie.glb (spec 11 Req 3.3).
+  const bruteFile = useAssetOrPlaceholder(BRUTE_MODEL_URL)
+  const bruteUrl = bruteFile === 'present' ? BRUTE_MODEL_URL : ZOMBIE_MODEL_URL
+  const brute = useGLTF(bruteUrl)
   // Crane's corpse outlives his store entry long enough to fade.
   const [ghosts, setGhosts] = useState<readonly { uid: string; type: EnemyId }[]>([])
   const tints = useMemo<TintCache>(() => new Map(), [])
@@ -355,7 +388,9 @@ export function EnemyModels() {
   return (
     <>
       {shown.map((z) => {
-        const gltf = ENEMY_LOOKS[z.type].model === 'brute' ? brute : zombie
+        const isBrute = ENEMY_LOOKS[z.type].model === 'brute'
+        const gltf = isBrute ? brute : zombie
+        const modelUrl = isBrute ? bruteUrl : ZOMBIE_MODEL_URL
         return (
           <Zombie
             key={z.uid}
@@ -363,6 +398,7 @@ export function EnemyModels() {
             type={z.type}
             scene={gltf.scene}
             clips={gltf.animations}
+            modelUrl={modelUrl}
             tints={tints}
             onFaded={onFaded}
           />

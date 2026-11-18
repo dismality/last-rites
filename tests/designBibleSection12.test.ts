@@ -3,7 +3,7 @@ import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsecti
 import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
 import { EFFECT_MAP } from '../src/data/effects'
 import { BAT } from '../src/data/bats'
-import { CUE_SUBTITLES, ENEMY_LOOKS, ENEMY_MAP } from '../src/data/enemies'
+import { COMMON_CLIPS, CUE_SUBTITLES, ENEMY_LOOKS, ENEMY_MAP, MOVEMENT_CLIP, expectedClips } from '../src/data/enemies'
 import { BRIDE, CRAWLER, CREATURE_SOUNDS, CREATURE_TELL_S, HOUND, BESTIARY_SEEN_RADIUS_M } from '../src/data/creatures'
 import { BESTIARY, FIELD_NOTE_MAX } from '../src/data/bestiary'
 import { CAPTION_MAP, type CaptionId } from '../src/data/captions'
@@ -26,7 +26,14 @@ import {
   SCRIPTED_MOMENTS,
   TRIGGER_SETS,
 } from '../src/data/screenScares'
-import { scareFaceUrl } from '../src/data/assets'
+import {
+  BRIDE_MODEL_URL,
+  BRUTE_MODEL_URL,
+  CRAWLER_MODEL_URL,
+  HOUND_MODEL_URL,
+  ZOMBIE_MODEL_URL,
+  scareFaceUrl,
+} from '../src/data/assets'
 import { LANTERN_HOOK_CAPTION, LANTERN_LIGHT } from '../src/data/lanternLight'
 import { GRIP_TABLE, HANDS_CLIPS, VIEWMODEL_TIMING, type GripWeaponId } from '../src/data/viewmodel'
 
@@ -341,6 +348,47 @@ describe('§12.2 new creatures mirror the data', () => {
       expect(e.fieldNote.length, e.id).toBeLessThanOrEqual(FIELD_NOTE_MAX)
       expect(e.whatWorks.length, e.id).toBeGreaterThan(0)
     })
+  })
+})
+
+// Spec 11 task 8.1 (Req 3.1, 3.2, 3.5, 3.7, 8.2): §12.3 (bible §14.3) against src/data/assets.ts and enemies.ts.
+describe('§12.3 zombie looks mirror the data', () => {
+  const s = subsection(bible, '12.3')
+  const row = (name: string): string => tableOf(s, 'Contract').rows.find((r) => r.Contract === name)!.Value
+  const ticked = (v: string): string[] => [...v.matchAll(/`([^`]+)`/g)].map((m) => m[1])
+
+  it.skipIf(s.cut)('names the five model files, the paths of assets.ts', () => {
+    const files = [ZOMBIE_MODEL_URL, BRUTE_MODEL_URL, CRAWLER_MODEL_URL, BRIDE_MODEL_URL, HOUND_MODEL_URL]
+    const text = row('Models')
+    for (const url of files) {
+      expect(url, url).toMatch(/^\/assets\/models\/enemies\/[a-z-]+\.glb$/)
+      expect(text, url).toContain(url.split('/').pop()!)
+    }
+    expect(text).toContain('public/assets/models/enemies/')
+    expect(new Set(files).size).toBe(5)
+  })
+
+  it.skipIf(s.cut)('has the clip contract: nine clips, the hound and bride with their own movement clip', () => {
+    const text = row('Clips')
+    for (const c of COMMON_CLIPS) expect(text, c).toContain(c)
+    for (const model of ['zombie', 'brute', 'crawler', 'bride', 'hound'] as const) {
+      const clips = expectedClips(model)
+      expect(clips, model).toHaveLength(9)
+      expect(new Set(clips).size, model).toBe(9)
+      expect(clips.includes('Crawl'), model).toBe(MOVEMENT_CLIP[model] === 'Crawl')
+    }
+    expect(MOVEMENT_CLIP.hound).not.toBe('Crawl')
+    expect(MOVEMENT_CLIP.bride).not.toBe('Crawl')
+    expect(ticked(text)).toEqual(expect.arrayContaining([MOVEMENT_CLIP.hound, MOVEMENT_CLIP.bride]))
+  })
+
+  it.skipIf(s.cut)('has four variants per new id, each tint a colour or absent', () => {
+    expect(row('Looks per new id')).toMatch(/^4 /)
+    for (const id of ['crawler', 'bride', 'hound'] as const) {
+      const variants = ENEMY_LOOKS[id].variants!
+      expect(variants, id).toHaveLength(4)
+      for (const v of variants) if (v.tint !== undefined) expect(v.tint, id).toMatch(/^#[0-9a-f]{6}$/i)
+    }
   })
 })
 

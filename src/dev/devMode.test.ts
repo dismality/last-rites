@@ -22,8 +22,12 @@ import {
   spawnBrideDev,
   spawnCrawlerAmbush,
   spawnHoundPack,
+  spawnLookGroup,
+  spawnZombiesWithUids,
   teleportNextToBat,
 } from './devActions'
+import { api } from '../debug/debugHook'
+import { useEnemyStore } from '../game/state/enemyStore'
 import { HOUND_PACKS_MAX } from '../data/creatures'
 import { stepCreatures } from '../game/state/creatureStep'
 import { useCreatureStore } from '../game/state/creatureStore'
@@ -223,6 +227,28 @@ describe('creature dev actions', () => {
     expect(packs.every((p) => p.pack.hounds.length === 3)).toBe(true)
     expect(spawnHoundPack()).toContain('Too many')
     expect(useCreatureStore.getState().packs).toHaveLength(HOUND_PACKS_MAX)
+  })
+})
+
+// Spec 11 task 8.5: zombies with known uids, and one of each look.
+describe('zombie look spawns', () => {
+  beforeEach(() => {
+    resetRun()
+    usePlayerStore.setState({ position: [0, 0, 0], yaw: 0 })
+  })
+
+  it('"Spawn zombies with uids" adds Shamblers with those uids once each', () => {
+    spawnZombiesWithUids(['a-1', 'b-2', 'a-1'])
+    expect(useEnemyStore.getState().enemies.map((e) => e.uid)).toEqual(['a-1', 'b-2'])
+    spawnZombiesWithUids(['a-1'])
+    expect(useEnemyStore.getState().enemies).toHaveLength(2)
+  })
+
+  it('"Spawn look group" spawns four zombies whose uids give looks 0 to 3', () => {
+    spawnLookGroup()
+    const looks = api.zombieLooks()
+    expect(looks.map((l) => l.look).sort()).toEqual([0, 1, 2, 3])
+    expect(looks.every((l) => l.meshes === null)).toBe(true) // no scene in Node
   })
 })
 

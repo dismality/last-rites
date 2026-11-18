@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { PLACEHOLDERS } from '../src/data/placeholders'
+import { LOOK_MESH_PLACEHOLDERS, PLACEHOLDERS } from '../src/data/placeholders'
 
 // Spec 11 Req 8.16 (design bible §14, "Waiting list and placeholders"): every placeholder use in
 // src/ carries a `// PLACEHOLDER: <path>` comment naming a declared art file, and model paths are
@@ -10,7 +10,7 @@ const files = Object.entries(SOURCES)
   .filter(([p]) => !/\.test\.tsx?$/.test(p))
   .map(([p, text]) => ({ path: p.replace('../', ''), text }))
 
-const DECLARED = new Set(PLACEHOLDERS.map((r) => r.path))
+const DECLARED = new Set([...PLACEHOLDERS.map((r) => r.path), ...LOOK_MESH_PLACEHOLDERS.map((r) => r.path)])
 /** A path mark (older prose marks such as AltarRite's predate spec 11 and name no file). */
 const MARK = /\/\/ PLACEHOLDER: (\/[^\s`]+)/g
 /** The component itself, and the files that only describe the rule. */

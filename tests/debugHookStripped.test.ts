@@ -17,6 +17,8 @@ describe('debug hook is dev only', () => {
       .filter(
         ([file, code]) =>
           !file.startsWith('../src/debug/') &&
+          // Test files are never bundled, so they may read the hook directly.
+          !/\.test\.tsx?$/.test(file) &&
           /from\s+['"][^'"]*\/debug\/|import\(\s*['"][^'"]*\/debug\//.test(code),
       )
       .map(([file]) => file)

@@ -2148,3 +2148,15 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - A heavy swing counts as `melee-down` and hits a crawler; a light swing is `melee-horizontal` and misses it. (2026-11-19)
   - Creature kills score nothing (no row in the bible); `KILL_POINTS` excludes crawler and hound. (2026-11-18)
   - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the comment fix in `src/data/cases.ts`, which are not task 7 work. (2026-11-19)
+
+### 2026-11-18: 11-horror-pass task 8: zombie look variants
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Zombie and Brute models now show exactly one of four `look-N` meshes, picked by an FNV-1a hash of the uid, with tints only where a variant defines one, clip fallback to Idle, and base-mesh fallback when a mesh or file is missing. Added `scripts/checkEnemyModels.mjs`, placeholder rows, dev spawn actions and `e2e/zombie-looks.spec.ts` with screenshots at 1280x720 and 800x600.
+- **What Kiro caught or sped up:** The full test run flagged that `tests/debugHookStripped.test.ts` counted `devMode.test.ts` as a non-test importer of the debug hook. The guard now ignores `*.test.ts(x)` files, since tests are never bundled. Lint, build, all 2848 unit tests and the zombie-looks e2e pass.
+- **Decisions made unattended:**
+  - Movement clips are `Gallop` for the hound and `Glide` for the Bride in place of Crawl (`MOVEMENT_CLIP` in `src/data/enemies.ts`, bible §14.3 updated). (2026-11-18)
+  - `checkEnemyModels` reads "one skin" as one skinned mesh with one skin shared by all `look-N` variants, and counts the triangles drawn at once (base meshes plus the largest look mesh) against 15,000. Missing files are skipped. (2026-11-18)
+  - A missing look mesh is registered in the Waiting_List under `<path>#<mesh>` (`lookMeshWaitingKey`), separate from the file-level `PLACEHOLDERS`. (2026-11-18)
+  - Dev spawn hooks: `spawnZombiesWithUids` (each uid once) and `spawnLookGroup` (four zombies, one per look), plus `api.zombieLooks()` in the debug hook. (2026-11-18)
+  - The debug-hook guard test now skips test files (see above). (2026-11-18)
+  - The commit leaves out `.kiro/specs/11-horror-pass/tasks.md`, `tasks.meta.json` and the comment fix in `src/data/cases.ts`, which are not task 8 work. (2026-11-18)

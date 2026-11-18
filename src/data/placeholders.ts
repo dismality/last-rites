@@ -9,6 +9,8 @@ import {
   BRISK_DRAUGHT_MODEL_URL,
   BRIDE_MODEL_URL,
   CRAWLER_MODEL_URL,
+  BRUTE_MODEL_URL,
+  ZOMBIE_MODEL_URL,
   HANDS_MODEL_URL,
   HOUND_MODEL_URL,
   LANTERN_COOKIE_URL,
@@ -62,6 +64,37 @@ export const PLACEHOLDERS: readonly PlaceholderRow[] = [
   row(LANTERN_MODEL_URL, 'model', 'H7', "held lantern; placeholder: today's weapon-only viewmodel and a fixed light offset"),
   row(LANTERN_COOKIE_URL, 'texture', 'H7', 'lantern spot light cookie; placeholder: a generated soft round texture'),
 ]
+
+/**
+ * A `look-N` mesh that a delivered model file does not carry yet (spec 11 H3). The file exists, so
+ * it is not in PLACEHOLDERS (the file-level list); the placeholder is the base mesh, shown instead.
+ * The runtime Waiting_List registers `${path}#${mesh}` when a model is found without the mesh.
+ */
+export interface LookMeshRow {
+  /** The model file the mesh belongs in. */
+  readonly path: string
+  readonly mesh: `look-${0 | 1 | 2 | 3}`
+  readonly owner: 'claude'
+  readonly feature: 'H3'
+  readonly use: string
+}
+
+const LOOK_INDEXES = [0, 1, 2, 3] as const
+
+export const LOOK_MESH_PLACEHOLDERS: readonly LookMeshRow[] = [ZOMBIE_MODEL_URL, BRUTE_MODEL_URL].flatMap((path) =>
+  LOOK_INDEXES.map(
+    (i): LookMeshRow => ({
+      path,
+      mesh: `look-${i}`,
+      owner: 'claude',
+      feature: 'H3',
+      use: `zombie look variant ${i} of ${path.split('/').pop()}; placeholder: the file's base mesh`,
+    }),
+  ),
+)
+
+/** The Waiting_List entry for a missing look mesh. */
+export const lookMeshWaitingKey = (path: string, mesh: string): string => `${path}#${mesh}`
 
 const PATHS = new Set(PLACEHOLDERS.map((r) => r.path))
 
