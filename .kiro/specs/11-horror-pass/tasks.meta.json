@@ -3,6 +3,14 @@
     "4.2 Pure bat systems and tests": {
       "status": "passed",
       "lastRunTimestamp": 1794960952915
+    },
+    "5.2 Pure info tip rules and tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1794963961399
+    },
+    "8.2 Pure look and clip rules with tests": {
+      "status": "passed",
+      "lastRunTimestamp": 1794997287051
     }
   },
   "executionHistory": {
@@ -203,6 +211,387 @@
         "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
         "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
         "timestamp": 1794963402554
+      },
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794963767030
+      }
+    ],
+    "4. H4: Bats that watch you (cuttable, cut order 4)": [
+      {
+        "executionId": "207d6b55-d3ae-4435-88f4-6e63be441398",
+        "chatSessionId": "sess_eab15961-81ab-434e-8385-f67d7a2cceb3",
+        "timestamp": 1794963767088
+      }
+    ],
+    "5.1 Settings and info tip data": [
+      {
+        "executionId": "bfcef75a-b97f-45c3-bc39-1fcda091ba3c",
+        "chatSessionId": "sess_aa470753-ed5c-435c-9992-072f1732d88c",
+        "timestamp": 1794963796950
+      },
+      {
+        "executionId": "bfcef75a-b97f-45c3-bc39-1fcda091ba3c",
+        "chatSessionId": "sess_aa470753-ed5c-435c-9992-072f1732d88c",
+        "timestamp": 1794963912262
+      }
+    ],
+    "5.2 Pure info tip rules and tests": [
+      {
+        "executionId": "bfcef75a-b97f-45c3-bc39-1fcda091ba3c",
+        "chatSessionId": "sess_aa470753-ed5c-435c-9992-072f1732d88c",
+        "timestamp": 1794963912512
+      },
+      {
+        "executionId": "bfcef75a-b97f-45c3-bc39-1fcda091ba3c",
+        "chatSessionId": "sess_aa470753-ed5c-435c-9992-072f1732d88c",
+        "timestamp": 1794963970834
+      }
+    ],
+    "5.3 InfoDot component and Escape handling": [
+      {
+        "executionId": "bfcef75a-b97f-45c3-bc39-1fcda091ba3c",
+        "chatSessionId": "sess_aa470753-ed5c-435c-9992-072f1732d88c",
+        "timestamp": 1794963971131
+      },
+      {
+        "executionId": "96be7fc1-4439-4ecb-adf1-e4066cf68e9f",
+        "chatSessionId": "sess_93e95052-b4c7-4b92-8589-a0bd961b22a2",
+        "timestamp": 1794971418272
+      },
+      {
+        "executionId": "96be7fc1-4439-4ecb-adf1-e4066cf68e9f",
+        "chatSessionId": "sess_93e95052-b4c7-4b92-8589-a0bd961b22a2",
+        "timestamp": 1794971649168
+      }
+    ],
+    "5.4 Place the dots": [
+      {
+        "executionId": "2ce9f91e-f852-48c0-b4ae-4a444d90fcef",
+        "chatSessionId": "sess_1daeec83-9374-48b2-9cb8-3d1bc4b8f975",
+        "timestamp": 1794971658908
+      },
+      {
+        "executionId": "2ce9f91e-f852-48c0-b4ae-4a444d90fcef",
+        "chatSessionId": "sess_1daeec83-9374-48b2-9cb8-3d1bc4b8f975",
+        "timestamp": 1794971824199
+      }
+    ],
+    "5.5 Info dots e2e and screenshots": [
+      {
+        "executionId": "17d96f8a-b701-4cf3-bb4b-44cc0bec2ee9",
+        "chatSessionId": "sess_0d12702a-caf1-4df4-8959-2d6e8b212276",
+        "timestamp": 1794971832647
+      },
+      {
+        "executionId": "17d96f8a-b701-4cf3-bb4b-44cc0bec2ee9",
+        "chatSessionId": "sess_0d12702a-caf1-4df4-8959-2d6e8b212276",
+        "timestamp": 1794972636766
+      }
+    ],
+    "5.6 Finish": [
+      {
+        "executionId": "ba0f2013-75cb-40c0-8513-69f695c6983d",
+        "chatSessionId": "sess_7c0ffec3-a9a2-484e-9356-cef12d8ff354",
+        "timestamp": 1794972648796
+      },
+      {
+        "executionId": "ba0f2013-75cb-40c0-8513-69f695c6983d",
+        "chatSessionId": "sess_7c0ffec3-a9a2-484e-9356-cef12d8ff354",
+        "timestamp": 1794972759963
+      }
+    ],
+    "5. H5: Info dots (cuttable, cut order 3)": [
+      {
+        "executionId": "ba0f2013-75cb-40c0-8513-69f695c6983d",
+        "chatSessionId": "sess_7c0ffec3-a9a2-484e-9356-cef12d8ff354",
+        "timestamp": 1794972760026
+      }
+    ],
+    "6.1 Lantern light data": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794972772493
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794972842889
+      }
+    ],
+    "6.2 Pure grip, lantern hand and flicker systems with tests": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794972843222
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973120177
+      }
+    ],
+    "6.3 Lantern light rig": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973120710
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973521045
+      }
+    ],
+    "6.4 Viewmodel hands": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973521473
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973689394
+      }
+    ],
+    "6.5 Placeholder assets for H7": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973689460
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973775079
+      }
+    ],
+    "6.6 Hands and lantern e2e, screenshots and perf": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794973775718
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794975133013
+      }
+    ],
+    "6.7 Finish": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794977579810
+      },
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794978063975
+      }
+    ],
+    "6. H7: Detailed hands and a realistic lantern light (cuttable, cut order 2)": [
+      {
+        "executionId": "cbca3256-27b0-489d-8d4c-b79110468491",
+        "chatSessionId": "sess_c75d246e-8ae5-446a-bcee-8710118ab946",
+        "timestamp": 1794978064018
+      }
+    ],
+    "7.1 Creature data": [
+      {
+        "executionId": "28d99444-b036-46b3-917f-044b68eac033",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794989770228
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794994106975
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794994376964
+      }
+    ],
+    "7.2 Pure creature systems and tests": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794994377235
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794994917063
+      }
+    ],
+    "7.3 Creature stores, scene components and wave wiring": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794994917662
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794995681992
+      }
+    ],
+    "7.4 Creature wiring: screen scares, lantern and Bestiary": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794995682095
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794995938100
+      }
+    ],
+    "7.5 Placeholder assets for H2": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794995938442
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996066865
+      }
+    ],
+    "7.6 Dev hooks for creatures": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996067175
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996365777
+      }
+    ],
+    "7.7 Creatures e2e and screenshots": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996366079
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996927510
+      }
+    ],
+    "7.8 Finish": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794996927763
+      },
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794997111664
+      }
+    ],
+    "7. H2: New creatures (cuttable, cut order 1, cut together with task 8)": [
+      {
+        "executionId": "28e842dd-6676-4b2a-a805-f013b80170b5",
+        "chatSessionId": "sess_5f7e6dbe-0652-4dfb-aae5-380b6c0558cf",
+        "timestamp": 1794997111738
+      }
+    ],
+    "8.1 Look data and asset paths": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997200431
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997261037
+      }
+    ],
+    "8.2 Pure look and clip rules with tests": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997261616
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997296042
+      }
+    ],
+    "8.3 Look variants in the scene": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997296342
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997492197
+      }
+    ],
+    "8.4 Placeholder assets for H3": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997491955
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997603015
+      }
+    ],
+    "8.5 Zombie looks e2e and screenshots": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997603628
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997879890
+      }
+    ],
+    "8.6 Finish": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794997880250
+      },
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794998003817
+      }
+    ],
+    "8. H3: Horror-game zombie looks (cuttable, cut order 1, cut together with task 7)": [
+      {
+        "executionId": "5cc966aa-291c-43be-8d70-7c9363f67307",
+        "chatSessionId": "sess_d643e046-778b-487f-92f5-f2008edf4e94",
+        "timestamp": 1794998003863
+      }
+    ],
+    "9.1 Whole-spec browser checks": [
+      {
+        "executionId": "c4cb3b23-045b-4b88-b15a-d6ebd08f9291",
+        "chatSessionId": "sess_a08faf0c-c2bf-4036-a1e5-4b0f96565d63",
+        "timestamp": 1794998500230
       }
     ]
   }

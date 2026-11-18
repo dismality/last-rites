@@ -1,4 +1,4 @@
-// Case data (spec 10 task 2.1, design bible §13, docs/case-design.md §3). Three cases, one per
+// Case data (spec 10 task 2.1, design bible §15, docs/case-design.md §3). Three cases, one per
 // stage. Answers are data; the case systems only compare player input with it. Minigame
 // internals (ledger rows, bell posts, hymn board and so on) join this file in tasks 3 to 5.
 // Pure data: no logic, no side effects.

@@ -118,7 +118,7 @@ Common rules for all tasks:
   - [x] 3.8 Finish
     - Run the Finish steps for task 3; commit `screen jumpscares (spec 11 task 3)`
 
-- [~] 4. H4: Bats that watch you (cuttable, cut order 4)
+- [x] 4. H4: Bats that watch you (cuttable, cut order 4)
   - [x] 4.1 Bat data
     - Create `src/data/bats.ts` (`BAT` constants: 8 to 12 perched, box height 0.6 to 1.6 m, watch range 14 m, max yaw 120°, ease 0.4 s, takeoff 3 m, gun range 10 m, flight 6 s, fade 1 s, return 120 s, chitter gap 20 s, 8 flaps per s, belfry flock 15 to 20 for at most 10 s); add the chitter sound and caption; add the §12.4 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 4.1, 4.3, 4.6, 4.7, 4.8, 4.9, 4.12, 8.2_
@@ -144,114 +144,114 @@ Common rules for all tasks:
     - Create `e2e/bats.spec.ts`: at night 8 to 12 bats are perched, the head turns within 14 m, a bat takes off within 3 m or on a shot within 10 m and is gone after about 7 s, no health change, the flock at dusk
     - Save screenshots at 1280x720 and 800x600 of a perched bat turning and of the same bat taking off
     - _Requirements: 4.1, 4.3, 4.7, 4.8, 4.11, 4.12, 8.21_
-  - [-] 4.8 Finish
+  - [x] 4.8 Finish
     - Run the Finish steps for task 4; commit `watching bats (spec 11 task 4)`
 
-- [~] 5. H5: Info dots (cuttable, cut order 3)
-  - [ ] 5.1 Settings and info tip data
+- [x] 5. H5: Info dots (cuttable, cut order 3)
+  - [x] 5.1 Settings and info tip data
     - Add `showInfoDots` (default On, saved) to `types.ts`, `settings.ts` and `Settings.tsx` (keyboard operable, visible focus)
     - Create `src/data/infoTips.ts` (`INFO_TIP_KEYS`, `INFO_TIPS`) for every journal section (list derived from the journal tab data) and the HUD panels: case board, clues, Curse meter, hints, map, recipes, satchel, relics, lantern oil, stamina, Bestiary and coins; write each tip from the current code (check hint prices in `caseHints.ts`, the map key in `data/controls.ts`, the pin limit, and when the case can be answered), at most 2 sentences about how to play, with the coins tip mentioning the vending machine; add the §12.5 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 5.1, 5.7, 5.8, 5.11, 5.12, 8.2_
-  - [ ] 5.2 Pure info tip rules and tests
+  - [x] 5.2 Pure info tip rules and tests
     - Create `src/game/systems/infoTips.ts` (`countSentences`, `tipFor`, `placeTooltip` keeping a tooltip inside the viewport and clear of the health bar, oil gauge and hint panel rects) and `infoTips.test.ts`; extend `settings.test.ts`
     - **Property 19: Info tips completeness**; **Property 20: Settings round trip** (jumpscares and showInfoDots together)
     - _Requirements: 5.2, 5.7, 5.8, 5.9, 5.10, 5.12_
-  - [ ] 5.3 InfoDot component and Escape handling
+  - [x] 5.3 InfoDot component and Escape handling
     - Create `src/ui/theme/InfoDot.tsx`: a button with `aria-describedby`, a `role="tooltip"` parchment tooltip shown within 100 ms on hover, focus or tap and closed on leave, blur or outside tap; renders nothing (out of DOM and Tab order) when `showInfoDots` is off
     - Confirm the order of the pause key listener (capture or bubble) and handle Escape: closes the open tooltip and does not open pause; with no tooltip open Esc reaches pause as before (use a small `infoDotState` flag if the listener is in the capture phase)
     - Write the testing-library component test: hover, focus and tap open, leave and blur close, Esc rules, `aria-describedby`, hidden dots absent
     - _Requirements: 5.2, 5.3, 5.4, 5.5, 5.6, 5.9, 8.9_
-  - [ ] 5.4 Place the dots
+  - [x] 5.4 Place the dots
     - Add an `InfoDot` next to each journal section heading and each HUD panel of Requirement 5.1 (the Bestiary dot is added with the Creatures page in task 7; the creatures journal key exists in the data now); check no overlap with the health bar, oil gauge or controls hint panel at 800x600 with Plain font for journal on
     - Info dots are DOM only: this task needs no art files and no Waiting_List entries
     - _Requirements: 5.1, 5.10, 8.10_
-  - [ ] 5.5 Info dots e2e and screenshots
+  - [x] 5.5 Info dots e2e and screenshots
     - Create `e2e/info-dots.spec.ts`: hover and Tab to each dot in the journal and the HUD, tooltip fully inside the viewport at 800x600 with Plain font on, Esc closes the tooltip without pausing, Esc again pauses, turning the setting off removes every dot and skips them in Tab order
     - Save screenshots at 1280x720 and 800x600 of the journal and the HUD with tooltips open
     - _Requirements: 5.2, 5.4, 5.5, 5.9, 5.10, 8.21_
-  - [ ] 5.6 Finish
+  - [x] 5.6 Finish
     - Run the Finish steps for task 5; commit `info dots (spec 11 task 5)`
 
-- [ ] 6. H7: Detailed hands and a realistic lantern light (cuttable, cut order 2)
-  - [ ] 6.1 Lantern light data
+- [x] 6. H7: Detailed hands and a realistic lantern light (cuttable, cut order 2)
+  - [x] 6.1 Lantern light data
     - Create `src/data/lanternLight.ts` (`LANTERN_LIGHT` constants: colour `#ffb46b`, low oil colour, shadow map 1024, fill radius 3, breathing, gutter and dip ranges, low oil threshold 15 and multiplier 2, move multiplier 1.5, Flashing-off limits, flare 0.3 s, bride dim 0.3) and the grip table and clip names in `src/data/viewmodel.ts`; add the hook caption "Lantern hooked to your belt"; add the §12.7 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 7.1, 7.2, 7.5, 7.9, 7.11, 7.12, 7.13, 7.14, 8.2_
-  - [ ] 6.2 Pure grip, lantern hand and flicker systems with tests
+  - [x] 6.2 Pure grip, lantern hand and flicker systems with tests
     - Create `src/game/systems/gripClass.ts` (total, exhaustive over weapon ids), `lanternHand.ts` (held, belt and strap states, anchor, caption-once flag, catch within 0.6 s) and `lanternFlicker.ts` (`flickerSignal`, `flickerParams`, `signalToFlame`, `signalToGlass`, last flare, low-pass for Flashing lights off, bride dim with slew limit) with a test file for each
     - **Property 26: Grip class is total and matches the table**; **Property 27: Lantern hand state machine**; **Property 28: Flicker signal bounds**; **Property 29: Flicker parameters respond to oil and movement**; **Property 11: Bride lantern effect** (the flicker part; the distance rule is exercised again in task 7)
     - Add the caption-once flag to the progression save: cleared by New Game, kept by Continue, Retry Night and Retry from morning
     - Extend `tests/captionCoverage.test.ts` with the hook caption
     - _Requirements: 7.2, 7.4, 7.5, 7.6, 7.8, 7.11, 7.12, 7.13, 7.14, 2.16, 8.6_
-  - [ ] 6.3 Lantern light rig
+  - [x] 6.3 Lantern light rig
     - Rework `src/scene/player/Lantern.tsx`: one shadow-casting spot light (map size 1024 or less, `SpotLight.map` cage cookie) plus one fill point light (no shadow, radius 3 m or less), both `#ffb46b`, driven by `flickerSignal` with the flame mesh scale and glass emissive from the same value in the same frame; light origin from the glass or the belt hook; low oil redder and gutters at least double; out with one 0.3 s flare at 0 oil; Low graphics turns the cookie off and keeps the shadow; bloom limited to the flame and glass with a `Selection`
     - Keep the number of shadow-casting lights at 4 or fewer
     - _Requirements: 7.8, 7.9, 7.11, 7.12, 7.13, 7.14, 7.15, 7.16, 8.14_
-  - [ ] 6.4 Viewmodel hands
+  - [x] 6.4 Viewmodel hands
     - Extend `src/scene/player/Viewmodel.tsx`: when `viewmodel/hands.glb` and `viewmodel/lantern.glb` load, play the grip clip by `gripFor` (switch within 0.3 s) and Lantern-Hold; lantern hand sway with 80 ms ±20 ms lag, lowered 0.05 to 0.15 m on sprint and steady with Head bob off; shotgun puts the lantern on the belt and the left hand on the fore-end, throws and heavy swings hang the lantern from the strap and catch it again; show the hook caption once per run
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.8_
-  - [ ] 6.5 Placeholder assets for H7
+  - [x] 6.5 Placeholder assets for H7
     - Keep today's weapon-only viewmodel when `hands.glb` or `lantern.glb` is missing, with the light origin at a fixed camera offset; generate a soft round `DataTexture` cookie when `lantern-cookie.png` is missing; register every missing path with `// PLACEHOLDER:` comments and `placeholders.ts` rows; test that the game runs with all three missing
     - _Requirements: 7.7, 7.10, 8.16, 8.22_
-  - [ ] 6.6 Hands and lantern e2e, screenshots and perf
+  - [x] 6.6 Hands and lantern e2e, screenshots and perf
     - Add `viewmodelState()` and `lanternLightState()` to the Debug_Hook; create `e2e/hands-lantern.spec.ts`: each Grip_Class, the belt lantern with the shotgun and its caption, cage shadows on the hut wall, low oil and out, Flashing lights off steady light
     - Save screenshots at 1280x720 and 800x600 for each Grip_Class, the belt lantern and the cage shadows; run the GPU perf spec before and after on the same scene and resolution and save `e2e/logs/lantern-perf-before.json` and `lantern-perf-after.json` (frame time, draw calls, shadow-light count of 4 or fewer)
     - _Requirements: 7.2, 7.4, 7.9, 7.14, 7.16, 8.14, 8.21_
-  - [ ] 6.7 Finish
+  - [x] 6.7 Finish
     - Run the Finish steps for task 6; commit `hands and realistic lantern light (spec 11 task 6)`
 
-- [ ] 7. H2: New creatures (cuttable, cut order 1, cut together with task 8)
-  - [ ] 7.1 Creature data
+- [x] 7. H2: New creatures (cuttable, cut order 1, cut together with task 8)
+  - [x] 7.1 Creature data
     - Add `crawler`, `bride` and `hound` to `EnemyId`, `ENEMY_MAP` and `ENEMY_LOOKS` (4 variants each) in `src/data/enemies.ts`; make `WaveEnemyId` exclude `bride`; create `src/data/creatures.ts` (crawler burst 2 m, face range 1.5 m, grab 8 and cooldown 1.5 s, lunge; bride reveal 3 m, drain 20, respawn 30 to 60 s, lantern dim 0.3 within 8 m; hound pack 2 to 3, circle 4 to 6 m, dart 10 and gap 2 s, scatter 15 m for 4 s; tell leads 0.5 to 1.5 s) and `src/data/bestiary.ts` (field note up to 200 characters and a "What works" line each); add the tell and attack sounds and captions; add the §12.2 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 2.1, 2.14, 2.15, 2.18, 3.7, 8.2_
-  - [ ] 7.2 Pure creature systems and tests
+  - [x] 7.2 Pure creature systems and tests
     - Create `src/game/systems/crawler.ts`, `bride.ts`, `hounds.ts`, `creatureTells.ts`, `hurtGuard.ts` and `bestiary.ts` (as in the design) with a test file each; add `crawler` and `hound` to `src/data/waves.ts` ladder rows (rows only increase) and extend `waves.test.ts`; add the combat attack kind (`melee-horizontal`, `melee-down`, `bullet`, `fire`) used by `crawlerHit`
     - **Property 6: Crawler rules**; **Property 7: Bride rules**; **Property 8: Hound pack rules**; **Property 9: Creature tells precede attacks**; **Property 11: Bride lantern effect** (distance rule and slew limit); **Property 12: Wave and elite tables stay on the curve**; **Property 13: Bestiary hides unseen creatures**; **Property 5: Screen scare never reduces health** (the creature damage clamp part with `clampScriptedDamage`)
     - Extend `tests/captionCoverage.test.ts` with every creature sound
     - _Requirements: 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 2.10, 2.11, 2.12, 2.13, 2.14, 2.15, 2.16, 2.17, 2.18, 2.20, 8.12, 8.18_
-  - [ ] 7.3 Creature stores, scene components and wave wiring
+  - [x] 7.3 Creature stores, scene components and wave wiring
     - Create `Crawler.tsx`, `Bride.tsx` and `Hound.tsx` in `src/scene/enemies/` following the existing zombie component pattern; add `stepCreatures` to `GameLoop.tsx` before the bat step; place crawlers at night 2 on distinct grave mounds and broken coffins and keep them unrendered until they first move; bride at stage 2 only with invisible-until-seen opacity and collider rules; hounds in packs inside the alive caps (12 / 16 / 20); every attack goes through `hurtPlayer` with the clamp; spatial tell and attack sounds with captions
     - Save the creature state and the seen set in the world and progression saves
     - _Requirements: 2.2, 2.3, 2.6, 2.7, 2.9, 2.12, 2.14, 2.15, 2.20, 8.13_
-  - [ ] 7.4 Creature wiring: screen scares, lantern and Bestiary
+  - [x] 7.4 Creature wiring: screen scares, lantern and Bestiary
     - Trigger the bottom zombie-face scare when a crawler bursts within 1.5 m in front (grab damage after the out phase starts) and the top ghost-face scare when the bride reaches the player (oil drain after the in phase ends); apply the grab or drain at once if the scare is skipped; wire the bride's lantern bend and 30% dim into the lantern rig
     - Create `src/ui/journal/Bestiary.tsx` (the "Creatures" page: sketch, field note, "What works" for seen creatures only) with its `InfoDot`; extend the Journal tab list and the tip-key test
     - _Requirements: 1.6, 1.7, 2.8, 2.16, 2.18, 5.1_
-  - [ ] 7.5 Placeholder assets for H2
+  - [x] 7.5 Placeholder assets for H2
     - Use the existing zombie model scaled and tinted for `crawler.glb`, `bride.glb` and `hound.glb` when missing, a hand-drawn-free text card "Sketch not drawn yet" for missing Bestiary sketches, procedural tones for missing sounds; register every path in the Waiting_List with `// PLACEHOLDER:` comments and `placeholders.ts` rows; test the game with all three models missing
     - _Requirements: 2.19, 8.16, 8.22_
-  - [ ] 7.6 Dev hooks for creatures
+  - [x] 7.6 Dev hooks for creatures
     - Add "Spawn crawler ambush", "Spawn bride" and "Spawn hound pack" to the Dev_Panel through real store actions; add `creatureState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 2.2, 2.6, 2.12_
-  - [ ] 7.7 Creatures e2e and screenshots
+  - [x] 7.7 Creatures e2e and screenshots
     - Create `e2e/creatures.spec.ts`: crawler ambush with its face scare and 8 damage, a horizontal swing misses and a downward swing hits, the bride seen only in the cone or within 3 m and the oil drain, lead does no damage to her, the hound pack circles and scatters on a gunshot, the Bestiary shows only seen creatures, player never drops below 1 HP from a scripted event
     - Save screenshots at 1280x720 and 800x600 of the crawler ambush, the bride in the lantern cone, the hound pack scatter and the Creatures page
     - _Requirements: 2.2, 2.3, 2.4, 2.7, 2.8, 2.10, 2.13, 2.18, 2.20, 8.21_
-  - [ ] 7.8 Finish
+  - [x] 7.8 Finish
     - Run the Finish steps for task 7; log every wave-table tuning change in the kiro-log entry; commit `new creatures (spec 11 task 7)`
 
-- [ ] 8. H3: Horror-game zombie looks (cuttable, cut order 1, cut together with task 7)
-  - [ ] 8.1 Look data and asset paths
+- [x] 8. H3: Horror-game zombie looks (cuttable, cut order 1, cut together with task 7)
+  - [x] 8.1 Look data and asset paths
     - Put the paths for `zombie.glb`, `zombie-brute.glb`, `crawler.glb`, `bride.glb` and `hound.glb` only in `src/data/assets.ts`; define the clip contract (Idle, Walk, Run, Crawl, Attack, Lunge, Threaten, HitReact, Death; the hound and bride use their own movement clip) and per-variant tints in `src/data/enemies.ts`; add the §12.3 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 3.1, 3.2, 3.5, 3.7, 8.2_
-  - [ ] 8.2 Pure look and clip rules with tests
+  - [x] 8.2 Pure look and clip rules with tests
     - Create `src/game/systems/lookVariant.ts` (`lookIndex` by FNV-1a hash of the uid modulo 4, `resolveClip` with one warning per model and clip) and `lookVariant.test.ts`
     - **Property 14: Look variant is deterministic and in range**; **Property 15: Clip fallback**
     - _Requirements: 3.3, 3.4_
-  - [ ] 8.3 Look variants in the scene
+  - [x] 8.3 Look variants in the scene
     - Update `src/scene/enemies/EnemyModels.tsx`: show exactly one `look-N` mesh and hide the other three, apply the tint only where the variant defines one, keep file materials otherwise, show the base mesh when the variant mesh is missing, fall back to `Idle` for a missing clip and to `zombie.glb` when a file fails to load; check the models in use stay one skinned mesh and under 15,000 triangles with a script run on delivered files
     - _Requirements: 3.3, 3.4, 3.5, 3.6, 3.8, 3.9_
-  - [ ] 8.4 Placeholder assets for H3
+  - [x] 8.4 Placeholder assets for H3
     - Register every missing model or `look-N` mesh in the Waiting_List with `// PLACEHOLDER:` comments and `placeholders.ts` rows; test the scene with missing files, missing meshes and missing clips without a thrown error
     - _Requirements: 3.3, 3.6, 8.16, 8.22_
-  - [ ] 8.5 Zombie looks e2e and screenshots
+  - [x] 8.5 Zombie looks e2e and screenshots
     - Create `e2e/zombie-looks.spec.ts`: spawn zombies with known uids through the Dev_Panel, assert one visible look mesh each, the same uid gives the same look, and all four looks appear in a group
     - Save screenshots at 1280x720 and 800x600 of a group showing different looks
     - _Requirements: 3.4, 3.6, 8.21_
-  - [ ] 8.6 Finish
+  - [x] 8.6 Finish
     - Run the Finish steps for task 8; commit `zombie look variants (spec 11 task 8)`
 
-- [ ] 9. Final task: whole-spec browser checks, GPU perf and the art waiting list (never cut)
-  - [ ] 9.1 Whole-spec browser checks
+- [~] 9. Final task: whole-spec browser checks, GPU perf and the art waiting list (never cut)
+  - [-] 9.1 Whole-spec browser checks
     - Create `e2e/horror-pass.spec.ts` that runs one check for each item of Requirement 8.21 that is still in the spec (skip the checks of cut tasks and say so in the report): each Screen_Scare at Full and Reduced, the crawler ambush, the Bride in the lantern cone, the hound pack scatter, the bat turning and taking off, each Info_Dot, a vending purchase, hands per Grip_Class with the belt lantern, and the cage shadows
     - Save one screenshot per check at 1280x720 and 800x600; verify every new panel is keyboard-operable with visible focus
     - _Requirements: 8.9, 8.21_
