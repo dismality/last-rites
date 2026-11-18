@@ -1,0 +1,101 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "3.1 Settings and screen scare data": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794937827005
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938029082
+      }
+    ],
+    "3.2 Pure screen scare system and tests": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938029360
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938200389
+      }
+    ],
+    "3.3 Screen scare overlay, effects and audio": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938200855
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938739383
+      }
+    ],
+    "3.4 Scripted moments and the trigger queue": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938738931
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938981014
+      }
+    ],
+    "3.5 Placeholder assets for H1": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794938981336
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939177012
+      }
+    ],
+    "3.6 Dev hooks for screen scares": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939177398
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939314749
+      }
+    ],
+    "3.7 Screen scare e2e and screenshots": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939314792
+      },
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939457517
+      }
+    ],
+    "3.8 Finish": [
+      {
+        "executionId": "a82a5d5d-ce4c-498f-91b9-70df10fa0509",
+        "chatSessionId": "sess_15be063a-12be-4c6e-a378-6d1d82828e74",
+        "timestamp": 1794939457152
+      },
+      {
+        "executionId": "c3c9dcb6-f792-4a52-b373-df51c7f1f5c8",
+        "chatSessionId": "sess_a2116af0-3e82-4f80-ac63-45d880bef21d",
+        "timestamp": 1794960602712
+      }
+    ]
+  }
+}

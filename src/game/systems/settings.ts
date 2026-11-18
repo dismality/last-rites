@@ -53,6 +53,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
 
 export const DEFAULT_SETTINGS: Settings = {
   scareIntensity: 'full',
+  jumpscares: 'full',
   flashingLights: true,
   cameraShake: true,
   headBob: true,
@@ -142,6 +143,10 @@ function sanitize(raw: unknown, base: Settings): Settings {
 
   if (typeof r.scareIntensity === 'string' && (SCARE_INTENSITIES as readonly string[]).includes(r.scareIntensity)) {
     out.scareIntensity = r.scareIntensity as Settings['scareIntensity']
+  }
+  // An old save has no jumpscares field, and an invalid value is dropped: both load as the default.
+  if (typeof r.jumpscares === 'string' && (SCARE_INTENSITIES as readonly string[]).includes(r.jumpscares)) {
+    out.jumpscares = r.jumpscares as Settings['jumpscares']
   }
   for (const key of BOOLEAN_KEYS) {
     if (typeof r[key] === 'boolean') out[key] = r[key]

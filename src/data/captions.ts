@@ -21,6 +21,9 @@ export const SILENT_CAPTION_EVENTS = [
   'hymn-stair-open',
   'crypt-pin-pulled',
   'relic-placed',
+  // Spec 11 H1: with Jumpscares off there is no face and no sting, only these 3 s subtitles.
+  'screen-scare-off-zombie',
+  'screen-scare-off-ghost',
 ] as const
 // (pin-reached has a synth voice, so it is a SoundId, not a silent event.)
 
@@ -68,6 +71,9 @@ export type CaptionId =
   | 'vending-handle'
   | 'vending-tray'
   | 'vending-refuse'
+  | 'screen-scare-sting'
+  | 'screen-scare-off-zombie'
+  | 'screen-scare-off-ghost'
 
 export interface CaptionDef {
   id: CaptionId
@@ -207,6 +213,10 @@ export const CAPTIONS: readonly CaptionDef[] = [
   { id: 'vending-handle', event: 'vending-handle', text: '[a brass handle clacks]', minSeconds: 1.5 },
   { id: 'vending-tray', event: 'vending-tray', text: '[something drops into the tray]', minSeconds: 1.5 },
   { id: 'vending-refuse', event: 'vending-refuse', text: '[the machine buzzes, refusing]', minSeconds: 1.5 },
+  // Spec 11 H1: shown from the in phase to the end of the out phase (about 1.1 s), so the floor holds it longer.
+  { id: 'screen-scare-sting', event: 'screen-scare-sting', text: '[a scream, close and sudden]', minSeconds: 1.5 },
+  { id: 'screen-scare-off-zombie', event: 'screen-scare-off-zombie', text: '[a pale face lunges at you from below]', minSeconds: 3 },
+  { id: 'screen-scare-off-ghost', event: 'screen-scare-off-ghost', text: '[a ghostly face drops in from above]', minSeconds: 3 },
 ]
 
 export const CAPTION_MAP: Readonly<Record<CaptionId, CaptionDef>> = Object.fromEntries(

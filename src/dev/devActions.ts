@@ -25,6 +25,8 @@ import { useChapelStore } from '../game/state/chapelStore'
 import { useCombatStore } from '../game/state/combatStore'
 import { useCraftingStore } from '../game/state/craftingStore'
 import { resetVendingStock } from '../game/state/vendingActions'
+import { setDevCheatFlags } from '../game/state/devCheats'
+import { triggerScreenScare } from '../game/state/screenScareActions'
 import { useDoorStore } from '../game/state/doorStore'
 import { useEndingStore } from '../game/state/endingStore'
 import { useEnemyStore } from '../game/state/enemyStore'
@@ -404,6 +406,21 @@ export function giveCoins(n = DEV_COIN_GIFT): string {
 export function resetVendingStockDev(): string {
   resetVendingStock()
   return 'Vending stock reset'
+}
+
+/**
+ * Spec 11 H1: a screen scare on demand through the real `triggerScreenScare`. The zombie face is
+ * a crawler's, the ghost face the bride's. The one-shot dev flag skips the cooldown and the
+ * overlay hold (the open panel is an overlay); the scare's own settings rules still apply.
+ */
+export function forceScreenScare(face: 'zombie' | 'ghost'): string {
+  setDevCheatFlags({ forceScreenScare: true })
+  try {
+    const outcome = triggerScreenScare(face === 'zombie' ? 'crawler' : 'bride')
+    return outcome === 'started' ? `Screen scare: ${face} face` : `Screen scare not started (${outcome})`
+  } finally {
+    setDevCheatFlags({ forceScreenScare: false })
+  }
 }
 
 export function unlockAllRecipes(): string {

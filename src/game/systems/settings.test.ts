@@ -21,6 +21,7 @@ function memoryStorage(initial?: string): SettingsStorage & { data: Map<string, 
 
 const settingsArb: fc.Arbitrary<Settings> = fc.record({
   scareIntensity: fc.constantFrom('full', 'reduced', 'off'),
+  jumpscares: fc.constantFrom('full', 'reduced', 'off'),
   flashingLights: fc.boolean(),
   cameraShake: fc.boolean(),
   headBob: fc.boolean(),
@@ -69,9 +70,34 @@ describe('settings persistence', () => {
     )
   })
 
+  // Feature: 11-horror-pass, Property 20: Settings round trip (jumpscares field)
+  it('round-trips every jumpscares value and loads any other stored value as full (property)', () => {
+    // **Validates: Requirements 1.11**
+    fc.assert(
+      fc.property(
+        settingsArb,
+        fc.oneof(fc.string(), fc.integer(), fc.boolean(), fc.constant(null)),
+        (s, bad) => {
+          const storage = memoryStorage()
+          saveSettings(s, storage)
+          expect(loadSettings(storage).jumpscares).toBe(s.jumpscares)
+          fc.pre(!['full', 'reduced', 'off'].includes(bad as string))
+          const stored = memoryStorage(JSON.stringify({ ...s, jumpscares: bad }))
+          expect(loadSettings(stored).jumpscares).toBe('full')
+        },
+      ),
+      { numRuns: 200 },
+    )
+  })
+
+  it('defaults jumpscares to full and loads an old save without the field as full', () => {
+    expect(DEFAULT_SETTINGS.jumpscares).toBe('full')
+    expect(loadSettings(memoryStorage(JSON.stringify({ fov: 80 }))).jumpscares).toBe('full')
+  })
+
   it('clamps out-of-range values and ignores invalid types', () => {
     const storage = memoryStorage(
-      JSON.stringify({ fov: 500, mouseSensitivity: -4, brightness: 9, masterVolume: -1, sfxVolume: 'loud', scareIntensity: 'max', headBob: 'yes' }),
+      JSON.stringify({ fov: 500, mouseSensitivity: -4, brightness: 9, masterVolume: -1, sfxVolume: 'loud', scareIntensity: 'max', jumpscares: 'loud', headBob: 'yes' }),
     )
     const s = loadSettings(storage)
     expect(s.fov).toBe(100)
@@ -80,6 +106,7 @@ describe('settings persistence', () => {
     expect(s.masterVolume).toBe(0)
     expect(s.sfxVolume).toBe(80)
     expect(s.scareIntensity).toBe('full')
+    expect(s.jumpscares).toBe('full')
     expect(s.headBob).toBe(true)
   })
 

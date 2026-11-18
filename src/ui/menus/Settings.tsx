@@ -96,6 +96,8 @@ function SliderRow({ setting, label, step }: { setting: RangeSetting; label: str
 export function SettingsFields() {
   const scareId = useId()
   const scare = useSettingsStore((s) => s.scareIntensity)
+  const jumpId = useId()
+  const jumpscares = useSettingsStore((s) => s.jumpscares)
   const setSetting = useSettingsStore((s) => s.setSetting)
   return (
     <form className="settings__group" onSubmit={(e) => e.preventDefault()}>
@@ -107,6 +109,18 @@ export function SettingsFields() {
           onChange={(e) =>
             setSetting('scareIntensity', e.target.value as SettingsValues['scareIntensity'])
           }
+        >
+          <option value="full">Full</option>
+          <option value="reduced">Reduced</option>
+          <option value="off">Off</option>
+        </select>
+      </div>
+      <div className="settings__row">
+        <label htmlFor={jumpId}>Jumpscares (full-screen faces)</label>
+        <select
+          id={jumpId}
+          value={jumpscares}
+          onChange={(e) => setSetting('jumpscares', e.target.value as SettingsValues['jumpscares'])}
         >
           <option value="full">Full</option>
           <option value="reduced">Reduced</option>

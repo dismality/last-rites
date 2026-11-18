@@ -52,8 +52,10 @@ describe('progressionStore', () => {
   })
 
   it('the persisted list names every saved field', () => {
-    expect([...PROGRESSION_PERSISTED].sort()).toEqual(Object.keys(defaultProgressionSave()).sort())
-    expect(Object.keys(captureProgressionSave()).sort()).toEqual([...PROGRESSION_PERSISTED].sort())
+    // Plus the screen scare state of spec 11, saved with the progression but held in its own store.
+    const saved = [...PROGRESSION_PERSISTED, 'screenScare'].sort()
+    expect(saved).toEqual(Object.keys(defaultProgressionSave()).sort())
+    expect(Object.keys(captureProgressionSave()).sort()).toEqual(saved)
   })
 
   it('a pending pick is reported to menuState', () => {

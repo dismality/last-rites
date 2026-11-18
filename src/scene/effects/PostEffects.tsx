@@ -6,6 +6,7 @@
 import { Bloom, EffectComposer, N8AO, Noise, ToneMapping, Vignette } from '@react-three/postprocessing'
 import { ToneMappingMode } from 'postprocessing'
 import { useSettingsStore } from '../../game/state/settingsStore'
+import { WorldDim } from './WorldDim'
 
 export function PostEffects() {
   const low = useSettingsStore((s) => s.lowGraphics)
@@ -32,6 +33,8 @@ export function PostEffects() {
         <Bloom key="bloom" luminanceThreshold={1} luminanceSmoothing={0.2} intensity={0.5} mipmapBlur />,
         <ToneMapping key="tone" mode={ToneMappingMode.AGX} />,
         <Vignette key="vignette" offset={0.3} darkness={0.6} />,
+        // Screen jumpscares dim the world to 30% for the hold (spec 11 H1); brightness 1 otherwise.
+        <WorldDim key="worlddim" />,
         // Full-strength noise buried the scene in static; keep it a subtle grain.
         <Noise key="noise" premultiplied opacity={0.12} />,
       ]}

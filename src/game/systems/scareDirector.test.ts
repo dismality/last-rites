@@ -14,6 +14,8 @@ import {
   type ScareContext,
 } from './scareDirector'
 import { SCARE_EVENT_MAP } from '../../data/scares'
+import { scareUiBlocking } from './minigameShell'
+import { initialScreenScareState, requestScreenScare } from './screenScares'
 
 const baseCtx: ScareContext = {
   enteredZones: [],
@@ -253,5 +255,45 @@ describe('no lurker lunge by day (spec 10)', () => {
       }
     }
     expect(seen).toBe(true)
+  })
+})
+
+describe('screen scares and overlays (spec 11 task 3.4)', () => {
+  // Feature: 11-horror-pass, Property 1: Screen scare cooldown and overlay gating
+  it('no screen scare starts and no director cue plays while an overlay or minigame is open (property)', () => {
+    fc.assert(
+      fc.property(
+        fc.boolean(),
+        fc.constantFrom(null, '1a', '2b', '3a' as const),
+        fc.integer(),
+        (menuOpen, minigame, seed) => {
+          const blocked = scareUiBlocking(menuOpen, minigame)
+          const rng = createRng(seed)
+          const r = requestScreenScare(
+            initialScreenScareState(),
+            { kind: 'scripted', momentId: 'ossuary-grille', simTime: 500 },
+            {
+              overlayOpen: blocked,
+              settings: { jumpscares: 'full', flashingLights: true, cameraShake: true },
+              prefersReducedMotion: false,
+              rng,
+            },
+          )
+          expect(r.outcome === 'started').toBe(!blocked)
+          if (blocked) {
+            expect(r.state.active).toBeNull()
+            expect(r.state.used.size).toBe(0)
+            const d = tickScares(
+              { ...createScareDirectorState(), firstScareDone: true },
+              1,
+              { ...baseCtx, uiBlocking: blocked, enteredZones: zoneIds },
+              rng,
+            )
+            expect(d.cues).toEqual([])
+          }
+        },
+      ),
+      { numRuns: 100 },
+    )
   })
 })

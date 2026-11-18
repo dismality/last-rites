@@ -11,6 +11,8 @@ const SPEC_11_SOUNDS: readonly SoundId[] = [
   'vending-handle',
   'vending-tray',
   'vending-refuse',
+  // Task 3, H1 screen scare sting (the Off subtitles are silent caption events, 3 s each).
+  'screen-scare-sting',
 ]
 /** The ones heard from a world position. */
 const SPEC_11_WORLD_SOUNDS: readonly SoundId[] = ['vending-coin', 'vending-handle', 'vending-tray', 'vending-refuse']

@@ -91,11 +91,12 @@ export function playSample(
   at?: SoundPosition,
   volume = 1,
   maxDistanceM = 40,
+  direct = false,
 ): Voice | null {
   try {
     const buffer = sampleBuffer(name)
     if (!buffer) return null
-    return engine.playBuffer(buffer, at, volume, maxDistanceM)
+    return engine.playBuffer(buffer, at, volume, maxDistanceM, direct)
   } catch {
     return null
   }

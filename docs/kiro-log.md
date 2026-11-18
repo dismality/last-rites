@@ -2005,3 +2005,15 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - The duck covers the music and SFX buses, and the sting plays straight to the master so the duck does not mute it. Reason: ducking the SFX bus would also cut the sting. (2026-11-18)
   - A saved `lastStartSim` later than the current sim clock is pulled back to now on load, because the clock restarts at 0 with the page. (2026-11-18)
+
+### 2026-11-12: 11-horror-pass task 3.4: Scripted moments and the trigger queue
+- **Kiro feature used:** spec task / PBT
+- **What happened:** Added a pure trigger queue (`systems/screenScareQueue.ts`) and its state glue (`state/screenScareQueue.ts`, `queueScreenScare` for the crawler and bride). `GameLoop` runs it each fixed step after the guidance step. The three scripted moments get their sites from `MOMENT_SITES` in `data/screenScares.ts`. A telegraph flicker plays 0.5 to 1.5 s before each face. Overlays hold a due scare, and a held or cooldown-skipped moment is never marked used.
+- **What Kiro caught or sped up:** Reused `isMenuOpen` and `scareUiBlocking` for the overlay gate. A cooldown guard stops a skipped moment from re-queuing its telegraph every tick. Decisions made unattended: the hut window and ossuary grille coordinates are estimates in `MOMENT_SITES` and need a playtest check. The coffin moment fires on any `itemCollected` within 3 m of the east broken coffin.
+### 2026-11-18: 11-horror-pass task 3.8: Finish (screen jumpscares)
+- **Kiro feature used:** spec task
+- **What happened:** Ran the Finish steps for task 3. `npm run lint` and `npm run build` pass, `npm test -- --run` passes (323 files, 2645 tests) and `e2e/screen-scares.spec.ts` passes (8 of 8). No fixes were needed. Committed task 3 as `screen jumpscares (spec 11 task 3)`.
+- **What Kiro caught or sped up:** The working tree also held unrelated All Hallows' Eve work (design bible §13: autumn leaves, harvest moon, turnip lanterns, wind and crow prompts, sky palette). Those files were left out of the commit so it holds task 3 only.
+- **Decisions made unattended:**
+  - The All Hallows' Eve files (`App.tsx`, `skyPalette.ts`, `allHallows*`, autumn scene components, `audio/prompts.test.ts`, `tools/audio/*`, `docs/audio-prompts.md`) were not staged. Reason: they belong to another change, not task 3. (2026-11-18)
+  - The `playBuffer` and `playVoice` `direct` parameter in `synth.ts` and `samples.ts` was committed with task 3. Reason: the sting uses it to bypass the ducked SFX bus. (2026-11-18)

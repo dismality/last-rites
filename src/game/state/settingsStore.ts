@@ -17,6 +17,7 @@ function saveToStorage(s: Settings): void {
 function extractSettings(current: SettingsStoreState): Settings {
   return {
     scareIntensity: current.scareIntensity,
+    jumpscares: current.jumpscares,
     flashingLights: current.flashingLights,
     cameraShake: current.cameraShake,
     headBob: current.headBob,

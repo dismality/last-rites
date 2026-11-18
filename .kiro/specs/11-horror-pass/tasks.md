@@ -83,46 +83,46 @@ Common rules for all tasks:
     - Run the Finish steps for task 2; commit `hut vending machine (spec 11 task 2)`
     - Done outside Kiro. Left uncommitted for the user to commit
 
-- [~] 3. H1: Screen jumpscares (cuttable, cut order 5)
-  - [-] 3.1 Settings and screen scare data
+- [ ] 3. H1: Screen jumpscares (cuttable, cut order 5)
+  - [x] 3.1 Settings and screen scare data
     - Add `jumpscares` (`full | reduced | off`, default `full`, invalid stored value loads as `full`) and its Settings menu control next to Scare intensity (keyboard operable, visible focus) in `types.ts`, `settings.ts` and `Settings.tsx`
     - Create `src/data/screenScares.ts` (cooldown 180 s, in 70 ms, out 250 ms, hold 550 to 800 ms, 85 vh, image sets, `SCRIPTED_MOMENTS` for the coffin on night 2, the hut west window on night 3 and the ossuary grille); add the sting sounds and captions; add the §12.1 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 1.1, 1.2, 1.11, 1.16, 1.17, 8.2_
-  - [ ] 3.2 Pure screen scare system and tests
+  - [x] 3.2 Pure screen scare system and tests
     - Create `src/game/systems/screenScares.ts` (`resolveScareFx`, `requestScreenScare` with held, cooldown and started outcomes, `pickImage`, `holdDuration`, `scareTimeline`, `phaseAt`, `shakeAt`, `telegraphLeadMs`, deferred gameplay effects keyed to the out start and the in end) and `screenScares.test.ts`
     - Extend `settings.test.ts`
     - **Property 1: Screen scare cooldown and overlay gating**; **Property 2: Effective scare effects follow the settings**; **Property 3: Scare timeline and telegraph bounds**; **Property 4: Image choice never repeats within a set**; **Property 5: Screen scare never reduces health** (the scare system part; the creature damage clamp part is added in task 7); **Property 20: Settings round trip** (jumpscares field; the info dots field is added in task 5)
     - Extend `tests/captionCoverage.test.ts` with the sting
     - _Requirements: 1.2, 1.3, 1.4, 1.9, 1.10, 1.11, 1.12, 1.13, 1.14, 1.15, 1.16, 1.18, 1.19, 8.4, 8.5, 8.6, 8.7, 8.12_
-  - [~] 3.3 Screen scare overlay, effects and audio
+  - [x] 3.3 Screen scare overlay, effects and audio
     - Create `src/ui/hud/ScreenScare.tsx` (85 vh image anchored bottom for zombie faces and top for ghost faces, linear 70 ms in, hold with scale jitter 1.00 to 1.04 and chromatic split, 250 ms out with slide and fade, one-frame white flash), the 30% world dim on the post-processing stack, camera shake through the existing channel, and `src/audio/screenScareAudio.ts` (attack, thud and scream layers, 70% master duck restored within 250 ms, 50% gain at Reduced)
     - Subtitle for the whole span at Full and Reduced, a 3 s descriptive subtitle at Off; Esc pauses within one frame and halts the timers and audio; `pointer-events: none`
     - Store the scare state (`lastStartSim`, used moments) in the progression save: kept by Continue, Retry Night and Retry from morning, cleared by New Game
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.12, 1.13, 1.14, 1.15, 1.17, 8.8, 8.11_
-  - [ ] 3.4 Scripted moments and the trigger queue
+  - [x] 3.4 Scripted moments and the trigger queue
     - Wire `requestScreenScare` into `GameLoop.tsx` after the enemy and scare steps; add the three scripted moments (coffin night 2, hut west window night 3, ossuary grille first look) with telegraphs 0.5 to 1.5 s before, held while crafting, satchel, journal, pause or any minigame is open, once per save, and never marked used when skipped
     - Leave an exposed trigger API for the crawler and bride (wired in task 7)
     - Extend `scareDirector` gating tests so no screen scare starts during an overlay
     - _Requirements: 1.6, 1.7, 1.8, 1.9, 1.10, 1.18, 8.12_
-  - [ ] 3.5 Placeholder assets for H1
+  - [x] 3.5 Placeholder assets for H1
     - Labelled flat rectangle "PLACEHOLDER face-zombie-1" (and the other four faces) when a face image is missing or fails to decode, registered once; procedural Web Audio sting layers when the sound files are missing; `// PLACEHOLDER:` comments and `placeholders.ts` rows
     - Add a test that mounts the overlay with a failing image and expects the same timing and sting
     - _Requirements: 1.20, 8.16, 8.22_
-  - [ ] 3.6 Dev hooks for screen scares
+  - [x] 3.6 Dev hooks for screen scares
     - Add "Force screen scare" (zombie face or ghost face, bypassing the cooldown only through a dev flag in `devCheats`) to the Dev_Panel; add `screenScareState()` to the Debug_Hook; extend `devMode.test.ts`
     - _Requirements: 1.1, 8.21_
-  - [ ] 3.7 Screen scare e2e and screenshots
+  - [x] 3.7 Screen scare e2e and screenshots
     - Create `e2e/screen-scares.spec.ts`: each face set at Full and at Reduced (image height 85% ±1 px, correct edge, flash and dim only at Full), Off shows only the subtitle, cooldown skip, held in the journal, Esc pauses mid-scare
     - Save screenshots at 1280x720 and 800x600 for each set at Full and at Reduced
     - _Requirements: 1.1, 1.3, 1.9, 1.10, 1.12, 1.13, 8.11, 8.21_
-  - [ ] 3.8 Finish
+  - [-] 3.8 Finish
     - Run the Finish steps for task 3; commit `screen jumpscares (spec 11 task 3)`
 
-- [ ] 4. H4: Bats that watch you (cuttable, cut order 4)
+- [~] 4. H4: Bats that watch you (cuttable, cut order 4)
   - [ ] 4.1 Bat data
     - Create `src/data/bats.ts` (`BAT` constants: 8 to 12 perched, box height 0.6 to 1.6 m, watch range 14 m, max yaw 120°, ease 0.4 s, takeoff 3 m, gun range 10 m, flight 6 s, fade 1 s, return 120 s, chitter gap 20 s, 8 flaps per s, belfry flock 15 to 20 for at most 10 s); add the chitter sound and caption; add the §12.4 check to `tests/designBibleSection12.test.ts`
     - _Requirements: 4.1, 4.3, 4.6, 4.7, 4.8, 4.9, 4.12, 8.2_
-  - [ ] 4.2 Pure bat systems and tests
+  - [~] 4.2 Pure bat systems and tests
     - Create `src/game/systems/batPerches.ts` (`qualifyingBoxes`, `choosePerches`) and `bats.ts` (perched, fleeing and gone state machine, `headYaw` with clamp and ease, `chitterAllowed`) with `batPerches.test.ts` and `bats.test.ts`; add the import-boundary test that `bats.ts` imports neither `playerHealth` nor `screenScares`
     - **Property 16: Bat perch selection**; **Property 17: Bat head turn**; **Property 18: Bat state machine**
     - Extend `tests/captionCoverage.test.ts` with the chitter

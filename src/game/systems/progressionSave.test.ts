@@ -109,6 +109,8 @@ const validSave: fc.Arbitrary<ProgressionSave> = fc
     stock: stockArb,
     stats,
     storm: fc.boolean(),
+    scareStart: fc.option(fc.integer({ min: 0, max: 100000 }), { nil: null }),
+    scareUsed: fc.subarray(['coffin-night-2', 'hut-window-night-3', 'ossuary-grille']),
     pickSeed: fc.integer({ min: 0, max: 1000 }),
   })
   .map((r) => {
@@ -129,6 +131,7 @@ const validSave: fc.Arbitrary<ProgressionSave> = fc
       stock: r.stock,
       stats: r.stats,
       storm: { active: r.storm },
+      screenScare: { lastStartSim: r.scareStart, used: r.scareUsed },
     }
   })
 
@@ -155,6 +158,7 @@ describe('sanitizeProgression', () => {
       stock: ['x', { rows: [] }, { rows: 5 }],
       stats: ['x', null, 5],
       storm: ['x', { active: 'yes' }, 5],
+      screenScare: ['x', 5, { lastStartSim: 'x', used: 'y' }],
     }
     const keys = Object.keys(junk) as (keyof ProgressionSave)[]
     fc.assert(

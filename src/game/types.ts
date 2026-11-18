@@ -239,6 +239,8 @@ export interface StaminaState {
 export interface Settings {
   /** Jumpscare / scare event intensity */
   scareIntensity: 'full' | 'reduced' | 'off'
+  /** Full-screen face jumpscares (spec 11 H1); separate from scareIntensity */
+  jumpscares: 'full' | 'reduced' | 'off'
   /** Whether light-flash effects are shown */
   flashingLights: boolean
   /** Whether camera shake is enabled */

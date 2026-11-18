@@ -5,7 +5,7 @@ import { DUSK_SNAPSHOT_KEY, MORNING_SNAPSHOT_KEY } from '../../data/balance'
 import { MODES } from '../../data/modes'
 import type { ProgressionSave } from '../systems/progressionSave'
 import { syncDerivedStats } from './derivedStats'
-import { captureProgressionSave, restoreProgressionSave } from './progressionPersistence'
+import { captureProgressionSnapshot, restoreProgressionSave } from './progressionPersistence'
 import { useProgressionStore } from './progressionStore'
 import { emit, subscribeToType } from '../events'
 import {
@@ -81,7 +81,7 @@ export const riteProgress: Snapshotable = {
 
 /** Progression goes through its own capture/restore so Retry and Save share one field list. */
 export const progressionSnapshot: Snapshotable = {
-  getState: () => captureProgressionSave(),
+  getState: () => captureProgressionSnapshot(),
   setState: (partial) => restoreProgressionSave(partial as unknown as ProgressionSave),
 }
 

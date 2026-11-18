@@ -7,6 +7,7 @@ import { CONTRACTS, CONTRACTS_PER_DAWN } from '../../data/contracts'
 import { DAWN_UPGRADES, OFFER_SIZE } from '../../data/dawnUpgrades'
 import { FIXED_ROWS, MERCHANT_ROWS, POOL_ROWS } from '../../data/merchant'
 import { MODE_IDS } from '../../data/modes'
+import { SCRIPTED_MOMENTS } from '../../data/screenScares'
 import type { Inventory, ModeId } from '../types'
 import { parseStats, type RunStats } from './runStats'
 
@@ -39,6 +40,14 @@ export interface ProgressionSave {
   stock: { rows: { id: string; qty: number }[] } | null
   stats: RunStats
   storm: { active: boolean }
+  /** Spec 11 H1: the screen scare cooldown and the scripted moments already used. */
+  screenScare: ScreenScareSave
+}
+
+/** Sim time (s) of the last screen scare start, and the scripted moments that have played. */
+export interface ScreenScareSave {
+  lastStartSim: number | null
+  used: string[]
 }
 
 export interface ProgressionSaveContext {
@@ -70,6 +79,7 @@ export function defaultProgressionSave(): ProgressionSave {
     stock: null,
     stats: parseStats(undefined),
     storm: { active: false },
+    screenScare: { lastStartSim: null, used: [] },
   }
 }
 
@@ -153,6 +163,16 @@ function sanitizeStock(raw: unknown): ProgressionSave['stock'] {
   return rows.length === STOCK_ROWS ? { rows } : null
 }
 
+function sanitizeScreenScare(raw: unknown): ScreenScareSave {
+  if (!isObj(raw)) return { lastStartSim: null, used: [] }
+  const known = new Set<string>(SCRIPTED_MOMENTS.map((m) => m.id))
+  const used = Array.isArray(raw.used)
+    ? [...new Set(raw.used.filter((id): id is string => typeof id === 'string' && known.has(id)))]
+    : []
+  const t = raw.lastStartSim
+  return { lastStartSim: typeof t === 'number' && Number.isFinite(t) && t >= 0 ? t : null, used }
+}
+
 /** Reads the progression block of a save. Never throws; junk or a missing block gives defaults. */
 export function sanitizeProgression(raw: unknown, ctx: ProgressionSaveContext): ProgressionSave {
   // Nothing in the context changes the result yet; it is part of the signature so callers
@@ -174,5 +194,6 @@ export function sanitizeProgression(raw: unknown, ctx: ProgressionSaveContext): 
     stock: sanitizeStock(raw.stock),
     stats: parseStats(raw.stats),
     storm: { active: isObj(raw.storm) && raw.storm.active === true },
+    screenScare: sanitizeScreenScare(raw.screenScare),
   }
 }

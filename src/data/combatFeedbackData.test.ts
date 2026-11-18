@@ -36,6 +36,9 @@ const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'vending-handle',
   'vending-tray',
   'vending-refuse',
+  'screen-scare-sting',
+  'screen-scare-off-zombie',
+  'screen-scare-off-ghost',
 ]
 import { SOUND_IDS, SOUND_RECIPES } from './sounds'
 

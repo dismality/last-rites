@@ -39,7 +39,7 @@ export class SynthEngine {
 
   constructor(
     readonly ctx: AudioContext,
-    destination: AudioNode,
+    private readonly destination: AudioNode,
   ) {
     this.sfx = ctx.createGain()
     this.music = ctx.createGain()
@@ -84,7 +84,14 @@ export class SynthEngine {
    * Play a decoded recording on the sfx bus, positioned when `at` is given. It shares the voice
    * cap with the synth voices. Returns a stop handle, or null if it could not start.
    */
-  playBuffer(buffer: AudioBuffer, at?: SoundPosition, volume = 1, maxDistanceM = 40): Voice | null {
+  playBuffer(
+    buffer: AudioBuffer,
+    at?: SoundPosition,
+    volume = 1,
+    maxDistanceM = 40,
+    /** Skip the sfx bus (and so its ducking); the caller applies the SFX volume itself. */
+    direct = false,
+  ): Voice | null {
     this.makeRoom()
     const { ctx } = this
     const src = ctx.createBufferSource()
@@ -106,7 +113,7 @@ export class SynthEngine {
       nodes.push(panner)
       tail = panner
     }
-    tail.connect(this.sfx)
+    tail.connect(direct ? this.destination : this.sfx)
     let stopped = false
     const voice: Voice = {
       stop: () => {
@@ -135,8 +142,13 @@ export class SynthEngine {
   }
 
   play(id: SoundId, at?: SoundPosition, volume = 1): boolean {
+    return this.playVoice(id, at, volume) !== null
+  }
+
+  /** Same as `play`, but hands back the stop handle (null for an unknown id). */
+  playVoice(id: SoundId, at?: SoundPosition, volume = 1, direct = false): Voice | null {
     const recipe: SoundRecipe | undefined = SOUND_RECIPES[id]
-    if (!recipe) return false
+    if (!recipe) return null
     this.makeRoom()
     const { ctx } = this
     const t0 = ctx.currentTime
@@ -160,7 +172,7 @@ export class SynthEngine {
       envelope.connect(panner)
       tail = panner
     }
-    tail.connect(this.sfx)
+    tail.connect(direct ? this.destination : this.sfx)
 
     const sources: AudioScheduledSourceNode[] = []
     const nodes: AudioNode[] = [envelope]
@@ -223,7 +235,7 @@ export class SynthEngine {
       s.start(t0)
       s.stop(end + 0.02)
     }
-    return true
+    return voice
   }
 }
 

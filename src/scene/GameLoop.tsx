@@ -1,10 +1,12 @@
 // GameLoop: thin driver for the fixed-timestep simulation. All rules live in src/game.
 
 import { staminaDrainMult } from '../game/systems/staminaCap'
-import { Suspense, useRef, type ReactNode } from 'react'
+import { Suspense, useEffect, useRef, type ReactNode } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Physics } from '@react-three/rapier'
-import { emit } from '../game/events'
+import { emit, subscribeToType } from '../game/events'
+import { noteCoffinOpened, tickScreenScareQueue } from '../game/state/screenScareQueue'
+import { playScareTelegraph } from './scares/screenScareTelegraph'
 import { useDigStore } from '../game/state/digStore'
 import { useNameTheDeadStore } from '../game/state/nameTheDeadStore'
 import { useGameStore, useLanternStore, usePlayerStore, useWorldStore } from '../game/state'
@@ -60,6 +62,9 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
   useCursorRelease()
   const accumulator = useRef(0)
 
+  // The marked coffin's loot being taken opens the coffin moment (it checks the player is beside it).
+  useEffect(() => subscribeToType('itemCollected', noteCoffinOpened), [])
+
   useFrame((_state, delta) => {
     // Paused: skip entirely and drop the backlog so resume doesn't fast-forward.
     // The ending sequence plays over a frozen world; the intro freezes it too.
@@ -101,6 +106,8 @@ function TickDriver({ sampleInput = liveInput }: { sampleInput?: () => TickInput
       progressionTick(STEP)
       tickStageClock(STEP)
       tickGuidance(STEP)
+      // After the enemy and scare steps (their components run each frame): screen scares last.
+      tickScreenScareQueue(playScareTelegraph)
       tickControlHints(
         STEP,
         snap.sprint && (snap.forward !== 0 || snap.strafe !== 0) && usePlayerStore.getState().stamina > 0,

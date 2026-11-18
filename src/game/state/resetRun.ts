@@ -18,6 +18,8 @@ import { useBossStore } from './bossStore'
 import { useRiteStore } from './riteStore'
 import { useWaitingList } from './waitingList'
 import { useVendingStore } from './vendingStore'
+import { resetScreenScareRuntime, useScreenScareStore } from './screenScareStore'
+import { resetScreenScareQueue } from './screenScareQueue'
 import { useChapelStore } from './chapelStore'
 import { useCoinStore } from './coinStore'
 import { resetCombatTickRuntime } from './combatTick'
@@ -73,6 +75,7 @@ interface Resettable {
 /** Replaced wholesale with their initial state. */
 export const REPLACED_STORES = [
   useVendingStore,
+  useScreenScareStore,
   useInventoryStore,
   useCraftingStore,
   useChapelStore,
@@ -149,6 +152,8 @@ export function resetRun(): void {
   resetProgressionEventsRuntime()
   takePlayerPush()
   queueTeleportToStore() // a mounted body from the previous run goes back to the start
+  resetScreenScareRuntime()
+  resetScreenScareQueue()
   meleeRuntime.shakeAge = Infinity
   meleeRuntime.dustQueue.length = 0
   gasRuntime.queue.length = 0

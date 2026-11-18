@@ -8,7 +8,10 @@ import { isDevEnabled } from './devFlag'
 import { DEV_TOGGLE_CODE, installDevKeys } from './devKeys'
 import { useDevPanelStore } from './devPanelStore'
 import { installDev } from './installDev'
-import { giveCoins, resetVendingStockDev } from './devActions'
+import { forceScreenScare, giveCoins, resetVendingStockDev } from './devActions'
+import { triggerScreenScare } from '../game/state/screenScareActions'
+import { useScreenScareStore } from '../game/state/screenScareStore'
+import { initialScreenScareState } from '../game/systems/screenScares'
 import { useProgressionStore } from '../game/state/progressionStore'
 import { useVendingStore } from '../game/state/vendingStore'
 import { freshStock } from '../game/systems/vending'
@@ -86,11 +89,11 @@ describe('Dev_Panel with the flag', () => {
 
 describe('cheat flags', () => {
   it('default to off and follow the panel', () => {
-    expect(getDevCheats()).toEqual({ god: false, noclip: false, timeScale: 1, panelOpen: false })
+    expect(getDevCheats()).toEqual({ god: false, noclip: false, timeScale: 1, panelOpen: false, forceScreenScare: false })
     setCheats({ god: true, noclip: true, timeScale: 20 })
-    expect(getDevCheats()).toEqual({ god: true, noclip: true, timeScale: 20, panelOpen: false })
+    expect(getDevCheats()).toEqual({ god: true, noclip: true, timeScale: 20, panelOpen: false, forceScreenScare: false })
     resetCheats()
-    expect(getDevCheats()).toEqual({ god: false, noclip: false, timeScale: 1, panelOpen: false })
+    expect(getDevCheats()).toEqual({ god: false, noclip: false, timeScale: 1, panelOpen: false, forceScreenScare: false })
   })
 
   it('an open panel counts as an overlay, so input stops and lock loss does not pause', () => {
@@ -102,7 +105,7 @@ describe('cheat flags', () => {
     // Cheats set from the panel must not clear the open flag.
     setCheats({ god: true })
     expect(getDevCheats().panelOpen).toBe(true)
-    setDevCheatFlags({ panelOpen: false })
+    setDevCheatFlags({ panelOpen: false, forceScreenScare: false })
     expect(isMenuOpen()).toBe(false)
   })
 })
@@ -119,5 +122,28 @@ describe('vending dev actions', () => {
     useVendingStore.getState().setStock({ stockLeft: { ...freshStock().stockLeft, bandage: 0, 'kola-tonic': 0 } })
     resetVendingStockDev()
     expect(useVendingStore.getState().stock).toEqual(freshStock())
+  })
+})
+
+// Spec 11 task 3.6: Force screen scare bypasses the cooldown and the open panel only through the dev flag.
+describe('force screen scare', () => {
+  afterEach(() => {
+    resetCheats()
+    setDevCheatFlags({ panelOpen: false })
+    useScreenScareStore.getState().setScare(initialScreenScareState())
+  })
+
+  it('starts a zombie or ghost face inside the cooldown and with the panel open', () => {
+    setDevCheatFlags({ panelOpen: true })
+    expect(forceScreenScare('zombie')).toContain('zombie')
+    expect(useScreenScareStore.getState().scare.active?.set).toBe('zombie-bottom')
+    expect(forceScreenScare('ghost')).toContain('ghost')
+    expect(useScreenScareStore.getState().scare.active?.set).toBe('ghost-top')
+  })
+
+  it('leaves the flag off afterwards, so a normal request still obeys the cooldown', () => {
+    forceScreenScare('zombie')
+    expect(getDevCheats().forceScreenScare).toBe(false)
+    expect(triggerScreenScare('crawler')).toBe('cooldown')
   })
 })

@@ -26,7 +26,10 @@ import {
   solveCurrentMinigame,
   unsolvedMinigames,
   triggerGrab,
+  forceScreenScare,
 } from '../dev/devActions'
+import { triggerScreenScare } from '../game/state/screenScareActions'
+import { screenScareRuntime, useScreenScareStore } from '../game/state/screenScareStore'
 import { useKillCamStore } from '../game/state/killCamStore'
 import { simClock } from '../game/state/simClock'
 import { caseOfStage } from '../data/cases'
@@ -417,6 +420,47 @@ const api = {
       }),
     }
   },
+  /** Spec 11 H1: the screen scare as the overlay sees it (active scare, cooldown clock, used moments). */
+  screenScareState(): {
+    active: {
+      set: string
+      image: string
+      kind: string
+      startSim: number
+      subtitleOnly: boolean
+      fx: { showImage: boolean; flash: boolean; dim: boolean }
+    } | null
+    lastStartSim: number | null
+    used: string[]
+    /** World brightness the dim effect applies now (1 = untouched). */
+    brightness: number
+  } {
+    const s = useScreenScareStore.getState().scare
+    const a = s.active
+    return {
+      active: a
+        ? {
+            set: a.set,
+            image: a.image,
+            kind: a.kind,
+            startSim: a.startSim,
+            subtitleOnly: a.fx.subtitleOnly,
+            fx: { showImage: a.fx.showImage, flash: a.fx.flash, dim: a.fx.dim },
+          }
+        : null,
+      brightness: screenScareRuntime.brightness,
+      lastStartSim: s.lastStartSim,
+      used: [...s.used],
+    }
+  },
+  /** A normal (not forced) screen scare request, as a creature would make it: obeys the cooldown and open overlays. */
+  requestScreenScare(kind: 'crawler' | 'bride'): string {
+    return triggerScreenScare(kind)
+  },
+  /** The Dev_Panel's "Force screen scare" (skips the cooldown through the dev flag). */
+  forceScreenScare(face: 'zombie' | 'ghost'): string {
+    return forceScreenScare(face)
+  },
   /** The Dev_Panel's "Reset vending stock" (the same action dawn runs). */
   resetVendingStock(): void {
     resetVendingStock()
@@ -507,7 +551,7 @@ const api = {
     scareRuntime.forced.push(id)
   },
   /** Sets Scare intensity or Subtitles through the real store action. */
-  setScareSetting(key: 'scareIntensity' | 'subtitles', value: 'full' | 'reduced' | 'off' | boolean): void {
+  setScareSetting(key: 'scareIntensity' | 'jumpscares' | 'subtitles', value: 'full' | 'reduced' | 'off' | boolean): void {
     useSettingsStore.getState().setSetting(key, value as never)
   },
   /** Scare effect values the scene reads: shake clock, lantern flicker, strobe flag and hand slow. */

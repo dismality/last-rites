@@ -36,6 +36,8 @@ export type SoundId =
   | 'vending-handle'
   | 'vending-tray'
   | 'vending-refuse'
+  // Spec 11 H1: the screen-scare sting.
+  | 'screen-scare-sting'
 
 export interface NoiseLayer {
   kind: 'noise'
@@ -356,6 +358,16 @@ export const SOUND_RECIPES: Readonly<Record<SoundId, SoundRecipe>> = {
     attackS: 0.01,
     decayS: 0.45,
     layers: [tone('square', 110, 108, 0.07), tone('square', 116, 114, 0.05)],
+  },
+  // Spec 11 H1: the screen-scare sting, flat in the head. Three layers (design bible §14.1): a
+  // sharp noise attack, a low sine thud and a falling sawtooth wail. Reduced plays it at half volume.
+  'screen-scare-sting': {
+    id: 'screen-scare-sting',
+    spatial: false,
+    maxDistanceM: 0,
+    attackS: 0.002,
+    decayS: 1.1,
+    layers: [noise('highpass', 5000, 1500, 0.8, 0.7), tone('sine', 70, 38, 0.8), tone('sawtooth', 880, 420, 0.3)],
   },
   // A steady hiss; the rain loop (src/audio/rain.ts) re-triggers or sustains it.
   'rain-noise': {

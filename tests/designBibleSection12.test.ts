@@ -2,6 +2,24 @@ import { describe, expect, it } from 'vitest'
 import { liveSubsections, parseHorrorPass, parseTables, readHorrorPass, subsection, tableOf } from './helpers/designBible'
 import { VENDING_FORBIDDEN, VENDING_RANGE_M, VENDING_ROWS } from '../src/data/vending'
 import { EFFECT_MAP } from '../src/data/effects'
+import {
+  SCARE_SETS,
+  SCREEN_SCARE_COOLDOWN_S,
+  SCREEN_SCARE_HEIGHT_VH,
+  SCREEN_SCARE_HOLD_MAX_MS,
+  SCREEN_SCARE_HOLD_MIN_MS,
+  SCREEN_SCARE_IN_MS,
+  SCREEN_SCARE_MAJOR_GAP_S,
+  SCREEN_SCARE_OFF_SUBTITLE_S,
+  SCREEN_SCARE_OUT_MS,
+  SCREEN_SCARE_SCALE_MAX,
+  SCREEN_SCARE_SCALE_MIN,
+  SCREEN_SCARE_TELEGRAPH_MAX_MS,
+  SCREEN_SCARE_TELEGRAPH_MIN_MS,
+  SCRIPTED_MOMENTS,
+  TRIGGER_SETS,
+} from '../src/data/screenScares'
+import { scareFaceUrl } from '../src/data/assets'
 
 // Spec 11 task 1.2 (Req 8.2, 8.3): the horror-pass section of the design bible ("§12" in spec 11,
 // "## 14. Horror pass" in the bible) has its nine subsections, and a small parser hands later tasks
@@ -92,6 +110,53 @@ describe('§12.6 vending machine mirrors src/data/vending.ts', () => {
     expect(s.body).toContain(`within ${VENDING_RANGE_M} m`)
     expect(s.body).toContain('+25% move speed for 60 s')
     expect(EFFECT_MAP['brisk-draught']).toMatchObject({ durationS: 60, mods: { moveSpeed: 1.25 } })
+  })
+})
+
+// Spec 11 task 3.1 (Req 1.1, 1.2, 1.16, 8.2): §12.1 (bible §14.1) against src/data/screenScares.ts.
+describe('§12.1 screen jumpscares mirror src/data/screenScares.ts', () => {
+  const s = subsection(bible, '12.1')
+  const unticked = (v: string): string => v.replace(/`/g, '')
+  const timing = (name: string): string => tableOf(s, 'Timing').rows.find((r) => r.Timing === name)!.Value
+
+  it.skipIf(s.cut)('has the same five faces, sets, edges and paths', () => {
+    const rows = tableOf(s, 'Face').rows
+    const data = Object.values(SCARE_SETS).flatMap((set) => set.faces.map((f) => ({ f, set })))
+    expect(rows.map((r) => unticked(r.Face))).toEqual(data.map((d) => d.f))
+    rows.forEach((r, i) => {
+      expect(r.Set, data[i].f).toBe(data[i].set.id)
+      expect(r.Edge.toLowerCase(), data[i].f).toBe(data[i].set.edge)
+      expect(unticked(r.Path), data[i].f).toBe(`public${scareFaceUrl(data[i].f)}`)
+    })
+  })
+
+  it.skipIf(s.cut)('has the same timings', () => {
+    expect(timing('Image height')).toBe(`${SCREEN_SCARE_HEIGHT_VH}% of the viewport height`)
+    expect(timing('In')).toBe(`${SCREEN_SCARE_IN_MS} ms, no easing`)
+    expect(timing('Hold')).toBe(`${SCREEN_SCARE_HOLD_MIN_MS} to ${SCREEN_SCARE_HOLD_MAX_MS} ms (random)`)
+    expect(timing('Out')).toMatch(new RegExp(`^${SCREEN_SCARE_OUT_MS} ms`))
+    expect(timing('Telegraph lead')).toMatch(
+      new RegExp(`^${SCREEN_SCARE_TELEGRAPH_MIN_MS} to ${SCREEN_SCARE_TELEGRAPH_MAX_MS} ms`),
+    )
+    expect(timing('Cooldown')).toMatch(new RegExp(`^${SCREEN_SCARE_COOLDOWN_S} s`))
+    expect(timing('Major-scare gap')).toMatch(new RegExp(`^${SCREEN_SCARE_MAJOR_GAP_S} s`))
+    expect(timing('Scale jitter')).toBe(`${SCREEN_SCARE_SCALE_MIN.toFixed(2)} to ${SCREEN_SCARE_SCALE_MAX.toFixed(2)}`)
+    expect(timing('Off subtitle')).toBe(`${SCREEN_SCARE_OFF_SUBTITLE_S} s`)
+  })
+
+  it.skipIf(s.cut)('has the same five triggers and their sets', () => {
+    const rows = tableOf(s, 'Trigger').rows
+    expect(rows.map((r) => unticked(r.Trigger))).toEqual(Object.keys(TRIGGER_SETS))
+    for (const r of rows) expect(r.Set, r.Trigger).toBe(TRIGGER_SETS[unticked(r.Trigger) as keyof typeof TRIGGER_SETS])
+  })
+
+  it.skipIf(s.cut)('has the three scripted moments, once per save', () => {
+    expect(SCRIPTED_MOMENTS.map((m) => m.id)).toEqual(['coffin-night-2', 'hut-window-night-3', 'ossuary-grille'])
+    for (const m of SCRIPTED_MOMENTS) {
+      expect(m.set, m.id).toBe(TRIGGER_SETS[m.id])
+      const row = tableOf(s, 'Trigger').rows.find((r) => unticked(r.Trigger) === m.id)!
+      expect(row['Gameplay effect'], m.id).toMatch(/Once per save/)
+    }
   })
 })
 

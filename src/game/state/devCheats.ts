@@ -15,9 +15,14 @@ export interface DevCheatFlags {
    * the controller stop and releasing pointer lock does not pause the game under the panel.
    */
   panelOpen: boolean
+  /**
+   * Set only for the length of one dev "Force screen scare" call: triggerScreenScare then skips
+   * the 180 s cooldown and the open-overlay hold (the open Dev_Panel counts as an overlay).
+   */
+  forceScreenScare: boolean
 }
 
-const OFF: DevCheatFlags = { god: false, noclip: false, timeScale: 1, panelOpen: false }
+const OFF: DevCheatFlags = { god: false, noclip: false, timeScale: 1, panelOpen: false, forceScreenScare: false }
 
 const flags: DevCheatFlags = { ...OFF }
 

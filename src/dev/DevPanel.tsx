@@ -10,6 +10,7 @@ import {
   giveEverything,
   giveKeyItem,
   giveCoins,
+  forceScreenScare,
   giveMaterial,
   resetVendingStockDev,
   givePage,
@@ -385,6 +386,14 @@ export function DevPanel() {
             </button>
             <button type="button" onClick={run(triggerGrab)}>
               Trigger grab
+            </button>
+          </Row>
+          <Row>
+            <button type="button" onClick={run(() => forceScreenScare('zombie'))}>
+              Force screen scare: zombie face
+            </button>
+            <button type="button" onClick={run(() => forceScreenScare('ghost'))}>
+              Force screen scare: ghost face
             </button>
           </Row>
           <Row>

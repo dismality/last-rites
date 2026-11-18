@@ -30,6 +30,7 @@ import { Minimap, MinimapHotkey } from './Minimap'
 import { AchievementToasts } from './AchievementToasts'
 import { DawnCard } from './DawnCard'
 import { DescentFade } from './DescentFade'
+import { ScreenScare } from './ScreenScare'
 import { MerchantMenu } from '../merchant/MerchantMenu'
 import { VendingPanel } from '../vending/VendingPanel'
 import { Hotbar } from '../satchel/Hotbar'
@@ -95,6 +96,7 @@ export function Hud() {
       <MerchantMenu />
       <VendingPanel />
       <DescentFade />
+      <ScreenScare />
     </div>
   )
 }
