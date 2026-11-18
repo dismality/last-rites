@@ -3,6 +3,8 @@
 *A first-person survival-horror mystery in a cursed Victorian cemetery. Built with [Kiro](https://kiro.dev) for Kiroween 2026 (Costume Contest).*
 
 **▶ Play:** https://last-rites.vercel.app (desktop browser, keyboard and mouse)
+
+**Stuck?** [Full walkthrough](docs/walkthrough.md) (Part A is spoiler-free; the rest gives every answer).
 <!-- TODO before submitting: add the demo video link, e.g. **🎬 Demo video:** https://youtube.com/watch?v=… -->
 
 <!-- Add a screenshot or GIF here: ![Last Rites](docs/screenshot.png) -->
