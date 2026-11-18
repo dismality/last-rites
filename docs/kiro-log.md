@@ -2221,3 +2221,9 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Defaults: Ambience 80, Voice 90, Strange noises 60. At 0 the strange noises stop entirely. (2026-11-18)
   - A strange noise with no file plays nothing and shows no subtitle. (2026-11-18)
+
+### 2026-11-18: Player instruction manual
+- **Started:** Outside Kiro
+- **What happened:** Added `docs/manual.md`, a spoiler-free instruction manual: getting started, controls, the screen, the day, night and dawn loop, solving a case, survival and combat, crafting, the dead, coins and upgrades, modes, settings and tips. It is linked from the README beside the walkthrough.
+- **What Kiro caught or sped up:** Nothing; written by hand from the design bible and the walkthrough.
+- **Decisions made unattended:** The manual leaves out the new creatures and every case answer, and points to the Creatures journal page and the walkthrough instead. (2026-11-18)

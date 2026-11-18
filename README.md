@@ -4,6 +4,8 @@
 
 **▶ Play:** https://last-rites.vercel.app (desktop browser, keyboard and mouse)
 
+**New here?** [Instruction manual](docs/manual.md) (no spoilers).
+
 **Stuck?** [Full walkthrough](docs/walkthrough.md) (Part A is spoiler-free; the rest gives every answer).
 <!-- TODO before submitting: add the demo video link, e.g. **🎬 Demo video:** https://youtube.com/watch?v=… -->
 
