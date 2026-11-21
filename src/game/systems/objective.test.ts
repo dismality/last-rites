@@ -443,7 +443,7 @@ describe('selectObjective in story stages (spec 10)', () => {
       story: true,
       progress: { page1Read: true, cryptKey: true, whistle: false, stairRevealed: false, ossuaryKey: false, relics: 0 },
     }
-    const st = (stage: 1 | 2 | 3, steps: { count: number; done: boolean }[]) =>
+    const st = (stage: 1 | 2 | 3, steps: { count: number; done: boolean; at?: readonly (readonly [number, number, number])[] }[]) =>
       selectObjective({ ...day, stage: { stage, curseLinks: 0, altarLockedS: 0, clues: { found: 1, total: 6 }, day: steps } })
     const open = { count: 0, done: false }
     const done = { count: 1, done: true }

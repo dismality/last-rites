@@ -2288,3 +2288,10 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Hands stay code-built rather than a GLB: a GLB needs finger bones and nine grip clips, while the code hands already fit every grip. (2026-11-21)
   - The crawler, bride and hound are left for Tripo: a creature needs a rigged, animated mesh, which code can't build well. The hound also needs a quadruped rig. (2026-11-21)
+
+
+### 2026-11-21: Production build fixed
+- **Started:** Outside Kiro
+- **What happened:** `npm run build` (`tsc -b`) failed on a test helper type in `src/game/systems/objective.test.ts` (its step type lacked `at`), so the deploys of the task-chain and models commits failed and the live game stayed on an older build. The helper's type now allows `at`; the build passes.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:** None.
