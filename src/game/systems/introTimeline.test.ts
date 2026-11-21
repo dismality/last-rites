@@ -33,6 +33,25 @@ describe('introTimeline', () => {
     })
   })
 
+  it('flows from the fence to the open grave with no ink, then dips once into the hut', () => {
+    const boundary = (i: number) => INTRO_SHOTS.slice(0, i + 1).reduce((n, x) => n + x.duration, 0)
+    // Shots 1-3 run on into the next shot: no ink either side of the join, and no jump in the pose.
+    for (const i of [0, 1, 2]) {
+      const t = boundary(i)
+      expect(introStateAt(t - 0.01).fade, `end of shot ${i + 1}`).toBe(0)
+      expect(introStateAt(t + 0.01).fade, `start of shot ${i + 2}`).toBe(0)
+      const a = introStateAt(t - 1e-6)
+      const b = introStateAt(t + 1e-6)
+      for (let k = 0; k < 3; k++) {
+        expect(Math.abs(a.position[k] - b.position[k])).toBeLessThan(0.01)
+        expect(Math.abs(a.target[k] - b.target[k])).toBeLessThan(0.01)
+      }
+    }
+    // The grave shot ends in ink and the hut shot comes up out of it.
+    expect(introStateAt(boundary(3) - 0.01).fade).toBeGreaterThan(0.9)
+    expect(introStateAt(boundary(3) + 0.01).fade).toBeGreaterThan(0.9)
+  })
+
   it('does not advance while paused and caps at the total', () => {
     expect(advanceIntro(3.2, 0.5, true)).toBe(3.2)
     expect(advanceIntro(20.9, 5, false)).toBe(21)

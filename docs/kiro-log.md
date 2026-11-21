@@ -2295,3 +2295,30 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** `npm run build` (`tsc -b`) failed on a test helper type in `src/game/systems/objective.test.ts` (its step type lacked `at`), so the deploys of the task-chain and models commits failed and the live game stayed on an older build. The helper's type now allows `at`; the build passes.
 - **What Kiro caught or sped up:** Nothing; done by hand.
 - **Decisions made unattended:** None.
+
+
+### 2026-11-21: The intro as one arrival
+- **Started:** Outside Kiro
+- **What happened:** Intro shots 1-4 are one unbroken camera move, with no dip to ink between them: over the south fence, up the path towards the hut's lit window, then drawn off the path across the untended graves to the oak-hollow grave as it bursts. Only then a dip to ink, into the hut (shot 5, unchanged). The chapel circle is gone. New `flow` flag per shot in `src/data/introCutscene.ts`, read by `introTimeline`. Tests: no ink at a flowing join, no jump in the pose, the camera at least 1.5 m from every tree.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:**
+  - Card texts and timings kept word for word, so the five recorded voice lines still match and no audio needs regenerating. (2026-11-21)
+
+
+### 2026-11-21: Safety bells explained
+- **Started:** Outside Kiro
+- **What happened:** The bells step's why line now says how a safety bell works: "If the buried woke, a cord from the coffin rang a bell above. One of these bells was silenced." The Bell Posts puzzle opens with a short paragraph on safety coffins (a cord from the hand, up a pipe, to a bell on a post) before the task.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:** None.
+
+
+### 2026-11-21: Controls tutorial and the journal key
+- **Started:** Outside Kiro
+- **What happened:**
+  - The controls panel is a short staged tutorial of every control. Start lines: move, look, sprint (hold Shift), lantern (F), use (E). Then by day: journal, satchel, items 1-4, map, pause. At dusk and night: attack, block, dodge, kick, reload. Each line fades once its key is pressed (look: about 600 px of mouse turn). Data in `src/data/controlHints.ts`; rules `markPressed`, `actionsForCode` and the groups in `src/game/systems/controlHints.ts`; real key, mouse and look listeners in `controlHintState.ts`.
+  - Fixed a fading line that could get stuck on the panel when something else changed during its 0.6 s fade (each fade now keeps its own timer).
+  - Objectives that need the journal show "J Open the journal" under them, automatically for any objective whose text names the journal, Case tab or case board (`journalKeyWord`); the altar answer shows "J Fill in the question in the journal first". The rule is in the steering (`product.md`) so future objectives follow it.
+  - New debug call `markControlHints(ids)` for headless tests, which can't capture the mouse.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:**
+  - Five lines at most at a time, in groups, so the panel never covers the screen; the fighting lines wait for dusk rather than crowding the first minute. (2026-11-21)

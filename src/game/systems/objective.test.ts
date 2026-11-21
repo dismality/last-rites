@@ -2,7 +2,14 @@ import { CASE_2_CREST_LOCK } from '../../data/cases'
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
 import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
-import { OBJECTIVE_MAX_LINE } from '../../data/objectiveRules'
+import {
+  CASE_ALTAR_LINE,
+  CASE_LINK_LINE,
+  JOURNAL_KEY_LINES,
+  JOURNAL_KEY_WORD,
+  OBJECTIVE_MAX_LINE,
+  STAGE_DAY_RULES,
+} from '../../data/objectiveRules'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { buildCompassMarkers } from './compass'
 import {
@@ -12,6 +19,7 @@ import {
   selectObjective,
   type ObjectiveInput,
   type Vec3,
+  journalKeyWord,
 } from './objective'
 
 const RUNS = { numRuns: 100 }
@@ -524,5 +532,21 @@ describe('selectObjective in story stages (spec 10)', () => {
     expect(stageReadyForDusk(st([done, done], 4))).toBe(false)
     expect(stageReadyForDusk(st([done, open], 5))).toBe(false)
     expect(stageReadyForDusk({ stage: 1, curseLinks: 5, altarLockedS: 0 })).toBe(false)
+  })
+
+  it('shows the journal key under any objective that needs the journal', () => {
+    expect(journalKeyWord({ main: CASE_LINK_LINE.replace('{n}', '1').replace('{m}', '5') })).toBe(JOURNAL_KEY_WORD)
+    expect(journalKeyWord({ main: CASE_ALTAR_LINE })).toBe(JOURNAL_KEY_LINES[CASE_ALTAR_LINE])
+    expect(journalKeyWord({ main: 'Gather the relics of the rite (0/5)', why: 'Journal pages 4 and 5 give the order.' })).toBe(
+      JOURNAL_KEY_WORD,
+    )
+    expect(journalKeyWord({ main: 'Examine the three bells (0/3)', why: 'A cord rang a bell above.' })).toBeNull()
+    // Every stage step that names the journal in its line or why line gets the key.
+    for (const rules of Object.values(STAGE_DAY_RULES)) {
+      for (const r of rules) {
+        const names = /journal|case tab|case board/i.test(`${r.main} ${r.why}`)
+        expect(journalKeyWord({ main: r.main, why: r.why }) !== null, r.main).toBe(names)
+      }
+    }
   })
 })

@@ -1,8 +1,9 @@
-// Intro cutscene: five camera shots with text cards (docs/game-design.md §11).
+// Intro cutscene: five camera shots with text cards (docs/game-design.md §11). Shots 1-4 flow
+// into one another as a single arrival; only the cut into the hut dips to ink.
 // Pure data. Control points are Catmull-Rom points sampled by systems/cameraPath.ts.
 // World axes: +X east, +Z south. The hut sits at the origin with its door in the +Z wall.
 
-import { CHAPEL_CENTER, type Vec3 } from './cemeteryLayout'
+import type { Vec3 } from './cemeteryLayout'
 import { SPAWN_YAW } from './spawn'
 
 export interface IntroShot {
@@ -14,6 +15,11 @@ export interface IntroShot {
   readonly card: { readonly text: string; readonly at: number; readonly hold: number }
   /** Shot 4 only: soil thrown outward from this grave `at` seconds into the shot. */
   readonly burst?: { readonly x: number; readonly z: number; readonly at: number }
+  /**
+   * True when this shot runs straight on into the next one: no dip to ink between them, and the
+   * next shot starts on this one's last camera point and target.
+   */
+  readonly flow?: boolean
 }
 
 /** How far ahead of the eye the end pose looks (only the direction matters). */
@@ -21,99 +27,78 @@ const END_LOOK_M = 3
 /** Where the intro's last frame looks: along SPAWN_YAW, level, toward the side table. */
 const END_TARGET: Vec3 = [-Math.sin(SPAWN_YAW) * END_LOOK_M, 1.65, -Math.cos(SPAWN_YAW) * END_LOOK_M]
 
-/** Dip to ink at every shot boundary; 0.5 s also keeps flashing-lights-off players comfortable. */
+/** Dip to ink at the start, and at a shot boundary unless the shot flows on; 0.5 s also keeps flashing-lights-off players comfortable. */
 export const INTRO_FADE_S = 0.5
 
 /** `grave-oak-hollow` spawn on the grounds (matches the open grave in shot 4). */
 const OAK_HOLLOW_GRAVE = { x: -15, z: 12 } as const
 
-const [CHAPEL_X, , CHAPEL_Z] = CHAPEL_CENTER
+/** Where shots 1-3 look: the hut's door and lit window, at the end of the path. */
+const HUT_DOOR_LOOK: Vec3 = [0, 1.6, 3]
+/** Where the camera clears the front fence and joins the path (end of shot 1, start of shot 2). */
+const HUT_PATH_ENTRY: Vec3 = [0, 2.9, 39]
+/** Where the camera leaves the path for the graves (end of shot 2, start of shot 3). */
+const PATH_TURN: Vec3 = [-1.8, 2.2, 24]
+/** Where the drift slows over the graves (end of shot 3, start of shot 4). */
+const GRAVE_APPROACH: Vec3 = [-11, 2.2, 16.5]
+const OAK_HOLLOW_LOOK: Vec3 = [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z]
 
 export const INTRO_SHOTS: readonly IntroShot[] = [
+  // Shots 1-4 are one unbroken arrival: over the front fence, up the path towards the hut's lit
+  // window, then drawn off the path across the untended graves to the oak-hollow grave as it
+  // bursts. Only then a dip to ink, and the keeper's own eyes in the hut (shot 5).
   {
-    // Outside the south fence (z = 40), drifting north toward the gate line.
+    // Outside the south fence (z = 40), rising over the railings towards the hut's lit window.
     id: 1,
     duration: 4,
     camera: {
-      // Outside the front fence the ground climbs a bank (y 0 at z 44, about 5.8 at z 62), so the
-      // shot comes down over it, about 2.5 m above the grass. At a fixed 2.5 m the camera started
-      // under the bank and looked through the back of the terrain.
+      // Outside the front fence the ground climbs a bank (y 0 at z 44, about 0.9 at z 50), so the
+      // shot starts about 1.7 m above the grass there and clears the 1.3 m railings at z 40.
       position: [
-        [0, 8.3, 62],
-        [0, 5.6, 56],
-        [0, 3.7, 51],
-        [0, 2.5, 46],
+        [0, 2.6, 50],
+        [0, 2.5, 46.5],
+        [0, 2.7, 43],
+        HUT_PATH_ENTRY,
       ],
-      target: [
-        [0, 2.2, 30],
-        [0, 2.2, 30],
-        [0, 2.2, 30],
-        [0, 2.2, 30],
-      ],
+      target: [HUT_DOOR_LOOK, HUT_DOOR_LOOK, HUT_DOOR_LOOK, HUT_DOOR_LOOK],
     },
     card: { text: 'Hollowmere, October 1891.', at: 0.4, hold: 3.4 },
+    flow: true,
   },
   {
-    // Inside the fence, above the headstones, over the gate toward the hut.
+    // On up the path, still looking at the hut: where the missing keeper lived.
     id: 2,
     duration: 5,
     camera: {
-      position: [
-        [-4, 2.6, 38],
-        [-3, 2.5, 31],
-        [-2, 2.3, 25],
-        [-1, 2.2, 20],
-      ],
-      target: [
-        [0, 2, 3],
-        [0, 2, 3],
-        [0, 2, 3],
-        [0, 2, 3],
-      ],
+      position: [HUT_PATH_ENTRY, [-0.4, 2.5, 34], [-1, 2.3, 29], PATH_TURN],
+      target: [HUT_DOOR_LOOK, HUT_DOOR_LOOK, HUT_DOOR_LOOK, HUT_DOOR_LOOK],
     },
     card: {
       text: 'The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks.',
       at: 0.4,
       hold: 4.4,
     },
+    flow: true,
   },
   {
-    // Sweeps past the chapel (x 7.5..12.5, z -1..11) on its open east and south sides.
+    // Drawn off the path, across the untended headstones on the west side, towards the oak hollow.
     id: 3,
     duration: 4,
     camera: {
-      position: [
-        [4, 2.2, 15],
-        [15, 2.4, 13.5],
-        [17, 2.2, 5],
-        [15, 2, -4],
-      ],
-      target: [
-        [CHAPEL_X, 2.5, CHAPEL_Z],
-        [CHAPEL_X, 2.5, CHAPEL_Z],
-        [CHAPEL_X, 2.5, CHAPEL_Z],
-        [CHAPEL_X, 2.5, CHAPEL_Z],
-      ],
+      position: [PATH_TURN, [-4.5, 2.1, 21], [-8, 2.1, 18.5], GRAVE_APPROACH],
+      target: [HUT_DOOR_LOOK, [-4, 1.2, 7], [-11, 0.6, 10], OAK_HOLLOW_LOOK],
     },
     card: { text: 'They need someone to tend the dead.', at: 0.4, hold: 3.4 },
+    flow: true,
   },
   {
-    // Looks down onto the oak-hollow grave; the camera is offset in z so the look is never vertical.
+    // Slows to a stop over the oak-hollow grave as it bursts; the camera is offset in z so the look
+    // is never vertical. Ends in ink.
     id: 4,
     duration: 4,
     camera: {
-      position: [
-        [-15, 4.5, 17],
-        [-15, 4, 15.5],
-        [-15, 3.4, 14.5],
-        [-15, 3, 14],
-      ],
-      target: [
-        [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z],
-        [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z],
-        [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z],
-        [OAK_HOLLOW_GRAVE.x, 0, OAK_HOLLOW_GRAVE.z],
-      ],
+      position: [GRAVE_APPROACH, [-12.6, 2.5, 15.7], [-13.8, 2.8, 15.1], [-14.6, 3, 14.7]],
+      target: [OAK_HOLLOW_LOOK, OAK_HOLLOW_LOOK, OAK_HOLLOW_LOOK, OAK_HOLLOW_LOOK],
     },
     card: { text: 'The graves here are opening. From the inside.', at: 0.4, hold: 3.4 },
     burst: { x: OAK_HOLLOW_GRAVE.x, z: OAK_HOLLOW_GRAVE.z, at: 1.5 },

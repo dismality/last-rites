@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { INTRO_END_POSE, INTRO_FADE_S, INTRO_SHOTS } from './introCutscene'
 import { samplePath } from '../game/systems/cameraPath'
-import { HUT } from './cemeteryLayout'
+import { HUT, generateTrees } from './cemeteryLayout'
 import { SPAWN_YAW } from './spawn'
 import { FIXED_SPAWNS } from './zones'
 import { resetRun } from '../game/state/resetRun'
@@ -84,6 +84,28 @@ describe('introCutscene data', () => {
     }
     return FRONT_BANK[FRONT_BANK.length - 1][1]
   }
+
+  it('keeps every camera at least 1.5 m from a tree trunk', () => {
+    const trees = generateTrees()
+    for (const s of INTRO_SHOTS) {
+      for (let k = 0; k <= 100; k++) {
+        const [x, , z] = samplePath(s.camera.position, k / 100)
+        for (const t of trees) {
+          expect(Math.hypot(t.position[0] - x, t.position[2] - z), `shot ${s.id} at ${k}% near ${t.kind}`).toBeGreaterThanOrEqual(1.5)
+        }
+      }
+    }
+  })
+
+  it('starts each flowing shot where the one before it ended', () => {
+    INTRO_SHOTS.forEach((s, i) => {
+      if (!s.flow) return
+      const next = INTRO_SHOTS[i + 1]
+      expect(next.camera.position[0]).toEqual(s.camera.position[s.camera.position.length - 1])
+      expect(next.camera.target[0]).toEqual(s.camera.target[s.camera.target.length - 1])
+    })
+    expect(INTRO_SHOTS.map((s) => Boolean(s.flow))).toEqual([true, true, true, false, false])
+  })
 
   it('keeps every camera at least 1.5 m above the ground, the front bank included', () => {
     for (const s of INTRO_SHOTS) {

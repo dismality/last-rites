@@ -36,6 +36,31 @@
   opacity: 0.85;
 }
 
+/* The journal key, under an objective that needs the journal (11s). */
+.hud-objective__key {
+  margin: 0.3rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--parchment);
+}
+
+.hud-objective__kbd {
+  min-width: 1.4rem;
+  padding: 0 0.35rem;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: var(--font-num);
+  font-size: 1rem;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 1px solid var(--parchment-dark);
+  border-bottom-width: 3px;
+  border-radius: 3px;
+}
+
 .hud-objective__second {
   margin: 0.15rem 0 0;
   font-family: var(--font-body);

@@ -56,15 +56,17 @@ test('the panel shows keys, fades each line after its action, and returns with t
 
   const panel = page.locator('.control-hints')
   await expect(panel).toBeVisible()
-  expect(await lineIds(page)).toEqual(['move', 'sprint'])
+  expect(await lineIds(page)).toEqual(['move', 'look', 'sprint', 'lantern', 'interact'])
   await expect(panel).toContainText('Move')
+  await expect(panel.locator('[data-hint="lantern"] kbd')).toHaveText(['F'])
+  await expect(panel.locator('[data-hint="interact"] kbd')).toHaveText(['E'])
   await expect(panel.locator('[data-hint="move"] kbd')).toHaveText(['W', 'A', 'S', 'D'])
   await expect(panel.locator('[data-hint="sprint"] kbd')).toHaveText(['Shift'])
   await page.screenshot({ path: `${SHOTS}/control-hints-1280x720.png` })
 
   // Walk about 15 m: the Move line fades and goes.
   await holdUntil(page, ['MoveForward'], async () => !(await lineIds(page)).includes('move'))
-  await expect.poll(() => lineIds(page)).toEqual(['sprint'])
+  await expect.poll(() => lineIds(page)).toEqual(['look', 'sprint', 'lantern', 'interact'])
   await expect(panel.locator('[data-hint="move"]')).toHaveCount(0, { timeout: 5000 })
 
   // A rusty shovel in hand shows no charge line; the axe does, and one charged swing clears it.
@@ -82,9 +84,21 @@ test('the panel shows keys, fades each line after its action, and returns with t
   await holdUntil(page, ['HeavyAttack'], async () => !(await lineIds(page)).includes('charge'))
   await expect(panel.locator('[data-hint="charge"]')).toHaveCount(0, { timeout: 5000 })
 
-  // Sprint 2 s: the last line goes and the panel is gone.
+  // Sprint 2 s: the sprint line goes.
   await page.evaluate(() => window.__lastRites!.teleport(0, 24, { yaw: 0 }))
-  await holdUntil(page, ['MoveForward', 'Sprint'], async () => (await lineIds(page)).length === 0)
+  await holdUntil(page, ['MoveForward', 'Sprint'], async () => !(await lineIds(page)).includes('sprint'))
+  // A real F press clears the lantern line (twice, so the lantern ends as it began).
+  await page.keyboard.press('KeyF')
+  await page.keyboard.press('KeyF')
+  await expect.poll(() => lineIds(page)).toEqual(['look', 'interact'])
+  // With the first lines learned, the next ones show; a number key clears the item line.
+  await page.evaluate(() => window.__lastRites!.markControlHints(['look', 'interact']))
+  await expect.poll(() => lineIds(page)).toEqual(['journal', 'satchel', 'hotbar', 'map', 'pause'])
+  await expect(panel.locator('[data-hint="hotbar"] kbd')).toHaveText(['1', '2', '3', '4'])
+  await page.screenshot({ path: `${SHOTS}/control-hints-next-1280x720.png` })
+  await page.keyboard.press('Digit2')
+  await expect.poll(() => lineIds(page)).toEqual(['journal', 'satchel', 'map', 'pause'])
+  await page.evaluate(() => window.__lastRites!.markControlHints(['journal', 'satchel', 'map', 'pause']))
   await expect(panel).toHaveCount(0, { timeout: 5000 })
 
   // Stamina bar carries its caption.
@@ -94,7 +108,7 @@ test('the panel shows keys, fades each line after its action, and returns with t
   await page.evaluate(() => window.__lastRites!.setSetting('showControlHints', false))
   await page.evaluate(() => window.__lastRites!.setSetting('showControlHints', true))
   await expect(panel).toBeVisible()
-  expect(await lineIds(page)).toEqual(['move', 'sprint', 'charge'])
+  expect(await lineIds(page)).toEqual([...['move', 'look', 'sprint', 'lantern', 'interact'], 'charge'])
   await page.evaluate(() => window.__lastRites!.setSetting('showControlHints', false))
   await expect(panel).toHaveCount(0)
 })

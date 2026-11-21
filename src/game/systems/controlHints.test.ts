@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest'
 import { CONTROL_HINT_IDS, type ControlHintId } from '../../data/controlHints'
 import { DEFAULT_SETTINGS } from './settings'
 import {
+  actionsForCode,
   advanceHints,
   freshHintProgress,
   hintKeyLabel,
   hintLines,
   hintsHidden,
   markHintUsed,
+  markPressed,
   parseHintsUsed,
   serializeHintsUsed,
 } from './controlHints'
@@ -27,18 +29,33 @@ describe('key names', () => {
 })
 
 describe('hint lines', () => {
-  it('shows move and sprint with the default keys, no charge line without a heavy weapon', () => {
+  it('starts with move, look, sprint, lantern and use, with the default keys; no charge line', () => {
     const lines = hintLines(base)
-    expect(lines.map((l) => l.id)).toEqual(['move', 'sprint'])
+    expect(lines.map((l) => l.id)).toEqual(['move', 'look', 'sprint', 'lantern', 'interact'])
     expect(lines[0]?.keys).toEqual(['W', 'A', 'S', 'D'])
-    expect(lines[1]?.keys).toEqual(['Shift'])
+    expect(lines[1]?.keys).toEqual(['Mouse'])
+    expect(lines[2]).toMatchObject({ prefix: 'Hold', keys: ['Shift'] })
+    expect(lines[3]?.keys).toEqual(['F'])
+    expect(lines[4]?.keys).toEqual(['E'])
+  })
+
+  it('then journal, satchel, items, map and pause by day; the fighting keys at dusk and night', () => {
+    const start = new Set<ControlHintId>(['move', 'look', 'sprint', 'lantern', 'interact'])
+    const day = hintLines({ ...base, used: start })
+    expect(day.map((l) => l.id)).toEqual(['journal', 'satchel', 'hotbar', 'map', 'pause'])
+    expect(day.map((l) => l.keys)).toEqual([['J'], ['Tab'], ['1', '2', '3', '4'], ['M'], ['Esc']])
+    const night = hintLines({ ...base, used: start, night: true })
+    expect(night.map((l) => l.id)).toEqual(['attack', 'block', 'dodge', 'kick', 'reload'])
+    expect(night.map((l) => l.keys)).toEqual([['Mouse 1'], ['Mouse 2'], ['C'], ['Q'], ['R']])
+    // Nothing past the start lines shows until those are learned.
+    expect(hintLines({ ...base, night: true }).map((l) => l.id)).toEqual(['move', 'look', 'sprint', 'lantern', 'interact'])
   })
 
   it('shows rebound keys', () => {
     const bindings = { ...DEFAULT_SETTINGS.bindings, MoveForward: 'ArrowUp', Sprint: 'ControlLeft' }
     const lines = hintLines({ ...base, bindings })
     expect(lines[0]?.keys[0]).toBe('↑')
-    expect(lines[1]?.keys).toEqual(['Ctrl'])
+    expect(lines.find((l) => l.id === 'sprint')?.keys).toEqual(['Ctrl'])
   })
 
   it('shows the charge line only with the axe or sabre in hand', () => {
@@ -54,7 +71,7 @@ describe('hint lines', () => {
   it('is empty when the setting is off, and a used line is gone', () => {
     expect(hintLines({ ...base, enabled: false })).toEqual([])
     const used = markHintUsed(new Set(), 'move')
-    expect(hintLines({ ...base, used }).map((l) => l.id)).toEqual(['sprint'])
+    expect(hintLines({ ...base, used }).map((l) => l.id)).toEqual(['look', 'sprint', 'lantern', 'interact'])
   })
 })
 
@@ -86,7 +103,34 @@ describe('clearing', () => {
   it('turning the setting back on shows every line again (empty used set)', () => {
     const used = new Set<ControlHintId>(CONTROL_HINT_IDS)
     expect(hintLines({ ...base, used, heldItem: 'wood-axe' })).toEqual([])
-    expect(hintLines({ ...base, used: new Set(), heldItem: 'wood-axe' })).toHaveLength(3)
+    expect(hintLines({ ...base, used: new Set(), heldItem: 'wood-axe' }).map((l) => l.id)).toEqual([
+      'move',
+      'look',
+      'sprint',
+      'lantern',
+      'interact',
+      'charge',
+    ])
+  })
+
+  it('a press clears the lines waiting for that action; any number key clears the item line', () => {
+    let used: ReadonlySet<ControlHintId> = new Set()
+    used = markPressed(used, 'Lantern')
+    expect([...used]).toEqual(['lantern'])
+    used = markPressed(used, 'Hotbar3')
+    expect(used.has('hotbar')).toBe(true)
+    expect(markPressed(used, 'MoveForward')).toBe(used)
+    expect(actionsForCode(DEFAULT_SETTINGS.bindings, 'KeyJ')).toEqual(['Journal'])
+    expect(actionsForCode(DEFAULT_SETTINGS.bindings, 'MouseLeft')).toEqual(['Attack'])
+  })
+
+  it('turning the view about 600 px clears the look line; bad input adds nothing', () => {
+    let r = advanceHints(freshHintProgress(), new Set(), { moved: 0, dt: 0, sprinting: false, looked: 599 })
+    expect(r.used.has('look')).toBe(false)
+    r = advanceHints(r.progress, r.used, { moved: 0, dt: 0, sprinting: false, looked: Number.NaN })
+    expect(r.progress.looked).toBe(599)
+    r = advanceHints(r.progress, r.used, { moved: 0, dt: 0, sprinting: false, looked: 1 })
+    expect(r.used.has('look')).toBe(true)
   })
 })
 

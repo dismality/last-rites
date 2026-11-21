@@ -3,7 +3,8 @@ import { readTutorialPrompt } from '../../game/state/guidanceTick'
 import { useGameStore } from '../../game/state/gameStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
-import { composeSecondLine } from '../../game/systems/objective'
+import { composeSecondLine, journalKeyWord } from '../../game/systems/objective'
+import { hintKeyLabel } from '../../game/systems/controlHints'
 import { CurseMeter } from './CurseMeter'
 import { PinnedRecipe } from './PinnedRecipe'
 import { InfoDot } from '../theme/InfoDot'
@@ -40,6 +41,7 @@ export function ObjectiveTracker() {
   if (screen !== 'game' || objective === null) return null
 
   const second = composeSecondLine(objective, prompt)
+  const journalWord = journalKeyWord(objective)
 
   return (
     <div className="hud-objective">
@@ -50,6 +52,11 @@ export function ObjectiveTracker() {
         </span>
       </div>
       {objective.why && <p className="hud-objective__why">{objective.why}</p>}
+      {journalWord && (
+        <p className="hud-objective__key">
+          <kbd className="hud-objective__kbd">{hintKeyLabel(bindings.Journal)}</kbd> {journalWord}
+        </p>
+      )}
       {second !== '' && <p className="hud-objective__second">{second}</p>}
       {objective.curse && (
         <div className="info-row">

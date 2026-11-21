@@ -16,7 +16,7 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
 - **Stage 2.** It pointed at the crest lock, which stands behind a gate that needs a key, and the objective never mentioned the key.
 
 **Fixed today:**
-- **Why line.** Every stage step now shows one line under the objective saying what it's for. For example: "Someone was buried alive. A safety bell lets the buried ring for help: one was silenced." So do the page and craft-a-weapon objectives.
+- **Why line.** Every stage step now shows one line under the objective saying what it's for. For example: "If the buried woke, a cord from the coffin rang a bell above. One of these bells was silenced." So do the page and craft-a-weapon objectives.
 - **One bell per post.** Each post opens only its own bell, so the player walks to all three graves.
 - **After the steps.** By day, once the steps are done, the objective says "Link the clues in the journal's Case tab (n/m)", then "At dusk, give your answer at the chapel altar", with the altar marker.
 - **Stage 2 key and gate.** Stage 2 now opens with "Find the key to the Mausoleum Row gate", shown as a search ring on the maps, then "Open the Mausoleum Row gate".

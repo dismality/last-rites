@@ -22,6 +22,9 @@ Day (explore, collect, investigate, craft) → Dusk (bell tolls, prepare, set tr
 - Desktop browsers (Chrome, Edge, Firefox) on mid-range laptops, keyboard and mouse.
 - Judges will play for about 5–10 minutes. **The first 2 minutes must impress**: atmosphere, a first scare and a first craft within reach. A Short Vigil option (3 stages, 2-minute days) fits a full run in about 15 minutes, and the case board offers hints so nobody gets stuck.
 
+## Objectives that need the journal
+Any objective the player can only finish by piecing things together in the journal must show the Journal key under it. Name the journal, the Case tab or the case board in the objective's line or why line and the key appears by itself (`journalKeyWord`); if the text can't say so, add the line to `JOURNAL_KEY_LINES` in `src/data/objectiveRules.ts`.
+
 ## Out of scope
 Multiplayer, mobile/touch controls, procedural maps, user accounts, monetization.
 

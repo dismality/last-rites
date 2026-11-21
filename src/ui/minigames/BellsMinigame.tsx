@@ -197,9 +197,13 @@ export function BellsMinigame() {
     <MinigameShell id="1b" title="The Bell Posts" result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="bells__intro">
-          A safety bell let someone buried by mistake ring for help from below. One of these three was
-          silenced on purpose. Look at the bell, the rope and the tag on this post, then visit the other
-          two graves.
+          In 1891 people dreaded being buried alive. A safety coffin had a cord tied to the hand inside,
+          run up a pipe to a bell on a post above the grave: if the &ldquo;dead&rdquo; woke underground, they
+          could pull it and ring for help.
+        </p>
+        <p className="bells__intro">
+          One of these three bells was silenced on purpose, so nobody would hear. Look at the bell, the
+          rope and the tag on this post, then visit the other two graves.
         </p>
 
         <ul className="bells__posts" aria-label="Bell posts examined">

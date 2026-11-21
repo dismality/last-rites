@@ -8,6 +8,9 @@ import {
   CASE_ALTAR_MARKER,
   CASE_ALTAR_WHY,
   CASE_LINK_LINE,
+  JOURNAL_KEY_LINES,
+  JOURNAL_KEY_WORD,
+  JOURNAL_OBJECTIVE_WORDS,
   CASE_LINK_WHY,
   CASE_SOLVE_LINE,
   CURSE_RULE,
@@ -350,4 +353,16 @@ export const selectObjective = (i: ObjectiveInput): Objective => {
   if (def.marker) result.marker = def.marker
   if (def.why) result.why = def.why
   return result
+}
+
+/**
+ * What the journal-key line under an objective says, or null when the objective needs no journal.
+ * An objective needs it when its line or why line names the journal (or the Case tab, or the case
+ * board), or when it is listed by line (the altar answer is filled in the journal).
+ */
+export function journalKeyWord(o: Pick<Objective, 'main' | 'why'>): string | null {
+  const listed = JOURNAL_KEY_LINES[o.main]
+  if (listed) return listed
+  const text = `${o.main} ${o.why ?? ''}`.toLowerCase()
+  return JOURNAL_OBJECTIVE_WORDS.some((w) => text.includes(w)) ? JOURNAL_KEY_WORD : null
 }

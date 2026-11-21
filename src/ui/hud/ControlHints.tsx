@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { CONTROL_HINT_FADE_S, type ControlHintId } from '../../data/controlHints'
+import { CONTROL_HINT_FADE_S, CONTROL_HINT_IDS, type ControlHintId } from '../../data/controlHints'
 import { useGameStore } from '../../game/state/gameStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -7,12 +7,14 @@ import { useIntroStore } from '../../game/state/introStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { useUiWorldStore } from '../../game/state/uiWorldStore'
+import { useWorldStore } from '../../game/state/worldStore'
 import { hintLines, hintsHidden, type HintLine } from '../../game/systems/controlHints'
 import { hotbarItem } from '../../game/systems/satchel'
 import './ControlHints.css'
 
 /**
- * Bottom-left panel naming the keys for move, sprint and the heavy charge. Sits in the same
+ * Bottom-left panel: a short staged tutorial of every control (move, look, sprint, lantern, use;
+ * then journal, satchel, items, map, pause; the fighting keys at dusk; the heavy charge). Sits in the same
  * column as the health bar and oil gauge, above them, so it can never overlap them. A line
  * fades out once its action has been done; a line that merely stops applying (axe put away)
  * goes at once.
@@ -36,6 +38,7 @@ export function ControlHints() {
   const merchant = useOverlayStore((s) => s.merchantOpen)
   const altar = useOverlayStore((s) => s.altarPanelOpen)
   const modes = useOverlayStore((s) => s.modeSelectOpen || s.achievementsOpen)
+  const night = useWorldStore((s) => s.phase !== 'day')
 
   const hidden = hintsHidden({
     screen,
@@ -45,24 +48,32 @@ export function ControlHints() {
     mapOpen,
     examining,
   })
-  const lines = hintLines({ enabled, used, bindings, heldItem: equipped === null ? null : hotbarItem(inventory, equipped) })
+  const lines = hintLines({ enabled, used, bindings, night, heldItem: equipped === null ? null : hotbarItem(inventory, equipped) })
 
-  // Lines that just cleared stay for the fade, then go.
+  // Lines that just cleared stay for the fade, then go. Each fade owns its timer, so a later
+  // change (another line clearing, an item switch) can never cancel it and strand the line.
   const [leaving, setLeaving] = useState<HintLine[]>([])
   const prev = useRef<HintLine[]>([])
+  const timers = useRef<number[]>([])
   useEffect(() => {
     const gone = prev.current.filter((p) => used.has(p.id) && !lines.some((l) => l.id === p.id))
     prev.current = lines
     if (gone.length === 0) return
     setLeaving((cur) => [...cur.filter((c) => !gone.some((g) => g.id === c.id)), ...gone])
-    const t = window.setTimeout(
-      () => setLeaving((cur) => cur.filter((c) => !gone.some((g) => g.id === c.id))),
-      CONTROL_HINT_FADE_S * 1000,
-    )
-    return () => window.clearTimeout(t)
+    const t = window.setTimeout(() => {
+      timers.current = timers.current.filter((x) => x !== t)
+      setLeaving((cur) => cur.filter((c) => !gone.some((g) => g.id === c.id)))
+    }, CONTROL_HINT_FADE_S * 1000)
+    timers.current.push(t)
     // `lines` is a fresh array each render; its content follows these inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, used, bindings, inventory, equipped])
+  }, [enabled, used, bindings, inventory, equipped, night])
+  useEffect(
+    () => () => {
+      for (const t of timers.current) window.clearTimeout(t)
+    },
+    [],
+  )
 
   if (hidden) return null
   const shown: { line: HintLine; leaving: boolean }[] = [
@@ -98,5 +109,4 @@ export function ControlHints() {
   )
 }
 
-const ORDER: readonly ControlHintId[] = ['move', 'sprint', 'charge']
-const order = (id: ControlHintId): number => ORDER.indexOf(id)
+const order = (id: ControlHintId): number => CONTROL_HINT_IDS.indexOf(id)

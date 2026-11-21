@@ -523,16 +523,24 @@ A horizontal bar at the bottom left, with current and max HP as text ("72 / 100"
 ### Lantern
 The flame icon shows **fuel only**: its height and brightness follow fuel, with "Oil 64%" beside it. Below 20% the label reads "Low oil" and the flame gutters (held steady when flashing lights is off).
 
+### Journal key under objectives (11s)
+Any objective that needs the journal to piece things together shows the Journal key under it: "J Open the journal". This is automatic: an objective gets it when its line or why line names the journal, the Case tab or the case board (`JOURNAL_OBJECTIVE_WORDS`), so **a new objective only has to say so in its text**. Objectives that need the journal without saying it are listed by line (`JOURNAL_KEY_LINES`): the altar answer shows "J Fill in the question in the journal first". Rule: `journalKeyWord` in `src/game/systems/objective.ts`.
+
 ### Controls hint panel (09)
 A small parchment-on-dark panel at the bottom left, in the same column as the health bar and oil gauge and **above** them, so it never overlaps them. One line per action, each a key cap plus a word. Data in `src/data/controlHints.ts`, rules in `src/game/systems/controlHints.ts`.
 
-| Line | Shows | Clears when |
-|---|---|---|
-| Move | W A S D Move (keys from the four movement bindings) | The player has moved about 10 m |
-| Sprint | Shift Sprint | The player has sprinted for 2 s |
-| Charge | "Hold V Charge a heavy swing". **Only while a weapon that can charge is in hand** (Wood Axe, Silver Sabre); left out with any other weapon, since V does nothing then | One charged heavy swing is released |
+**(11s, 2026-11-21)** The panel is now a short staged tutorial of every control. It shows a few lines at a time, in groups; each line fades once its action is done.
 
-- **When:** from the end of the intro. A used line fades out over 0.6 s (a steady linear fade, so it suits Flashing lights off too); a line that merely stops applying (axe put away) goes at once. When every line is gone the panel is gone. The charge line returns whenever an axe or sabre is equipped until a heavy swing has been made.
+| Group | Lines | Clears when |
+|---|---|---|
+| Start (from the end of the intro) | W A S D Move · Mouse Look around · Hold Shift Sprint (uses stamina) · F Lantern on or off (it burns oil) · E Use, pick up or read | Move: about 10 m walked. Look: about 600 px of mouse turn. Sprint: 2 s sprinted. The rest: their key pressed once |
+| Next (by day, once every start line is done) | J Journal: pages, map and the case board · Tab Satchel · 1 2 3 4 Switch the item in hand · M Big map · Esc Pause, settings and controls | Its key pressed once (any of 1 to 4 for the item line) |
+| Night (at dusk and night, once every start line is done; replaces Next until day) | Mouse 1 Attack · Hold Mouse 2 Block · C Dodge · Q Kick them back · R Reload a gun | Its key pressed once |
+| Weapon | "Hold V Charge a heavy swing", **only while a weapon that can charge is in hand** (Wood Axe, Silver Sabre) | One charged heavy swing is released |
+
+Keys are read live from the bindings. Presses count only while playing (not in the intro or menus' own screens before a run).
+
+- **When:** from the end of the intro. A used line fades out over 0.6 s; each fade keeps its own timer, so a later change (another line clearing, an item switch) can't strand a faded line (a steady linear fade, so it suits Flashing lights off too); a line that merely stops applying (axe put away) goes at once. When every line is gone the panel is gone. The charge line returns whenever an axe or sabre is equipped until a heavy swing has been made.
 - **Setting:** **Show control hints** (Settings, default On, saved with the others) hides the whole panel. Turning it back on shows every line again.
 - **Hidden** in menus (pause, journal, satchel, merchant, altar panel, mode select), the workbench view, the big map, examine, cutscenes and endings.
 - **Saved:** the used lines are saved with the run (next to the tutorial steps). Continue restores them, so the panel does not come back unless the setting is turned back on. New Game clears them. Retry Night and Retry from morning leave them alone, like the tutorial.
@@ -669,12 +677,14 @@ Entering a zone shows its name for 2.5 s in IM Fell English SC, with a short lin
 ### Intro cutscene
 Plays once on New Game: about 20 s in-engine **(09, B15)** (was about 35 s), five camera shots, the fog flyover and the hut card kept, with text cards in the keeper's hand. Space or Enter skips it, and Esc opens pause. It never plays on Continue.
 
+**(2026-11-21)** Shots 1 to 4 are now one unbroken camera move, the new keeper's arrival, with no dip to ink between them. The only cut is into the hut. The old shot 3 circled the chapel for no reason; it now leaves the path for the untended graves, which is what its card is about. The cards and their voice lines are unchanged.
+
 | Shot | Camera | Card |
 |---|---|---|
-| 1 | Down the lane to the cemetery gate, in fog | "Hollowmere, October 1891." |
-| 2 | Over the gate toward the hut | "The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks." |
-| 3 | Past the chapel | "They need someone to tend the dead." |
-| 4 | Down onto an open grave, soil thrown outward | "The graves here are opening. From the inside." |
+| 1 | Outside the south fence, rising over the railings towards the hut's lit window | "Hollowmere, October 1891." |
+| 2 | On up the path, still on the hut: where the missing keeper lived | "The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks." |
+| 3 | Drawn off the path, west across the untended headstones towards the oak hollow | "They need someone to tend the dead." |
+| 4 | Slows to a stop over the oak-hollow grave as the soil bursts; dips to ink | "The graves here are opening. From the inside." |
 | 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "Elias left a page on the table." **(09)** |
 
 It ends with the first objective appearing in the tracker.

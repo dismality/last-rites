@@ -49,7 +49,8 @@ You can rebind every key except Pause in **Settings → Controls**.
 - **Lantern flame.** This is your **oil gauge**. As the oil burns down, the flame and your circle of light shrink.
 - **Stamina.** Sprinting and kicking use it.
 - **Clock.** By day it counts down: "Dusk in m:ss".
-- **Controls hint.** A small panel above the health bar shows the keys you need right now.
+- **Controls hint.** A small panel above the health bar teaches the controls a few at a time: first moving, looking, sprinting, the lantern and using things; then the journal, satchel, items, map and pause; at dusk, the fighting keys. Each line fades once you've used it.
+- **Journal key.** When an objective needs the journal (linking clues, filling in the question, the rite's order), its key shows under the objective.
 - **Outlines.** Things you can use or pick up get an outline when you look at them.
 
 ## 4. How a run works

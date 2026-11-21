@@ -14,7 +14,7 @@ export interface IntroState {
   position: Vec3
   target: Vec3
   card: { text: string; opacity: number } | null
-  /** Ink opacity 0..1: ramps in over the first INTRO_FADE_S of a shot and out over the last. */
+  /** Ink opacity 0..1: ramps in over the first INTRO_FADE_S of a shot and out over the last, except where shots flow. */
   fade: number
   done: boolean
 }
@@ -39,9 +39,11 @@ export const introStateAt = (t: number): IntroState => {
   const local = Math.min(s.duration, time - start)
   const u = clamp01(local / s.duration)
 
-  // The last shot ends clear: the player takes over from the bench view, not from black.
-  const fadeIn = 1 - clamp01(local / INTRO_FADE_S)
-  const fadeOut = shot === INTRO_SHOTS.length - 1 ? 0 : 1 - clamp01((s.duration - local) / INTRO_FADE_S)
+  // The last shot ends clear: the player takes over from the bench view, not from black. A shot
+  // that flows on neither fades out nor lets the next one fade in, so the camera move is unbroken.
+  const flowsIn = shot > 0 && INTRO_SHOTS[shot - 1].flow === true
+  const fadeIn = flowsIn ? 0 : 1 - clamp01(local / INTRO_FADE_S)
+  const fadeOut = shot === INTRO_SHOTS.length - 1 || s.flow ? 0 : 1 - clamp01((s.duration - local) / INTRO_FADE_S)
   const fade = Math.max(fadeIn, fadeOut)
 
   const cardLocal = local - s.card.at

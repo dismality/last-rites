@@ -164,6 +164,18 @@ export const EARLY_DUSK_SCORE = 150
 export const EARLY_DUSK_LINE = 'The bell carries over the graves. The light is going.'
 export const CASE_ALTAR_MARKER = 'Altar'
 
+/**
+ * Objectives that need the journal to piece things together show its key under them (11s). Any
+ * objective whose line or why line names one of these words gets it automatically, so a new
+ * objective only has to say "journal" or "Case tab" to get the key. The altar answer is filled in
+ * the journal's Case tab without saying so, so it is listed by line.
+ */
+export const JOURNAL_OBJECTIVE_WORDS: readonly string[] = ['journal', 'case tab', 'case board']
+export const JOURNAL_KEY_WORD = 'Open the journal'
+export const JOURNAL_KEY_LINES: Readonly<Record<string, string>> = {
+  [CASE_ALTAR_LINE]: 'Fill in the question in the journal first',
+}
+
 type Point = readonly [number, number, number]
 
 /**
@@ -247,7 +259,7 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
       target: 3,
       // All three looked at is not the end: the step closes when the cut bell is named.
       whenCounted: 'Name the cut bell at a bell post',
-      why: 'Someone was buried alive. A safety bell lets the buried ring for help: one was silenced.',
+      why: 'If the buried woke, a cord from the coffin rang a bell above. One of these bells was silenced.',
       done: 'The silenced bell is named. Its clues are pinned to your case board (J).',
       marker: 'Bells',
       place: { kind: 'nearest', at: CASE_1_BELLS.map((b) => b.position) },

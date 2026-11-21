@@ -104,6 +104,7 @@ import { useHunchStore } from '../game/state/hunchStore'
 import { winRuntime } from '../scene/effects/winRuntime'
 import { endingCameraRuntime } from '../scene/effects/endingCameraRuntime'
 import { useGuidanceStore } from '../game/state/guidanceStore'
+import { markHintUsed, parseHintsUsed } from '../game/systems/controlHints'
 import { useSettingsStore } from '../game/state/settingsStore'
 import { bellRuntime } from '../scene/world/bellRuntime'
 import { queueTeleport } from '../game/state/playerTeleport'
@@ -1098,6 +1099,16 @@ export const api = {
     value: boolean,
   ): void {
     useSettingsStore.getState().setSetting(key, value)
+  },
+  /**
+   * Marks control-hint lines as used, as if the player had done them (headless runs cannot capture
+   * the mouse, so the look line never clears on its own there).
+   */
+  markControlHints(ids: string[]): void {
+    const g = useGuidanceStore.getState()
+    let used = g.hintsUsed
+    for (const id of parseHintsUsed(ids)) used = markHintUsed(used, id)
+    g.setHints({ hintsUsed: used })
   },
   /** The angle (radians) the chapel bell mesh was last given, or null while the mesh is not found. */
   bellMeshAngle(): number | null {
