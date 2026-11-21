@@ -205,9 +205,10 @@ test('mouse: watch log, crest lock and boot prints wrong then right, then both a
   await shoot(page, 'case2-2b')
   await closeMinigame(page)
 
-  // A crypt name tablet reads out its family and year.
+  // A crypt name tablet reads out its family and year. Reveals queue, so let the 2b ones finish first.
+  await expect(page.locator('.clue-reveal')).toHaveCount(0, { timeout: 20_000 })
   await usePropUntil(page, 'crest-tablet-Marlowe', async () =>
-    ((await page.locator('.clue-reveal').textContent()) ?? '').includes('1752'),
+    (await page.locator('.clue-reveal').allTextContents()).some((t) => t.includes('1752')),
   )
 
   // 2a: all four dials to the moon (wrong), then the founders' order with the ▲ buttons.

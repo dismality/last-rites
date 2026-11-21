@@ -33,6 +33,23 @@ import { useStageStore } from '../../game/state/stageStore'
 import { useToastStore } from '../../game/state/toastStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { HYMN_TILE_COUNT } from '../../game/systems/caseSave'
+import {
+  BellPostShape,
+  BootCastShape,
+  CryptDoorShape,
+  DialShape,
+  EvidenceShape,
+  HymnTileShape,
+  LogbookShape,
+  LoosePageShape,
+  NichePierShape,
+  PsalterShape,
+  ShroudedBodyShape,
+  SlateShape,
+  TabletRivets,
+  WalkClueShape,
+  type WalkClueLook,
+} from './caseShapes'
 import { Interactable } from './Interactable'
 
 const POST_HEIGHT = 1.1
@@ -53,23 +70,7 @@ function BellPost({ post }: { post: BellPostDef }) {
           useOverlayStore.getState().setMinigameOpen('1b')
         }}
       >
-        <mesh position={[0, POST_HEIGHT / 2, 0]}>
-          <cylinderGeometry args={[0.03, 0.04, POST_HEIGHT, 6]} />
-          <meshStandardMaterial color="#2a2623" roughness={0.9} metalness={0.4} />
-        </mesh>
-        <mesh position={[0, POST_HEIGHT + 0.1, 0]}>
-          <coneGeometry args={[0.13, 0.2, 8]} />
-          <meshStandardMaterial color="#6b5a3a" roughness={0.7} metalness={0.5} />
-        </mesh>
-        {/* A cut rope hangs short, a whole one reaches the ground. */}
-        <mesh position={[0.06, POST_HEIGHT - (cut ? 0.2 : 0.5), 0]}>
-          <cylinderGeometry args={[0.012, 0.012, cut ? 0.4 : 1, 5]} />
-          <meshStandardMaterial color="#8a7a5a" roughness={1} />
-        </mesh>
-        <mesh position={[-0.05, POST_HEIGHT - 0.25, 0.04]} rotation={[0, 0.4, 0]}>
-          <boxGeometry args={[0.1, 0.13, 0.01]} />
-          <meshStandardMaterial color="#c9b88f" roughness={1} />
-        </mesh>
+        <BellPostShape height={POST_HEIGHT} cut={cut} />
       </Interactable>
     </group>
   )
@@ -93,19 +94,12 @@ function HymnBoardHotspot() {
   )
 }
 
-/** The psalter: a small closed book on the vestry cupboard shelf. PLACEHOLDER box meshes, no lights. */
+/** The psalter: a small closed book on the vestry cupboard shelf. Leather, pages and brass, no lights. */
 function Psalter() {
   return (
     <group position={[...PSALTER_POSITION]} rotation={[0, 0.5, 0]}>
       <Interactable id="psalter" kind="psalter" runeHeight={0.3} onInteract={openHymnBoard}>
-        <mesh position={[0, 0.03, 0]}>
-          <boxGeometry args={[0.2, 0.06, 0.28]} />
-          <meshStandardMaterial color="#3b2a22" roughness={0.9} />
-        </mesh>
-        <mesh position={[0.005, 0.03, 0]}>
-          <boxGeometry args={[0.2, 0.045, 0.26]} />
-          <meshStandardMaterial color="#c9b88f" roughness={1} />
-        </mesh>
+        <PsalterShape />
       </Interactable>
     </group>
   )
@@ -114,7 +108,7 @@ function Psalter() {
 /**
  * Five brass letter tiles on the altar top. A tile with a letter set glows ember (emissive, no
  * light) so progress reads from the world as well as the overlay. They vanish as the stair opens
- * and the altar slides. PLACEHOLDER: plain brass boxes, the lettered tile model is art still to come.
+ * and the altar slides. The letters themselves are shown in the overlay.
  */
 function HymnTiles() {
   const tiles = useCaseStore((s) => s.cases['sealed-catacombs'].hymnTiles)
@@ -123,16 +117,9 @@ function HymnTiles() {
   return (
     <group position={[cx, HYMN_TILE_ROW.y, cz + ALTAR_WHISTLE_OFFSET[2] + HYMN_TILE_ROW.forward]}>
       {Array.from({ length: HYMN_TILE_COUNT }, (_, i) => (
-        <mesh key={i} position={[start + i * HYMN_TILE_ROW.spacing, 0, 0]}>
-          <boxGeometry args={[0.18, 0.03, 0.18]} />
-          <meshStandardMaterial
-            color="#a8832f"
-            roughness={0.5}
-            metalness={0.7}
-            emissive="#e8913a"
-            emissiveIntensity={tiles[i] ? 0.6 : 0}
-          />
-        </mesh>
+        <group key={i} position={[start + i * HYMN_TILE_ROW.spacing, 0, 0]}>
+          <HymnTileShape lit={Boolean(tiles[i])} />
+        </group>
       ))}
     </group>
   )
@@ -155,55 +142,6 @@ function HymnProps() {
 }
 
 const openTimeline = () => useOverlayStore.getState().setMinigameOpen('3b')
-
-/** Meshes of each evidence prop. PLACEHOLDER: plain boxes and cylinders, the modelled props are art still to come. */
-function EvidenceShape({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
-  switch (id) {
-    case 'unsent-letter':
-      return (
-        <mesh rotation={[0, 0.5, 0]}>
-          <boxGeometry args={[0.2, 0.01, 0.14]} />
-          <meshStandardMaterial color="#d8c9a3" roughness={1} />
-        </mesh>
-      )
-    case 'cart-ruts':
-      return (
-        <>
-          {[-0.55, 0.55].map((x) => (
-            <mesh key={x} position={[x, 0, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-              <planeGeometry args={[0.22, 2.4]} />
-              <meshStandardMaterial color="#1d1813" roughness={1} />
-            </mesh>
-          ))}
-        </>
-      )
-    case 'spilled-oil':
-      return (
-        <mesh rotation={[-Math.PI / 2, 0, 0]}>
-          <circleGeometry args={[0.42, 14]} />
-          <meshStandardMaterial color="#14110f" roughness={0.3} metalness={0.3} />
-        </mesh>
-      )
-    case 'hearse-pin':
-      return (
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <cylinderGeometry args={[0.03, 0.03, 0.4, 8]} />
-          <meshStandardMaterial color="#2a2623" roughness={0.8} metalness={0.6} />
-        </mesh>
-      )
-    case 'nail-marks':
-      return (
-        <>
-          {[-0.1, 0, 0.1].map((x) => (
-            <mesh key={x} position={[x, 0, 0]} rotation={[0, 0, 0.15]}>
-              <boxGeometry args={[0.025, 0.4, 0.01]} />
-              <meshStandardMaterial color="#c9b88f" roughness={1} />
-            </mesh>
-          ))}
-        </>
-      )
-  }
-}
 
 /** One piece of Elias's last night. Examining it puts its card in hand for minigame 3b. */
 function EvidenceProp({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
@@ -231,19 +169,12 @@ function EvidenceProp({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
   )
 }
 
-/** The slate at the foot of the crypt step where the six cards are laid out. PLACEHOLDER box meshes. */
+/** The slate at the foot of the crypt step where the six cards are laid out. */
 function TimelineSlate() {
   return (
     <group position={[...CASE_3_CRYPT_PROPS.slate]} rotation={[0, Math.PI / 2 - 0.3, 0]}>
       <Interactable id="timeline-slate" kind="timeline-slate" runeHeight={1.2} outlineRange={4} onInteract={openTimeline}>
-        <mesh position={[0, 0.4, 0]}>
-          <cylinderGeometry args={[0.04, 0.05, 0.8, 6]} />
-          <meshStandardMaterial color="#2a2623" roughness={0.9} />
-        </mesh>
-        <mesh position={[0, 0.9, 0]} rotation={[-0.35, 0, 0]}>
-          <boxGeometry args={[0.7, 0.45, 0.04]} />
-          <meshStandardMaterial color="#3a342d" roughness={0.9} />
-        </mesh>
+        <SlateShape />
       </Interactable>
     </group>
   )
@@ -251,8 +182,7 @@ function TimelineSlate() {
 
 /**
  * The Crane crypt once the pin is pulled: a dark doorway, the door leaf swung back and Elias
- * lying in it (the Iron Ossuary Key is a fixed spawn that waits for 3b too). PLACEHOLDER shapes: a
- * modelled door and body are art still to come. No collider, so the doorway never traps the player.
+ * lying in it (the Iron Ossuary Key is a fixed spawn that waits for 3b too). No collider, so the doorway never traps the player.
  */
 function CryptOpened() {
   const { doorX, doorFaceZ, body } = CASE_3_CRYPT_PROPS
@@ -262,19 +192,11 @@ function CryptOpened() {
         <boxGeometry args={[1.5, 2.0, 0.05]} />
         <meshStandardMaterial color="#050505" roughness={1} />
       </mesh>
-      <mesh position={[doorX + 0.95, 1.0, doorFaceZ + 0.45]} rotation={[0, Math.PI / 2 - 0.4, 0]}>
-        <boxGeometry args={[0.8, 1.95, 0.06]} />
-        <meshStandardMaterial color="#3b2a22" roughness={0.9} />
-      </mesh>
+      <group position={[doorX + 0.95, 1.0, doorFaceZ + 0.45]} rotation={[0, Math.PI / 2 - 0.4, 0]}>
+        <CryptDoorShape />
+      </group>
       <group position={[...body]} rotation={[0, 1.2, 0]}>
-        <mesh position={[0, 0.1, 0]}>
-          <boxGeometry args={[1.4, 0.18, 0.5]} />
-          <meshStandardMaterial color="#4a4036" roughness={1} />
-        </mesh>
-        <mesh position={[0.78, 0.12, 0]}>
-          <sphereGeometry args={[0.15, 8, 6]} />
-          <meshStandardMaterial color="#9a8a74" roughness={1} />
-        </mesh>
+        <ShroudedBodyShape />
       </group>
     </>
   )
@@ -299,61 +221,13 @@ function CryptProps() {
 
 // ---- Walk clues ----
 
-/** A walk clue's look. PLACEHOLDER shapes: a paper, a spade, a posy or a small bundle. */
-function WalkClueShape({ clue }: { clue: ClueDef }) {
-  if (clue.id === 'spade-fresh-clay') {
-    return (
-      <group rotation={[0, 0, 0.35]}>
-        <mesh position={[0, 0.55, 0]}>
-          <cylinderGeometry args={[0.02, 0.02, 0.9, 6]} />
-          <meshStandardMaterial color="#5a4632" roughness={0.9} />
-        </mesh>
-        <mesh position={[0, 0.08, 0]}>
-          <boxGeometry args={[0.18, 0.24, 0.02]} />
-          <meshStandardMaterial color="#6b4a2e" roughness={1} metalness={0.3} />
-        </mesh>
-      </group>
-    )
-  }
-  if (clue.id === 'hale-fresh-flowers') {
-    const buds: readonly (readonly [number, number])[] = [
-      [-0.06, 0],
-      [0.05, 0.04],
-      [0.01, -0.06],
-    ]
-    return (
-      <group>
-        {buds.map(([x, z], i) => (
-          <mesh key={i} position={[x, 0.05, z]}>
-            <sphereGeometry args={[0.045, 6, 5]} />
-            <meshStandardMaterial color={i === 1 ? '#c9c2a8' : '#8a3a3a'} roughness={1} />
-          </mesh>
-        ))}
-      </group>
-    )
-  }
-  if (clue.id === 'oil-other-crypt') {
-    return (
-      <mesh position={[0, 0.006, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <circleGeometry args={[0.3, 14]} />
-        <meshStandardMaterial color="#14110f" roughness={0.3} metalness={0.3} />
-      </mesh>
-    )
-  }
-  if (clue.icon === 'read') {
-    return (
-      <mesh position={[0, 0.005, 0]} rotation={[0, 0.4, 0]}>
-        <boxGeometry args={[0.2, 0.01, 0.15]} />
-        <meshStandardMaterial color="#d8c9a3" roughness={1} />
-      </mesh>
-    )
-  }
-  return (
-    <mesh position={[0, 0.06, 0]}>
-      <boxGeometry args={[0.22, 0.12, 0.16]} />
-      <meshStandardMaterial color="#4a4036" roughness={1} />
-    </mesh>
-  )
+/** Which look a walk clue takes. */
+function walkLook(clue: ClueDef): WalkClueLook {
+  if (clue.id === 'spade-fresh-clay') return 'spade'
+  if (clue.id === 'hale-fresh-flowers') return 'posy'
+  if (clue.id === 'oil-other-crypt') return 'oil'
+  if (clue.icon === 'read') return 'note'
+  return 'bundle'
 }
 
 type WalkClueDef = ClueDef & { found: { kind: 'walk' } }
@@ -373,7 +247,7 @@ function WalkClue({ clue }: { clue: WalkClueDef }) {
           useCaseStore.getState().findClue(clue.id)
         }}
       >
-        <WalkClueShape clue={clue} />
+        <WalkClueShape look={walkLook(clue)} />
         {/* A flat prop is thin, so a hidden box gives the crosshair something to land on. */}
         <mesh visible={false} position={[0, 0.12, 0]}>
           <boxGeometry args={[0.45, 0.3, 0.45]} />
@@ -412,20 +286,16 @@ const LOOSE_PAGES: readonly (readonly [number, number, number])[] = [
   [-0.03, 0.22, 0.9],
 ]
 
-/** The watch-house logbook on the lodge table, with torn pages loose beside it. PLACEHOLDER boxes. */
+/** The watch-house logbook on the lodge table, with torn pages loose beside it. */
 function WatchLogbook() {
   return (
     <group position={[...CASE_2_LOGBOOK_POSITION]} rotation={[0, 0.25, 0]}>
       <Interactable id="watch-logbook" kind="watch-logbook" runeHeight={0.4} outlineRange={4} onInteract={openWatchLog}>
-        <mesh position={[0, 0.025, 0]}>
-          <boxGeometry args={[0.24, 0.05, 0.32]} />
-          <meshStandardMaterial color="#2e231c" roughness={0.9} />
-        </mesh>
+        <LogbookShape />
         {LOOSE_PAGES.map(([x, z, r], i) => (
-          <mesh key={i} position={[x * 0.5, 0.003, z]} rotation={[0, r, 0]}>
-            <boxGeometry args={[0.12, 0.004, 0.16]} />
-            <meshStandardMaterial color="#d8c9a3" roughness={1} />
-          </mesh>
+          <group key={i} position={[x * 0.9 + 0.08, 0.001, z]} rotation={[0, r, 0]}>
+            <LoosePageShape />
+          </group>
         ))}
       </Interactable>
     </group>
@@ -493,6 +363,7 @@ function CrestTablet({ t }: { t: CrestTabletDef }) {
           <planeGeometry args={[0.56, 0.35]} />
           <meshStandardMaterial map={tex ?? undefined} roughness={0.95} />
         </mesh>
+        <TabletRivets />
       </Interactable>
     </group>
   )
@@ -506,33 +377,23 @@ function CrestNiche() {
   return (
     <group position={[x, 0, z]} rotation={[0, Math.PI / 2, 0]}>
       <Interactable id="crest-lock" kind="crest-lock" runeHeight={1.5} outlineRange={4} onInteract={openCrestLock}>
-        <mesh position={[0, 0.6, -0.1]}>
-          <boxGeometry args={[0.7, 1.2, 0.3]} />
-          <meshStandardMaterial color="#6e675c" roughness={0.95} />
-        </mesh>
+        <NichePierShape />
         <mesh position={[0, 0.45, 0.06]}>
           <boxGeometry args={[0.4, 0.3, 0.02]} />
           <meshStandardMaterial color={solved ? '#050505' : '#5d574d'} roughness={1} />
         </mesh>
         {dials.map((d, i) => (
-          <mesh key={i} position={[-0.24 + i * 0.16, 0.95, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.06, 0.06, 0.03, 12]} />
-            <meshStandardMaterial
-              color="#8a8170"
-              roughness={0.8}
-              emissive="#e8913a"
-              emissiveIntensity={solved ? 0.5 : d ? 0.15 : 0}
-            />
-          </mesh>
+          <group key={i} position={[-0.24 + i * 0.16, 0.95, 0.06]}>
+            <DialShape glow={solved ? 0.5 : d ? 0.15 : 0} />
+          </group>
         ))}
       </Interactable>
     </group>
   )
 }
 
-/** One plaster cast in front of the Ames stone. PLACEHOLDER: a pale slab with a dark print. */
+/** One plaster cast in front of the Ames stone, its print drawn from the cast's details. */
 function BootCast({ cast }: { cast: CastDef }) {
-  const worn = cast.size === null
   return (
     <group position={[...cast.position]} rotation={[0, 0.2, 0]}>
       <Interactable
@@ -546,14 +407,7 @@ function BootCast({ cast }: { cast: CastDef }) {
           useOverlayStore.getState().setMinigameOpen('2c')
         }}
       >
-        <mesh position={[0, 0.025, 0]}>
-          <boxGeometry args={[0.22, 0.05, 0.36]} />
-          <meshStandardMaterial color="#e2ddd0" roughness={1} />
-        </mesh>
-        <mesh position={[0, 0.051, worn ? 0.08 : 0]}>
-          <boxGeometry args={[0.1, 0.002, worn ? 0.1 : 0.27]} />
-          <meshStandardMaterial color="#8d8576" roughness={1} />
-        </mesh>
+        <BootCastShape cast={cast} />
         <mesh visible={false} position={[0, 0.12, 0]}>
           <boxGeometry args={[0.35, 0.25, 0.45]} />
         </mesh>

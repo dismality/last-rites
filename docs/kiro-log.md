@@ -2273,3 +2273,18 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - No snap sound for a wrong string: there is no synth recipe for one, and adding audio is out of scope. (2026-11-21)
   - Wrong pairs stay in the save (they cost nothing, Req 8.6); they are only hidden once their string has fallen. (2026-11-21)
   - Missing-clue pins sit 3 m off a walk clue, so they mark an area rather than the spot. (2026-11-21)
+
+
+### 2026-11-21: Detailed models for the simple props
+- **Started:** Outside Kiro
+- **What happened:**
+  - First-person hands rebuilt: jointed fingers with knuckles and nails, a padded palm, a two-joint thumb, wrist, linen shirt cuff, buttoned coat cuff and a creased sleeve. They still close round each weapon's grip.
+  - The held lantern is now a cage lantern: brass fount, wick wheel, bellied glass globe, four bowed guard wires, vented hood, ring, and a teardrop flame.
+  - Case props built as merged meshes in `src/scene/world/caseShapes.tsx`: bell posts (cast bell, bracket, frayed cut rope, nailed tag), psalter, hymn tiles, the five evidence props, the slate easel, the crypt door and Elias's shrouded body, the walk clues, the open logbook, the crest niche and dials, and the boot casts.
+  - Each boot cast's print is drawn from its details: a smooth smudged heel, a cross-cut sole with nine of ten hobnails, or a narrow town shoe with a separate heel.
+  - Altar relics now use their item models.
+  - Helpers in `src/scene/assets/shapeKit.ts`; Tripo prompts for the creatures in `docs/tripo-prompts.md`.
+- **What Kiro caught or sped up:** Nothing; done by hand. Typecheck, lint and all unit tests pass.
+- **Decisions made unattended:**
+  - Hands stay code-built rather than a GLB: a GLB needs finger bones and nine grip clips, while the code hands already fit every grip. (2026-11-21)
+  - The crawler, bride and hound are left for Tripo: a creature needs a rigged, animated mesh, which code can't build well. The hound also needs a quadruped rig. (2026-11-21)
