@@ -55,7 +55,39 @@ It also has to be rigged with finger bones in Blender, with these clips: `Grip-P
 
 Put its origin at the **glass centre**, where the light anchors. Name the globe mesh `glass` and the flame mesh `flame` (`LANTERN_MESHES`), so the flicker drives them.
 
+## 6. Realism pass: drop-in replacements for code-built props
+
+The 2026-11-22 realism pass reworked these in code:
+
+- surface detail on every world material;
+- wind-blown grass, ground mist and a deeper hut;
+- five carved gravestones.
+
+Code still falls short on **sculpted, organic shapes**. These three props are drop-in: export over the file, and the game loads it with no code change. Keep each one's size, origin and facing, or its collider stops matching it.
+
+### Mourner statue: `public/assets/models/props/statue-mourner.glb`
+
+> Weathered Victorian cemetery statue of a mourning woman in a hooded robe, head bowed, hands clasped at her chest, on a square stone plinth. Grey limestone with green-black lichen, rain streaks and a chipped nose and fingers. Realistic. Facing forward.
+
+It must fit **0.86 m square at the base and 1.9 m tall**, with the base at `y = 0` and the face toward +Z (`statue-mourner.json`). The scare turns the whole model, so it needs no rig.
+
+### Grave hand: `public/assets/models/props/grave-hand.glb`
+
+> A rotting human hand and forearm reaching up out of the soil, fingers clawed, grey-green skin with torn nails and a scrap of burial cloth at the wrist, clumps of wet earth around it. Realistic, horror.
+
+Put the soil line at `y = 0`. It's about 0.45 m above ground.
+
+### Broken coffin: `public/assets/models/props/coffin-broken.glb`
+
+> An old Victorian wooden coffin half-rotted, lid split and pushed aside, dark warped boards with rusted iron handles and nails, dirt and roots inside. Realistic.
+
+Match the current coffin's length, about 2 m. Its base goes at `y = 0`.
+
+Before committing any of these, check them in game: `node tools/video/looks.mjs tools/video/out/looks <tag>`.
+
 ## Not needed
+
+- **Gravestones, hut, chapel, grass, mist, wall and wood surfaces:** these are all built in code (see section 6).
 
 - **Hymn board:** it's painted into the chapel model.
 - **Boots:** Elias's boots already have `props/clue-hut-boots.glb`, and the boot casts are now built in code from each cast's tread, size and hobnails.

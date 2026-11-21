@@ -8,6 +8,7 @@
 
 import { useLayoutEffect, useRef } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
+import { addSurfaceDetail } from '../assets/surfaceDetail'
 import { CuboidCollider, RigidBody } from '@react-three/rapier'
 import type { Group } from 'three'
 import { DRACO_PATH, HUT_MODEL_URL } from '../../data/assets'
@@ -30,6 +31,7 @@ function HutModels() {
     hutRef.current?.traverse((o) => {
       if ('isMesh' in o) o.receiveShadow = true
     })
+    if (hutRef.current) addSurfaceDetail(hutRef.current)
   }, [hut])
 
   return <Clone ref={hutRef} object={hut} />

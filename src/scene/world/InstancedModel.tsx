@@ -4,6 +4,7 @@
 
 import { useEffect, useMemo } from 'react'
 import { useGLTF } from '@react-three/drei'
+import { addSurfaceDetail, kitSurfaceKind } from '../assets/surfaceDetail'
 import * as THREE from 'three'
 import { worldModelUrl, type WorldModelId } from '../../data/assets'
 import type { Placement } from '../../data/cemeteryLayout'
@@ -42,6 +43,8 @@ export function InstancedModel({
   const { scene } = useGLTF(url ?? worldModelUrl(model as WorldModelId))
 
   const meshes = useMemo(() => {
+    // Kit models get the world's surface detail too (their kind comes from the model's name).
+    if (model) addSurfaceDetail(scene, kitSurfaceKind(model))
     scene.updateMatrixWorld(true)
     const found: THREE.Mesh[] = []
     scene.traverse((o) => {
@@ -72,7 +75,7 @@ export function InstancedModel({
       inst.receiveShadow = receiveShadow
       return inst
     })
-  }, [scene, placements, centerXZ, lift, castShadow, receiveShadow])
+  }, [scene, model, placements, centerXZ, lift, castShadow, receiveShadow])
 
   // The instanced meshes borrow geometry and material from the cached glTF, so
   // only the per-instance buffers are ours to free.

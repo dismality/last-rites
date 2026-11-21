@@ -2322,3 +2322,22 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** Nothing; done by hand.
 - **Decisions made unattended:**
   - Five lines at most at a time, in groups, so the panel never covers the screen; the fighting lines wait for dusk rather than crowding the first minute. (2026-11-21)
+
+
+### 2026-11-22: Realism pass (surfaces, grass, mist, hut, gravestones)
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Surface detail:** every world material (`lr-stone`, `lr-wood`, `lr-bark` and so on, plus the kit models) now has a bump, a tint in its hollows and rougher pits. These come from code-built tileable textures (`src/scene/assets/surfaceTextures.ts`) sampled triplanar in world space (`surfaceDetail.ts`). Walls, bark and headstones no longer read as smooth painted boxes up close. The detail fades out from 14 to 38 m so nothing shimmers far away.
+  - **Grass:** thousands of clumps of long autumn grass sway in the wind (`GroundCover.tsx`, layout in `groundCoverLayout.ts`). They keep off paths, floors and stones, thin out on trodden ground and shrink into the fog past 22-32 m. Low graphics halves the density.
+  - **Ground mist:** four thin drifting sheets just above the turf (`GroundMist.tsx`). They take the sky's fog colour, thicken at dusk and night, and never show inside the hut or chapel.
+  - **Hut** (`tools/blender/hut.py`):
+    - deeper clapboard;
+    - a two-course rubble footing instead of eight blocks;
+    - moss on the low shingle rows;
+    - knee braces under the eaves;
+    - a lean-to canopy over the door on two posts, which have new colliders (the hut now has 10 boxes).
+  - **Gravestones:** the five readable stones are new models with plinths, moulded borders and carved lettering (`tools/blender/headstones.py`). They are scaled to the old footprints, so the colliders still fit. `prep_kenney_graveyard.py` no longer rebuilds them.
+  - Tripo prompts for the sculpted props that code can't do well (the mourner statue, grave hand and broken coffin) are in `docs/tripo-prompts.md` section 6.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:**
+  - The surface detail is a shader layer, not UV textures, because the Blender models carry vertex colours and no UVs. (2026-11-22)

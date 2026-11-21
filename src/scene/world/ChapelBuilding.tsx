@@ -7,6 +7,7 @@
 
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
+import { addSurfaceDetail } from '../assets/surfaceDetail'
 import { useFrame } from '@react-three/fiber'
 import { CuboidCollider, RigidBody, type RapierRigidBody } from '@react-three/rapier'
 import { Matrix4, Vector3, type Group, type Object3D } from 'three'
@@ -153,6 +154,8 @@ function ChapelModels() {
       o.receiveShadow = true
       o.castShadow = hasAncestorNamed(o, CHAPEL_MESH.shadowCasters)
     })
+    if (inner.current) addSurfaceDetail(inner.current)
+    if (outer.current) addSurfaceDetail(outer.current)
     bell.current = outer.current?.getObjectByName(CHAPEL_MESH.bell) ?? null
     const root = inner.current
     altar.current = []

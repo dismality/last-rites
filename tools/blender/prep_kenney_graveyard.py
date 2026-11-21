@@ -19,9 +19,11 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT_DIR = os.path.join(ROOT, "public", "assets", "models", "world")
 
 # Scale per group. Crypts are larger than the rest so the player fits through their doors.
+# The five readable stones (gravestone-bevel, -broken, -cross, -round, -wide) are built in detail by
+# headstones.py now, so they are left out here: re-running this must not overwrite them.
 GROUPS = {
-    1.5: """grave grave-border gravestone-bevel gravestone-broken gravestone-cross gravestone-cross-large
-            gravestone-debris gravestone-decorative gravestone-roof gravestone-round gravestone-wide cross
+    1.5: """grave grave-border gravestone-cross-large
+            gravestone-debris gravestone-decorative gravestone-roof cross
             cross-column cross-wood stone-wall stone-wall-column stone-wall-curve
             stone-wall-damaged iron-fence iron-fence-bar iron-fence-border iron-fence-border-column
             iron-fence-border-curve iron-fence-border-gate iron-fence-curve iron-fence-damaged fence

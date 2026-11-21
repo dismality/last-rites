@@ -11,8 +11,9 @@ const inside = (b: (typeof HUT_BOXES)[number], x: number, z: number) =>
 const box = (note: string) => HUT_BOXES.find((b) => b.note.startsWith(note))!
 
 describe('hut scene JSON', () => {
-  it('loads 8 finite boxes and the table surfaces', () => {
-    expect(HUT_BOXES).toHaveLength(8)
+  it('loads 10 finite boxes (8 inside, 2 canopy posts) and the table surfaces', () => {
+    expect(HUT_BOXES).toHaveLength(10)
+    expect(HUT_BOXES.filter((b) => b.note.startsWith('canopy post'))).toHaveLength(2)
     for (const b of HUT_BOXES) {
       for (const v of [...b.center, ...b.half, b.rotY]) expect(Number.isFinite(v)).toBe(true)
       expect(b.half.every((h) => h > 0)).toBe(true)

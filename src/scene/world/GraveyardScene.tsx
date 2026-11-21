@@ -11,6 +11,7 @@ import * as THREE from 'three'
 import { DRACO_PATH, GRAVEYARD_MODEL_URL } from '../../data/assets'
 import { GRAVEYARD_COLLIDERS } from '../../data/graveyardColliders'
 import { WIN_GATE_CLIP } from '../effects/winRuntime'
+import { addSurfaceDetail } from '../assets/surfaceDetail'
 
 /** Materials in the GLB that throw shadows (the lantern is the only shadow-casting light that matters). */
 const CASTING_MATERIALS = new Set(['lr-stone', 'lr-iron', 'lr-bark'])
@@ -44,6 +45,7 @@ function prepare(scene: THREE.Object3D): void {
     mesh.castShadow = casts
     mesh.receiveShadow = true
   })
+  addSurfaceDetail(scene)
 }
 
 useGLTF.setDecoderPath(DRACO_PATH)

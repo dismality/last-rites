@@ -9,6 +9,9 @@
 // Draw-call budget: every repeated prop goes through <InstancedModel>, one call per model type.
 import { useLayoutEffect, useMemo, useRef } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
+import { addSurfaceDetail } from '../assets/surfaceDetail'
+import { GroundCover } from './GroundCover'
+import { GroundMist } from './GroundMist'
 import { CuboidCollider, CylinderCollider, RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import {
@@ -159,6 +162,7 @@ function CatacombsScene() {
     ref.current?.traverse((o) => {
       if ('isMesh' in o) o.receiveShadow = true
     })
+    if (ref.current) addSurfaceDetail(ref.current)
   }, [scene])
   return (
     <>
@@ -306,6 +310,8 @@ export function Cemetery() {
     <group name="cemetery">
       <Grounds />
       <GraveyardScene />
+      <GroundCover />
+      <GroundMist />
       <LampPosts />
       <SpawnDressing />
       <Hut />

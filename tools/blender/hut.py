@@ -96,7 +96,7 @@ def walls():
             else:
                 ra, rb = a, b
             for p0, p1 in clip(ra, rb, v, v + hgt, w['open'], 0.02):
-                board(ext, w, p0, p1, v, v + hgt + 0.03, WT / 2 + 0.005, WT / 2 + 0.03, math.radians(3.5))
+                board(ext, w, p0, p1, v, v + hgt + 0.035, WT / 2 + 0.005, WT / 2 + 0.042, math.radians(6.5))
             v += hgt
         # Vertical planks inside.
         ia, ib = (a + WT, b - WT)
@@ -150,17 +150,26 @@ def walls():
     kit.add(ext, Matrix.Identity(4), 'wood', EXT, 1, name='walls')
     kit.add(inn, Matrix.Identity(4), 'wood', INT, 2, name='walls')
     kit.add(trim, Matrix.Identity(4), 'wood', TRIM, 3, name='trim')
-    # Stone footing blocks.
+    # Rubble footing: two courses of rough fieldstones right round the walls (open at the door).
     st = new()
-    for sx in (-1, 1):
-        for zz in (-HZ, -1.0, 1.0, HZ):
-            box(st, (sx * HX, 0.06, zz), (0.4, 0.14, 0.4))
-    for xx in (-1.6, 1.6):
-        for sz in (-1, 1):
-            box(st, (xx, 0.06, sz * HZ), (0.4, 0.14, 0.4))
-    bevel(st, 0.03)
-    jitter(st, 0.02, 5, 3)
-    kit.add(st, Matrix.Identity(4), 'stone', stone((120, 114, 104), 0.6, 0.2), 4, name='stone')
+    proud = WT / 2 + 0.07
+    for w in WALLS:
+        a, b = w['run']
+        a, b = a - 0.06, b + 0.06
+        for course, (y0, y1) in enumerate(((-0.04, 0.15), (0.15, 0.31))):
+            u = a + (0.0 if course == 0 else R.uniform(0.08, 0.16))
+            while u < b - 0.05:
+                lw = min(R.uniform(0.22, 0.42), b - u)
+                if w['axis'] == 'x' and w['out'] > 0 and u + lw > -DOOR_W / 2 - 0.05 and u < DOOR_W / 2 + 0.05 and course == 1:
+                    u += lw
+                    continue
+                c = wpos(w, u + lw / 2, (y0 + y1) / 2 + R.uniform(-0.01, 0.01), proud / 2)
+                sz_ = wsize(w, lw - 0.025, y1 - y0 - 0.02, proud + 0.04 + R.uniform(0, 0.03))
+                box(st, c, sz_)
+                u += lw
+    bevel(st, 0.025)
+    jitter(st, 0.012, 5, 7)
+    kit.add(st, Matrix.Identity(4), 'stone', stone((118, 112, 100), 0.7, 0.3), 4, name='stone')
 
 
 def floor():
@@ -222,7 +231,7 @@ def roof():
     box(raft, (0, RIDGE - 0.12, 0), (0.12, 0.16, RZ1 - RZ0))                                   # ridge beam
     kit.add(raft, Matrix.Identity(4), 'wood', wood((70, 50, 34), 0.3), 12, name='roof-timber')
 
-    tones = [(92, 76, 60), (78, 66, 54), (104, 92, 78), (70, 60, 50)]
+    tones = [(92, 76, 60), (78, 66, 54), (104, 92, 78), (70, 60, 50), (74, 80, 56), (62, 70, 50)]
     bms = [new() for _ in tones]
     for side in (-1, 1):
         s, row = -0.05, 0
@@ -237,7 +246,10 @@ def roof():
                 L = min(0.42, SLEN - s + 0.04)
                 cx, cy = on_slope(side, s + L / 2, 0.02 + 0.01)
                 M = T(cx, cy, (a + b) / 2) @ RZ(-side * SLOPE) @ RZ(side * math.radians(R.uniform(2.5, 6))) @ RY(math.radians(R.uniform(-2, 2)))
-                bmesh.ops.create_cube(bms[R.randrange(len(tones))], size=1.0, matrix=M @ S(L, 0.018, b - a - 0.01))
+                # Moss gathers on the lower, wetter rows.
+                mossy = R.random() < max(0.0, 0.45 - s / SLEN) * 0.9
+                pick = R.choice((4, 5)) if mossy else R.randrange(4)
+                bmesh.ops.create_cube(bms[pick], size=1.0, matrix=M @ S(L, 0.018 + R.uniform(0, 0.008), b - a - 0.01))
             s += 0.17
             row += 1
     for bm, tone in zip(bms, tones):
@@ -278,6 +290,40 @@ def door():
     hs = tube([(0.2 * math.cos(a), DOOR_H + 0.42 + 0.2 * math.sin(a), HZ + WT / 2 + 0.08) for a in
                [math.radians(d) for d in range(-40, 221, 20)]], 0.018, 5)
     kit.add(hs, Matrix.Identity(4), 'iron', iron(0.6), 23, name='iron')
+    # Lean-to canopy over the door: two posts, a beam, rafters, boards and shingles.
+    cz0, cz1 = HZ + WT / 2 + 0.03, HZ + 1.15
+    cy0, cy1 = DOOR_H + 0.62, DOOR_H + 0.3
+    cw = 1.25
+    cn = new()
+    for sx in (-1, 1):
+        px = sx * 1.02
+        box(cn, (px, (cy1 - 0.06) / 2, HZ + 1.0), (0.11, cy1 - 0.06, 0.11))                      # post
+        box(cn, (px, 0.03, HZ + 1.0), (0.2, 0.06, 0.2))                                          # post pad
+        L = math.hypot(0.45, 0.45)
+        bmesh.ops.create_cube(cn, size=1.0, matrix=T(px, cy1 - 0.3, HZ + 0.78) @ RX(math.radians(45)) @ S(0.07, L, 0.07))  # brace
+        kit.collider(px, HZ + 1.0, 0.07, cy1 / 2, 0.07, note='canopy post')
+    box(cn, (0, cy1 - 0.03, HZ + 1.0), (cw * 2 + 0.2, 0.12, 0.12))                             # beam
+    slope = math.atan2(cy0 - cy1, cz1 - cz0)
+    sl = math.hypot(cy0 - cy1, cz1 - cz0) + 0.08
+    for i in range(6):
+        xx = -cw + i * (2 * cw) / 5
+        bmesh.ops.create_cube(cn, size=1.0, matrix=T(xx, (cy0 + cy1) / 2 + 0.05, (cz0 + cz1) / 2) @ RX(slope) @ S(0.06, 0.09, sl))
+    box(cn, (0, cy0 + 0.02, cz0 + 0.03), (cw * 2 + 0.1, 0.12, 0.06))                           # wall plate
+    kit.add(cn, Matrix.Identity(4), 'wood', TRIM, 25, name='trim')
+    cb = new()
+    for i in range(int(sl / 0.12)):
+        t = (i + 0.5) / int(sl / 0.12)
+        zz = cz0 + (cz1 - cz0) * t
+        yy = cy0 + (cy1 - cy0) * t + 0.12
+        bmesh.ops.create_cube(cb, size=1.0, matrix=T(R.uniform(-0.01, 0.01), yy, zz) @ RX(slope + math.radians(R.uniform(2, 5))) @ S(cw * 2 + 0.3, 0.022, 0.15))
+    kit.add(cb, Matrix.Identity(4), 'wood', wood((84, 72, 58), 0.4, weather=0.6), 26, name='shingles')
+    # Knee braces under the side eaves.
+    kb = new()
+    for sx in (-1, 1):
+        for zz in (-HZ + 0.35, -0.8 - WIN['w'] / 2 - 0.5, 0.9, HZ - 0.35):
+            L = 0.5
+            bmesh.ops.create_cube(kb, size=1.0, matrix=T(sx * (HX + WT / 2 + 0.2), H - 0.22, zz) @ RZ(sx * math.radians(45)) @ S(L, 0.07, 0.07))
+    kit.add(kb, Matrix.Identity(4), 'wood', TRIM, 27, name='trim')
     # Step.
     st = new()
     box(st, (0, 0.03, HZ + 0.45), (1.8, 0.06, 0.6))
