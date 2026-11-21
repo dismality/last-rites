@@ -2,9 +2,9 @@
 // three candidate graves. The player looks at each post's bell, rope and tag, and once all three
 // posts are examined answers "Which bell was cut?". The verdict is the pure `bellPosts` rule; a
 // wrong post adds Doubt through the Case_Store and shows a message. A right one solves 1b and the
-// case system pins the three clue cards. Keyboard: arrows pick the part, Enter inspects, Tab changes
-// post, C marks the post as the cut bell. Mouse: click a part of the drawing or a notebook row.
-// Progress is kept in the Case_Store.
+// case system pins the three clue cards. Each post opens only its own bell: the player walks to all
+// three. Keyboard: arrows pick the part, Enter inspects, C names this post as the cut bell. Mouse:
+// click a part of the drawing or a notebook row. Progress is kept in the Case_Store.
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react'
 import { CASE_1_BELLS, CASE_1_STONES, type BellPostDef, type BellPostId } from '../../data/cases'
 import { playPageTurn } from '../../audio/AudioManager'
@@ -13,7 +13,6 @@ import { useOverlayStore } from '../../game/state/overlayStore'
 import {
   BELL_FACETS,
   cutQuestionOpen,
-  cyclePost,
   facetText,
   FACET_LABEL,
   isPostExamined,
@@ -128,7 +127,8 @@ export function BellsMinigame() {
   const examined = useCaseStore((s) => s.cases[CASE_ID].bellsExamined)
   const solved = useCaseStore((s) => s.cases[CASE_ID].minigames.includes('1b'))
   const focus = useOverlayStore((s) => s.bellPostFocus)
-  const [postIndex, setPostIndex] = useState(() => Math.max(0, POST_IDS.findIndex((id) => id === focus)))
+  // Only the post the player used in the world: the others are examined at their own graves.
+  const postIndex = Math.max(0, POST_IDS.findIndex((id) => id === focus))
   const [facetIndex, setFacetIndex] = useState(0)
   const [read, setRead] = useState<FacetsRead>(NO_FACETS_READ)
   const [result, setResult] = useState<{ kind: ResultKind; text: string } | null>(null)
@@ -145,13 +145,6 @@ export function BellsMinigame() {
     const t = window.setTimeout(() => view.current?.focus(), 0)
     return () => window.clearTimeout(t)
   }, [])
-
-  const goPost = (index: number) => {
-    setPostIndex(index)
-    setFacetIndex(0)
-    setResult(null)
-    view.current?.focus()
-  }
 
   /** Look closely at one part of the current post. What it shows goes into the notebook. */
   const inspectFacet = (f: BellFacet) => {
@@ -187,11 +180,6 @@ export function BellsMinigame() {
     if (e.code.startsWith('Arrow')) {
       e.preventDefault()
       setFacetIndex((i) => turnFacet(i, e.code))
-    } else if (e.code === 'Tab') {
-      // Tab changes post here; Esc and the Close button still leave the overlay.
-      e.preventDefault()
-      e.stopPropagation()
-      goPost(cyclePost(postIndex, e.shiftKey))
     } else if (e.code === 'Enter' && !(e.target instanceof HTMLButtonElement)) {
       e.preventDefault()
       inspectFacet(facet)
@@ -203,34 +191,33 @@ export function BellsMinigame() {
 
   const questionOpen = cutQuestionOpen(examined)
   const readHere = readOf(post.id)
+  const left = CASE_1_BELLS.filter((p) => !examined.includes(p.id)).map(stoneName)
 
   return (
     <MinigameShell id="1b" title="The Bell Posts" result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="bells__intro">
           A safety bell let someone buried by mistake ring for help from below. One of these three was
-          silenced on purpose. Look at the bell, the rope and the tag on each post.
+          silenced on purpose. Look at the bell, the rope and the tag on this post, then visit the other
+          two graves.
         </p>
 
-        <div className="bells__posts" role="group" aria-label="Bell posts">
+        <ul className="bells__posts" aria-label="Bell posts examined">
           {CASE_1_BELLS.map((p, i) => {
-            const n = readOf(p.id).length
             const done = examined.includes(p.id)
             return (
-              <button
-                key={p.id}
-                type="button"
-                className="bells__post-tab"
-                aria-pressed={i === postIndex}
-                tabIndex={-1}
-                onClick={() => goPost(i)}
-              >
-                <span className="bells__post-name">{stoneName(p)}</span>
-                <span className="bells__post-count">{done ? '✓ examined' : `${n} of ${BELL_FACETS.length} looked at`}</span>
-              </button>
+              <li key={p.id} className="bells__post-tab" aria-current={i === postIndex ? 'location' : undefined}>
+                <span className="bells__post-name">
+                  {stoneName(p)}
+                  {i === postIndex ? ' (here)' : ''}
+                </span>
+                <span className="bells__post-count">
+                  {done ? '✓ examined' : i === postIndex ? `${readHere.length} of ${BELL_FACETS.length} looked at` : 'not yet visited'}
+                </span>
+              </li>
             )
           })}
-        </div>
+        </ul>
 
         <div
           ref={view}
@@ -279,8 +266,10 @@ export function BellsMinigame() {
             {solved
               ? `✓ ${PINNED_NOTE}`
               : questionOpen
-                ? `Which bell was cut? Pick its post above, then name it.`
-                : `Examine all three posts to name the cut bell (${examined.length} of ${POST_IDS.length} done).`}
+                ? `All three posts are examined. If this is the cut bell, name it; if not, go to the one that is.`
+                : isPostExamined(readHere)
+                  ? `Done here (${examined.length} of ${POST_IDS.length}). Still to examine: ${left.join(' and ')}.`
+                  : `Examine all three posts to name the cut bell (${examined.length} of ${POST_IDS.length} done).`}
           </p>
           <button
             type="button"
@@ -293,7 +282,7 @@ export function BellsMinigame() {
           </button>
         </div>
 
-        <p className="bells__keys">Arrows pick a part · Enter inspects · Tab changes post · C names the cut bell</p>
+        <p className="bells__keys">Arrows pick a part · Enter inspects · C names this bell as the cut one</p>
       </div>
     </MinigameShell>
   )

@@ -446,13 +446,21 @@ describe('selectObjective in story stages (spec 10)', () => {
       selectObjective({ ...day, stage: { stage, curseLinks: 0, altarLockedS: 0, clues: { found: 1, total: 6 }, day: steps } })
     const open = { count: 0, done: false }
     const done = { count: 1, done: true }
-    const o = st(2, [open, open, open])
+    // Stage 2: the Row gate's key first, as a search area, then the gate.
+    const key = st(2, [open, open, open, open, open])
+    expect(key.main).toBe('Find the key to the Mausoleum Row gate (0/1)')
+    expect(key.areaM).toBeGreaterThan(0)
+    expect(key.why).toMatch(/Pell/)
+    const gate = st(2, [done, open, open, open, open])
+    expect(gate.main).toBe('Open the Mausoleum Row gate (0/1)')
+    expect(gate.areaM).toBeUndefined()
+    const o = st(2, [done, done, open, open, open])
     expect(o.main).toBe("Open the sexton's crest lock (0/1)")
     expect(o.marker).toBe('Crest lock')
     expect(o.position).toEqual(CASE_2_CREST_LOCK.niche)
-    expect(st(2, [done, open, open]).main).toBe('Put the watch log in order (0/1)')
-    expect(st(2, [done, done, open]).main).toBe('Compare the boot prints (0/1)')
-    expect(st(2, [done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
+    expect(st(2, [done, done, done, open, open]).main).toBe('Put the watch log in order (0/1)')
+    expect(st(2, [done, done, done, done, open]).main).toBe('Compare the boot prints (0/1)')
+    expect(st(2, [done, done, done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
     expect(st(1, [done, { count: 2, done: false }]).main).toBe('Examine the three bells (2/3)')
     // All three examined but the cut bell not yet named: say what is left, not a stuck 3/3.
     expect(st(1, [done, { count: 3, done: false }]).main).toBe('Name the cut bell at a bell post')
@@ -462,10 +470,38 @@ describe('selectObjective in story stages (spec 10)', () => {
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] },
+      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, open, open, open] },
     })
     expect(armed.second).toBe("Open the sexton's crest lock (0/1)")
     const night = selectObjective({ ...day, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] } })
     expect(night.rule).toBe(1)
+  })
+
+  it('once the day steps are done, leads to the case board and then the altar', () => {
+    const base = fc.sample(inputArb, 1)[0]
+    const day = {
+      ...base,
+      phase: 'day' as const,
+      needsWeapon: false,
+      story: true,
+      progress: { page1Read: true, cryptKey: true, whistle: false, stairRevealed: false, ossuaryKey: false, relics: 0 },
+    }
+    const done = { count: 1, done: true }
+    const at = (curseLinks: number) =>
+      selectObjective({ ...day, stage: { stage: 1, curseLinks, altarLockedS: 0, linksTotal: 5, day: [done, { count: 3, done: true }] } })
+    expect(at(2).main).toBe("Link the clues in the journal's Case tab (2/5)")
+    expect(at(2).position).toBeUndefined()
+    expect(at(2).why).toMatch(/curse/)
+    const altar = at(5)
+    expect(altar.main).toBe('At dusk, give your answer at the chapel altar')
+    expect(altar.marker).toBe('Altar')
+    expect(altar.position).toEqual(CHAPEL_ALTAR)
+    // Still unarmed: the craft rule leads, the next case step sits on the second line.
+    const armed = selectObjective({
+      ...day,
+      needsWeapon: true,
+      stage: { stage: 1, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: [done, { count: 3, done: true }] },
+    })
+    expect(armed.second).toBe("Link the clues in the journal's Case tab (1/5)")
   })
 })

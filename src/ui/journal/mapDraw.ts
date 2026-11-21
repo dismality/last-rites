@@ -32,7 +32,7 @@ export interface MapScene {
   landmarks: readonly Landmark[]
   player: { x: number; z: number; yaw: number }
   /** Current objective; the marker is drawn only when it has a world position. */
-  objective?: { position?: readonly [number, number, number]; marker?: string; main: string } | null
+  objective?: { position?: readonly [number, number, number]; marker?: string; main: string; areaM?: number } | null
   /** Marks with no landmark entry (hut, merchant, wave graves); the caller decides which show. */
   extraMarks?: readonly ExtraMark[]
   /** Pins, drawn above the landmarks and under the objective and the quill. */
@@ -107,6 +107,32 @@ export interface MapProjection {
 
 const SHEET_PROJECTION: MapProjection = { toPx, clamp: clampToMap, width: MAP_WIDTH }
 
+/**
+ * A search area: a soft ember wash inside a dashed ember ring, so the player knows roughly where
+ * to look without being shown the spot. Drawn under the objective's own mark.
+ */
+function drawSearchArea(
+  ctx: CanvasRenderingContext2D,
+  at: readonly [number, number, number],
+  radiusM: number,
+  proj: MapProjection,
+): void {
+  const [cx, cy] = proj.toPx(at[0], at[2])
+  const [ex] = proj.toPx(at[0] + radiusM, at[2])
+  const r = Math.abs(ex - cx)
+  if (!(r > 0)) return
+  ctx.save()
+  ctx.beginPath()
+  ctx.arc(cx, cy, r, 0, Math.PI * 2)
+  ctx.fillStyle = 'rgba(232, 145, 58, 0.16)'
+  ctx.fill()
+  ctx.setLineDash([6, 4])
+  ctx.lineWidth = 2
+  ctx.strokeStyle = '#e8913a'
+  ctx.stroke()
+  ctx.restore()
+}
+
 /** Diamond glyph plus a 16 px text label, clamped to the map edge so it is never lost. */
 export function drawObjective(
   ctx: CanvasRenderingContext2D,
@@ -114,6 +140,7 @@ export function drawObjective(
   proj: MapProjection = SHEET_PROJECTION,
 ): void {
   if (!o?.position) return
+  if (o.areaM) drawSearchArea(ctx, o.position, o.areaM, proj)
   const [x, y] = proj.clamp(...proj.toPx(o.position[0], o.position[2]))
   const label = o.marker ?? o.main
   ctx.save()

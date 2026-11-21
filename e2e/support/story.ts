@@ -226,16 +226,16 @@ export async function stage1(page: Page, begun: number): Promise<{ firstMinigame
   await closeMinigame(page)
   await expectObjective(page, /Examine the three bells|Craft a weapon/)
 
-  // 1b: the bell posts. One overlay holds all three.
-  await openMinigame(page, 'bell-pell')
-  for (const post of ['Pell', 'Hale', 'Ames']) {
-    await click(page, page.locator('.bells__post-tab').filter({ hasText: post }))
+  // 1b: the bell posts. Each post opens only its own bell, so visit all three.
+  for (const post of ['bell-hale', 'bell-ames', 'bell-pell']) {
+    await openMinigame(page, post)
     for (const side of ['Turn the bell', 'Inspect the rope', 'Read the tag']) {
       await click(page, page.locator('.bells__facet-btn').filter({ hasText: side }))
       await click(page, page.locator('.bells__act').filter({ hasText: 'Inspect' }))
     }
+    if (post !== 'bell-pell') await closeMinigame(page)
   }
-  await click(page, page.locator('.bells__post-tab').filter({ hasText: 'Pell' }))
+  // Still at Pell's post, the one that was cut.
   await click(page, page.getByRole('button', { name: /This one/ }))
   await expect.poll(() => solved(page, CASE1)).toContain('1b')
   await closeMinigame(page)

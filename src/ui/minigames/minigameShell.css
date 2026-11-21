@@ -123,7 +123,7 @@
 
 /* Minigame 1b: the bell posts. Parts and states carry marks and words, never colour alone. */
 .bells__intro { margin: 0 0 0.75rem; font-size: 1.05rem; line-height: 1.6; }
-.bells__posts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.bells__posts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
 .bells__post-tab, .bells__facet-btn, .bells__act {
   font: inherit;
   font-family: var(--font-body);
@@ -143,8 +143,8 @@
   border-width: 1px;
   border-color: var(--parchment-dark);
 }
-.bells__post-tab:hover { border-color: var(--ink); }
-.bells__post-tab[aria-pressed='true'] { border: 2px solid var(--ink); background: rgba(20, 17, 15, 0.1); }
+.bells__post-tab { cursor: default; border-style: solid; }
+.bells__post-tab[aria-current='location'] { border: 2px solid var(--ink); background: rgba(20, 17, 15, 0.1); }
 .bells__post-name { font-size: 1.1rem; font-weight: 700; }
 .bells__post-count { font-size: 0.9rem; opacity: 0.8; }
 

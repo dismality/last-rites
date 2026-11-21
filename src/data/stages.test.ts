@@ -2,7 +2,7 @@ import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { LAST_NIGHT, NIGHT_FOG_DENSITY } from './balance'
 import { CAPTIONS } from './captions'
-import { STAGE_DAY_RULES } from './objectiveRules'
+import { OBJECTIVE_WHY_MAX, STAGE_DAY_RULES } from './objectiveRules'
 import { RECIPE_MAP } from './recipes'
 import {
   fogOfLadderRow,
@@ -62,7 +62,18 @@ describe('stage data (design bible §8, §13)', () => {
 
   it('has day rules for every stage and altar captions', () => {
     expect(STAGE_DAY_RULES[1]).toHaveLength(2)
-    expect(STAGE_DAY_RULES[2]).toHaveLength(3)
+    // Stage 2 starts with the Row gate's key and the gate itself, then its three minigames.
+    expect(STAGE_DAY_RULES[2]).toHaveLength(5)
+    expect(STAGE_DAY_RULES[2][0].place.kind).toBe('area')
+    for (const stage of [1, 2, 3] as const) {
+      const ms = STAGE_DAY_RULES[stage].flatMap((r) => (r.minigame ? [r.minigame] : []))
+      expect(new Set(ms).size).toBe(ms.length)
+    }
+    // Every step says why it matters, in a line that fits under the objective.
+    for (const r of Object.values(STAGE_DAY_RULES).flat()) {
+      expect(r.why.length).toBeGreaterThan(0)
+      expect(r.why.length).toBeLessThanOrEqual(OBJECTIVE_WHY_MAX)
+    }
     expect(STAGE_DAY_RULES[3]).toHaveLength(3)
     expect(CAPTIONS.find((c) => c.id === 'altar-wrong')?.text).toBe('[a sour note from the altar]')
     for (const id of ['altar-wrong', 'altar-locked', 'altar-solved']) {

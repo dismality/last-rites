@@ -31,7 +31,8 @@ export interface MinimapScene {
   /** Already discovered landmarks (the caller filters by exploration and night-only). */
   landmarks: readonly Landmark[]
   /** World x, z of the current objective, when it has a place. */
-  objective: { x: number; z: number } | null
+  /** `areaM`: a search area of that radius (metres), drawn as a ring round the mark. */
+  objective: { x: number; z: number; areaM?: number } | null
   /** Map pins; one off the map is pinned to the border with a chevron, like the objective. */
   pins?: readonly Pin[]
   reducedMotion: boolean
@@ -87,6 +88,22 @@ export function drawMinimap(ctx: CanvasRenderingContext2D, scene: MinimapScene):
 function drawObjective(ctx: CanvasRenderingContext2D, scene: MinimapScene): void {
   if (!scene.objective) return
   const m = placeMarker(scene.geometry, scene.player, scene.objective, MINIMAP.markerInsetPx)
+  const area = scene.objective.areaM
+  if (area && !m.pinned) {
+    // The ring is drawn where the area really is (it may run off the window's edge).
+    const k = pxPerMetre(scene.geometry)
+    const [ax, az] = worldToMinimap(scene.geometry, scene.player, scene.objective.x, scene.objective.z)
+    ctx.save()
+    ctx.beginPath()
+    ctx.arc(ax, az, area * k, 0, Math.PI * 2)
+    ctx.fillStyle = 'rgba(232, 145, 58, 0.16)'
+    ctx.fill()
+    ctx.setLineDash([5, 3])
+    ctx.lineWidth = 1.5
+    ctx.strokeStyle = EMBER
+    ctx.stroke()
+    ctx.restore()
+  }
   ctx.save()
   ctx.translate(m.x, m.y)
   ctx.fillStyle = EMBER

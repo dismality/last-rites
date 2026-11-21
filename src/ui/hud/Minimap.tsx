@@ -116,7 +116,7 @@ function MinimapView() {
         player: { x: sample.x, z: sample.z, yaw: sample.yaw },
         cells,
         landmarks,
-        objective: op ? { x: op[0], z: op[2] } : null,
+        objective: op ? { x: op[0], z: op[2], areaM: useGuidanceStore.getState().objective?.areaM } : null,
         pins,
         reducedMotion: reduced,
       })

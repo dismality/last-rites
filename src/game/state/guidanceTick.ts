@@ -131,6 +131,7 @@ const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
   return {
     stage: s.stage,
     curseLinks: selectCorrectLinks(useCaseStore.getState(), s.stage),
+    linksTotal: caseOfStage(s.stage).notes.length,
     altarLockedS: Math.max(0, Math.ceil(s.altar.lockedUntil - s.nightElapsed)),
     day: readStageDaySteps(s.stage),
   }
@@ -149,9 +150,9 @@ const readHunchCandidates = (stage: 1 | 2 | 3): HunchCandidate[] => {
     if (c.found.kind === 'walk' && !progress.found.includes(c.id)) out.push({ id: c.id, position: c.found.position })
   }
   const rules = STAGE_DAY_RULES[stage]
-  def.minigames.forEach((m, k) => {
+  def.minigames.forEach((m) => {
     if (progress.minigames.includes(m)) return
-    const place = rules[k]?.place
+    const place = rules.find((r) => r.minigame === m)?.place
     if (place?.kind === 'point') out.push({ id: m, position: place.at })
     else if (place?.kind === 'nearest') {
       const bells = m === '1b' ? CASE_1_BELLS.filter((b) => !progress.bellsExamined.includes(b.id)) : []
@@ -182,7 +183,13 @@ const readStageDaySteps = (stage: 1 | 2 | 3): { count: number; done: boolean }[]
     const bells = cases['saved-by-the-bell'].bellsExamined.length
     return [one('1a'), { count: solved('1b') ? 3 : Math.min(3, bells), done: solved('1b') }]
   }
-  if (stage === 2) return [one('2a'), one('2b'), one('2c')]
+  if (stage === 2) {
+    // The case lies behind the Mausoleum Row gate: first its key (Pell's grave), then the gate.
+    const gateOpen = useMysteryStore.getState().mystery.gates['mausoleum-row']
+    const hasKey = gateOpen || useInventoryStore.getState().inventory.keyItems.includes('rusted-crypt-key')
+    const flag = (done: boolean) => ({ count: done ? 1 : 0, done })
+    return [flag(hasKey), flag(gateOpen), one('2a'), one('2b'), one('2c')]
+  }
   const inv = useInventoryStore.getState().inventory
   const relics = countRelics(inv.relics, useMysteryStore.getState().mystery.relics)
   return [one('3a'), one('3b'), { count: relics, done: relics >= 5 }]
@@ -194,6 +201,8 @@ const sameObjective = (a: Objective | null, b: Objective): boolean =>
   a.main === b.main &&
   a.second === b.second &&
   a.marker === b.marker &&
+  a.areaM === b.areaM &&
+  a.why === b.why &&
   a.curse?.value === b.curse?.value &&
   a.position?.[0] === b.position?.[0] &&
   a.position?.[2] === b.position?.[2]

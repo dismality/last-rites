@@ -4,6 +4,11 @@
 import { BENCH_Z, CHAPEL_ALTAR } from '../../data/cemeteryLayout'
 import {
   ALTAR_LOCKED_LINE,
+  CASE_ALTAR_LINE,
+  CASE_ALTAR_MARKER,
+  CASE_ALTAR_WHY,
+  CASE_LINK_LINE,
+  CASE_LINK_WHY,
   CASE_SOLVE_LINE,
   CURSE_RULE,
   OBJECTIVE_MAX_LINE,
@@ -56,6 +61,8 @@ export interface ObjectiveInput {
     curseLinks: number
     /** Whole seconds the altar stays silent after a wrong answer; 0 when it listens. */
     altarLockedS: number
+    /** Correct links the case has in all; with it, the done-steps line says what comes next. */
+    linksTotal?: number
     /** Clues found for the case, when the case board can say. */
     clues?: { found: number; total: number }
     /**
@@ -72,6 +79,10 @@ export interface Objective {
   second: string
   position?: Vec3
   marker?: string
+  /** Why the objective matters: what it is for and where it leads. Absent when obvious. */
+  why?: string
+  /** A search area rather than a spot: the maps draw a circle this many metres round `position`. */
+  areaM?: number
   /** Set on the curse line: the HUD draws the number and bar from it. */
   curse?: { value: number; max: number }
 }
@@ -202,7 +213,7 @@ const secondLine = (def: ObjectiveRuleDef, i: ObjectiveInput): string => {
     const story = ruleDef(matchRule({ ...i, needsWeapon: false }))
     const step = STAGE_STEP_REPLACES.includes(story.id) ? stageDayObjective(i) : null
     if (step) return step.main
-    if (i.stage?.day && STAGE_STEP_REPLACES.includes(story.id)) return stageCaseLine(i.stage)
+    if (i.stage?.day && STAGE_STEP_REPLACES.includes(story.id)) return stageDoneObjective(i.stage).main
     return story.id === 11 && i.stage ? stageCaseLine(i.stage) : mainLine(story, i)
   }
   const t = def.second ?? ''
@@ -235,6 +246,22 @@ const stageCaseLine = (stage: NonNullable<ObjectiveInput['stage']>): string => {
     : `Solve the case: ${title}`
 }
 
+/**
+ * By day once every step is done: link the clues, then answer at the altar after dusk. Without a
+ * link total it falls back to naming the case.
+ */
+const stageDoneObjective = (
+  stage: NonNullable<ObjectiveInput['stage']>,
+): Pick<Objective, 'main' | 'position' | 'marker' | 'why'> => {
+  const total = stage.linksTotal
+  if (total === undefined || !(total > 0)) return { main: cut(stageCaseLine(stage)) }
+  const made = clampInt(stage.curseLinks, 0, total)
+  if (made < total) {
+    return { main: cut(CASE_LINK_LINE.replace('{n}', String(made)).replace('{m}', String(total))), why: CASE_LINK_WHY }
+  }
+  return { main: cut(CASE_ALTAR_LINE), position: CHAPEL_ALTAR, marker: CASE_ALTAR_MARKER, why: CASE_ALTAR_WHY }
+}
+
 /** Story rules the stage day steps stand in for (6-11: keys, whistle, stair, relics, fallback). */
 const STAGE_STEP_REPLACES: readonly ObjectiveRuleId[] = [6, 7, 8, 9, 10, 11]
 
@@ -265,14 +292,20 @@ const stageDayObjective = (i: ObjectiveInput): Objective | null => {
   const count = clampInt(day[at]?.count ?? 0, 0, rule.target)
   const place = rule.place
   const position =
-    place.kind === 'point' ? place.at : place.kind === 'nearest' ? nearest(place.at, i.playerPos) : nearest(i.relicSites, i.playerPos)
+    place.kind === 'point' || place.kind === 'area'
+      ? place.at
+      : place.kind === 'nearest'
+        ? nearest(place.at, i.playerPos)
+        : nearest(i.relicSites, i.playerPos)
   const o: Objective = {
     rule: (6 + at) as ObjectiveRuleId,
     main: cut(count >= rule.target && rule.whenCounted ? rule.whenCounted : `${rule.main} (${count}/${rule.target})`),
     second: cut(ruleDef(6).second?.replace('{clock}', formatClock(i.secondsLeft)) ?? ''),
     marker: rule.marker,
+    why: rule.why,
   }
   if (position) o.position = position
+  if (place.kind === 'area') o.areaM = place.radiusM
   return o
 }
 
@@ -283,7 +316,7 @@ export const selectObjective = (i: ObjectiveInput): Objective => {
     const step = stageDayObjective(i)
     if (step) return step
     // Every step done: the old key and relic rules no longer apply in a stage; name the case.
-    if (i.stage?.day) return { rule: 11, main: cut(stageCaseLine(i.stage)), second: cut(secondLine(ruleDef(11), i)) }
+    if (i.stage?.day) return { rule: 11, ...stageDoneObjective(i.stage), second: cut(secondLine(ruleDef(11), i)) }
   }
   const def = ruleDef(matched)
   if (i.stage && def.id === 11 && i.story !== false) {
@@ -301,5 +334,6 @@ export const selectObjective = (i: ObjectiveInput): Objective => {
   }
   if (position) result.position = position
   if (def.marker) result.marker = def.marker
+  if (def.why) result.why = def.why
   return result
 }

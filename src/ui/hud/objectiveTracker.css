@@ -26,6 +26,16 @@
   animation: hud-objective-fade 220ms ease-out;
 }
 
+.hud-objective__why {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-style: italic;
+  line-height: 1.3;
+  color: var(--parchment);
+  opacity: 0.85;
+}
+
 .hud-objective__second {
   margin: 0.15rem 0 0;
   font-family: var(--font-body);

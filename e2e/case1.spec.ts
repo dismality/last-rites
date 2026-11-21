@@ -235,24 +235,33 @@ test('mouse: ledger with a wrong flag, bells with a wrong post, then both altar 
   await page.getByRole('button', { name: /Close/ }).first().click()
   await expect(page.locator('.minigame-shell')).toHaveCount(0)
 
-  // 1b: the bell posts stand now. Open Pell's post, then examine all three.
+  // 1b: the bell posts stand now. Each post opens only its own bell, so visit all three.
   await useProp(page, 'bell-pell')
   await expect(page.getByRole('dialog', { name: 'The Bell Posts' })).toBeVisible()
+  await expect(page.locator('.bells__post-tab[aria-current]')).toContainText('Pell')
   await examineByMouse(page)
   await shoot(page, 'case1-bells')
-  for (const key of ['hale', 'ames']) {
-    await page.locator('.bells__post-tab').filter({ hasText: BELL_TAB[key] }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.minigame-shell')).toHaveCount(0)
+  for (const key of ['ames', 'hale']) {
+    await useProp(page, `bell-${key}`)
+    await expect(page.locator('.bells__post-tab[aria-current]')).toContainText(BELL_TAB[key])
     await examineByMouse(page)
+    if (key === 'ames') {
+      await page.keyboard.press('Escape')
+      await expect(page.locator('.minigame-shell')).toHaveCount(0)
+    }
   }
   await expect.poll(async () => (await caseState(page)).cases[CASE_ID].bellsExamined.length).toBe(3)
   // The wrong post (Hale's rope is whole) costs a wrong answer and says so.
-  await page.locator('.bells__post-tab').filter({ hasText: 'Hale' }).click()
   await page.getByRole('button', { name: /This one/ }).click()
   await expect(result(page)).toContainText('That rope is sound')
   expect(await solvedMinigames(page)).not.toContain('1b')
   expect((await caseState(page)).cases[CASE_ID].wrongAnswers).toBe(2)
   // The right post: Pell's cut rope.
-  await page.locator('.bells__post-tab').filter({ hasText: 'Pell' }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.minigame-shell')).toHaveCount(0)
+  await useProp(page, 'bell-pell')
   await page.getByRole('button', { name: /This one/ }).click()
   await expect.poll(() => solvedMinigames(page)).toContain('1b')
   await expect(page.locator('.bells__solved')).toBeVisible()
@@ -315,7 +324,7 @@ test('mouse: ledger with a wrong flag, bells with a wrong post, then both altar 
   expect(errors).toEqual([])
 })
 
-test('keyboard only: ledger and bells are solved with arrows, Enter, F, 1-3, Tab and C', async ({ page }) => {
+test('keyboard only: ledger and bells are solved with arrows, Enter, F, 1-3 and C', async ({ page }) => {
   test.setTimeout(300_000)
   const { errors } = await boot(page)
   // A real player's cursor is free while a Minigame is open; drop the fake lock so Tab behaves.
@@ -371,25 +380,33 @@ test('keyboard only: ledger and bells are solved with arrows, Enter, F, 1-3, Tab
   await key('Escape')
   await expect(page.locator('.minigame-shell')).toHaveCount(0)
 
-  // 1b: back to a free-look cursor for the walk, then the overlay by keyboard.
-  await page.evaluate(() => window.__lastRites!.lockless(true))
-  await useProp(page, 'bell-pell')
-  await page.evaluate(() => window.__lastRites!.lockless(false))
-  await expect(page.locator('.bells__view')).toBeFocused()
-  for (let post = 0; post < 3; post++) {
-    // Enter reads a side; Right turns to the next; Tab moves to the next post.
+  // 1b: each post opens only its own bell, so walk to each one and read it by keyboard.
+  const openPost = async (id: string) => {
+    await page.evaluate(() => window.__lastRites!.lockless(true))
+    await useProp(page, id)
+    await page.evaluate(() => window.__lastRites!.lockless(false))
+    await expect(page.locator('.bells__view')).toBeFocused()
+  }
+  for (const id of ['bell-pell', 'bell-hale', 'bell-ames']) {
+    await openPost(id)
+    // Enter reads a side; Right turns to the next.
     await key('Enter')
     await key('ArrowRight')
     await key('Enter')
     await key('ArrowRight')
     await key('Enter')
-    if (post < 2) await key('Tab')
+    if (id !== 'bell-ames') {
+      await key('Escape')
+      await expect(page.locator('.minigame-shell')).toHaveCount(0)
+    }
   }
   await expect.poll(async () => (await caseState(page)).cases[CASE_ID].bellsExamined.length).toBe(3)
-  // Focus is on Ames' post: C names it, wrongly. Tab wraps to Pell, whose rope was cut.
+  // At Ames' post: C names it, wrongly. Then back to Pell, whose rope was cut.
   await key('KeyC')
   await expect(result(page)).toContainText('That rope is sound')
-  await key('Tab')
+  await key('Escape')
+  await expect(page.locator('.minigame-shell')).toHaveCount(0)
+  await openPost('bell-pell')
   await key('KeyC')
   await expect.poll(() => solvedMinigames(page)).toContain('1b')
   await key('Escape')

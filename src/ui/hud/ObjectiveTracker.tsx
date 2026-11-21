@@ -49,6 +49,7 @@ export function ObjectiveTracker() {
           {objective.main}
         </span>
       </div>
+      {objective.why && <p className="hud-objective__why">{objective.why}</p>}
       {second !== '' && <p className="hud-objective__second">{second}</p>}
       {objective.curse && (
         <div className="info-row">

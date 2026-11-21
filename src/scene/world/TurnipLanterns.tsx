@@ -152,6 +152,9 @@ export function TurnipLanterns() {
     b.instanceMatrix.needsUpdate = true
     s.instanceMatrix.needsUpdate = true
     p.instanceMatrix.needsUpdate = true
+    // The culling bounds are computed once, before these matrices were set (every copy at the
+    // origin), so the lanterns showed only while the view faced the origin. Recompute them now.
+    for (const m of [b, s, p]) m.computeBoundingSphere()
     if (p.instanceColor) p.instanceColor.needsUpdate = true
   }, [])
 

@@ -2227,3 +2227,32 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:** Added `docs/manual.md`, a spoiler-free instruction manual: getting started, controls, the screen, the day, night and dawn loop, solving a case, survival and combat, crafting, the dead, coins and upgrades, modes, settings and tips. It is linked from the README beside the walkthrough.
 - **What Kiro caught or sped up:** Nothing; written by hand from the design bible and the walkthrough.
 - **Decisions made unattended:** The manual leaves out the new creatures and every case answer, and points to the Creatures journal page and the walkthrough instead. (2026-11-18)
+
+### 2026-11-21: Stray lantern glow beside the lantern and in the intro
+- **Started:** Outside Kiro
+- **What happened:** The light rig in `src/scene/player/Lantern.tsx` drew its own flame and glass spheres at the fixed lantern anchor. The hand-held lantern draws its own flame and glass and sways away from that anchor, so a pale glow showed beside it, and in the intro (no hands) the glow floated on its own. The rig's two spheres are now hidden. They still carry the flicker values the debug hook reads, and the lights are unchanged.
+- **What Kiro caught or sped up:** Nothing; done by hand. Typecheck, lint, the player unit tests and `e2e/hands-lantern.spec.ts` pass.
+- **Decisions made unattended:** Hidden rather than removed, so the debug hook and the lantern e2e keep their numbers. (2026-11-21)
+
+### 2026-11-21: Bell posts one at a time, quiet finished props, turnip lanterns, stage 2 key step
+- **Started:** Outside Kiro
+- **What happened:**
+  - Bell posts: each post now opens only its own bell, so the player visits all three. The cut bell is named at its post once all three are examined. The panel lists which posts are done and which are left.
+  - Objective after the day steps: "Link the clues in the journal's Case tab (n/m)", then "At dusk, give your answer at the chapel altar" with the altar marker (`stageDoneObjective`).
+  - Stage 2 starts with "Find the key to the Mausoleum Row gate" as a search area (a ring on the big map, the journal map and the minimap), then "Open the Mausoleum Row gate". Stage day rules can name their minigame; the keeper's hunch now looks rules up by it.
+  - Finished props (an idle cue such as "The bells are examined") no longer get an outline or rune. Highlights are for the next task only.
+  - Turnip lanterns popped in and out as the view turned. Their instanced culling bounds were computed before the instances were placed; they are recomputed now. The chapel door boards got the same fix.
+  - `docs/kiro-prompt-task-chain.md`: a prompt for Kiro to make every task give the key and the reason for the next one.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:**
+  - The crypt-key search circle is 7 m across, centred a few metres off Pell's grave, so it says "around here". (2026-11-21)
+  - The larger task-chain work goes to Kiro (11r) instead of being built here, at the developer's request. (2026-11-21)
+
+### 2026-11-21: Why lines under every objective; player workflow audit
+- **Started:** Outside Kiro
+- **What happened:**
+  - Every stage day step, the Elias page and the craft-a-weapon objective now show one italic line under the objective saying why it matters and where it leads (`why` on the objective rules; `Objective.why`; the case-board and altar lines have their own). For example, the bells: "Someone was buried alive. A safety bell lets the buried ring for help: one was silenced."
+  - `docs/workflow-audit.md` checks the game against an outside review comparing it with Golden Idol, Obra Dinn, Dredge, CoD Zombies and Amnesia. Each workflow is marked Good, Fixed, Kiro or Skip.
+  - `docs/kiro-prompt-task-chain.md` gains the audit's workflow items: dusk warnings, ringing for an early dusk, missing-clue cards, feedback on wrong links and the dawn hook.
+- **What Kiro caught or sped up:** Nothing; done by hand. Typecheck, lint and all unit tests pass. The Short Vigil playthrough e2e passed before the why lines were added.
+- **Decisions made unattended:** The review's mini-night tutorial is marked Skip because the freeze is close. (2026-11-21)

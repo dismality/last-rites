@@ -297,6 +297,10 @@ export function Interactable({
       intro: introCameraRuntime.active,
     })
     const isHover = !hide && cue.targetable && useInteractionStore.getState().hover?.id === key
+    // Done for now (an idle prompt such as "The bells are examined"): it still answers a look with
+    // its prompt, but no outline or rune calls the player back to it. Highlights are for what is next.
+    const resting = cue.targetable && !cue.actionable && !cue.pulse
+    const highlight = isHover && !resting
     const { fuel, on } = useLanternStore.getState()
     const lit = isRuneVisible({
       distance: dist,
@@ -349,19 +353,19 @@ export function Interactable({
     // Proximity outline (clue spots): fades in over the last metre of `outlineRange`, only while
     // examining would do something. A steady fade, never a pulse, so it suits every comfort setting.
     const near =
-      outlineRange !== undefined && !used && !hide && cue.targetable
+      outlineRange !== undefined && !used && !hide && cue.targetable && !resting
         ? Math.min(1, Math.max(0, (outlineRange - dist) / OUTLINE_FADE_BAND_M))
         : 0
-    const wantOutline = isHover || near > 0 || (used && f.outlineFrom > 0 && alpha > 0 && !hide)
+    const wantOutline = highlight || near > 0 || (used && f.outlineFrom > 0 && alpha > 0 && !hide)
     setOutlineOn((o) => (o === wantOutline ? o : wantOutline))
-    if (outlineMat.current) outlineMat.current.opacity = OUTLINE_OPACITY * (used ? alpha : isHover ? 1 : near)
+    if (outlineMat.current) outlineMat.current.opacity = OUTLINE_OPACITY * (used ? alpha : highlight ? 1 : near)
 
     if (rune.current) {
       rune.current.opacity = used
         ? hide
           ? 0
           : f.runeFrom * alpha
-        : isHover
+        : highlight
           ? 1
           : cue.pulse
             ? pulseLevel

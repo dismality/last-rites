@@ -154,6 +154,8 @@ export function ChapelDoors() {
       }
     }
     mesh.instanceMatrix.needsUpdate = true
+    // Culling bounds are computed once, from the matrices of that moment: refresh them.
+    mesh.computeBoundingSphere()
   }, [active])
 
   // Boards and cracks follow the door store: a missing slot or a cracked board is a matrix change.
@@ -199,6 +201,8 @@ export function ChapelDoors() {
     bm.instanceMatrix.needsUpdate = true
     cm.instanceMatrix.needsUpdate = true
     if (bm.instanceColor) bm.instanceColor.needsUpdate = true
+    bm.computeBoundingSphere()
+    cm.computeBoundingSphere()
   }, [active, doors])
 
   if (!active) return null

@@ -273,13 +273,16 @@ export function Lantern() {
       <object3D ref={target} position={[0, 0, -1]} />
       <pointLight ref={fill} color={LANTERN_LIGHT.color} decay={2} />
       <pointLight ref={ember} color={LANTERN_LIGHT.color} decay={2} />
-      {/* Flame and glass are the lantern's HDR emissives (Req 7.16, see FLAME_HDR). */}
-        <mesh ref={flame}>
+      {/* Flame and glass are the lantern's HDR emissives (Req 7.16, see FLAME_HDR). They are kept
+          hidden: the hand-held lantern (ViewmodelLantern) draws its own flame and glass, and these
+          sat at the fixed anchor while that one sways, so they showed as a stray glow beside it and
+          floated alone in the intro. They still carry the flicker values the Debug_Hook reads. */}
+        <mesh ref={flame} visible={false}>
           <sphereGeometry args={[FLAME_RADIUS, 12, 8]} />
           {/* toneMapped off so the flame stays bright enough to bloom. */}
           <meshBasicMaterial color={FLAME_HDR} toneMapped={false} />
         </mesh>
-        <mesh ref={glass}>
+        <mesh ref={glass} visible={false}>
           <sphereGeometry args={[FLAME_RADIUS * 2.2, 12, 8]} />
           <meshStandardMaterial
             color="#2a1d10"
