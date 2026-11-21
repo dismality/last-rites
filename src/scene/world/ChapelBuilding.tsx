@@ -34,6 +34,7 @@ import { playerPositionRef } from './playerPositionRef'
 import { StairDescent } from './StairDescent'
 import { isBellActive } from '../../game/systems/repairs'
 import { useCaseStore } from '../../game/state/caseStore'
+import { callDuskEarly } from '../../game/state/earlyDusk'
 import { useChapelStore } from '../../game/state/chapelStore'
 import { useStageStore } from '../../game/state/stageStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
@@ -107,7 +108,9 @@ function CaseAltar({ z }: { z: number }) {
         kind="case-altar"
         runeHeight={1.6}
         onInteract={() => {
-          useOverlayStore.getState().setAltarPanelOpen(true)
+          // By day with the case ready, the bell calls the dusk early; otherwise the answer panel.
+          if (callDuskEarly()) ringBell()
+          else useOverlayStore.getState().setAltarPanelOpen(true)
         }}
       >
         <mesh visible={false} position={[0, 0.55, 0]}>

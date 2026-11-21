@@ -2256,3 +2256,20 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - `docs/kiro-prompt-task-chain.md` gains the audit's workflow items: dusk warnings, ringing for an early dusk, missing-clue cards, feedback on wrong links and the dawn hook.
 - **What Kiro caught or sped up:** Nothing; done by hand. Typecheck, lint and all unit tests pass. The Short Vigil playthrough e2e passed before the why lines were added.
 - **Decisions made unattended:** The review's mini-night tutorial is marked Skip because the freeze is close. (2026-11-21)
+
+### 2026-11-21: The task chain, built (was the 11r Kiro prompt)
+- **Started:** Outside Kiro
+- **What happened:**
+  - New steps: stage 2 "Read the crypt tablets (n/6)" before the crest lock; stage 3 "Find what happened to Elias (n/6)" before the slate, as a search area. Both point at the nearest thing not yet done. Tablets read are saved (`tabletsRead`).
+  - Every step has a done line, shown once as a centred reveal when it finishes (`stepAnnouncements`). A new stage opens with its own line. Nothing replays on a load.
+  - Dusk warnings: a far bell at 2:00 of day left and trembling graves at 0:30, each with a subtitle (`src/data/duskWarnings.ts`, `duskWarningsCrossed`).
+  - Early dusk: once the day steps are done and every clue is linked, the altar's prompt reads "Ring the bell, call the dusk now" (+150 score). A second press before dusk begins pays nothing.
+  - Case board: face-down cards for missing clues say roughly where to look, and a click drops a map pin. A wrong string sags, then falls away with "The thread slips".
+  - `docs/kiro-prompt-task-chain.md` is marked done; `docs/workflow-audit.md` verdicts updated.
+- **What Kiro caught or sped up:** Nothing; done by hand. Typecheck, lint and all unit tests pass.
+- **Decisions made unattended:**
+  - No oil reward for an early dusk: the lantern has no refill hook to give it. Score only. (2026-11-21)
+  - No crows in the warning: the crow calls are ambience, not a one-off sound. The far thunder roll stands in for the trembling graves. (2026-11-21)
+  - No snap sound for a wrong string: there is no synth recipe for one, and adding audio is out of scope. (2026-11-21)
+  - Wrong pairs stay in the save (they cost nothing, Req 8.6); they are only hidden once their string has fallen. (2026-11-21)
+  - Missing-clue pins sit 3 m off a walk clue, so they mark an area rather than the spot. (2026-11-21)

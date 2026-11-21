@@ -2,28 +2,35 @@
 // Final_Question, and the hint tiers. Rules live in the case systems and caseStore; this file
 // only reads them and calls store actions. The question is filled here by day and given at the altar.
 import { InfoDot } from '../theme/InfoDot'
-import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { caseOfStage } from '../../data/cases'
+import { STAGE_DAY_RULES } from '../../data/objectiveRules'
+import { usePinStore } from '../../game/state/pinStore'
 import { useCaseStore } from '../../game/state/caseStore'
 import { economy } from '../../game/state/economyPort'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { useStageStore } from '../../game/state/stageStore'
-import { earnedNotes } from '../../game/systems/caseBoard'
+import { earnedNotes, linkKey } from '../../game/systems/caseBoard'
 import {
+  boardStrings,
   curseView,
   hintRows,
   layoutCards,
   linkMessage,
+  missingCards,
   pickCard,
   questionSegments,
   stringViews,
   type Pt,
 } from './caseBoardView'
 import { ClueCard } from './ClueCard'
+import { MissingCard } from './MissingCard'
 import { RedString } from './RedString'
 
 /** Pointer travel (px) before a press becomes a drag instead of a click. */
 const DRAG_START_PX = 6
+/** How long a wrong string sags on the board before it falls away (ms). */
+const WRONG_FALL_MS = 2200
 
 interface Drag {
   id: string
@@ -42,6 +49,13 @@ export function CaseBoard() {
   const [selected, setSelected] = useState<string | null>(null)
   const [message, setMessage] = useState('')
   const [drag, setDrag] = useState<{ from: Pt; to: Pt } | null>(null)
+  // A wrong pair's string: drawn sagging, then gone (playtest 11r).
+  const [falling, setFalling] = useState<string | null>(null)
+  useEffect(() => {
+    if (!falling) return
+    const t = setTimeout(() => setFalling(null), WRONG_FALL_MS)
+    return () => clearTimeout(t)
+  }, [falling])
   const boardRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<Drag | null>(null)
   const suppressClick = useRef(false)
@@ -49,15 +63,20 @@ export function CaseBoard() {
   const found = useMemo(() => new Set(progress.found), [progress.found])
   const shown = useMemo(() => def.clues.filter((c) => found.has(c.id)), [def, found])
   const cards = useMemo(() => layoutCards(shown, def.clues), [shown, def])
-  const strings = useMemo(() => stringViews(progress.links, def, cards), [progress.links, def, cards])
+  const backs = useMemo(() => missingCards(def.clues, found, STAGE_DAY_RULES[stage]), [def, found, stage])
+  const allStrings = useMemo(() => stringViews(progress.links, def, cards), [progress.links, def, cards])
+  const strings = useMemo(() => boardStrings(allStrings, falling), [allStrings, falling])
   const notes = earnedNotes({ links: progress.links }, def)
   const curse = curseView(progress.links, def)
   const titleOf = (id: string) => def.clues.find((c) => c.id === id)?.title ?? id
   const hints = hintRows(def, progress.hints, coins, nightElapsed, economy().story())
 
   const tryLink = (a: string, b: string) => {
+    const key = linkKey(a, b)
+    const triedWrong = allStrings.some((s) => s.key === key && !s.correct)
     const r = useCaseStore.getState().link(a, b)
-    setMessage(linkMessage(titleOf, a, b, r))
+    if (r.added && !r.note) setFalling(key)
+    setMessage(linkMessage(titleOf, a, b, r, triedWrong))
   }
 
   const onPick = (id: string) => {
@@ -144,7 +163,7 @@ export function CaseBoard() {
 
       <p className="case-board__help">
         Drag from one card to another, or select a card and press Enter on a second. A solid string with ✓ is a true
-        connection; a dashed string with ✗ joins nothing yet.
+        connection; a pair that joins nothing sags with ✗ and falls away. Wrong pairs cost nothing.
       </p>
 
       <div
@@ -165,8 +184,20 @@ export function CaseBoard() {
             onPointerDown={onCardDown}
           />
         ))}
-        {shown.length === 0 && (
-          <p className="case-cork__empty">The board is bare. Clues pin themselves here as you find them.</p>
+        {/* After the real cards, so Tab reaches the clues first. */}
+        {backs.map((b) => (
+          <MissingCard
+            key={b.id}
+            view={b}
+            onPin={(v) => {
+              if (!v.pin) return
+              usePinStore.getState().place(v.pin)
+              setMessage(`Pinned on the map: ${v.pin.name}. Open the Map tab to see it.`)
+            }}
+          />
+        ))}
+        {shown.length === 0 && backs.length === 0 && (
+          <p className="case-cork__empty">No clues yet. Each face-down card says where one might be.</p>
         )}
       </div>
 

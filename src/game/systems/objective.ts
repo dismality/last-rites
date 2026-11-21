@@ -69,7 +69,7 @@ export interface ObjectiveInput {
      * Progress on the stage's day steps (`STAGE_DAY_RULES[stage]`, same order): the count shown
      * and whether the step is done. When present, the steps replace story rules 6-10 by day.
      */
-    day?: readonly { count: number; done: boolean }[]
+    day?: readonly { count: number; done: boolean; at?: readonly Vec3[] }[]
   }
 }
 
@@ -262,6 +262,16 @@ const stageDoneObjective = (
   return { main: cut(CASE_ALTAR_LINE), position: CHAPEL_ALTAR, marker: CASE_ALTAR_MARKER, why: CASE_ALTAR_WHY }
 }
 
+/**
+ * True when the stage's day work is all done and every clue is linked: the case waits only for
+ * night, so the altar may call the dusk early (playtest 11r).
+ */
+export const stageReadyForDusk = (stage: NonNullable<ObjectiveInput['stage']>): boolean => {
+  const total = stage.linksTotal
+  if (!stage.day || stage.day.length === 0 || total === undefined || !(total > 0)) return false
+  return stage.day.every((d) => d.done) && stage.curseLinks >= total
+}
+
 /** Story rules the stage day steps stand in for (6-11: keys, whistle, stair, relics, fallback). */
 const STAGE_STEP_REPLACES: readonly ObjectiveRuleId[] = [6, 7, 8, 9, 10, 11]
 
@@ -291,12 +301,16 @@ const stageDayObjective = (i: ObjectiveInput): Objective | null => {
   const rule = rules[at]
   const count = clampInt(day[at]?.count ?? 0, 0, rule.target)
   const place = rule.place
+  // A step with several things left points at the nearest one not yet done.
+  const left = day[at]?.at
   const position =
-    place.kind === 'point' || place.kind === 'area'
-      ? place.at
-      : place.kind === 'nearest'
-        ? nearest(place.at, i.playerPos)
-        : nearest(i.relicSites, i.playerPos)
+    left && left.length > 0
+      ? nearest(left, i.playerPos)
+      : place.kind === 'point' || place.kind === 'area'
+        ? place.at
+        : place.kind === 'nearest'
+          ? nearest(place.at, i.playerPos)
+          : nearest(i.relicSites, i.playerPos)
   const o: Objective = {
     rule: (6 + at) as ObjectiveRuleId,
     main: cut(count >= rule.target && rule.whenCounted ? rule.whenCounted : `${rule.main} (${count}/${rule.target})`),

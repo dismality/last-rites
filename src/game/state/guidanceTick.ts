@@ -2,8 +2,11 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
-import { caseOfStage, CASE_1_BELLS, type MinigameId } from '../../data/cases'
-import { STAGE_DAY_RULES } from '../../data/objectiveRules'
+import { crestTabletPosition, EVIDENCE_SEARCH, STAGE_DAY_RULES } from '../../data/objectiveRules'
+import { caseOfStage, CASE_1_BELLS, CASE_2_CREST_LOCK, CASE_3_BOOTS_CLUE, type EvidenceCardId, type MinigameId } from '../../data/cases'
+import { useGameStore } from './gameStore'
+import { stepAnnouncements, type StepWatch } from '../systems/stageSteps'
+import { useClueRevealStore } from './clueRevealStore'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
@@ -18,6 +21,7 @@ import { cellAt, isExplored } from '../systems/mapReveal'
 import { redirectViaStair } from '../systems/stairDescent'
 import {
   selectObjective,
+  stageReadyForDusk,
   type Objective,
   type ObjectiveInput,
   type Vec3,
@@ -137,6 +141,23 @@ const readStageInput = (): NonNullable<ObjectiveInput['stage']> => {
   }
 }
 
+/** By day in a story run, the case is ready for the altar: its bell may call the dusk early. */
+export const earlyDuskReady = (): boolean =>
+  isStoryRun() &&
+  useGameStore.getState().screen === 'game' &&
+  useWorldStore.getState().phase === 'day' &&
+  stageReadyForDusk(readStageInput())
+
+/** Announces finished steps for the current story stage; call once per guidance refresh. */
+const watchStageSteps = (story: boolean): void => {
+  // Off the game screen (title, death, a load) forget what was seen, so a Continue or a Retry
+  // never announces steps that were already done.
+  if (useGameStore.getState().screen !== 'game') return resetStepWatch()
+  if (!story) return
+  const s = useStageStore.getState()
+  announceSteps(s.stage, readStageDaySteps(s.stage))
+}
+
 /**
  * Where the stage's unfound clues are (spec 10, keeper's hunch): its walk clues not yet picked up,
  * and the station of each unsolved minigame (its stage day step's place, same order as the case's
@@ -175,24 +196,77 @@ const tickHunch = (dt: number): void => {
 }
 
 /** Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). */
-const readStageDaySteps = (stage: 1 | 2 | 3): { count: number; done: boolean }[] => {
+type DayStep = { count: number; done: boolean; at?: readonly (readonly [number, number, number])[] }
+
+const ALL_CARDS: readonly EvidenceCardId[] = Object.keys(EVIDENCE_SEARCH) as EvidenceCardId[]
+
+/**
+ * Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). A
+ * step with several things to do points at the nearest one not yet done (`at`).
+ */
+const readStageDaySteps = (stage: 1 | 2 | 3): DayStep[] => {
   const cases = useCaseStore.getState().cases
   const solved = (id: MinigameId) => caseOfStage(stage).minigames.includes(id) && cases[caseOfStage(stage).id].minigames.includes(id)
   const one = (id: MinigameId) => ({ count: solved(id) ? 1 : 0, done: solved(id) })
   if (stage === 1) {
-    const bells = cases['saved-by-the-bell'].bellsExamined.length
-    return [one('1a'), { count: solved('1b') ? 3 : Math.min(3, bells), done: solved('1b') }]
+    const examined = cases['saved-by-the-bell'].bellsExamined
+    const left = CASE_1_BELLS.filter((b) => !examined.includes(b.id)).map((b) => b.position)
+    return [
+      one('1a'),
+      { count: solved('1b') ? 3 : Math.min(3, examined.length), done: solved('1b'), ...(left.length > 0 ? { at: left } : {}) },
+    ]
   }
   if (stage === 2) {
-    // The case lies behind the Mausoleum Row gate: first its key (Pell's grave), then the gate.
+    // The case lies behind the Mausoleum Row gate: first its key (Pell's grave), then the gate,
+    // then the tablets that the crest lock needs.
     const gateOpen = useMysteryStore.getState().mystery.gates['mausoleum-row']
     const hasKey = gateOpen || useInventoryStore.getState().inventory.keyItems.includes('rusted-crypt-key')
     const flag = (done: boolean) => ({ count: done ? 1 : 0, done })
-    return [flag(hasKey), flag(gateOpen), one('2a'), one('2b'), one('2c')]
+    const read = cases['resurrection-men'].tabletsRead
+    const tablets = CASE_2_CREST_LOCK.tablets
+    const tabletsDone = solved('2a') || tablets.every((t) => read.includes(t.family))
+    const unread = tablets.filter((t) => !read.includes(t.family)).map(crestTabletPosition)
+    return [
+      flag(hasKey),
+      flag(gateOpen),
+      {
+        count: tabletsDone ? tablets.length : Math.min(tablets.length, read.length),
+        done: tabletsDone,
+        ...(unread.length > 0 ? { at: unread } : {}),
+      },
+      one('2a'),
+      one('2b'),
+      one('2c'),
+    ]
   }
   const inv = useInventoryStore.getState().inventory
   const relics = countRelics(inv.relics, useMysteryStore.getState().mystery.relics)
-  return [one('3a'), one('3b'), { count: relics, done: relics >= 5 }]
+  // Elias's evidence: the cards examined, and the dry boots through their hut clue.
+  const found = new Set<EvidenceCardId>(cases['sealed-catacombs'].evidenceFound)
+  if (useMysteryStore.getState().mystery.clues.has(CASE_3_BOOTS_CLUE)) found.add('dry-boots')
+  const cardsDone = solved('3b') || found.size >= ALL_CARDS.length
+  const missing = ALL_CARDS.filter((c) => !found.has(c)).map((c) => EVIDENCE_SEARCH[c])
+  return [
+    one('3a'),
+    { count: cardsDone ? ALL_CARDS.length : found.size, done: cardsDone, ...(missing.length > 0 ? { at: missing } : {}) },
+    one('3b'),
+    { count: relics, done: relics >= 5 },
+  ]
+}
+
+/** Last stage steps seen, so a step that finishes is announced once (`stepAnnouncements`). */
+let stepWatch: StepWatch | null = null
+
+/** Forget the steps seen (a new run, a load), so nothing is announced for what was already done. */
+export const resetStepWatch = (): void => {
+  stepWatch = null
+}
+
+const announceSteps = (stage: 1 | 2 | 3, day: readonly DayStep[]): void => {
+  const now: StepWatch = { stage, done: day.map((d) => d.done) }
+  const lines = stepAnnouncements(stepWatch, now)
+  stepWatch = now
+  for (const line of lines) useClueRevealStore.getState().revealPlain(line)
 }
 
 const sameObjective = (a: Objective | null, b: Objective): boolean =>
@@ -218,6 +292,7 @@ const digTutorialActive = (): boolean => {
 /** Recomputes the objective now; writes only on change so subscribers stay quiet. */
 export const refreshGuidance = (): void => {
   const input = readObjectiveInput()
+  watchStageSteps(input.story !== false)
   const selected = selectObjective(input)
   // Once the chapel stair is open it is the way into the catacombs, not the corridor gate.
   const via = redirectViaStair(selected.position, input.playerPos, input.progress.stairRevealed)

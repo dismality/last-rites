@@ -11,6 +11,9 @@ import {
 const SPEC_08_CAPTION_IDS: readonly CaptionId[] = [
   'thunder-close',
   'thunder-far',
+  // Playtest 11r: the dusk warnings are checked in duskWarnings.test.ts.
+  'dusk-toll',
+  'dusk-tremble',
   'merchant-arrive',
   'merchant-leave',
   'coins-collected',

@@ -4,6 +4,9 @@ import { iconUrl, type InteractRuneId, type MarkId } from '../../data/assets'
 import type { CaseDef, ClueDef, ClueIcon, FinalQuestionDef } from '../../data/cases'
 import { correctLinkCount, linkKey } from '../../game/systems/caseBoard'
 import { nextHintCost, type HintState } from '../../game/systems/caseHints'
+import { ITEM_MAP } from '../../data/items'
+import type { StageDayRule } from '../../data/objectiveRules'
+import { ZONE_CARDS } from '../../data/zoneCards'
 
 const RUNES: readonly string[] = ['pickup', 'dig', 'open', 'read', 'examine', 'nail', 'trade']
 
@@ -42,6 +45,58 @@ export function layoutCards(clues: readonly ClueDef[], all: readonly ClueDef[]):
       at: { x: 12.5 + col * 25, y: 25 + row * 50 },
       tiltDeg: TILTS[i % TILTS.length],
     }
+  })
+}
+
+/** A clue not found yet: a face-down card that says roughly where to look (playtest 11r). */
+export interface MissingCardView {
+  id: string
+  at: Pt
+  tiltDeg: number
+  /** "Somewhere in Mausoleum Row", "From: Examine the three bells". */
+  where: string
+  /** Where a map pin goes when the card is clicked; absent when there is no place to search. */
+  pin?: { x: number; z: number; name: string }
+}
+
+/** Metres a search pin sits from the clue itself, so the card points at an area, not the spot. */
+const SEARCH_PIN_OFFSET_M = 3
+
+/**
+ * Face-down cards for the case's clues not yet found, in the same grid slots their cards will
+ * take. `rules` are the stage's day steps, for the place a minigame clue comes from.
+ */
+export function missingCards(
+  all: readonly ClueDef[],
+  found: ReadonlySet<string>,
+  rules: readonly StageDayRule[],
+): MissingCardView[] {
+  const missing = all.filter((c) => !found.has(c.id))
+  return layoutCards(missing, all).map(({ clue, at, tiltDeg }) => {
+    const src = clue.found
+    const base = { id: clue.id, at, tiltDeg }
+    if (src.kind === 'walk') {
+      const zone = ZONE_CARDS[src.spot].name
+      const [x, , z] = src.position
+      return {
+        ...base,
+        where: `Somewhere in ${zone}`,
+        pin: { x: x + SEARCH_PIN_OFFSET_M, z: z - SEARCH_PIN_OFFSET_M, name: `Search: ${zone}` },
+      }
+    }
+    if (src.kind === 'minigame') {
+      const rule = rules.find((r) => r.minigame === src.id)
+      if (!rule) return { ...base, where: 'From a puzzle of this case' }
+      const p = rule.place
+      const point = p.kind === 'point' || p.kind === 'area' ? p.at : p.kind === 'nearest' ? p.at[0] : undefined
+      return {
+        ...base,
+        where: `From: ${rule.main}`,
+        ...(point ? { pin: { x: point[0], z: point[2], name: rule.marker } } : {}),
+      }
+    }
+    if (src.kind === 'purchase') return { ...base, where: 'Sold at dawn by the hearse cart' }
+    return { ...base, where: `Found with the ${ITEM_MAP[src.item].name}` }
   })
 }
 
@@ -98,11 +153,21 @@ export function linkMessage(
   a: string,
   b: string,
   r: { added: boolean; note: { text: string } | null },
+  /** The pair was tried before and joins nothing (its string fell away). */
+  triedWrong = false,
 ): string {
   const pair = `${titleOf(a)} and ${titleOf(b)}`
-  if (!r.added) return `${pair} are already joined.`
+  if (!r.added) return triedWrong ? `${pair} were tried already: they do not connect.` : `${pair} are already joined.`
   if (r.note) return `Right link: ${pair}. ${r.note.text}`
-  return `Dashed string: ${pair}. Nothing connects them yet.`
+  return `The thread slips: ${pair} do not connect. Try another pair.`
+}
+
+/**
+ * Strings to draw: every right link, and a wrong one only while it falls (playtest 11r). Wrong
+ * pairs stay in the save (they cost nothing, Req 8.6) but no longer clutter the board.
+ */
+export function boardStrings(all: readonly StringView[], falling: string | null): StringView[] {
+  return all.filter((s) => s.correct || s.key === falling)
 }
 
 export interface Segment {

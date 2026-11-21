@@ -5,7 +5,7 @@ This file checks the game against an outside review that compared Last Rites wit
 **Verdicts:**
 - **Good** means good enough to ship.
 - **Fixed** means it was fixed today.
-- **Kiro** means it's in `docs/kiro-prompt-task-chain.md`.
+- **Kiro** meant it was in `docs/kiro-prompt-task-chain.md`. Those items are all built now (2026-11-21), so that prompt is no longer needed.
 - **Skip** means it isn't worth doing before the 26 November freeze.
 
 ## The biggest problem: steps had no reason
@@ -27,8 +27,8 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
 | Benchmark | What Last Rites does now | Verdict |
 |---|---|---|
 | *Golden Idol*: clues log themselves | The clue reveal writes every clue into the journal. Reading a stone adds its rubbing to the ledger cross-check. Case cards pin themselves. | **Good** |
-| *Obra Dinn*: you know a clue is missing, and guessing is punished | The case line shows "clues n/m". A wrong altar answer brings a wave at once and 30 s of silence, and after two wrong answers you must link another pair first. But the board doesn't show *which* clue is missing or where. | Penalty **Good**; missing-clue cards **Kiro** |
-| *Dredge*: dusk felt, not read off a clock | There's a "Dusk in m:ss" countdown, fog that thickens each stage, a 30 s dusk and the weapon reminder at 2 minutes. There are no bells, birds or other world cues before dusk. | **Kiro** (bell and crow warnings) |
+| *Obra Dinn*: you know a clue is missing, and guessing is punished | The case line shows "clues n/m". A wrong altar answer brings a wave at once and 30 s of silence, and after two wrong answers you must link another pair first. But the board doesn't show *which* clue is missing or where. | Penalty **Good**; missing-clue cards **Fixed** |
+| *Dredge*: dusk felt, not read off a clock | There's a "Dusk in m:ss" countdown, fog that thickens each stage, a 30 s dusk and the weapon reminder at 2 minutes. There are no bells, birds or other world cues before dusk. | **Fixed** (far bell at 2:00, trembling graves at 0:30) |
 | *CoD Zombies*: gaps between waves | Waves never stop, but there are 15 s between them and boards can be repaired in that gap. | **Good** |
 | *Amnesia*: danger while you read | The journal pauses the game by day and keeps it running at night. Scares are held back while it's open, so they stay fair. | **Good** |
 
@@ -57,10 +57,10 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
   - Verdict: **Good**.
 - **A reward for finishing the day early.**
   - Now: none. The player waits out the clock.
-  - Verdict: **Kiro**. Ring the chapel bell to bring dusk early, for a little oil and a small score bonus.
+  - Verdict: **Fixed**. Once the day steps are done and every clue is linked, the altar's prompt becomes "Ring the bell, call the dusk now" (+150 score). No oil reward: the lantern has no refill hook to give it.
 - **The "oh no" moment at dusk.**
   - Now: the countdown and a 30 s dusk only.
-  - Verdict: **Kiro**. Toll the far bell and send the crows up at 2:00, then have the graves tremble at 0:30. All of these sounds exist already.
+  - Verdict: **Fixed**. A far bell tolls at 2:00 ("[a far bell tolls: two minutes to dusk]") and the graves tremble with a low rumble at 0:30 ("[the graves tremble: dusk is close]"). No crows: the crow calls are ambience, not a one-off sound.
 
 ### C. Night survival and deduction ("How do I fight and think?")
 - **Chokepoints.**
@@ -74,7 +74,7 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
   - Verdict: **Good**.
 - **Feedback on links.**
   - Now: a right pair gets a thick string, a ✓ and a note. A wrong pair costs nothing and says nothing.
-  - Verdict: **Kiro**. A wrong string should sag and fall, so the player knows without being told the answer.
+  - Verdict: **Fixed**. A wrong string sags with its ✗ for about a second, then falls away, and the note says "The thread slips". Trying the same pair again says it was tried already. No snap sound.
 - **The altar.**
   - Now: a wrong answer brings a wave and silence. A right one turns the dead to dust and brings the sunrise.
   - Verdict: **Good**.
@@ -88,7 +88,7 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
   - Verdict: **Good**. Named builds would be an extra.
 - **A hook for the next stage.**
   - Now: the key comes from Pell's grave, and the stage 2 objective now says so and why.
-  - Verdict: **Fixed**. Kiro adds a dawn line, "Something glints in Pell's grave."
+  - Verdict: **Fixed**. The new stage opens with "Something glints in Pell’s grave." (stage 2) or "Two cases closed. Elias’s own story is the last." (stage 3).
 
 ## 3. What keeps players playing
 
@@ -100,9 +100,10 @@ The game's main logic gap was that a step didn't say why it mattered or what it 
 | Replays | End-of-run stats, achievements, Endless and Short Vigil. There are no par times. | **Good**; par times would be an extra |
 | Clues seeded for the epilogue | Silas's receipt in stage 1, then the flyleaf and the ledger's handwriting in stage 3 | **Good** |
 
-## 4. Gaps left in the step chain (for Kiro)
+## 4. Gaps in the step chain (all fixed)
 
-- **Crest lock.** It needs the six crypt tablets, but no step tells the player to read them. Add "Read the crypt tablets (n/6)".
-- **Stage 3 evidence cards.** They aren't a step. Add "Find what happened to Elias (n/6)", with search areas.
-- **Hymn board.** It should point at the psalter in the vestry.
-- **Step completion.** Finishing a step should say what was learned, as a short reveal line, before the next objective appears.
+- **Crest lock.** Fixed: "Read the crypt tablets (n/6)" comes before the lock, pointing at the nearest unread tablet.
+- **Stage 3 evidence cards.** Fixed: "Find what happened to Elias (n/6)", a search area that moves to the nearest card not yet found.
+- **Hymn board.** Fixed: its why line names the vestry psalter.
+- **Step completion.** Fixed: each finished step shows its done line (what was learned and where it points) as a centred reveal.
+- **Missing clues.** Fixed: the case board shows a face-down card for each clue not found yet ("Somewhere in Mausoleum Row", "From: Examine the three bells"). Clicking one drops a map pin near it.

@@ -118,13 +118,14 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   await expect(page.locator('.case-notes li').first()).toContainText('signed the certificate before he had died')
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
 
-  // A wrong pair differs by shape and words: a dashed string with a cross, no note, meter unchanged.
+  // A wrong pair differs by shape and words: a dashed string with a cross that sags and falls away,
+  // no note, meter unchanged (playtest 11r).
   await dragCard(page, 'hale-fresh-flowers', 'marsh-stone-toppled')
   await expect(page.locator('.case-tag--wrong')).toHaveCount(1)
   await expect(page.locator('.case-tag--wrong')).toHaveText('✗')
   await expect(page.locator('.case-string--wrong')).toHaveCount(1)
   await expect(page.locator('.case-string--right')).toHaveCount(1)
-  await expect(page.locator('.case-note')).toContainText('Dashed string')
+  await expect(page.locator('.case-note')).toContainText('thread slips')
   await expect(page.locator('.case-notes li')).toHaveCount(1)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
   // The two strings differ in more than colour: dash pattern and stroke width.
@@ -137,6 +138,10 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   })
   expect(style.wrong.dash).not.toBe(style.right.dash)
   expect(style.wrong.width).toBeLessThan(style.right.width)
+  // Then it falls away, and trying the pair again says so.
+  await expect(page.locator('.case-string--wrong')).toHaveCount(0, { timeout: 4000 })
+  await dragCard(page, 'hale-fresh-flowers', 'marsh-stone-toppled')
+  await expect(page.locator('.case-note')).toContainText('tried already')
 
   // A second right pair by keyboard: select one card, then the other, with Enter.
   await card(page, 'ledger-no-certificates').focus()
@@ -173,7 +178,7 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   await buy.click()
   await expect(page.locator('.case-hint__text')).toHaveCount(1)
   await expect(page.locator('.case-hint__text')).toContainText('Hint 1.')
-  await expect(page.locator('.case-hints__coins')).toHaveText('Grave Coins: 7')
+  await expect(page.locator('.case-hints__coins')).toHaveText(/^Grave Coins: 7(?!\d)/)
   // Tier 2 now costs 10, which 7 coins cannot pay.
   await expect(page.getByRole('button', { name: /Reveal hint 2/ })).toBeDisabled()
   await expect(page.getByRole('button', { name: /Reveal hint 2/ })).toContainText('10 Grave Coins')
@@ -199,9 +204,9 @@ test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots 
   await expect(page.locator('.case-board')).toBeVisible()
 
   // Tab walks into the first two cards (ledger entries); Enter on each ties them. The scrollable
-  // panel may take one Tab stop first.
+  // panel and the header's info dots take Tab stops first.
   const firstCard = card(page, 'ledger-no-certificates')
-  for (let i = 0; i < 3 && !(await firstCard.evaluate((el) => el === document.activeElement)); i++) {
+  for (let i = 0; i < 10 && !(await firstCard.evaluate((el) => el === document.activeElement)); i++) {
     await page.keyboard.press('Tab')
   }
   await expect(firstCard).toBeFocused()

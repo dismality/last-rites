@@ -1,5 +1,10 @@
 # Kiro prompt: every task leads to the next
 
+> **Done outside Kiro (2026-11-21).** Everything below is built: the step chain, the done lines, the
+> stage openings, the dusk warnings, the early-dusk bell, the missing-clue cards and the falling wrong
+> strings. See `docs/workflow-audit.md` and the kiro-log entry of that date. Don't paste this into
+> Kiro; it's kept as a record.
+
 Paste everything below the line into Kiro.
 
 ---

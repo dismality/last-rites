@@ -6,6 +6,7 @@ import { OBJECTIVE_MAX_LINE } from '../../data/objectiveRules'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { buildCompassMarkers } from './compass'
 import {
+  stageReadyForDusk,
   composeSecondLine,
   formatClock,
   selectObjective,
@@ -447,30 +448,39 @@ describe('selectObjective in story stages (spec 10)', () => {
     const open = { count: 0, done: false }
     const done = { count: 1, done: true }
     // Stage 2: the Row gate's key first, as a search area, then the gate.
-    const key = st(2, [open, open, open, open, open])
+    const key = st(2, [open, open, open, open, open, open])
     expect(key.main).toBe('Find the key to the Mausoleum Row gate (0/1)')
     expect(key.areaM).toBeGreaterThan(0)
     expect(key.why).toMatch(/Pell/)
-    const gate = st(2, [done, open, open, open, open])
+    const gate = st(2, [done, open, open, open, open, open])
     expect(gate.main).toBe('Open the Mausoleum Row gate (0/1)')
     expect(gate.areaM).toBeUndefined()
-    const o = st(2, [done, done, open, open, open])
+    // Then the six tablets, pointing at the nearest one not yet read.
+    const far: [number, number, number] = [99, 0, 99]
+    const tablets = st(2, [done, done, { count: 2, done: false, at: [far, base.playerPos] }, open, open, open])
+    expect(tablets.main).toBe('Read the crypt tablets (2/6)')
+    expect(tablets.position).toEqual(base.playerPos)
+    const o = st(2, [done, done, done, open, open, open])
     expect(o.main).toBe("Open the sexton's crest lock (0/1)")
     expect(o.marker).toBe('Crest lock')
     expect(o.position).toEqual(CASE_2_CREST_LOCK.niche)
-    expect(st(2, [done, done, done, open, open]).main).toBe('Put the watch log in order (0/1)')
-    expect(st(2, [done, done, done, done, open]).main).toBe('Compare the boot prints (0/1)')
-    expect(st(2, [done, done, done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
+    expect(st(2, [done, done, done, done, open, open]).main).toBe('Put the watch log in order (0/1)')
+    expect(st(2, [done, done, done, done, done, open]).main).toBe('Compare the boot prints (0/1)')
+    expect(st(2, [done, done, done, done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
     expect(st(1, [done, { count: 2, done: false }]).main).toBe('Examine the three bells (2/3)')
     // All three examined but the cut bell not yet named: say what is left, not a stuck 3/3.
     expect(st(1, [done, { count: 3, done: false }]).main).toBe('Name the cut bell at a bell post')
-    expect(st(3, [done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
+    const evidence = st(3, [done, { count: 4, done: false }, open, open])
+    expect(evidence.main).toBe('Find what happened to Elias (4/6)')
+    expect(evidence.areaM).toBeGreaterThan(0)
+    expect(st(3, [done, done, open, open]).main).toBe("Reconstruct Elias's last night (0/1)")
+    expect(st(3, [done, done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
     // The weapon rule keeps the step on its second line; night keeps the curse line.
     const armed = selectObjective({
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, open, open, open] },
+      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, done, open, open, open] },
     })
     expect(armed.second).toBe("Open the sexton's crest lock (0/1)")
     const night = selectObjective({ ...day, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] } })
@@ -500,8 +510,19 @@ describe('selectObjective in story stages (spec 10)', () => {
     const armed = selectObjective({
       ...day,
       needsWeapon: true,
+      secondsLeft: 30,
       stage: { stage: 1, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: [done, { count: 3, done: true }] },
     })
     expect(armed.second).toBe("Link the clues in the journal's Case tab (1/5)")
+  })
+
+  it('is ready for an early dusk only with every day step done and every clue linked', () => {
+    const done = { count: 1, done: true }
+    const open = { count: 0, done: false }
+    const st = (day: { count: number; done: boolean }[], curseLinks: number) => ({ stage: 1 as const, curseLinks, altarLockedS: 0, linksTotal: 5, day })
+    expect(stageReadyForDusk(st([done, done], 5))).toBe(true)
+    expect(stageReadyForDusk(st([done, done], 4))).toBe(false)
+    expect(stageReadyForDusk(st([done, open], 5))).toBe(false)
+    expect(stageReadyForDusk({ stage: 1, curseLinks: 5, altarLockedS: 0 })).toBe(false)
   })
 })

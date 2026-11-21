@@ -16,7 +16,7 @@ export function RedString({ strings, pending }: Props) {
           <path
             key={s.key}
             d={s.path}
-            className={`case-string ${s.correct ? 'case-string--right' : 'case-string--wrong'}`}
+            className={`case-string ${s.correct ? 'case-string--right' : 'case-string--wrong case-string--falling'}`}
             vectorEffect="non-scaling-stroke"
             fill="none"
           />
@@ -35,7 +35,7 @@ export function RedString({ strings, pending }: Props) {
       {strings.map((s) => (
         <span
           key={s.key}
-          className={`case-tag ${s.correct ? 'case-tag--right' : 'case-tag--wrong'}`}
+          className={`case-tag ${s.correct ? 'case-tag--right' : 'case-tag--wrong case-tag--falling'}`}
           style={{ left: `${s.mid.x}%`, top: `${s.mid.y}%` }}
           aria-hidden="true"
         >

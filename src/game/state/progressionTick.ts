@@ -7,6 +7,8 @@ import { DAY_DURATION_S } from '../../data/balance'
 import { STAGE_COUNT } from '../../data/stages'
 import { MODES } from '../../data/modes'
 import { emit } from '../events'
+import { duskWarningsCrossed } from '../systems/duskWarnings'
+import { emitCombatSound } from './combatSounds'
 import { stepPiles } from '../systems/coins'
 import { musicLayer } from '../systems/musicLayer'
 import { currentWeights, stepMixer } from '../systems/musicMixer'
@@ -144,6 +146,21 @@ function stepMusic(dt: number): void {
   musicRuntime.stems = currentWeights(mixer)
 }
 
+/** Seconds of day left at the last step; null outside the day, so a new day starts fresh. */
+let dayLeftS: number | null = null
+
+/** The far bell and the trembling graves before dusk (src/data/duskWarnings.ts). */
+function stepDuskWarnings(): void {
+  const world = useWorldStore.getState()
+  if (world.phase !== 'day') {
+    dayLeftS = null
+    return
+  }
+  const left = deriveTickInput().dayLengthS - world.phaseTime
+  for (const w of duskWarningsCrossed(dayLeftS, left)) emitCombatSound(w.sound, undefined, w.caption)
+  dayLeftS = left
+}
+
 /** One fixed step. Returns at once when the player is taken or the sim is frozen. */
 export function progressionTick(dt: number): void {
   if (useGameStore.getState().taken || isSimFrozen()) return
@@ -157,4 +174,5 @@ export function progressionTick(dt: number): void {
   stepCoins(dt)
   stepStormRuntime(dt)
   stepMusic(dt)
+  stepDuskWarnings()
 }

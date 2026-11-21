@@ -232,6 +232,21 @@
 .case-string { stroke-linecap: round; }
 .case-string--right { stroke: var(--blood-bright); stroke-width: 3.5px; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)); }
 .case-string--wrong { stroke: #5b1a1a; stroke-width: 2px; stroke-dasharray: 7 6; }
+/* Playtest 11r: a wrong string sags, then drops away (CaseBoard clears it after 2.2 s). */
+.case-string--falling { animation: case-string-fall 2.2s ease-in forwards; }
+.case-tag--falling { animation: case-tag-fall 2.2s ease-in forwards; }
+@keyframes case-string-fall {
+  0%, 45% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(6%); }
+}
+@keyframes case-tag-fall {
+  0%, 45% { opacity: 1; translate: 0 0; }
+  100% { opacity: 0; translate: 0 2.5rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .case-string--falling, .case-tag--falling { animation: case-fade-out 2.2s linear forwards; }
+}
+@keyframes case-fade-out { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
 .case-string--pending { stroke: var(--ember-dim); stroke-width: 2px; stroke-dasharray: 2 5; }
 
 .case-tag {
@@ -251,6 +266,31 @@
 .case-tag--right { border-radius: 50%; }
 .case-tag--wrong { border-radius: 2px; }
 
+/* Playtest 11r: a clue not found yet, face down, saying roughly where to look. */
+.clue-back {
+  position: absolute;
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(var(--tilt, 0deg));
+  width: 11rem;
+  max-width: 22%;
+  min-width: 8.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.9rem 0.6rem 0.5rem;
+  text-align: left;
+  font: inherit;
+  color: var(--parchment);
+  background: repeating-linear-gradient(135deg, #3a2a1c 0 6px, #33251a 6px 12px);
+  border: 1px dashed var(--parchment-dark);
+  box-shadow: 1px 3px 6px rgba(0, 0, 0, 0.55);
+  opacity: 0.85;
+}
+button.clue-back { cursor: pointer; }
+button.clue-back:hover, button.clue-back:focus-visible { opacity: 1; outline: 2px solid var(--ember-dim); }
+.clue-back__title { font-weight: 600; }
+.clue-back__where { font-style: italic; }
+.clue-back__act { font-size: 1rem; opacity: 0.8; }
 .clue-card {
   position: absolute;
   z-index: 2;

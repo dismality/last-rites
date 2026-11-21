@@ -13,6 +13,8 @@ export interface CueFacts {
   need?: string | null
   /** Repeatable only: nothing new to do right now (stone already read, door full). */
   idle?: boolean
+  /** Replaces the action's usual verb when this use does something else (the altar's early dusk). */
+  verb?: string
 }
 
 export interface CueSettings {
@@ -58,7 +60,7 @@ export function interactionCue(
   if (facts.idle && def.idlePrompt) {
     return { targetable: true, actionable: false, prompt: def.idlePrompt, pulse: false, fade: null }
   }
-  const verb = ACTION_LABEL[def.action]
+  const verb = facts.verb ?? ACTION_LABEL[def.action]
   const base = `${keyLabel(settings.keyCode)}: ${verb}`
   return {
     targetable: true,

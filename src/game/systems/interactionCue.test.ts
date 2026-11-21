@@ -134,4 +134,12 @@ describe('fadeAlpha', () => {
       }),
     )
   })
+
+  it('a verb override names the use, and stays actionable', () => {
+    const c = interactionCue('case-altar', { usedUp: false, verb: 'Ring the bell' }, { keyCode: 'KeyE', flashingLights: false })
+    expect(c.actionable).toBe(true)
+    expect(c.prompt).toBe('E: Ring the bell')
+    // Without it the altar keeps its usual verb.
+    expect(interactionCue('case-altar', { usedUp: false }, { keyCode: 'KeyE', flashingLights: false }).prompt).not.toMatch(/Ring/)
+  })
 })

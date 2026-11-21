@@ -1,3 +1,5 @@
+import { STAGE_DAY_RULES } from '../../data/objectiveRules'
+import { caseOfStage } from '../../data/cases'
 import { describe, expect, it } from 'vitest'
 import { CASES } from '../../data/cases'
 import { linkKey } from '../../game/systems/caseBoard'
@@ -7,6 +9,8 @@ import {
   hintRows,
   layoutCards,
   linkMessage,
+  boardStrings,
+  missingCards,
   pickCard,
   questionSegments,
   stringViews,
@@ -40,7 +44,8 @@ describe('caseBoardView', () => {
   it('words right and wrong links differently', () => {
     const t = (id: string) => id
     expect(linkMessage(t, 'a', 'b', { added: true, note: { text: 'N.' } })).toContain('Right link')
-    expect(linkMessage(t, 'a', 'b', { added: true, note: null })).toContain('Dashed')
+    expect(linkMessage(t, 'a', 'b', { added: true, note: null })).toContain('thread slips')
+    expect(linkMessage(t, 'a', 'b', { added: false, note: null }, true)).toContain('tried already')
     expect(linkMessage(t, 'a', 'b', { added: false, note: null })).toContain('already')
   })
 
@@ -75,5 +80,30 @@ describe('caseBoardView', () => {
 
   it('gives every clue of every case an icon url', () => {
     for (const c of CASES) for (const k of c.clues) expect(clueIconUrl(k.icon)).toMatch(/^\/assets\/icons\//)
+  })
+
+  it('draws right strings always, and a wrong one only while it falls', () => {
+    const v = (key: string, correct: boolean) => ({ key, a: 'a', b: 'b', correct, path: '', mid: { x: 0, y: 0 } })
+    const all = [v('r', true), v('w1', false), v('w2', false)]
+    expect(boardStrings(all, null).map((s) => s.key)).toEqual(['r'])
+    expect(boardStrings(all, 'w2').map((s) => s.key)).toEqual(['r', 'w2'])
+  })
+
+  it('lays a face-down card for each clue not found, saying where to look', () => {
+    const def = caseOfStage(1)
+    const found = new Set([def.clues[0].id])
+    const backs = missingCards(def.clues, found, STAGE_DAY_RULES[1])
+    expect(backs.map((b) => b.id)).toEqual(def.clues.slice(1).map((c) => c.id))
+    for (const b of backs) expect(b.where.length).toBeGreaterThan(0)
+    // A walk clue names its zone and pins near it, never on the spot itself.
+    const walk = def.clues.find((c) => c.found.kind === 'walk' && !found.has(c.id))
+    if (walk && walk.found.kind === 'walk') {
+      const b = backs.find((x) => x.id === walk.id)!
+      expect(b.where).toMatch(/^Somewhere in /)
+      expect(b.pin).toBeDefined()
+      expect(Math.hypot(b.pin!.x - walk.found.position[0], b.pin!.z - walk.found.position[2])).toBeGreaterThan(1)
+    }
+    // Every clue found: no face-down cards.
+    expect(missingCards(def.clues, new Set(def.clues.map((c) => c.id)), STAGE_DAY_RULES[1])).toEqual([])
   })
 })

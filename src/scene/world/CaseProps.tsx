@@ -480,7 +480,10 @@ function CrestTablet({ t }: { t: CrestTabletDef }) {
         subject={t.family}
         runeHeight={0.4}
         outlineRange={6}
-        onInteract={() => useClueRevealStore.getState().revealPlain(line)}
+        onInteract={() => {
+          useCaseStore.getState().readTablet(t.family)
+          useClueRevealStore.getState().revealPlain(line)
+        }}
       >
         <mesh position={[0, 0, -0.012]}>
           <boxGeometry args={[0.6, 0.38, 0.02]} />

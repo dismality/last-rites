@@ -48,6 +48,8 @@ export interface CaseProgress {
   ledgerLines: LedgerLine[]
   /** Minigame 1b: bell posts fully examined (bell, rope and tag). Kept when the overlay closes. */
   bellsExamined: BellPostId[]
+  /** Stage 2: crypt tablets read on the Row (family names). Kept like a found clue. */
+  tabletsRead: string[]
   /** Minigame 2a: the crest each of the four dials shows (null: not yet turned). Kept when the overlay closes. */
   crestDials: (CrestId | null)[]
   /** Minigame 2b: the torn log pages as arranged, earliest first. Kept when the overlay closes. */
@@ -103,6 +105,7 @@ export function freshProgress(id: CaseId): CaseProgress {
     hints: { revealed: 0 },
     ledgerLines: [],
     bellsExamined: [],
+    tabletsRead: [],
     crestDials: emptyCrestDials(),
     watchLog: [],
     hymnTiles: emptyHymnTiles(),
@@ -189,6 +192,10 @@ function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
       id === 'saved-by-the-bell'
         ? (uniq(strings(raw.bellsExamined).filter((x) => CASE_1_BELLS.some((b) => b.id === x))) as BellPostId[])
         : [],
+    tabletsRead:
+      id === 'resurrection-men'
+        ? uniq(strings(raw.tabletsRead).filter((x) => CASE_2_CREST_LOCK.tablets.some((t) => t.family === x)))
+        : [],
     crestDials: id === 'resurrection-men' ? sanitizeCrestDials(raw.crestDials) : emptyCrestDials(),
     watchLog: id === 'resurrection-men' ? sanitizeWatchLog(raw.watchLog) : [],
     hymnTiles: id === 'sealed-catacombs' ? sanitizeHymnTiles(raw.hymnTiles) : emptyHymnTiles(),
@@ -234,6 +241,7 @@ export function mergeRetry(snapshot: CaseSave, current: CaseSave): CaseSave {
       ledgerLines: c.ledgerLines.length >= s.ledgerLines.length ? c.ledgerLines : s.ledgerLines,
       // A post already examined stays examined, like a found clue.
       bellsExamined: union(s.bellsExamined, c.bellsExamined),
+      tabletsRead: union(s.tabletsRead, c.tabletsRead),
       // Dials and pages: the draft the player touched most recently is never older than the snapshot's.
       crestDials: c.crestDials.filter(Boolean).length >= s.crestDials.filter(Boolean).length ? c.crestDials : s.crestDials,
       watchLog: c.watchLog.length >= s.watchLog.length ? c.watchLog : s.watchLog,

@@ -70,6 +70,8 @@ interface CaseStoreState extends CaseSave {
   setTimeline: (order: readonly EvidenceCardId[]) => void
   /** Minigame 1b: record a bell post as fully examined (bell, rope and tag read). */
   examineBell: (id: BellPostId) => void
+  /** Stage 2: record a crypt tablet as read (by family). */
+  readTablet: (family: string) => void
   /** Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. */
   giveAnswer: () => AnswerOutcome
   /**
@@ -169,6 +171,10 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
 
   setLedgerLines: (lines) => patchProgress(set, 'saved-by-the-bell', (p) => ({ ...p, ledgerLines: lines })),
 
+  readTablet: (family) =>
+    patchProgress(set, 'resurrection-men', (p) =>
+      p.tabletsRead.includes(family) ? p : { ...p, tabletsRead: [...p.tabletsRead, family] },
+    ),
   examineBell: (id) =>
     patchProgress(set, 'saved-by-the-bell', (p) =>
       p.bellsExamined.includes(id) ? p : { ...p, bellsExamined: [...p.bellsExamined, id] },

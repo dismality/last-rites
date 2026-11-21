@@ -11,6 +11,8 @@
 import { DOORS } from '../../data/barricades'
 import type { EvidenceCardId } from '../../data/cases'
 import { GATE_DEFS } from '../../data/gateHints'
+import { EARLY_DUSK_VERB } from '../../data/objectiveRules'
+import { earlyDuskReady } from './guidanceTick'
 import type { InteractableKind } from '../../data/interactables'
 import { ITEM_MAP } from '../../data/items'
 import { TOMBSTONE_MAP, type TombstoneId } from '../../data/tombstones'
@@ -111,6 +113,8 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
     case 'altar-whistle':
       return { usedUp: useMysteryStore.getState().mystery.gates.catacombs }
     case 'case-altar':
+      // By day with the case ready, the altar's bell calls the dusk early (playtest 11r).
+      if (earlyDuskReady()) return { usedUp: false, verb: EARLY_DUSK_VERB }
       // Only night takes an answer; the other phases show the quiet prompt (Req 3.5).
       return { usedUp: false, idle: useWorldStore.getState().phase !== 'night' }
     case 'weapon-pickup': {

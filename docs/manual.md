@@ -74,12 +74,15 @@ The game has **three stages**. Each stage is one day, one night and a dawn.
 ## 5. Solving a case
 
 1. **Find clues.** Read gravestones, examine objects and pick up papers. Each clue becomes a pinned card in your journal (**J**, the **Case** tab).
-2. **Solve the puzzles.** Some clues open small puzzles, such as checking records against the stones. The objective tells you where to go next.
+   - A clue you haven't found yet shows as a **face-down card** saying roughly where to look. Click it to drop a map pin there.
+2. **Solve the puzzles.** Some clues open small puzzles, such as checking records against the stones. The objective tells you where to go next, and the italic line under it tells you why. When a step is done, a short line says what you learned.
 3. **Link the evidence.** On the case board, join two cards that belong together with **red string**. Drag from one card to the other, or select one card, then the other, and press Enter.
    - **A right pair** gets a solid string, a ✓ tag and a short note, and it lowers the **Curse meter**.
-   - **A wrong pair** costs nothing.
+   - **A wrong pair** costs nothing. Its string sags and falls away.
 4. **Fill in the answer.** The final question sits at the bottom of the board as a sentence with blanks. You can fill it in at any time.
 5. **Give the answer at the altar.** Go to the chapel altar **at night** and press **E**.
+   - Done early? Once every step is finished and every clue is linked, the altar's bell can **call the dusk now** for a small score bonus.
+   - Listen for the warnings: a far bell tolls two minutes before dusk, and the graves tremble at thirty seconds.
    - **Right:** the waves stop, the dead fall to dust and the sun rises.
    - **Wrong:** a wave arrives at once and the altar falls silent for 30 seconds. After two wrong answers, you must link one more pair of clues before trying again.
 

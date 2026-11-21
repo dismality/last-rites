@@ -48,6 +48,8 @@ export type CaptionId =
   | 'boss-rise'
   | 'congregation'
   | 'toll'
+  | 'dusk-toll'
+  | 'dusk-tremble'
   | 'boss-death'
   | 'thunder-close'
   | 'thunder-far'
@@ -142,10 +144,14 @@ export const CAPTIONS: readonly CaptionDef[] = [
     minSeconds: 1.5,
   },
   { id: 'toll', event: 'toll', text: '[a great bell tolls]', minSeconds: 2.5 },
+  // Playtest 11r: the day's two warnings before dusk (src/data/duskWarnings.ts).
+  { id: 'dusk-toll', event: 'toll', text: '[a far bell tolls: two minutes to dusk]', minSeconds: 3.5 },
   { id: 'boss-death', event: 'boss-death', text: 'Forgive them. Not me.', minSeconds: 3 },
   // Spec 08. Thunder lasts a few seconds, so its caption stays 3 s (Req 10.9).
   { id: 'thunder-close', event: 'thunder-close', text: '[thunder]', minSeconds: 3 },
   { id: 'thunder-far', event: 'thunder-far', text: '[thunder]', minSeconds: 3 },
+  // Playtest 11r: the dusk warning's tremble (after the storm's own line, which stays the default).
+  { id: 'dusk-tremble', event: 'thunder-far', text: '[the graves tremble: dusk is close]', minSeconds: 3.5 },
   {
     id: 'merchant-arrive',
     event: 'merchant-arrive',
