@@ -32,3 +32,8 @@ __pycache__/
 
 # Raw audio downloads (tools/audio/generate.mjs); the converted .ogg files are what the game uses.
 tools/audio/raw/
+
+# Demo video working files (voice-over downloads, recorded clips, renders)
+tools/video/raw/
+tools/video/clips/
+tools/video/out/
