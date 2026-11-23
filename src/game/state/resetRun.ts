@@ -7,6 +7,7 @@
 //   CUSTOM_RESETS    stores that need their own reset action
 //   KEPT_STORES      not run state, with the reason
 
+import { useNarrationStore } from './narrationStore'
 import { gasRuntime } from '../../scene/effects/gasRuntime'
 import { graveBurstRuntime } from '../../scene/effects/graveBurstRuntime'
 import { meleeRuntime } from '../../scene/player/meleeRuntime'
@@ -80,6 +81,7 @@ interface Resettable {
 /** Replaced wholesale with their initial state. */
 export const REPLACED_STORES = [
   useBatStore,
+  useNarrationStore,
   useCreatureStore,
   useVendingStore,
   useScreenScareStore,

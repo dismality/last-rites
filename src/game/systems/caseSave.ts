@@ -30,7 +30,7 @@ export interface LedgerLine {
   flag: LedgerFlagKind | null
 }
 
-const FLAG_KINDS: readonly LedgerFlagKind[] = ['date', 'plot', 'certificate']
+const FLAG_KINDS: readonly LedgerFlagKind[] = ['date', 'plot', 'cause']
 
 /** One case's progress. Found clues, links and solved minigames are what Retry keeps. */
 export interface CaseProgress {
@@ -48,6 +48,8 @@ export interface CaseProgress {
   ledgerLines: LedgerLine[]
   /** Minigame 1b: bell posts fully examined (bell, rope and tag). Kept when the overlay closes. */
   bellsExamined: BellPostId[]
+  /** Case 1: the stones read at the graves (stone ids), so the ledger can show what they say. */
+  stonesRead: string[]
   /** Stage 2: crypt tablets read on the Row (family names). Kept like a found clue. */
   tabletsRead: string[]
   /** Minigame 2a: the crest each of the four dials shows (null: not yet turned). Kept when the overlay closes. */
@@ -105,6 +107,7 @@ export function freshProgress(id: CaseId): CaseProgress {
     hints: { revealed: 0 },
     ledgerLines: [],
     bellsExamined: [],
+    stonesRead: [],
     tabletsRead: [],
     crestDials: emptyCrestDials(),
     watchLog: [],
@@ -192,6 +195,8 @@ function sanitizeProgress(raw: unknown, id: CaseId): CaseProgress {
       id === 'saved-by-the-bell'
         ? (uniq(strings(raw.bellsExamined).filter((x) => CASE_1_BELLS.some((b) => b.id === x))) as BellPostId[])
         : [],
+    stonesRead:
+      id === 'saved-by-the-bell' ? uniq(strings(raw.stonesRead).filter((x) => CASE_1_STONES.some((st) => st.id === x))) : [],
     tabletsRead:
       id === 'resurrection-men'
         ? uniq(strings(raw.tabletsRead).filter((x) => CASE_2_CREST_LOCK.tablets.some((t) => t.family === x)))
@@ -241,6 +246,7 @@ export function mergeRetry(snapshot: CaseSave, current: CaseSave): CaseSave {
       ledgerLines: c.ledgerLines.length >= s.ledgerLines.length ? c.ledgerLines : s.ledgerLines,
       // A post already examined stays examined, like a found clue.
       bellsExamined: union(s.bellsExamined, c.bellsExamined),
+      stonesRead: union(s.stonesRead, c.stonesRead),
       tabletsRead: union(s.tabletsRead, c.tabletsRead),
       // Dials and pages: the draft the player touched most recently is never older than the snapshot's.
       crestDials: c.crestDials.filter(Boolean).length >= s.crestDials.filter(Boolean).length ? c.crestDials : s.crestDials,

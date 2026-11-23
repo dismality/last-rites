@@ -26,6 +26,7 @@ import {
   type ClueDef,
 } from './cases'
 import { ITEM_MAP } from './items'
+import { checkTypedAnswer } from '../game/systems/caseAnswer'
 import { CAPTIONS } from './captions'
 import { HYMN_BOARD_NUMBERS } from './chapelScenery'
 import { JOURNAL_PAGE_MAP } from './journal'
@@ -77,11 +78,12 @@ describe('case data', () => {
     for (const id of ids) expect(id).toMatch(/^[a-z]+(-[a-z]+)*$/)
   })
 
-  it('has 3 hint tiers at 5, 10 and 20 coins and a 3 to 5 sentence closed page', () => {
+  it('has 3 hint tiers at 5, 10 and 20 coins and a 3 to 6 sentence closed page', () => {
     for (const c of CASES) {
       expect(c.hints.map((h) => h.cost)).toEqual([...HINT_COSTS])
       expect(c.closedPage.length).toBeGreaterThanOrEqual(3)
-      expect(c.closedPage.length).toBeLessThanOrEqual(5)
+      // Case 1's page is the keeper's write-up, ending on what it proves (playtest story pass).
+      expect(c.closedPage.length).toBeLessThanOrEqual(6)
       expect(c.closedPage).toBe(CLOSED_CASE_PAGES[c.id])
       expect(c.curseSteps).toBeGreaterThan(0)
     }
@@ -108,6 +110,11 @@ describe('Property 18: case data is internally consistent', () => {
   it('every answer is among its slot options and matches the slot count', () => {
     for (const c of CASES) {
       for (const q of [c.final, ...(c.accusation ? [c.accusation] : [])]) {
+        if (q.typed) {
+          expect(q.slots).toHaveLength(0)
+          expect(q.typed.accept.length).toBeGreaterThan(0)
+          continue
+        }
         expect(q.answer.length).toBe(q.slots.length)
         const holes = (q.template.match(/\{\d+\}/g) ?? []).length
         expect(holes).toBe(q.slots.length)
@@ -151,7 +158,7 @@ describe('case 1 minigame data', () => {
       const found = [
         e.date !== s.date ? 'date' : null,
         e.plot !== s.plot ? 'plot' : null,
-        e.certificate ? null : 'certificate',
+        s.cause !== undefined && s.cause !== e.cause ? 'cause' : null,
       ].filter(Boolean)
       expect(found, s.id).toEqual(s.mismatch ? [s.mismatch] : [])
     }
@@ -165,14 +172,20 @@ describe('case 1 minigame data', () => {
       CASE_1_RIGHT_FLAGS.map((f) => f.stoneId).sort(),
     )
     const cond = Object.fromEntries(CASE_1_BELLS.map((b) => [b.stone, b.condition]))
-    expect(cond).toEqual({ pell: 'rope-cut', ames: 'rusted-solid', hale: 'intact' })
+    expect(cond).toEqual({ pell: 'rope-cut', ames: 'intact', hale: 'intact' })
     const clueIds = new Set(
       c1.clues.filter((k) => k.found.kind === 'minigame' && k.found.id === '1b').map((k) => k.id),
     )
     for (const b of CASE_1_BELLS) if (b.clueId) expect(clueIds.has(b.clueId)).toBe(true)
     const pell = CASE_1_BELLS.find((b) => b.stone === 'pell')!
-    expect(pell.tag).toContain('12 March')
-    expect(CASE_1_LEDGER.find((e) => e.id === 'l-pell')?.date).toBe('1862-03-13')
+    // The tag is signed by J. Vane on the ledger's false date, a day before the stone's.
+    expect(pell.tag).toContain('11 March')
+    expect(pell.tag).toContain('J. Vane')
+    expect(CASE_1_LEDGER.find((e) => e.id === 'l-pell')?.date).toBe('1862-03-11')
+    for (const f of CASE_1_RIGHT_FLAGS) {
+      const stone = CASE_1_STONES.find((x) => x.id === f.stoneId)!
+      expect(CASE_1_LEDGER.find((e) => e.id === stone.ledgerId)?.amendedBy, f.stoneId).toBe('J.V.')
+    }
   })
   it("hides the key in Pell's grave and the red herrings stand by their stones", () => {
     expect(CASE_1_REWARD.stone).toBe('pell')
@@ -191,10 +204,15 @@ describe('case 1 minigame data', () => {
       }
     }
   })
-  it('answers Pell with the cut rope and the early certificate', () => {
-    expect(c1.final.answer[0]).toBe("Pell's grave")
-    expect(c1.final.answer[1]).toContain('rope was cut')
-    expect(c1.final.answer[1]).toContain('certificate was signed before')
+  it('asks who silenced Pell, typed, and takes Josiah Vane in any case or spelling', () => {
+    expect(c1.final.template).toBe('Who silenced John Pell?')
+    expect(c1.final.slots).toHaveLength(0)
+    for (const said of ['Josiah Vane', 'josiah vane', 'J. Vane', 'jv', ' JOSIAH  VANE ', 'the undertaker', 'Mr. Vane']) {
+      expect(checkTypedAnswer(c1.final, said), said).toBe(true)
+    }
+    for (const said of ['', 'Pell', 'Silas Vane', 'Elias Thorne', 'the sexton']) {
+      expect(checkTypedAnswer(c1.final, said), said).toBe(false)
+    }
   })
 })
 
@@ -322,7 +340,8 @@ describe("Property 17: every answer's clues are reachable", () => {
   })
 
   it('every needed clue is linked by at least one note and every minigame yields a clue', () => {
-    for (const c of CASES) {
+    // Case 1 has no board links: its journal asks one question instead.
+    for (const c of CASES.filter((x) => x.notes.length > 0)) {
       const linked = new Set(c.notes.flatMap((n) => [n.a, n.b]))
       for (const clue of c.clues.filter((k) => !k.redHerring)) {
         expect(linked.has(clue.id), `${c.id}/${clue.id}`).toBe(true)

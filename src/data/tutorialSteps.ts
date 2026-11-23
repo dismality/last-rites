@@ -61,7 +61,7 @@ export const TUTORIAL_STEPS: readonly TutorialStepDef[] = [
   },
   { id: 7, action: 'openJournal', template: '{Journal} opens the journal and map' },
   // Spec 10 Req 10.5: the Case tab holds the cork board the three cases are solved on.
-  { id: 8, action: 'openCaseTab', template: 'Open the Case tab in the journal to pin clues together' },
+  { id: 8, action: 'openCaseTab', template: 'Open the Case board in the journal to join clues together' },
 ]
 
 /** The one item whose pickup finishes step 2 (spec 09, B4). */

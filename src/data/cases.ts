@@ -16,10 +16,10 @@ export type MinigameId = '1a' | '1b' | '2a' | '2b' | '2c' | '3a' | '3b'
 
 /** Clue ids are kebab-case literals, one union per case. */
 export type Case1ClueId =
-  | 'ledger-no-certificates'
+  | 'ledger-wrong-cause'
   | 'ledger-date-mismatch'
   | 'pell-rope-cut'
-  | 'ames-bell-rusted'
+  | 'two-bells-ring'
   | 'pell-tag-early'
   | 'hale-fresh-flowers'
   | 'marsh-stone-toppled'
@@ -64,6 +64,11 @@ export interface DeductionNote {
   a: ClueId
   b: ClueId
   text: string
+  /**
+   * The case board asks this about card `a`; the answer is card `b` (playtest: free linking was
+   * guesswork). It must not name `b`'s title.
+   */
+  question?: string
 }
 
 export interface FinalSlotDef {
@@ -78,6 +83,12 @@ export interface FinalQuestionDef {
   answer: readonly string[]
   /** The Stage 3 accusation does not affect the win. */
   optional?: boolean
+  /**
+   * Typed at the altar instead of chosen (playtest: options gave the answer away). `template` is
+   * then the whole question, `slots` and `answer` are empty, and any of these forms is right.
+   * Matching ignores case, spaces and punctuation (`normalizeAnswer` in caseAnswer.ts).
+   */
+  typed?: { accept: readonly string[] }
 }
 
 export interface HintTierDef {
@@ -111,7 +122,7 @@ export const HINT_COSTS = [5, 10, 20] as const
 
 // ---- Case 1 minigame data (spec 10 task 3.1) ----
 
-export type LedgerFlagKind = 'date' | 'plot' | 'certificate'
+export type LedgerFlagKind = 'date' | 'plot' | 'cause'
 
 /** One line of the parish register page on the hut shelf (minigame 1a, left page). */
 export interface LedgerEntryDef {
@@ -124,6 +135,8 @@ export interface LedgerEntryDef {
   doctor: string
   /** False when the line cites no death certificate. */
   certificate: boolean
+  /** Initials written in the margin beside a line that was changed after the burial. */
+  amendedBy?: string
 }
 
 /** A readable stone (minigame 1a, right page: the rubbing). */
@@ -132,6 +145,8 @@ export interface StoneRubbingDef {
   name: string
   date: string
   plot: string
+  /** What the stone says took them, when it says. */
+  cause?: string
   /** The ledger line this stone belongs to. */
   ledgerId: string
   /** Where the stone stands. The four old stones reuse `tombstones.ts`; the two new ones are guesses. */
@@ -142,7 +157,7 @@ export interface StoneRubbingDef {
 
 export type BellPostId = 'bell-pell' | 'bell-hale' | 'bell-ames'
 
-export type BellCondition = 'rope-cut' | 'rusted-solid' | 'intact'
+export type BellCondition = 'rope-cut' | 'intact'
 
 /** A safety-bell post at a candidate grave (minigame 1b). */
 export interface BellPostDef {
@@ -163,7 +178,7 @@ export interface BellPostDef {
 export const LEDGER_WRONG_FLAG_MESSAGE = 'These two agree'
 
 /** Shown when the wrong post is named as the cut bell (requirement 13.4). */
-export const BELL_WRONG_POST_MESSAGE = 'That rope is sound. Look again at the others.'
+export const BELL_WRONG_POST_MESSAGE = 'That bell rang when you pulled it. Which one stayed silent?'
 
 export const CASE_1_LEDGER: readonly LedgerEntryDef[] = [
   {
@@ -183,15 +198,17 @@ export const CASE_1_LEDGER: readonly LedgerEntryDef[] = [
     cause: 'Cholera',
     doctor: 'Dr. Pryor',
     certificate: true,
+    amendedBy: 'J.V.',
   },
   {
     id: 'l-ames',
     name: 'Esther Ames',
     date: '1849-11-07',
     plot: 'Grounds, east row 1',
-    cause: 'Fever',
+    cause: 'A fall',
     doctor: 'Dr. Pryor',
-    certificate: false,
+    certificate: true,
+    amendedBy: 'J.V.',
   },
   {
     id: 'l-corbet',
@@ -232,11 +249,12 @@ export const CASE_1_LEDGER: readonly LedgerEntryDef[] = [
   {
     id: 'l-pell',
     name: 'John Pell, sexton',
-    date: '1862-03-13',
+    date: '1862-03-11',
     plot: 'Grounds, north row 3',
     cause: 'Apoplexy',
     doctor: 'Dr. Lisle',
     certificate: true,
+    amendedBy: 'J.V.',
   },
 ]
 
@@ -254,6 +272,7 @@ export const CASE_1_STONES: readonly StoneRubbingDef[] = [
     name: 'Tobias Hale',
     date: '1849-11-05',
     plot: 'Grounds, west row 1',
+    cause: 'Cholera',
     ledgerId: 'l-hale',
     position: [-14.6, 0, -15.8],
     mismatch: 'plot',
@@ -263,15 +282,17 @@ export const CASE_1_STONES: readonly StoneRubbingDef[] = [
     name: 'Esther Ames',
     date: '1849-11-07',
     plot: 'Grounds, east row 1',
+    cause: 'Fever',
     ledgerId: 'l-ames',
     position: [16.4, 0, -22.6],
-    mismatch: 'certificate',
+    mismatch: 'cause',
   },
   {
     id: 'pell',
     name: 'John Pell',
     date: '1862-03-12',
     plot: 'Grounds, north row 3',
+    cause: 'Apoplexy',
     ledgerId: 'l-pell',
     position: [-8.4, 0, -22.4],
     mismatch: 'date',
@@ -298,7 +319,7 @@ export const CASE_1_STONES: readonly StoneRubbingDef[] = [
 /** The three flags that narrow the case to three graves. */
 export const CASE_1_RIGHT_FLAGS: readonly { stoneId: string; kind: LedgerFlagKind }[] = [
   { stoneId: 'pell', kind: 'date' },
-  { stoneId: 'ames', kind: 'certificate' },
+  { stoneId: 'ames', kind: 'cause' },
   { stoneId: 'hale', kind: 'plot' },
 ]
 
@@ -308,9 +329,9 @@ export const CASE_1_BELLS: readonly BellPostDef[] = [
     id: 'bell-pell',
     stone: 'pell',
     position: [-7.2, 0, -22.4],
-    rope: 'The rope ends in a clean slant, cut by a blade, and the cord above is still sound.',
-    bell: 'The bell turns freely and is bright where the hand has worn it.',
-    tag: 'Certificate signed 12 March 1862, the day before the ledger says he died.',
+    rope: 'The cord ends in a clean slant, cut by a blade. It hangs loose and pulls nothing.',
+    bell: 'The bell is sound, but with the cord cut it can never ring.',
+    tag: 'Death certificate signed 11 March 1862 by J. Vane, Undertaker. His stone says he died on the 12th.',
     condition: 'rope-cut',
     clueId: 'pell-rope-cut',
     tagClueId: 'pell-tag-early',
@@ -321,18 +342,18 @@ export const CASE_1_BELLS: readonly BellPostDef[] = [
     position: [-15.8, 0, -15.8],
     rope: 'The rope is whole, a little green with damp.',
     bell: 'The bell rings clear when turned.',
-    tag: 'Certificate signed 5 November 1849, the day of death.',
+    tag: 'Death certificate signed 5 November 1849 by Dr. Pryor, the day of death.',
     condition: 'intact',
   },
   {
     id: 'bell-ames',
     stone: 'ames',
     position: [17.6, 0, -22.6],
-    rope: 'The rope is whole but stiff.',
-    bell: 'The bell is rusted solid. The clapper will not move.',
-    tag: 'No certificate is tied here.',
-    condition: 'rusted-solid',
-    clueId: 'ames-bell-rusted',
+    rope: 'The cord is whole, a little stiff.',
+    bell: 'The bell rings clear when the cord is pulled.',
+    tag: 'Death certificate signed 7 November 1849 by Dr. Pryor, the day of death.',
+    condition: 'intact',
+    clueId: 'two-bells-ring',
   },
 ]
 
@@ -574,41 +595,41 @@ const CASE_1: CaseDef = {
   title: 'Saved by the Bell',
   clues: [
     {
-      id: 'ledger-no-certificates',
-      title: 'No certificate',
-      line: 'A burial the ledger lists, with no certificate to match.',
+      id: 'ledger-wrong-cause',
+      title: 'Altered entries',
+      line: 'Pell, Ames and Hale: three ledger entries changed in fresh ink, each initialled J.V.',
       icon: 'read',
       redHerring: false,
       found: { kind: 'minigame', id: '1a' },
     },
     {
       id: 'ledger-date-mismatch',
-      title: 'Wrong date',
-      line: 'The stone and the ledger disagree on the day.',
+      title: 'Dead a day early',
+      line: "The ledger has John Pell dead on the 11th. His own stone says the 12th.",
       icon: 'read',
       redHerring: false,
       found: { kind: 'minigame', id: '1a' },
     },
     {
       id: 'pell-rope-cut',
-      title: 'The cut rope',
-      line: 'The bell rope at Pell is cut clean, by a knife and not by rot.',
+      title: 'The cut cord',
+      line: "Pell's bell cord is cut clean, by a knife. His is the only bell that cannot ring.",
       icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '1b' },
     },
     {
-      id: 'ames-bell-rusted',
-      title: 'The rusted bell',
-      line: 'The Ames bell is rusted solid. It never rang.',
+      id: 'two-bells-ring',
+      title: 'Two bells ring',
+      line: 'The bells of Esther Ames and Tobias Hale both ring. Only Pell was silenced.',
       icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '1b' },
     },
     {
       id: 'pell-tag-early',
-      title: 'The hasty tag',
-      line: 'The tag on the Pell bell gives a date before the ledger says he died.',
+      title: 'Signed J. Vane',
+      line: "Pell's certificate was signed on the 11th by J. Vane, the undertaker: a day before he died.",
       icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '1b' },
@@ -630,66 +651,21 @@ const CASE_1: CaseDef = {
       found: { kind: 'walk', spot: 'grounds', position: [-10.4, 0, -17.4] },
     },
   ],
-  notes: [
-    {
-      a: 'ledger-no-certificates',
-      b: 'ledger-date-mismatch',
-      text: 'Two entries in the same hand, and neither fits the stones.',
-    },
-    {
-      a: 'pell-rope-cut',
-      b: 'ames-bell-rusted',
-      text: 'One bell was cut, one never could ring. Only one grave was meant to be silenced.',
-    },
-    {
-      a: 'pell-rope-cut',
-      b: 'pell-tag-early',
-      text: 'Someone cut the rope and signed the certificate before he had died.',
-    },
-    {
-      a: 'ledger-no-certificates',
-      b: 'ames-bell-rusted',
-      text: 'No certificate and a bell that cannot ring: a careless burial, not a plotted one.',
-    },
-    {
-      a: 'ledger-date-mismatch',
-      b: 'pell-tag-early',
-      text: 'The tag date is a day before the ledger date. The ledger was written to cover it.',
-    },
-  ],
+  // No board links in Case 1: the journal asks which bell was cut instead (playtest).
+  notes: [],
   minigames: ['1a', '1b'],
   final: {
-    template: 'The one buried alive lies in {0} because {1}.',
-    slots: [
-      {
-        label: 'Grave',
-        options: ["Pell's grave", "Hale's grave", "Ames's grave", "Marsh's grave"],
-      },
-      {
-        label: 'Reason',
-        options: [
-          'the bell rope was cut and the certificate was signed before the death',
-          'fresh flowers show she was still visited',
-          'the stone fell in the frost',
-          'the bell was rusted solid',
-        ],
-      },
-    ],
-    answer: [
-      "Pell's grave",
-      'the bell rope was cut and the certificate was signed before the death',
-    ],
+    template: 'Who silenced John Pell?',
+    slots: [],
+    answer: [],
+    typed: {
+      accept: ['Josiah Vane', 'J. Vane', 'J.V.', 'Vane', 'Josiah', 'Mr Vane', 'the undertaker', 'Josiah Vane, the undertaker'],
+    },
   },
   hints: [
-    {
-      cost: 5,
-      text: 'Look at the cards from the ledger and the bells. The flowers and the stone do not matter.',
-    },
-    { cost: 10, text: 'Find the grave where the rope was cut and the date is wrong by a day.' },
-    {
-      cost: 20,
-      text: "Pell's grave: the rope was cut, and the certificate was signed before the death.",
-    },
+    { cost: 5, text: 'Read the stones of Pell, Ames and Hale, then check each one against its ledger entry.' },
+    { cost: 10, text: 'Pull the three bell cords. Only one bell stayed silent, and its tag is signed.' },
+    { cost: 20, text: "The tag on Pell's cut cord is signed J. Vane: Josiah Vane, the undertaker." },
   ],
   closedPage: CLOSED_CASE_PAGES['saved-by-the-bell'],
   curseSteps: DEFAULT_CURSE_STEPS,
@@ -755,16 +731,19 @@ const CASE_2: CaseDef = {
       a: 'watch-log-gap',
       b: 'sexton-watch-ledger',
       text: 'The ledger puts the lodge keeper on watch in that gap.',
+      question: 'Nothing was logged for two hours. Which record says whose watch it was?',
     },
     {
       a: 'boot-print-match',
       b: 'watch-log-gap',
       text: 'The boots at the grave belong to the man whose watch went quiet.',
+      question: 'The boots at the grave match one man. What shows his watch went quiet that night?',
     },
     {
       a: 'surgeon-receipt',
       b: 'boot-print-match',
       text: 'The one who was paid is the one who left the prints.',
+      question: 'Someone was paid for "subjects". What puts that man at the robbed grave?',
     },
   ],
   minigames: ['2a', '2b', '2c'],
@@ -1153,21 +1132,25 @@ const CASE_3: CaseDef = {
       a: 'vane-ledger-flyleaf',
       b: 'vane-receipt',
       text: 'The same careful hand: father and son.',
+      question: 'The flyleaf names Josiah Vane, in a careful hand. What else is written in that hand?',
     },
     {
       a: 'elias-unsent-letter',
       b: 'vane-ledger-flyleaf',
       text: '"The undertaker\'s family" is the Vane family.',
+      question: 'Elias wrote of "the undertaker\'s family". Which clue names the undertaker?',
     },
     {
       a: 'hearse-cart-ruts',
       b: 'hearse-pin-hasp',
       text: 'A hearse cart came and went, and the pin that held the door came from it.',
+      question: 'A hearse cart came the night Elias vanished. What did it leave at the crypt door?',
     },
     {
       a: 'hymn-letters-below',
       b: 'elias-unsent-letter',
       text: 'What was hidden below, Elias wrote of before he was sealed in.',
+      question: 'The hymns spell BELOW. Who wrote about what was hidden below?',
     },
   ],
   minigames: ['3a', '3b'],
@@ -1248,7 +1231,7 @@ export interface DeadNameDef {
  * Case 2, Elias's letter in Case 3). The strangers are in no evidence, so they can never be named.
  */
 export const DEAD_NAMES: readonly DeadNameDef[] = [
-  { name: 'Esther Ames', stage: 2, clues: ['ames-bell-rusted', 'watch-log-gap'] },
+  { name: 'Esther Ames', stage: 2, clues: ['two-bells-ring', 'watch-log-gap'] },
   { name: 'John Pell', stage: 2, clues: ['pell-rope-cut', 'pell-tag-early'] },
   { name: 'Tobias Hale', stage: 2, clues: ['hale-fresh-flowers'] },
   { name: 'Marsh', stage: 2, clues: ['marsh-stone-toppled'] },

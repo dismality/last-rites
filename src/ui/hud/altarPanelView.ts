@@ -20,7 +20,7 @@ export function clock(totalSeconds: number): string {
 export const DAY_MESSAGE = 'The curse does not stir by day. Answers are given at the altar, at night.'
 export const EARLY_MESSAGE = 'The altar answers only at night. Wait for the bell, then come back.'
 export const LINK_MESSAGE =
-  'The altar wants more than a guess. Link one more clue on the case board (Journal, Case tab), then answer again.'
+  'The altar wants more than a guess. Link one more clue on the case board (Journal, Case board tab), then answer again.'
 export const READY_MESSAGE = 'Check each blank, then give your answer. A wrong one wakes the dead.'
 
 export function altarStatus(altar: AltarState, now: number, phase: Phase, links: number): AltarStatus {

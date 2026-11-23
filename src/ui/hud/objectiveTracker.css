@@ -18,6 +18,15 @@
   margin: 0;
 }
 
+.hud-objective__goal {
+  margin: 0 0 2px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ember, #e8913a);
+}
+
 .hud-objective__main {
   display: block;
   font-family: var(--font-heading);

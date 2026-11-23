@@ -1,0 +1,74 @@
+.keeper-say {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: min(760px, calc(100vw - 32px));
+  display: flex;
+  justify-content: center;
+  /* Above every overlay (minigames 236, journal, altar), so the keeper is heard over them. */
+  z-index: 400;
+  pointer-events: none;
+}
+
+.keeper-say__line {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 10px 16px 12px;
+  border: 1px solid rgba(214, 196, 160, 0.35);
+  border-left: 3px solid var(--parchment, #d8c9a8);
+  background: rgba(8, 6, 4, 0.82);
+  color: var(--parchment, #d8c9a8);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.keeper-say__who {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.keeper-say__text {
+  font-family: var(--font-body);
+  font-size: 21px;
+  line-height: 1.35;
+  font-style: italic;
+  animation: keeper-say-in 0.35s ease-out;
+}
+
+.keeper-say__more {
+  align-self: flex-end;
+  font-size: 18px;
+  opacity: 0.6;
+}
+
+@keyframes keeper-say-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .keeper-say__text {
+    animation: none;
+  }
+}
+
+@media (max-height: 640px) {
+  .keeper-say__text {
+    font-size: 18px;
+  }
+}

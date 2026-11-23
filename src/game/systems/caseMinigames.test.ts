@@ -37,7 +37,7 @@ const rightFlags = (): LedgerFlagInput[] =>
     ledgerId: CASE_1_STONES.find((s) => s.id === r.stoneId)!.ledgerId,
   }))
 
-const kinds: LedgerFlagKind[] = ['date', 'plot', 'certificate']
+const kinds: LedgerFlagKind[] = ['date', 'plot', 'cause']
 const postIds: BellPostId[] = CASE_1_BELLS.map((p) => p.id)
 const cutId = CASE_1_BELLS.find((p) => p.condition === 'rope-cut')!.id
 
@@ -91,7 +91,7 @@ describe('ledgerFlags (1a)', () => {
 describe('bellPosts (1b)', () => {
   it('pins the cut rope, the rusted bell and the early tag once all posts are examined', () => {
     expect(bellClues(postIds).sort()).toEqual(
-      ['ames-bell-rusted', 'pell-rope-cut', 'pell-tag-early'].sort(),
+      ['two-bells-ring', 'pell-rope-cut', 'pell-tag-early'].sort(),
     )
   })
 

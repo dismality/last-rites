@@ -134,3 +134,33 @@
   background: var(--ink);
   padding: 0 4px;
 }
+
+/* Developer mode chip: under the compass, out of the way of the objective and the hotbar. */
+.dev-skip-chip {
+  position: fixed;
+  top: 104px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 4px 10px;
+  font: 12px/1.4 system-ui, sans-serif;
+  color: #e8e2d4;
+  background: rgba(20, 18, 16, 0.72);
+  border: 1px solid rgba(232, 145, 58, 0.55);
+  border-radius: 4px;
+  pointer-events: none;
+}
+.dev-skip-chip kbd {
+  font: inherit;
+  padding: 0 4px;
+  border: 1px solid rgba(232, 226, 212, 0.5);
+  border-radius: 3px;
+}
+.dev-skip-chip strong {
+  color: #f0b070;
+  font-weight: 600;
+}

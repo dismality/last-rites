@@ -38,6 +38,7 @@ type BooleanKey =
   | 'plainJournalFont'
   | 'lowGraphics'
   | 'showInfoDots'
+  | 'developerMode'
 
 const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'damageNumbers',
@@ -54,6 +55,7 @@ const BOOLEAN_KEYS: readonly BooleanKey[] = [
   'plainJournalFont',
   'lowGraphics',
   'showInfoDots',
+  'developerMode',
 ]
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -82,6 +84,7 @@ export const DEFAULT_SETTINGS: Settings = {
   plainJournalFont: false,
   lowGraphics: false,
   showInfoDots: true,
+  developerMode: false,
   bindings: {
     MoveForward: 'KeyW',
     MoveBackward: 'KeyS',

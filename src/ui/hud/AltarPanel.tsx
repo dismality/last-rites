@@ -3,8 +3,16 @@
 // Answer button that calls `caseStore.giveAnswer`. It never freezes the world: at night the dead
 // keep coming while the player answers. It owns Esc (closes) like the workbench does.
 // Reads stores and calls actions only; the rules are in the systems and `altarPanelView`.
-import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react'
 import { caseOfStage } from '../../data/cases'
+import { CLOSED_CASE_PAGES } from '../../data/caseText'
+import { HandwrittenPage } from '../journal/HandwrittenPage'
 import { useCaseStore } from '../../game/state/caseStore'
 import { useGameStore } from '../../game/state/gameStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
@@ -16,7 +24,10 @@ import { RitePanelBody } from './RitePanel'
 import { altarStatus, verdictMessage } from './altarPanelView'
 import './altarPanel.css'
 
-const FOCUSABLE = 'select, button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+/** The ready line for a typed answer: there are no blanks to check. */
+const TYPED_READY = 'Type the name, then give your answer. A wrong one wakes the dead.'
+
+const FOCUSABLE = 'input, select, button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
 
 function AltarPanelBody({ onClose }: { onClose: () => void }) {
   const stage = useStageStore((s) => s.stage)
@@ -25,13 +36,22 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
   const altar = useStageStore((s) => s.altar)
   // Quarter-second steps keep the countdown live without a render on every fixed step. Rounded up,
   // so the clock never runs behind the store and a fresh 30 s lock never reads "0:31".
-  const now = useStageStore((s) => Math.ceil(s.nightElapsed * 4) / 4)
+  const stepped = useStageStore((s) => Math.ceil(s.nightElapsed * 4) / 4)
+  // Rounding up must not open the altar early: until the store's lock has really run out, the
+  // panel stays locked (playtest e2e: "ready" showed for a moment while Answer was still refused).
+  const unlocked = useStageStore((s) => s.nightElapsed >= s.altar.lockedUntil)
+  const now = unlocked ? stepped : Math.min(stepped, altar.lockedUntil - 1e-3)
   const solved = useStageStore((s) => s.caseSolved)
   const phase = useWorldStore((s) => s.phase)
   const [result, setResult] = useState('')
+  const [typed, setTyped] = useState('')
+  const typedQuestion = def.final.typed !== undefined
   const root = useRef<HTMLDivElement>(null)
 
-  const links = useMemo(() => correctLinkCount({ links: progress.links }, def), [progress.links, def])
+  const links = useMemo(
+    () => correctLinkCount({ links: progress.links }, def),
+    [progress.links, def],
+  )
   const status = altarStatus(altar, now, phase, links)
 
   // Focus the first blank so the keyboard works at once.
@@ -39,10 +59,11 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
     root.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus()
   }, [])
 
-  // The case is solved: the sequence takes over, so the panel steps out of the way.
+  // The case is solved: the sequence takes over, so the panel steps out of the way. A typed case
+  // (Case 1) first writes up what the keeper worked out, and closes when the player is done reading.
   useEffect(() => {
-    if (solved) onClose()
-  }, [solved, onClose])
+    if (solved && !typedQuestion) onClose()
+  }, [solved, typedQuestion, onClose])
 
   // Esc closes the panel and goes no further; capture phase so the pause trigger never sees it.
   useEffect(() => {
@@ -72,8 +93,8 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
   }
 
   const answer = () => {
-    const verdict = useCaseStore.getState().giveAnswer()
-    setResult(verdictMessage(verdict) ?? '')
+    const verdict = useCaseStore.getState().giveAnswer(typed)
+    setResult(verdict.kind === 'incomplete' && typedQuestion ? 'Type a name before you answer.' : (verdictMessage(verdict) ?? ''))
   }
 
   return (
@@ -90,50 +111,96 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
         </h2>
         <p className="altar-panel__case">{def.title}</p>
 
-        <p className="altar-panel__sentence">
-          {questionSegments(def.final).map((seg, i) => {
-            if (seg.kind === 'text') return <span key={i}>{seg.text}</span>
-            const slot = seg.slot ?? 0
-            const slotDef = def.final.slots[slot]
-            return (
-              <select
-                key={i}
-                className="altar-panel__slot"
-                aria-label={`${slotDef.label}, blank ${slot + 1} of ${def.final.slots.length}`}
-                value={progress.slots[slot] ?? ''}
-                onChange={(e) => useCaseStore.getState().fillSlot(slot, e.target.value || null)}
+        {solved && typedQuestion ? (
+          <div className="altar-panel__summary">
+            <p className="altar-panel__summary-head">
+              ✦ The altar holds the name. The keeper writes it down:
+            </p>
+            <HandwrittenPage lines={CLOSED_CASE_PAGES[def.id]} className="altar-panel__hand" />
+            <div className="altar-panel__actions">
+              <button type="button" className="altar-panel__btn" onClick={onClose}>
+                Close (Esc)
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            {typedQuestion ? (
+              <form
+                className="altar-panel__typed"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  answer()
+                }}
               >
-                <option value="">(empty)</option>
-                {slotDef.options.map((o) => (
-                  <option key={o} value={o}>
-                    {o}
-                  </option>
-                ))}
-              </select>
-            )
-          })}
-        </p>
+                <label className="altar-panel__sentence" htmlFor="altar-typed">
+                  {def.final.template}
+                </label>
+                <input
+                  id="altar-typed"
+                  className="altar-panel__input"
+                  type="text"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="Type the name"
+                  value={typed}
+                  onChange={(e) => setTyped(e.target.value)}
+                />
+              </form>
+            ) : (
+              <p className="altar-panel__sentence">
+                {questionSegments(def.final).map((seg, i) => {
+                  if (seg.kind === 'text') return <span key={i}>{seg.text}</span>
+                  const slot = seg.slot ?? 0
+                  const slotDef = def.final.slots[slot]
+                  return (
+                    <select
+                      key={i}
+                      className="altar-panel__slot"
+                      aria-label={`${slotDef.label}, blank ${slot + 1} of ${def.final.slots.length}`}
+                      value={progress.slots[slot] ?? ''}
+                      onChange={(e) =>
+                        useCaseStore.getState().fillSlot(slot, e.target.value || null)
+                      }
+                    >
+                      <option value="">(empty)</option>
+                      {slotDef.options.map((o) => (
+                        <option key={o} value={o}>
+                          {o}
+                        </option>
+                      ))}
+                    </select>
+                  )
+                })}
+              </p>
+            )}
 
-        {/* The state is words and a mark, never colour alone. */}
-        <p className="altar-panel__status" role="status" aria-live="polite">
-          <span className="altar-panel__mark" aria-hidden="true">
-            {status.kind === 'ready' ? '✦' : status.kind === 'locked' ? '⌛' : '✕'}
-          </span>
-          {status.text}
-        </p>
-        <p className="altar-panel__result" role="status" aria-live="assertive">
-          {result}
-        </p>
-        <p className="altar-panel__count">Wrong answers on this case: {altar.wrong}</p>
+            {/* The state is words and a mark, never colour alone. */}
+            <p className="altar-panel__status" role="status" aria-live="polite">
+              <span className="altar-panel__mark" aria-hidden="true">
+                {status.kind === 'ready' ? '✦' : status.kind === 'locked' ? '⌛' : '✕'}
+              </span>
+              {status.kind === 'ready' && typedQuestion ? TYPED_READY : status.text}
+            </p>
+            <p className="altar-panel__result" role="status" aria-live="assertive">
+              {result}
+            </p>
+            <p className="altar-panel__count">Wrong answers on this case: {altar.wrong}</p>
 
-        <div className="altar-panel__actions">
-          <button type="button" className="altar-panel__btn" onClick={answer}>
-            Answer
-          </button>
-          <button type="button" className="altar-panel__btn altar-panel__btn--quiet" onClick={onClose}>
-            Step back (Esc)
-          </button>
-        </div>
+            <div className="altar-panel__actions">
+              <button type="button" className="altar-panel__btn" onClick={answer}>
+                Answer
+              </button>
+              <button
+                type="button"
+                className="altar-panel__btn altar-panel__btn--quiet"
+                onClick={onClose}
+              >
+                Step back (Esc)
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

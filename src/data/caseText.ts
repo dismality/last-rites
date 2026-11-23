@@ -5,11 +5,14 @@
 import type { CaseId } from './stages'
 
 export const CLOSED_CASE_PAGES: Readonly<Record<CaseId, readonly string[]>> = {
+  // Case 1 is the keeper's own write-up: it writes itself across the page when the case is solved.
   'saved-by-the-bell': [
-    'In the nineteenth century many people feared being buried before they were truly dead.',
-    'Inventors sold safety coffins with a bell on a rope, so that anyone who woke below could call for help.',
-    'Pell was laid down on a certificate signed before the hour of his death, and the rope that might have saved him was cut.',
-    'The keeper heard what the bell never rang, and the curse lets the first night go.',
+    'The ledger says John Pell died on the 11th of March. His own stone says the 12th.',
+    'His bell cord was cut clean, and his was the only one: the bells of Esther Ames and Tobias Hale both ring.',
+    'His death certificate was signed on the 11th by J. Vane, the undertaker, while he was still alive.',
+    'Josiah Vane signed John Pell dead a day early, rewrote the ledger to match, and cut the cord so no one would hear him ring.',
+    'He changed the entries for Esther Ames and Tobias Hale too, to hide Pell among them.',
+    'What this proves: Elias found it first. The Vanes bury people who know too much.',
   ],
   'resurrection-men': [
     'Anatomy schools needed bodies, and the law gave them far too few.',

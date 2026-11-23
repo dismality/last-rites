@@ -3,7 +3,13 @@ import { useGameStore, useWorldStore } from '../../game/state'
 import { isMenuOpen, isSimFrozen, resumeGame, setDawnPickProbe } from '../../game/state/menuState'
 import { useOverlayStore } from '../../game/state/overlayStore'
 import { useEndingStore } from '../../game/state/endingStore'
-import { handlePauseKey, handlePointerLockLost, lockChangeLosesLock } from './usePauseTriggers'
+import {
+  ESC_CLOSE_GRACE_MS,
+  handlePauseKey,
+  handlePointerLockLost,
+  lockChangeLosesLock,
+  noteEscClosed,
+} from './usePauseTriggers'
 
 beforeEach(() => {
   useGameStore.getState().setPaused(false)
@@ -38,6 +44,15 @@ describe('pause triggers with 08 overlays', () => {
     useOverlayStore.setState({ merchantOpen: false })
     handlePointerLockLost()
     expect(useGameStore.getState().paused).toBe(true)
+  })
+
+  it('a lock lost just after Esc closed a puzzle does not pause; a later loss does', () => {
+    noteEscClosed(10_000)
+    handlePointerLockLost(10_000 + ESC_CLOSE_GRACE_MS - 100)
+    expect(useGameStore.getState().paused).toBe(false)
+    handlePointerLockLost(10_000 + ESC_CLOSE_GRACE_MS + 100)
+    expect(useGameStore.getState().paused).toBe(true)
+    noteEscClosed(-1e12)
   })
 
   it('pointer-lock loss on the ending screen does not pause (startEnding frees the cursor)', () => {

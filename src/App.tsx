@@ -29,6 +29,7 @@ import { Journal } from './ui/journal/Journal'
 import { BigMap } from './ui/map/BigMap'
 import { AltarPanel } from './ui/hud/AltarPanel'
 import { MinigameHost } from './ui/minigames/MinigameHost'
+import { KeeperNarration } from './ui/hud/KeeperNarration'
 import { TombstoneOverlay } from './ui/tombstone/TombstoneOverlay'
 import { Satchel } from './ui/satchel/Satchel'
 import { HotbarWheel } from './ui/satchel/HotbarWheel'
@@ -204,6 +205,7 @@ export default function App() {
       <MinigameHost />
       <Satchel />
       <HotbarWheel />
+      <KeeperNarration />
       {/* Last, so the item name shows above every overlay that lists items. */}
       <ItemNameLabel />
     </>

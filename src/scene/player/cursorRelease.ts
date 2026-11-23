@@ -53,7 +53,10 @@ export function useCursorRelease(): void {
       requestLock(canvasEl())
     }
 
-    const onGesture = () => {
+    const onGesture = (e: Event) => {
+      // Esc is never a relock gesture: a lock taken during the Esc that closed a puzzle is let go
+      // again by the browser at once, and that loss read as a pause. The next click or key relocks.
+      if ((e as KeyboardEvent).code === 'Escape') return
       lastGesture = performance.now()
       if (pendingRelock) relock()
     }

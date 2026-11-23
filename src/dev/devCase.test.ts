@@ -63,13 +63,16 @@ describe('solveCurrentMinigame', () => {
 
 describe('linkClues and giveClue', () => {
   it('links a deduction pair once both clues are found', () => {
-    const n = case1.notes[0]
+    // Case 1 has no links (its journal asks one question); Case 2 does.
+    useStageStore.setState({ stage: 2 })
+    const case2 = CASE_MAP['resurrection-men']
+    const n = case2.notes[0]
     expect(linkClues(n.a, n.b)).toContain('Could not')
     giveClue(n.a)
     giveClue(n.b)
     expect(giveClue(n.a)).toContain('already')
     expect(linkClues(n.a, n.b)).toContain('Linked')
-    expect(useCaseStore.getState().cases[case1.id].links).toHaveLength(1)
+    expect(useCaseStore.getState().cases[case2.id].links).toHaveLength(1)
   })
 })
 

@@ -45,6 +45,7 @@ const settingsArb: fc.Arbitrary<Settings> = fc.record({
   plainJournalFont: fc.boolean(),
   lowGraphics: fc.boolean(),
   showInfoDots: fc.boolean(),
+  developerMode: fc.boolean(),
   bindings: fc.constant({ ...DEFAULT_SETTINGS.bindings }),
 })
 
@@ -108,6 +109,11 @@ describe('settings persistence', () => {
       }),
       { numRuns: 100 },
     )
+  })
+
+  it('defaults developer mode off and treats an invalid value as off', () => {
+    expect(DEFAULT_SETTINGS.developerMode).toBe(false)
+    expect(loadSettings(memoryStorage(JSON.stringify({ developerMode: 'yes' }))).developerMode).toBe(false)
   })
 
   it('defaults showInfoDots on and treats a missing or invalid value as on', () => {

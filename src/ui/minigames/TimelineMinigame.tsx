@@ -129,9 +129,9 @@ export function TimelineMinigame() {
     <MinigameShell id="3b" title="Elias's Last Night" captions={captions} result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="timeline__intro">
-          Six things tell how Elias spent his last night. Put them in order, from midnight to dawn. Drag a card,
-          or use Left and Right to choose one, Space to lift it, Left and Right to move it, Space to set it
-          down, and Enter to judge. You hold {order.length} of {SLOTS}.
+          <strong>Drag the six cards into the order of Elias&apos;s last night, midnight to dawn.</strong> You hold{' '}
+          {order.length} of {SLOTS}.
+          <span className="minigame-shell__sr"> Keyboard: Left and Right choose a card, Space lifts and sets it down, Enter judges.</span>
         </p>
 
         <div className="timeline__ends" aria-hidden="true">
@@ -231,7 +231,7 @@ export function TimelineMinigame() {
             Later
           </button>
           <button type="button" className="timeline__act" tabIndex={-1} disabled={solved} onClick={confirm}>
-            Judge the night (Enter)
+            Judge the night
           </button>
         </div>
 

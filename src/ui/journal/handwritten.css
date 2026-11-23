@@ -1,0 +1,17 @@
+.handwritten { position: relative; font-family: var(--font-journal, var(--font-body)); font-size: 1.2rem; line-height: 1.65; cursor: default; }
+.handwritten__line { margin: 0 0 0.45rem; }
+.handwritten__pen { display: inline-block; margin-left: 1px; opacity: 0.7; animation: handwritten-blink 0.8s steps(2) infinite; }
+.handwritten__skip {
+  margin-top: 0.25rem;
+  padding: 0.2rem 0.7rem;
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+@keyframes handwritten-blink { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .handwritten__pen { animation: none; } }

@@ -70,10 +70,15 @@ interface CaseStoreState extends CaseSave {
   setTimeline: (order: readonly EvidenceCardId[]) => void
   /** Minigame 1b: record a bell post as fully examined (bell, rope and tag read). */
   examineBell: (id: BellPostId) => void
+  /** Case 1: record a stone as read at its grave. */
+  readStone: (id: string) => void
   /** Stage 2: record a crypt tablet as read (by family). */
   readTablet: (family: string) => void
-  /** Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. */
-  giveAnswer: () => AnswerOutcome
+  /**
+   * Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. A typed
+   * question (Case 1) takes the player's words as `typed`.
+   */
+  giveAnswer: (typed?: string) => AnswerOutcome
   /**
    * A relic placed in the wrong slot of the rite (Req 17.3): the altar judges it as a wrong
    * answer, so the 30 s lock, the instant wave, the link rule and Sharp Eye all apply.
@@ -171,6 +176,9 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
 
   setLedgerLines: (lines) => patchProgress(set, 'saved-by-the-bell', (p) => ({ ...p, ledgerLines: lines })),
 
+  readStone: (id) =>
+    patchProgress(set, 'saved-by-the-bell', (p) => (p.stonesRead.includes(id) ? p : { ...p, stonesRead: [...p.stonesRead, id] })),
+
   readTablet: (family) =>
     patchProgress(set, 'resurrection-men', (p) =>
       p.tabletsRead.includes(family) ? p : { ...p, tabletsRead: [...p.tabletsRead, family] },
@@ -189,14 +197,14 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     return verdict
   },
 
-  giveAnswer: () => {
+  giveAnswer: (typed = '') => {
     const def = activeCase()
     // Stage 3's answer is the rite itself (relic placement, `riteStore`); a filled slot sheet
     // must never solve it around Father Crane.
     if (def.id === 'sealed-catacombs') return { kind: 'incomplete' }
     const p = get().cases[def.id]
-    if (!isAnswerComplete(def.final, p.slots)) return { kind: 'incomplete' }
-    const correct = checkFinalAnswer(def, p.slots)
+    if (!isAnswerComplete(def.final, p.slots, typed)) return { kind: 'incomplete' }
+    const correct = checkFinalAnswer(def, p.slots, typed)
     const links = correctLinkCount({ links: p.links }, def)
     const verdict = useStageStore.getState().giveAltarAnswer(correct, links, 'case')
     // Only a real wrong answer counts against Sharp Eye; a locked or day answer was never judged.

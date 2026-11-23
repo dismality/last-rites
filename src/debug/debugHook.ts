@@ -45,11 +45,15 @@ import { triggerScreenScare } from '../game/state/screenScareActions'
 import { screenScareRuntime, useScreenScareStore } from '../game/state/screenScareStore'
 import { useKillCamStore } from '../game/state/killCamStore'
 import { simClock } from '../game/state/simClock'
-import { caseOfStage } from '../data/cases'
+import { caseOfStage, type BellPostId } from '../data/cases'
+import type { TombstoneId } from '../data/tombstones'
+import { useTombstoneStore } from '../game/state/tombstoneStore'
 import { RITE_ORDER } from '../data/relics'
 import { useAccusationStore } from '../game/state/accusationStore'
 import { useRiteStore } from '../game/state/riteStore'
 import { useCaseStore } from '../game/state/caseStore'
+import { answerCutBell, pullBellCord } from '../game/state/case1Story'
+import { useNarrationStore } from '../game/state/narrationStore'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
 import { createRng, deriveSeed } from '../game/rng'
@@ -258,7 +262,14 @@ export const api = {
     count: number
     lastStartS: number | null
     now: number
-    held: { enemy: string; pull: boolean; holdS: number; shake: boolean; closeUp: boolean; stinger: string | null } | null
+    held: {
+      enemy: string
+      pull: boolean
+      holdS: number
+      shake: boolean
+      closeUp: boolean
+      stinger: string | null
+    } | null
     edge: string | null
     fov: number | null
   } {
@@ -280,7 +291,11 @@ export const api = {
   /** Keeper's hunch: seconds of day play since the last clue and the clue the flame leans to. */
   hunch(): { sinceClueS: number; found: number; target: string | null; at: number[] | null } {
     const h = useHunchStore.getState()
-    return { ...h.clock, target: h.target?.id ?? null, at: h.target ? [...h.target.position] : null }
+    return {
+      ...h.clock,
+      target: h.target?.id ?? null,
+      at: h.target ? [...h.target.position] : null,
+    }
   },
   /** As if `seconds` of day play had passed without a clue. */
   skipHunch(seconds: number): void {
@@ -314,7 +329,9 @@ export const api = {
    */
   holdZombies(uids: readonly string[], seconds = 60): void {
     const store = useEnemyStore.getState()
-    store.setEnemies(store.enemies.map((e) => (uids.includes(e.uid) ? { ...e, stagger: seconds } : e)))
+    store.setEnemies(
+      store.enemies.map((e) => (uids.includes(e.uid) ? { ...e, stagger: seconds } : e)),
+    )
   },
   /** Removes the named zombies (a clean frame for screenshot differencing). */
   removeZombies(uids: readonly string[]): void {
@@ -415,6 +432,24 @@ export const api = {
   linkClues(a: string, b: string): string {
     return linkClues(a, b)
   },
+  /** Case 1: read a tombstone as E does (opens the rubbing, then closes it). */
+  readStone(id: TombstoneId): void {
+    useTombstoneStore.getState().open(id)
+    useTombstoneStore.getState().close()
+  },
+  /** Case 1: pull a bell post's cord as E does (no sound in tests). */
+  pullBell(id: BellPostId): void {
+    pullBellCord(id)
+  },
+  /** Case 1: the journal's "Which bell was cut?". */
+  answerCutBell(id: BellPostId): string {
+    return answerCutBell(id).kind
+  },
+  /** What the keeper is saying now, and everything said this run. */
+  narration(): { now: string | null; heard: string[] } {
+    const n = useNarrationStore.getState()
+    return { now: n.queue[0] ?? null, heard: [...n.heard] }
+  },
   /** Spec 11 H6: the vending machine as the panel sees it (stock, visible rows, open flag, last purchase). */
   vendingState(): {
     open: boolean
@@ -461,7 +496,8 @@ export const api = {
     return {
       equipped,
       grip: handsRuntime.grip,
-      gripExpected: equipped !== null && equipped in GRIP_TABLE ? gripFor(equipped as GripWeaponId) : null,
+      gripExpected:
+        equipped !== null && equipped in GRIP_TABLE ? gripFor(equipped as GripWeaponId) : null,
       lanternMode: hand.mode,
       acting: hand.acting,
       shotgunEquipped: hand.shotgunEquipped,
@@ -493,7 +529,12 @@ export const api = {
     shadowAutoUpdate: boolean
   } {
     const l = useLanternStore.getState()
-    return { on: l.on, fuel: l.fuel, ...lanternLightRuntime, spotPosition: [...lanternLightRuntime.spotPosition] }
+    return {
+      on: l.on,
+      fuel: l.fuel,
+      ...lanternLightRuntime,
+      spotPosition: [...lanternLightRuntime.spotPosition],
+    }
   },
   /** Spec 11 H4: the bats as the step sees them (phase, box and head yaw per bat, chitter clock). */
   batState(): {
@@ -534,7 +575,15 @@ export const api = {
     seededNight: number | null
     simTime: number
     crawlers: { id: string; phase: string; x: number; z: number; wave: boolean }[]
-    bride: { alive: boolean; x: number; z: number; returnIn: number; visible: boolean; dim: number; bend: number }
+    bride: {
+      alive: boolean
+      x: number
+      z: number
+      returnIn: number
+      visible: boolean
+      dim: number
+      bend: number
+    }
     packs: { id: string; size: number; hounds: { x: number; z: number }[] }[]
     seen: string[]
   } {
@@ -542,7 +591,13 @@ export const api = {
     return {
       seededNight: s.seededNight,
       simTime: s.simTime,
-      crawlers: s.crawlers.map((e) => ({ id: e.id, phase: e.c.phase, x: e.c.x, z: e.c.z, wave: e.wave })),
+      crawlers: s.crawlers.map((e) => ({
+        id: e.id,
+        phase: e.c.phase,
+        x: e.c.x,
+        z: e.c.z,
+        wave: e.wave,
+      })),
       bride: {
         alive: s.bride.alive,
         x: s.bride.x,
@@ -580,7 +635,13 @@ export const api = {
     const origin = { x: p.position[0], z: p.position[2] }
     const dir = forwardFromYaw(p.yaw)
     if (mode === 'light' || mode === 'heavy' || mode === 'sabre') {
-      return meleeCreatures(origin, dir, damage, mode !== 'light', mode === 'sabre' ? 'silver-sabre' : 'other')
+      return meleeCreatures(
+        origin,
+        dir,
+        damage,
+        mode !== 'light',
+        mode === 'sabre' ? 'silver-sabre' : 'other',
+      )
     }
     const r = shotCreatures(origin, dir, damage, mode === 'lead' ? 'lead' : 'blessed-rounds')
     return r ? [r] : []
@@ -602,7 +663,11 @@ export const api = {
    * Spec 11 task 8.5: each zombie's look. `look` is the pure `lookIndex(uid)`; `meshes` lists the
    * meshes in its model with their own visible flag, or null while no model is in the scene.
    */
-  zombieLooks(): { uid: string; look: number; meshes: { name: string; visible: boolean }[] | null }[] {
+  zombieLooks(): {
+    uid: string
+    look: number
+    meshes: { name: string; visible: boolean }[] | null
+  }[] {
     const root = bodyRuntime.scene
     return useEnemyStore.getState().enemies.map((e) => {
       const group: THREE.Object3D | undefined = root?.getObjectByName(`zombie-${e.uid}`)
@@ -733,7 +798,12 @@ export const api = {
     queueTeleport({ position: [x, y, z], yaw, pitch })
   },
   /** Where the Rapier body (feet) and the camera really are, or null when no rig is mounted. */
-  body(): { feet: [number, number, number]; camera: [number, number, number]; yaw: number; pitch: number } | null {
+  body(): {
+    feet: [number, number, number]
+    camera: [number, number, number]
+    yaw: number
+    pitch: number
+  } | null {
     const { body, camera } = bodyRuntime
     if (!body || !camera) return null
     const t = body.translation()
@@ -759,11 +829,19 @@ export const api = {
     scareRuntime.forced.push(id)
   },
   /** Sets Scare intensity or Subtitles through the real store action. */
-  setScareSetting(key: 'scareIntensity' | 'jumpscares' | 'subtitles', value: 'full' | 'reduced' | 'off' | boolean): void {
+  setScareSetting(
+    key: 'scareIntensity' | 'jumpscares' | 'subtitles',
+    value: 'full' | 'reduced' | 'off' | boolean,
+  ): void {
     useSettingsStore.getState().setSetting(key, value as never)
   },
   /** Scare effect values the scene reads: shake clock, lantern flicker, strobe flag and hand slow. */
-  scareFx(): { shakeAge: number | null; flickerLeft: number; flickerStrobe: boolean; slowLeft: number } {
+  scareFx(): {
+    shakeAge: number | null
+    flickerLeft: number
+    flickerStrobe: boolean
+    slowLeft: number
+  } {
     return {
       shakeAge: Number.isFinite(scareRuntime.shakeAge) ? scareRuntime.shakeAge : null,
       flickerLeft: scareRuntime.flickerLeft,
@@ -783,7 +861,11 @@ export const api = {
     world.colliders.forEach((c) => {
       const t = c.translation()
       const dist = Math.hypot(t.x - x, t.z - z)
-      const s = c.shape as unknown as { halfExtents?: { x: number; y: number; z: number }; radius?: number; halfHeight?: number }
+      const s = c.shape as unknown as {
+        halfExtents?: { x: number; y: number; z: number }
+        radius?: number
+        halfHeight?: number
+      }
       // Big boxes (ground, fences, boundaries) reach the point from far away: use the box edge.
       const reach = s.halfExtents ? Math.max(s.halfExtents.x, s.halfExtents.z) : (s.radius ?? 0)
       if (dist - reach > radius) return
@@ -902,7 +984,11 @@ export const api = {
    * named ancestor, with how many of them also cast shadows (drawn again per shadow pass). For the
    * draw-call budget (spec 09 task 11n-e); dev only.
    */
-  drawCensus(): { total: number; shadowCasters: number; groups: { name: string; meshes: number; casters: number }[] } | null {
+  drawCensus(): {
+    total: number
+    shadowCasters: number
+    groups: { name: string; meshes: number; casters: number }[]
+  } | null {
     const root = bodyRuntime.scene
     const camera = bodyRuntime.camera
     if (!root || !camera) return null
@@ -1095,7 +1181,15 @@ export const api = {
   },
   /** Sets one boolean or numeric setting through the real store action (saved like in the Settings menu). */
   setSetting(
-    key: 'showMinimap' | 'showPinsInWorld' | 'showControlHints' | 'plainJournalFont' | 'lowGraphics' | 'flashingLights' | 'cameraShake' | 'showInfoDots',
+    key:
+      | 'showMinimap'
+      | 'showPinsInWorld'
+      | 'showControlHints'
+      | 'plainJournalFont'
+      | 'lowGraphics'
+      | 'flashingLights'
+      | 'cameraShake'
+      | 'showInfoDots',
     value: boolean,
   ): void {
     useSettingsStore.getState().setSetting(key, value)
@@ -1115,9 +1209,17 @@ export const api = {
     return bellRuntime.meshAngle
   },
   /** The map pins, whether the big map is open, and how many pin beacons are in the scene. */
-  mapPins(): { pins: Array<{ slot: number; x: number; z: number; name: string }>; mapOpen: boolean; beacons: number } {
+  mapPins(): {
+    pins: Array<{ slot: number; x: number; z: number; name: string }>
+    mapOpen: boolean
+    beacons: number
+  } {
     const pins = usePinStore.getState().pins.map((p) => ({ ...p }))
-    return { pins, mapOpen: useGameStore.getState().mapOpen, beacons: [1, 2, 3].filter((s) => api.meshesUnder(`pin-beacon-${s}`) > 0).length }
+    return {
+      pins,
+      mapOpen: useGameStore.getState().mapOpen,
+      beacons: [1, 2, 3].filter((s) => api.meshesUnder(`pin-beacon-${s}`) > 0).length,
+    }
   },
   /** Places a pin through the real store action (the browser spec clicks the map for the main path). */
   placePin(x: number, z: number, name?: string): void {
@@ -1249,7 +1351,12 @@ function installEventLog(): void {
   eventLogOn = true
   const t0 = performance.now()
   const note = (type: string, phase?: string) =>
-    eventLog.push({ type, phase, night: useWorldStore.getState().nightNumber, at: performance.now() - t0 })
+    eventLog.push({
+      type,
+      phase,
+      night: useWorldStore.getState().nightNumber,
+      at: performance.now() - t0,
+    })
   subscribeToType('phaseChanged', (e) => note('phaseChanged', e.phase))
   subscribeToType('nightStarted', () => note('nightStarted'))
   subscribeToType('nightCleared', () => note('nightCleared'))
@@ -1261,4 +1368,3 @@ export function installDebugHook(): void {
   frames ??= installFrameRecorder(FRAME_WINDOW_MS)
   window.__lastRites = api
 }
-

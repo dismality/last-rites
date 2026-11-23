@@ -475,9 +475,12 @@ describe('selectObjective in story stages (spec 10)', () => {
     expect(st(2, [done, done, done, done, open, open]).main).toBe('Put the watch log in order (0/1)')
     expect(st(2, [done, done, done, done, done, open]).main).toBe('Compare the boot prints (0/1)')
     expect(st(2, [done, done, done, done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
-    expect(st(1, [done, { count: 2, done: false }]).main).toBe('Examine the three bells (2/3)')
-    // All three examined but the cut bell not yet named: say what is left, not a stuck 3/3.
-    expect(st(1, [done, { count: 3, done: false }]).main).toBe('Name the cut bell at a bell post')
+    // Stage 1: the three stones, the ledger, then the bell cords.
+    expect(st(1, [{ count: 1, done: false }, open, open]).main).toBe('Read the stones of Pell, Ames and Hale (1/3)')
+    expect(st(1, [done, { count: 2, done: false }, open]).main).toBe('Check the ledger against the stones (2/3)')
+    expect(st(1, [done, done, { count: 2, done: false }]).main).toBe('Pull the bell cords at the three graves (2/3)')
+    // All three pulled but the journal question not yet answered: say what is left, not a stuck 3/3.
+    expect(st(1, [done, done, { count: 3, done: false }]).main).toBe('In your journal: which bell was cut?')
     const evidence = st(3, [done, { count: 4, done: false }, open, open])
     expect(evidence.main).toBe('Find what happened to Elias (4/6)')
     expect(evidence.areaM).toBeGreaterThan(0)
@@ -505,9 +508,10 @@ describe('selectObjective in story stages (spec 10)', () => {
       progress: { page1Read: true, cryptKey: true, whistle: false, stairRevealed: false, ossuaryKey: false, relics: 0 },
     }
     const done = { count: 1, done: true }
+    const steps = [done, done, done, done, done, done]
     const at = (curseLinks: number) =>
-      selectObjective({ ...day, stage: { stage: 1, curseLinks, altarLockedS: 0, linksTotal: 5, day: [done, { count: 3, done: true }] } })
-    expect(at(2).main).toBe("Link the clues in the journal's Case tab (2/5)")
+      selectObjective({ ...day, stage: { stage: 2, curseLinks, altarLockedS: 0, linksTotal: 5, day: steps } })
+    expect(at(2).main).toBe('Link clues on the case board in your journal (2/5)')
     expect(at(2).position).toBeUndefined()
     expect(at(2).why).toMatch(/curse/)
     const altar = at(5)
@@ -519,9 +523,14 @@ describe('selectObjective in story stages (spec 10)', () => {
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 1, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: [done, { count: 3, done: true }] },
+      stage: { stage: 2, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: steps },
     })
-    expect(armed.second).toBe("Link the clues in the journal's Case tab (1/5)")
+    expect(armed.second).toBe('Link clues on the case board in your journal (1/5)')
+    // A case with no links (Case 1) goes straight to the altar, to type the name.
+    const typed = selectObjective({ ...day, stage: { stage: 1, curseLinks: 0, altarLockedS: 0, linksTotal: 0, day: [done, done, done] } })
+    expect(typed.main).toBe('At dusk, name who did it at the chapel altar')
+    expect(typed.position).toEqual(CHAPEL_ALTAR)
+    expect(stageReadyForDusk({ stage: 1, curseLinks: 0, altarLockedS: 0, linksTotal: 0, day: [done, done, done] })).toBe(true)
   })
 
   it('is ready for an early dusk only with every day step done and every clue linked', () => {

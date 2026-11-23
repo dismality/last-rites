@@ -3,6 +3,8 @@
 
 import {
   CASE_1_BELLS,
+  CASE_1_RIGHT_FLAGS,
+  CASE_1_STONES,
   CASE_2_CASTS,
   CASE_2_CREST_LOCK,
   CASE_2_LOGBOOK_POSITION,
@@ -152,7 +154,7 @@ export const CASE_SOLVE_LINE = 'Solve the case: {title}, clues {n}/{m}'
  * By day once the stage's steps are done, what to do next: link the clues on the case board, then
  * answer at the altar after dusk. `{n}` and `{m}` are the correct links made and needed.
  */
-export const CASE_LINK_LINE = "Link the clues in the journal's Case tab ({n}/{m})"
+export const CASE_LINK_LINE = 'Link clues on the case board in your journal ({n}/{m})'
 export const CASE_LINK_WHY = 'Join the clues that belong together. Each right pair weakens the curse.'
 export const CASE_ALTAR_LINE = 'At dusk, give your answer at the chapel altar'
 export const CASE_ALTAR_WHY = 'The case is ready. The altar listens at night. Ring its bell to call the dusk early.'
@@ -163,6 +165,12 @@ export const EARLY_DUSK_SCORE = 150
 /** Shown when the bell is rung for an early dusk. */
 export const EARLY_DUSK_LINE = 'The bell carries over the graves. The light is going.'
 export const CASE_ALTAR_MARKER = 'Altar'
+/** A case answered by typing a name at the altar (Case 1): nothing to fill in first. */
+export const CASE_NAME_ALTAR_LINE = 'At dusk, name who did it at the chapel altar'
+export const CASE_NAME_ALTAR_WHY = 'The altar listens at night: type the name there. Ring its bell to call the dusk early.'
+
+/** The story's one goal, shown above every objective in a story run (playtest story pass). */
+export const STORY_GOAL_LINE = 'Find Elias Thorne (trail {n} of 3)'
 
 /**
  * Objectives that need the journal to piece things together show its key under them (11s). Any
@@ -239,29 +247,40 @@ export const EVIDENCE_SEARCH: Readonly<Record<EvidenceCardId, Point>> = {
 /** Radius of each evidence search ring (metres). */
 export const EVIDENCE_RADIUS_M = 4
 
+/** The three graves Elias named in Case 1: the stones that carry a ledger mismatch. */
+const CASE_1_GRAVES = CASE_1_RIGHT_FLAGS.map((f) => CASE_1_STONES.find((s) => s.id === f.stoneId)!)
+
 /** The parish register page beside the powder tin on the hut shelf (Hut.tsx). */
 const LEDGER_PAGE: Point = [POWDER_TIN_HUT[0] + 0.35, POWDER_TIN_HUT[1], POWDER_TIN_HUT[2]]
 
 export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]>> = {
   1: [
     {
+      main: 'Read the stones of Pell, Ames and Hale',
+      target: CASE_1_GRAVES.length,
+      marker: 'Stone',
+      place: { kind: 'nearest', at: CASE_1_GRAVES.map((g) => g.position) },
+      why: 'Elias wrote that the ledger was changed. The stones were carved at the burials: read them.',
+      done: 'All three stones read. Now check them against the parish ledger on the hut shelf.',
+    },
+    {
       minigame: '1a',
-      main: 'Cross-check the ledger against the stones',
-      target: 1,
+      main: 'Check the ledger against the stones',
+      target: CASE_1_GRAVES.length,
       marker: 'Ledger',
       place: { kind: 'point', at: LEDGER_PAGE },
-      why: 'Elias wrote that the ledger and the stones disagree. Find the graves that do not match.',
-      done: 'Three burials do not add up: Pell, Ames and Hale. Each of those graves has a safety bell.',
+      why: 'For each grave, mark whether the ledger agrees with its stone, and if not, what differs.',
+      done: 'Three entries were changed, each initialled J.V.: Pell, Ames and Hale. Each grave has a safety bell.',
     },
     {
       minigame: '1b',
-      main: 'Examine the three bells',
+      main: 'Pull the bell cords at the three graves',
       target: 3,
-      // All three looked at is not the end: the step closes when the cut bell is named.
-      whenCounted: 'Name the cut bell at a bell post',
-      why: 'If the buried woke, a cord from the coffin rang a bell above. One of these bells was silenced.',
-      done: 'The silenced bell is named. Its clues are pinned to your case board (J).',
-      marker: 'Bells',
+      // All three pulled is not the end: the step closes when the journal question is answered.
+      whenCounted: 'In your journal: which bell was cut?',
+      why: 'If the buried woke, a cord from the coffin rang a bell above. See whether these three still ring.',
+      done: 'John Pell’s cord was cut, and the tag is signed J. Vane, the undertaker. Name him at the altar tonight.',
+      marker: 'Bell',
       place: { kind: 'nearest', at: CASE_1_BELLS.map((b) => b.position) },
     },
   ],

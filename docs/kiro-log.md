@@ -2341,3 +2341,52 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** Nothing; done by hand.
 - **Decisions made unattended:**
   - The surface detail is a shader layer, not UV textures, because the Blender models carry vertex colours and no UVs. (2026-11-22)
+
+
+### 2026-11-23: Developer mode, the Esc fix and clearer puzzles
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Developer mode** is now a setting (Settings, last toggle) as well as `?dev=1`. While it is on, a chip under the compass names the keys:
+    - `]` clears the current objective step through the real stores (`src/dev/skipStep.ts`): read the page, solve the step's puzzle, open the gate, read the tablets, find the evidence, give the relics, link every clue and fill the answer, call the dusk, start the night, solve the case;
+    - `` ` `` opens the dev panel.
+  - **Esc in a puzzle no longer pauses as well.** The Esc that closed a puzzle relocked the mouse, the browser let the lock go again for that same Esc, and the lost lock read as a pause. Esc is no longer a relock gesture, and a lock lost within 1.5 s of an Esc that closed a screen is ignored (`cursorRelease.ts`, `usePauseTriggers.ts`).
+  - **Puzzle text:** each intro is one or two sentences with the goal in bold; the key-by-key instructions are kept for screen readers only, and the "(Enter)" and "(F)" labels are gone from the buttons. The crest lock's "demo aid" note is removed.
+  - **Bell posts:** opening a post examines it at once. The odd part is ringed on the drawing and marked ⚠ in bold, and a table compares the three graves. Once all three are checked, any post names the silenced bell with one button per grave.
+  - **Journal:** the Case tab is now "Case board". The journal opens on it when the objective is to link clues or fill the answer. Its help line is bold and counts the links found ("0 of 5").
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:**
+  - The skip key is `]`, which nothing else binds. It never skips more than one step per press. (2026-11-23)
+
+
+### 2026-11-23: Case board questions
+- **Started:** Outside Kiro
+- **What happened:**
+  - The case board asks one question at a time instead of leaving the player to try every pair. Example: "Pell's rope was cut. Which other bell could never have rung?"
+    - The card the question is about is marked; clicking the card that answers it draws the string through the same link action as before, so the curse meter, notes and saves are unchanged.
+    - Wrong guesses still cost nothing. Dragging a string between any two cards still works.
+  - Every link in the three cases has a question (12 in all, the `question` field on each deduction note in `src/data/cases.ts`). No question names the card that answers it; a test checks this.
+  - The next question is the first unlinked one whose two cards are both found (`src/game/systems/caseQuestions.ts`). When a clue is still missing, the board says so and points to the face-down cards. Once all are linked it says to fill in the answer and go to the altar at night.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:** None.
+
+
+### 2026-11-23: Stage 1 story pass (Saved by the Bell)
+- **Started:** Outside Kiro
+- **What happened:**
+  - Stage 1 is now one chain, each step giving the next its clue:
+    - **Page 1** explains what safety bells are and names three graves: John Pell, Esther Ames and Tobias Hale.
+    - **Stones:** each stone now carries a cause of death and a plot. Reading the three named stones (E at the grave) is the first objective.
+    - **Ledger:** each line is shown beside its stone. The player marks it "The stone agrees" or what differs (date, plot, cause). All three entries were changed, each initialled J.V. Marking an altered line "agrees" adds Doubt.
+    - **Bells:** E pulls the cord at each grave; there is no bell puzzle screen any more (`BellsMinigame.tsx` is deleted). Ames and Hale ring; Pell's cord is cut.
+    - **Journal:** once all three are pulled, the Case board asks "Which bell was cut?". Wrong picks cost nothing. The right one shows Pell's tag, signed by J. Vane, and stamps "J.V. = Josiah Vane, the undertaker" in large type.
+    - **Altar:** the name is typed, not picked. Case doesn't matter, and several forms are accepted (Josiah Vane, J. Vane, J.V., Vane, the undertaker, and others). The keeper's write-up then writes itself on the panel, a few letters at a time.
+  - **The keeper's narration:** a line at the bottom of the screen explains each find, with full names, and says what to check next (`src/data/case1Narration.ts`, `narrationStore.ts`, `KeeperNarration.tsx`). A new find replaces lines still waiting.
+  - **Goal line:** "Find Elias Thorne (trail N of 3)" shows under the objective all game.
+  - **Typing guard:** letters typed into a text box no longer reach the game keys (J, E, and so on); Esc and Tab still do (`src/ui/typingGuard.ts`).
+  - Case 1 has no clue links now, so its Case board shows the findings instead. The link tests use Case 2.
+  - The e2e specs for Case 1, the case board and the playthrough's Stage 1 follow the new flow.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's spec structure, the case data shape, the store actions and the save format are kept and extended.
+- **Decisions made unattended:**
+  - Pell's ledger date is the 11th and his stone the 12th; Ames's ledger cause is "A fall" against "fever" on her stone; Hale's plot differs. (2026-11-23)
+  - The page-1 voice line has new text but was not regenerated, as that spends credits. It stays switched off until it is. (2026-11-23)
+  - The altar panel no longer shows "ready" for a moment before a lock has run out, which made Answer refuse a right name (`AltarPanel.tsx`). (2026-11-23)

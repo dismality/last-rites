@@ -1,7 +1,8 @@
 import { test, expect, type Page } from '@playwright/test'
 
 // Spec 10 task 2.7: the case board, the hint buttons, the altar panel and the Closed cases tab in
-// real Chrome. Real mouse and keyboard do the playing; the dev hook only sets up (gives clues and
+// real Chrome. Linking clues is Case 2's board (Case 1 is written up as findings instead, and its
+// altar takes a typed name). Real mouse and keyboard do the playing; the dev hook only sets up (gives clues and
 // coins, moves the clock). Waits are polled state or rendered-frame counts, never fixed sleeps.
 
 const SHOTS = 'e2e/screenshots'
@@ -21,9 +22,11 @@ interface StageSnap {
   altar: { lockedUntil: number; wrong: number }
 }
 
-const world = (page: Page) => page.evaluate(() => window.__lastRites!.snapshot('world') as WorldSnap)
+const world = (page: Page) =>
+  page.evaluate(() => window.__lastRites!.snapshot('world') as WorldSnap)
 const stage = (page: Page) => page.evaluate(() => window.__lastRites!.stageState() as StageSnap)
-const caseJson = (page: Page) => page.evaluate(() => JSON.stringify(window.__lastRites!.caseState()))
+const caseJson = (page: Page) =>
+  page.evaluate(() => JSON.stringify(window.__lastRites!.caseState()))
 const enemyCount = (page: Page) =>
   page.evaluate(() => (window.__lastRites!.snapshot('enemies') as unknown[]).length)
 
@@ -58,16 +61,20 @@ async function boot(page: Page): Promise<string[]> {
 
 async function intoNight(page: Page): Promise<void> {
   await page.evaluate(() => window.__lastRites!.skipToDusk(1))
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'dusk')
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'dusk',
+  )
   await page.evaluate(() => window.__lastRites!.skipToNight(1))
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'night')
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'night',
+  )
 }
 
 /** J, then the Case tab with a real click. */
 async function openCaseTab(page: Page): Promise<void> {
   await page.keyboard.press('KeyJ')
   await expect(page.getByRole('dialog', { name: 'Journal' })).toBeVisible()
-  await page.getByRole('tab', { name: 'Case', exact: true }).click()
+  await page.getByRole('tab', { name: 'Case board', exact: true }).click()
   await expect(page.locator('.case-board')).toBeVisible()
 }
 
@@ -96,31 +103,41 @@ async function shoot(page: Page, name: string): Promise<void> {
   await frames(page, 4)
 }
 
-const RIGHT_GRAVE = "Pell's grave"
-const RIGHT_REASON = 'the bell rope was cut and the certificate was signed before the death'
+/** Case 2, The Resurrection Men: the first two blanks of its final question. */
+const RIGHT_WHO = 'the lodge keeper'
+const RIGHT_MOTIVE = "the surgeon's receipt in his hand"
 
-test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint tier', async ({ page }) => {
+/** Starts Stage 2 by day with all of its clues pinned. */
+async function caseTwo(page: Page): Promise<void> {
+  await page.evaluate(() => window.__lastRites!.skipToStage(2))
+  await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).stage === 2)
+  await page.evaluate(() => window.__lastRites!.giveAllClues())
+}
+
+test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint tier', async ({
+  page,
+}) => {
   test.setTimeout(300_000)
   const errors = await boot(page)
-  await page.evaluate(() => window.__lastRites!.giveAllClues())
+  await caseTwo(page)
   await openCaseTab(page)
 
-  // Seven clue cards are pinned, and the curse meter starts full.
-  await expect(page.locator('.clue-card')).toHaveCount(7)
+  // Six clue cards are pinned, and the curse meter starts full.
+  await expect(page.locator('.clue-card')).toHaveCount(6)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 10 / 10')
 
   // A right pair by mouse drag: a solid string with a check, the deduction note and the meter.
-  await dragCard(page, 'pell-rope-cut', 'pell-tag-early')
+  await dragCard(page, 'boot-print-match', 'watch-log-gap')
   await expect(page.locator('.case-tag--right')).toHaveCount(1)
   await expect(page.locator('.case-tag--right')).toHaveText('✓')
   await expect(page.locator('.case-note')).toContainText('Right link')
   await expect(page.locator('.case-notes li')).toHaveCount(1)
-  await expect(page.locator('.case-notes li').first()).toContainText('signed the certificate before he had died')
+  await expect(page.locator('.case-notes li').first()).toContainText('whose watch went quiet')
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
 
   // A wrong pair differs by shape and words: a dashed string with a cross that sags and falls away,
   // no note, meter unchanged (playtest 11r).
-  await dragCard(page, 'hale-fresh-flowers', 'marsh-stone-toppled')
+  await dragCard(page, 'spade-fresh-clay', 'doctor-school-letter')
   await expect(page.locator('.case-tag--wrong')).toHaveCount(1)
   await expect(page.locator('.case-tag--wrong')).toHaveText('✗')
   await expect(page.locator('.case-string--wrong')).toHaveCount(1)
@@ -140,20 +157,19 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   expect(style.wrong.width).toBeLessThan(style.right.width)
   // Then it falls away, and trying the pair again says so.
   await expect(page.locator('.case-string--wrong')).toHaveCount(0, { timeout: 4000 })
-  await dragCard(page, 'hale-fresh-flowers', 'marsh-stone-toppled')
+  await dragCard(page, 'spade-fresh-clay', 'doctor-school-letter')
   await expect(page.locator('.case-note')).toContainText('tried already')
 
-  // A second right pair by keyboard: select one card, then the other, with Enter.
-  await card(page, 'ledger-no-certificates').focus()
-  await page.keyboard.press('Enter')
-  await expect(card(page, 'ledger-no-certificates')).toHaveAttribute('aria-pressed', 'true')
-  await card(page, 'ledger-date-mismatch').focus()
+  // A second right pair by keyboard. The board's question marks the card it is about (the gap),
+  // so Enter on the card that answers it (the watch ledger) ties the two.
+  await expect(card(page, 'watch-log-gap')).toHaveAttribute('aria-pressed', 'true')
+  await card(page, 'sexton-watch-ledger').focus()
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-tag--right')).toHaveCount(2)
   await expect(page.locator('.case-notes li')).toHaveCount(2)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 8 / 10')
   // Linking the same pair again changes nothing.
-  await dragCard(page, 'pell-rope-cut', 'pell-tag-early')
+  await dragCard(page, 'boot-print-match', 'watch-log-gap')
   await expect(page.locator('.case-note')).toContainText('already joined')
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 8 / 10')
 
@@ -161,11 +177,11 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
 
   // The final-question slots are real selects.
   const slots = page.locator('.case-final__slot')
-  await expect(slots).toHaveCount(2)
-  await slots.nth(0).selectOption({ label: RIGHT_GRAVE })
-  await slots.nth(1).selectOption({ label: RIGHT_REASON })
-  await expect.poll(() => caseJson(page)).toContain(RIGHT_REASON)
-  expect(await caseJson(page)).toContain(RIGHT_GRAVE)
+  await expect(slots).toHaveCount(4)
+  await slots.nth(0).selectOption({ label: RIGHT_WHO })
+  await slots.nth(1).selectOption({ label: RIGHT_MOTIVE })
+  await expect.poll(() => caseJson(page)).toContain('surgeon')
+  expect(await caseJson(page)).toContain(RIGHT_WHO)
 
   // Hints: with no coins the button is off and says why; with coins tier 1 costs 5 and reveals.
   await page.evaluate(() => window.__lastRites!.setCoins(0))
@@ -186,10 +202,12 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   expect(errors).toEqual([])
 })
 
-test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots by arrows', async ({ page }) => {
+test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots by arrows', async ({
+  page,
+}) => {
   test.setTimeout(300_000)
   const errors = await boot(page)
-  await page.evaluate(() => window.__lastRites!.giveAllClues())
+  await caseTwo(page)
 
   await page.keyboard.press('KeyJ')
   await expect(page.getByRole('dialog', { name: 'Journal' })).toBeVisible()
@@ -200,30 +218,32 @@ test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots 
   await page.evaluate(() => window.__lastRites!.lockless(false))
   await page.keyboard.press('ArrowRight')
   await page.keyboard.press('ArrowRight')
-  await expect(page.getByRole('tab', { name: 'Case', exact: true })).toHaveAttribute('aria-selected', 'true')
+  await expect(page.getByRole('tab', { name: 'Case board', exact: true })).toHaveAttribute(
+    'aria-selected',
+    'true',
+  )
   await expect(page.locator('.case-board')).toBeVisible()
 
-  // Tab walks into the first two cards (ledger entries); Enter on each ties them. The scrollable
-  // panel and the header's info dots take Tab stops first.
-  const firstCard = card(page, 'ledger-no-certificates')
-  for (let i = 0; i < 10 && !(await firstCard.evaluate((el) => el === document.activeElement)); i++) {
+  // The board's question marks the card it is about; Enter on the card that answers it ties the
+  // two. Tab walks into the first card (the watch ledger, which answers the first question); the
+  // scrollable panel and the header's info dots take Tab stops first.
+  const firstCard = card(page, 'sexton-watch-ledger')
+  for (
+    let i = 0;
+    i < 10 && !(await firstCard.evaluate((el) => el === document.activeElement));
+    i++
+  ) {
     await page.keyboard.press('Tab')
   }
   await expect(firstCard).toBeFocused()
-  await page.keyboard.press('Enter')
-  await page.keyboard.press('Tab')
-  await expect(card(page, 'ledger-date-mismatch')).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-notes li')).toHaveCount(1)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
   await expect(page.locator('.case-note')).toContainText('Right link')
 
-  // A second right pair, again from the keyboard alone.
+  // The second question is about the boots; the gap, one Tab on, answers it.
   await page.keyboard.press('Tab')
-  await expect(card(page, 'pell-rope-cut')).toBeFocused()
-  await page.keyboard.press('Enter')
-  await page.keyboard.press('Tab')
-  await expect(card(page, 'ames-bell-rusted')).toBeFocused()
+  await expect(card(page, 'watch-log-gap')).toBeFocused()
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-tag--right')).toHaveCount(2)
 
@@ -276,7 +296,7 @@ test('the day journal pauses the world; the night journal does not', async ({ pa
   expect(errors).toEqual([])
 })
 
-test('altar: a wrong answer locks it and wakes a wave, the right one solves the case; Closed cases shows the page', async ({
+test('altar: a wrong name locks it and wakes a wave, the right one solves the case; Closed cases shows the page', async ({
   page,
 }) => {
   test.setTimeout(240_000)
@@ -285,23 +305,29 @@ test('altar: a wrong answer locks it and wakes a wave, the right one solves the 
   await intoNight(page)
 
   // Let the first wave arrive, then clear the field so a new spawn can only come from the answer.
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('enemies') as unknown[]).length > 0, undefined, {
-    timeout: 60_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('enemies') as unknown[]).length > 0,
+    undefined,
+    {
+      timeout: 60_000,
+    },
+  )
   await page.evaluate(() => window.__lastRites!.killAll())
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('enemies') as unknown[]).length === 0, undefined, {
-    timeout: 30_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('enemies') as unknown[]).length === 0,
+    undefined,
+    {
+      timeout: 30_000,
+    },
+  )
 
-  // Open the panel and fill the blanks with a WRONG answer by mouse.
+  // Open the panel and type a WRONG name.
   await page.evaluate(() => window.__lastRites!.setAltarPanel(true))
   const panel = page.getByRole('dialog', { name: 'The Altar' })
   await expect(panel).toBeVisible()
-  await expect(panel.locator('.altar-panel__status')).toContainText('Check each blank')
-  const slots = panel.locator('.altar-panel__slot')
-  await expect(slots).toHaveCount(2)
-  await slots.nth(0).selectOption({ label: "Hale's grave" })
-  await slots.nth(1).selectOption({ label: 'fresh flowers show she was still visited' })
+  await expect(panel.locator('.altar-panel__status')).toContainText('Type the name')
+  const input = panel.locator('.altar-panel__input')
+  await input.fill('Tobias Hale')
   await shoot(page, 'case-altar')
 
   await panel.getByRole('button', { name: 'Answer' }).click()
@@ -331,15 +357,23 @@ test('altar: a wrong answer locks it and wakes a wave, the right one solves the 
 
   // Wait the lock out (sim time), then give the RIGHT answer.
   await page.evaluate(() => window.__lastRites!.killAll())
-  await expect(panel.locator('.altar-panel__status')).toContainText('Check each blank', { timeout: 60_000 })
-  await slots.nth(0).selectOption({ label: RIGHT_GRAVE })
-  await slots.nth(1).selectOption({ label: RIGHT_REASON })
+  await expect(panel.locator('.altar-panel__status')).toContainText('Type the name', {
+    timeout: 60_000,
+  })
+  await input.fill('Josiah Vane')
   await panel.getByRole('button', { name: 'Answer' }).click()
   await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).caseSolved)
+  // The keeper's summary writes itself in the panel; Close puts it away.
+  await expect(panel.locator('.handwritten')).toBeVisible()
+  await panel.getByRole('button', { name: /Close/ }).click()
   await expect(panel).toHaveCount(0)
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'dawn', undefined, {
-    timeout: 30_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'dawn',
+    undefined,
+    {
+      timeout: 30_000,
+    },
+  )
   const log = await page.evaluate(() => window.__lastRites!.events().map((e) => e.type))
   expect(log).toContain('nightCleared')
 
@@ -352,9 +386,13 @@ test('altar: a wrong answer locks it and wakes a wave, the right one solves the 
   await expect(page.locator('.dawn-picker__card')).toHaveCount(0)
   await page.evaluate(() => window.__lastRites!.lockless(true))
   // The dawn summary card sits above everything for the 10 s of dawn, so read the journal by day.
-  await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'day', undefined, {
-    timeout: 60_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'day',
+    undefined,
+    {
+      timeout: 60_000,
+    },
+  )
 
   // Closed cases: the page of the solved case is there.
   await page.keyboard.press('KeyJ')
@@ -364,7 +402,7 @@ test('altar: a wrong answer locks it and wakes a wave, the right one solves the 
   await expect(closed).toBeVisible()
   await expect(closed).toContainText('Cases closed: 1 of 3')
   await expect(closed).toContainText('Saved by the Bell')
-  await expect(closed).toContainText('safety coffins with a bell on a rope')
+  await expect(closed).toContainText('signed John Pell dead a day early')
   await shoot(page, 'case-closed')
 
   // By the next day stage 2 has begun (its case unsolved), and case 1 stays closed.

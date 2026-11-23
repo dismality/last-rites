@@ -11,6 +11,7 @@ import { economy } from '../../game/state/economyPort'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { useStageStore } from '../../game/state/stageStore'
 import { earnedNotes, linkKey } from '../../game/systems/caseBoard'
+import { nextQuestion } from '../../game/systems/caseQuestions'
 import {
   boardStrings,
   curseView,
@@ -23,6 +24,7 @@ import {
   stringViews,
   type Pt,
 } from './caseBoardView'
+import { Case1Findings } from './Case1Findings'
 import { ClueCard } from './ClueCard'
 import { MissingCard } from './MissingCard'
 import { RedString } from './RedString'
@@ -63,13 +65,23 @@ export function CaseBoard() {
   const found = useMemo(() => new Set(progress.found), [progress.found])
   const shown = useMemo(() => def.clues.filter((c) => found.has(c.id)), [def, found])
   const cards = useMemo(() => layoutCards(shown, def.clues), [shown, def])
-  const backs = useMemo(() => missingCards(def.clues, found, STAGE_DAY_RULES[stage]), [def, found, stage])
-  const allStrings = useMemo(() => stringViews(progress.links, def, cards), [progress.links, def, cards])
+  const backs = useMemo(
+    () => missingCards(def.clues, found, STAGE_DAY_RULES[stage]),
+    [def, found, stage],
+  )
+  const allStrings = useMemo(
+    () => stringViews(progress.links, def, cards),
+    [progress.links, def, cards],
+  )
   const strings = useMemo(() => boardStrings(allStrings, falling), [allStrings, falling])
   const notes = earnedNotes({ links: progress.links }, def)
   const curse = curseView(progress.links, def)
   const titleOf = (id: string) => def.clues.find((c) => c.id === id)?.title ?? id
+  const ask = nextQuestion(def, found, progress.links, titleOf)
+  const about = ask.kind === 'ask' ? ask.question.about : null
   const hints = hintRows(def, progress.hints, coins, nightElapsed, economy().story())
+  // Case 1 has no strings to draw: its journal page walks the findings and asks one question.
+  const linking = def.notes.length > 0
 
   const tryLink = (a: string, b: string) => {
     const key = linkKey(a, b)
@@ -82,6 +94,13 @@ export function CaseBoard() {
   const onPick = (id: string) => {
     if (suppressClick.current) {
       suppressClick.current = false
+      return
+    }
+    // With a question open, a click answers it: the card is tried against the one asked about.
+    if (about) {
+      if (id === about)
+        setMessage('That is the card the question is about. Click the card that answers it.')
+      else tryLink(about, id)
       return
     }
     const r = pickCard(selected, id)
@@ -123,7 +142,9 @@ export function CaseBoard() {
     setTimeout(() => {
       suppressClick.current = false
     }, 0)
-    const over = document.elementFromPoint(e.clientX, e.clientY)?.closest<HTMLElement>('[data-clue-id]')
+    const over = document
+      .elementFromPoint(e.clientX, e.clientY)
+      ?.closest<HTMLElement>('[data-clue-id]')
     const target = over?.dataset.clueId
     if (target && target !== d.id) {
       setSelected(null)
@@ -134,7 +155,12 @@ export function CaseBoard() {
   const buyHint = () => {
     const buy = useCaseStore.getState().useHint
     const r = buy()
-    if (r.ok) setMessage(r.cost === 0 ? `Hint ${r.tier} revealed for free.` : `Hint ${r.tier} revealed for ${r.cost} Grave Coins.`)
+    if (r.ok)
+      setMessage(
+        r.cost === 0
+          ? `Hint ${r.tier} revealed for free.`
+          : `Hint ${r.tier} revealed for ${r.cost} Grave Coins.`,
+      )
     else if (r.reason === 'coins') setMessage(`Not enough Grave Coins: the hint costs ${r.cost}.`)
     else setMessage('Every hint is already revealed.')
   }
@@ -152,19 +178,45 @@ export function CaseBoard() {
           Clues pinned: {shown.length} of {def.clues.length}
           <InfoDot tipKey="hud-clues" label="About clues" />
         </p>
-        <div className="case-curse" role="img" aria-label={curse.label}>
-          <span className="case-curse__label">{curse.label}</span>
-          <InfoDot tipKey="hud-curse" label="About the Curse meter" />
-          <span className="case-curse__bar" aria-hidden="true">
-            <span className="case-curse__fill" style={{ width: `${curse.fraction * 100}%` }} />
-          </span>
-        </div>
+        {linking && (
+          <div className="case-curse" role="img" aria-label={curse.label}>
+            <span className="case-curse__label">{curse.label}</span>
+            <InfoDot tipKey="hud-curse" label="About the Curse meter" />
+            <span className="case-curse__bar" aria-hidden="true">
+              <span className="case-curse__fill" style={{ width: `${curse.fraction * 100}%` }} />
+            </span>
+          </div>
+        )}
       </header>
 
-      <p className="case-board__help">
-        Drag from one card to another, or select a card and press Enter on a second. A solid string with ✓ is a true
-        connection; a pair that joins nothing sags with ✗ and falls away. Wrong pairs cost nothing.
-      </p>
+      {!linking && <Case1Findings />}
+
+      {linking && (
+        <div className="case-question" role="status" aria-live="polite">
+          {ask.kind === 'ask' ? (
+            <>
+              <p className="case-question__count">
+                Question {ask.question.number} of {ask.question.total}
+              </p>
+              <p className="case-question__text">{ask.question.text}</p>
+              <p className="case-question__how">
+                The card it is about is marked. <strong>Click the card that answers it.</strong>{' '}
+                Wrong guesses cost nothing.
+              </p>
+            </>
+          ) : ask.kind === 'wait' ? (
+            <p className="case-question__text">
+              {ask.left === 1 ? 'One question is' : `${ask.left} questions are`} left, but a clue it
+              needs is not found yet. The face-down cards say where to look.
+            </p>
+          ) : (
+            <p className="case-question__text">
+              ✓ Every clue is linked. Fill in the question below, then answer at the chapel altar at
+              night.
+            </p>
+          )}
+        </div>
+      )}
 
       <div
         ref={boardRef}
@@ -178,7 +230,8 @@ export function CaseBoard() {
           <ClueCard
             key={c.clue.id}
             view={c}
-            selected={selected === c.clue.id}
+            selected={about ? c.clue.id === about : selected === c.clue.id}
+            selectedLabel={about ? 'The question is about this card' : undefined}
             linkCount={linkCountOf(c.clue.id)}
             onPick={onPick}
             onPointerDown={onCardDown}
@@ -197,13 +250,20 @@ export function CaseBoard() {
           />
         ))}
         {shown.length === 0 && backs.length === 0 && (
-          <p className="case-cork__empty">No clues yet. Each face-down card says where one might be.</p>
+          <p className="case-cork__empty">
+            No clues yet. Each face-down card says where one might be.
+          </p>
         )}
       </div>
 
-      <div className="case-note" role="status" aria-live="polite">
-        {message || 'Link two cards to test an idea.'}
-      </div>
+      {linking && (
+        <div className="case-note" role="status" aria-live="polite">
+          {message ||
+            (about
+              ? 'Click the card that answers the question.'
+              : 'Link two cards to test an idea.')}
+        </div>
+      )}
 
       {notes.length > 0 && (
         <ul className="case-notes" aria-label="Deductions">
@@ -238,7 +298,11 @@ export function CaseBoard() {
             )
           })}
         </p>
-        <p className="case-final__altar">Fill the blanks here. You answer at the altar, by night.</p>
+        <p className="case-final__altar">
+          {def.final.typed
+            ? 'You answer at the altar, by night, by typing the name.'
+            : 'Fill the blanks here. You answer at the altar, by night.'}
+        </p>
       </div>
 
       <div className="case-hints">

@@ -7,6 +7,8 @@ import {
   CASE_ALTAR_LINE,
   CASE_ALTAR_MARKER,
   CASE_ALTAR_WHY,
+  CASE_NAME_ALTAR_LINE,
+  CASE_NAME_ALTAR_WHY,
   CASE_LINK_LINE,
   JOURNAL_KEY_LINES,
   JOURNAL_KEY_WORD,
@@ -257,6 +259,8 @@ const stageDoneObjective = (
   stage: NonNullable<ObjectiveInput['stage']>,
 ): Pick<Objective, 'main' | 'position' | 'marker' | 'why'> => {
   const total = stage.linksTotal
+  // A case with no links (Case 1) goes straight to the altar once its steps are done.
+  if (total === 0) return { main: cut(CASE_NAME_ALTAR_LINE), position: CHAPEL_ALTAR, marker: CASE_ALTAR_MARKER, why: CASE_NAME_ALTAR_WHY }
   if (total === undefined || !(total > 0)) return { main: cut(stageCaseLine(stage)) }
   const made = clampInt(stage.curseLinks, 0, total)
   if (made < total) {
@@ -271,7 +275,7 @@ const stageDoneObjective = (
  */
 export const stageReadyForDusk = (stage: NonNullable<ObjectiveInput['stage']>): boolean => {
   const total = stage.linksTotal
-  if (!stage.day || stage.day.length === 0 || total === undefined || !(total > 0)) return false
+  if (!stage.day || stage.day.length === 0 || total === undefined || !(total >= 0)) return false
   return stage.day.every((d) => d.done) && stage.curseLinks >= total
 }
 

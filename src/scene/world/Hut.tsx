@@ -83,9 +83,9 @@ export function Hut() {
           visible={false}
         />
         {/* Tables, stove, cot, barrels, log stack and the vending machine, from hut.json. */}
-        {HUT_BOXES.map((b) => (
+        {HUT_BOXES.map((b, i) => (
           <CuboidCollider
-            key={b.note}
+            key={`${b.note}-${i}`}
             args={[b.half[0], b.half[1], b.half[2]]}
             position={[...b.center]}
             rotation={[0, b.rotY, 0]}

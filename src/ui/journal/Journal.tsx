@@ -28,12 +28,14 @@ import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import { InfoDot } from '../theme/InfoDot'
 import type { InfoTipKey } from '../../data/infoTips'
+import { CASE_ALTAR_LINE, CASE_LINK_LINE } from '../../data/objectiveRules'
+import { useGuidanceStore } from '../../game/state/guidanceStore'
 import './journal.css'
 
 const TABS = [
   { id: 'pages', label: 'Pages' },
   { id: 'clues', label: 'Clues' },
-  { id: 'case', label: 'Case' },
+  { id: 'case', label: 'Case board' },
   { id: 'closed', label: 'Closed cases' },
   { id: 'relics', label: 'Relics' },
   { id: 'contracts', label: 'Contracts' },
@@ -41,6 +43,12 @@ const TABS = [
   { id: 'creatures', label: 'Creatures' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
+
+/** The objective sends the player to the case board: linking clues, or the answer for the altar. */
+function objectiveNeedsCaseBoard(): boolean {
+  const main = useGuidanceStore.getState().objective?.main ?? ''
+  return main.startsWith(CASE_LINK_LINE.split(' (')[0]) || main === CASE_ALTAR_LINE
+}
 
 const ZONE_LABEL: Record<string, string> = {
   grounds: 'the Grounds',
@@ -194,7 +202,8 @@ function RelicsTab() {
 }
 
 function JournalBody({ onClose }: { onClose: () => void }) {
-  const [tab, setTab] = useState<TabId>('pages')
+  // When the next step is on the case board (link the clues, fill the answer), open there.
+  const [tab, setTab] = useState<TabId>(() => (objectiveNeedsCaseBoard() ? 'case' : 'pages'))
   const tabRefs = useRef<Record<TabId, HTMLButtonElement | null>>({
     pages: null,
     clues: null,
@@ -210,7 +219,9 @@ function JournalBody({ onClose }: { onClose: () => void }) {
   const unreadClues = useMysteryStore((s) => unreadClueCount(s.mystery))
 
   useEffect(() => {
-    tabRefs.current.pages?.focus()
+    tabRefs.current[tab]?.focus()
+    // Focus only the tab the journal opened on.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // The tutorial's "Opening the Case tab" step (Req 10.5). Re-emitting is harmless.

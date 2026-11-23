@@ -10,10 +10,10 @@ import type { LedgerLine } from './caseSave'
 export const FLAG_LABEL: Record<LedgerFlagKind, string> = {
   date: 'Date',
   plot: 'Plot',
-  certificate: 'Missing certificate',
+  cause: 'Cause of death',
 }
 
-export const FLAG_KINDS: readonly LedgerFlagKind[] = ['date', 'plot', 'certificate']
+export const FLAG_KINDS: readonly LedgerFlagKind[] = ['date', 'plot', 'cause']
 
 export const NO_LINE_MESSAGE = 'Draw a line from a stone to a ledger entry first.'
 export const SOLVED_MESSAGE = 'Three burials do not add up. Their graves are marked in your journal.'

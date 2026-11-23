@@ -21,6 +21,8 @@ import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
 const c1 = CASES[0]
+// Case 1 has no board links (its journal asks one question), so linking is tested on Case 2.
+const c2 = CASES[1]
 
 function fakeStorage(): Storage {
   const m = new Map<string, string>()
@@ -59,7 +61,8 @@ describe('caseStore', () => {
   })
 
   it('finds each clue once and links only found clues, with note and curse', () => {
-    const n = c1.notes[0]
+    useStageStore.setState({ stage: 2 })
+    const n = c2.notes[0]
     expect(useCaseStore.getState().findClue('not-a-clue')).toBe(false)
     expect(useCaseStore.getState().link(n.a, n.b).added).toBe(false)
     expect(useCaseStore.getState().findClue(n.a)).toBe(true)
@@ -69,8 +72,8 @@ describe('caseStore', () => {
     expect(r.added).toBe(true)
     expect(r.note?.text).toBe(n.text)
     expect(useCaseStore.getState().link(n.b, n.a).added).toBe(false)
-    expect(selectCorrectLinks(useCaseStore.getState(), 1)).toBe(1)
-    expect(selectCurse(useCaseStore.getState(), 1).value).toBe(c1.curseSteps - 1)
+    expect(selectCorrectLinks(useCaseStore.getState(), 2)).toBe(1)
+    expect(selectCurse(useCaseStore.getState(), 2).value).toBe(c2.curseSteps - 1)
   })
 
   it('a wrong day answer adds Doubt, costs 50 score and feeds the next night', () => {
@@ -115,25 +118,28 @@ describe('caseStore', () => {
   it('the altar check uses the case data: wrong locks and spawns, right solves', () => {
     useWorldStore.getState().setPhase('night')
     useWaveStore.getState().setWaves(startStageNight(1))
+    // Case 1's answer is typed: who silenced John Pell.
     const cs = useCaseStore.getState()
-    expect(cs.giveAnswer().kind).toBe('incomplete')
-    c1.final.slots.forEach((s, i) => cs.fillSlot(i, s.options.find((o) => o !== c1.final.answer[i]) ?? null))
-    expect(useCaseStore.getState().giveAnswer().kind).toBe('wrong')
+    expect(cs.giveAnswer('').kind).toBe('incomplete')
+    expect(cs.giveAnswer('   ').kind).toBe('incomplete')
+    expect(useCaseStore.getState().giveAnswer('Silas Vane').kind).toBe('wrong')
     expect(useCaseStore.getState().cases[c1.id].wrongAnswers).toBe(1)
-    c1.final.answer.forEach((o, i) => useCaseStore.getState().fillSlot(i, o))
-    expect(useCaseStore.getState().giveAnswer().kind).toBe('locked')
+    expect(useCaseStore.getState().giveAnswer('josiah vane').kind).toBe('locked')
     tickStageClock(31)
-    expect(useCaseStore.getState().giveAnswer().kind).toBe('solved')
+    expect(useCaseStore.getState().giveAnswer('J. Vane').kind).toBe('solved')
     expect(useStageStore.getState().caseSolved).toBe(true)
     // A locked answer was never judged, so it did not count as wrong.
     expect(useCaseStore.getState().cases[c1.id].wrongAnswers).toBe(1)
   })
 
   it('Continue rebuilds the store from the save', () => {
-    const n = c1.notes[0]
+    useStageStore.setState({ stage: 2 })
+    const n = c2.notes[0]
     useCaseStore.getState().findClue(n.a)
     useCaseStore.getState().findClue(n.b)
     useCaseStore.getState().link(n.a, n.b)
+    useCaseStore.getState().readStone('pell')
+    useStageStore.setState({ stage: 1 })
     useCaseStore.getState().submitMinigame('1a', false)
     useCaseStore.getState().closeCase(c1.id)
     const before = { cases: useCaseStore.getState().cases, closed: useCaseStore.getState().closed, doubt: useCaseStore.getState().doubt }
@@ -147,13 +153,13 @@ describe('caseStore', () => {
 
   it('Retry Night unions knowledge but restores Doubt and wrong answers; New Game resets', () => {
     useWorldStore.getState().setPhase('dusk')
-    useCaseStore.getState().findClue(c1.notes[0].a)
+    useCaseStore.getState().findClue(c1.clues[0].id)
     expect(saveDuskSnapshot()).toBe(true)
-    useCaseStore.getState().findClue(c1.notes[0].b)
+    useCaseStore.getState().findClue(c1.clues[1].id)
     useCaseStore.getState().submitMinigame('1a', false)
     retryNight()
     const s = useCaseStore.getState()
-    expect(s.cases[c1.id].found).toEqual(expect.arrayContaining([c1.notes[0].a, c1.notes[0].b]))
+    expect(s.cases[c1.id].found).toEqual(expect.arrayContaining([c1.clues[0].id, c1.clues[1].id]))
     expect(s.cases[c1.id].wrongAnswers).toBe(0)
     expect(s.doubt.doubt).toBe(0)
     resetRun()
@@ -164,8 +170,8 @@ describe('caseStore', () => {
   it('Retry from morning also keeps what was found', () => {
     saveMorningSnapshot()
     expect(hasMorningSnapshot()).toBe(true)
-    useCaseStore.getState().findClue(c1.notes[0].a)
+    useCaseStore.getState().findClue(c1.clues[0].id)
     retryFromMorning()
-    expect(useCaseStore.getState().cases[c1.id].found).toContain(c1.notes[0].a)
+    expect(useCaseStore.getState().cases[c1.id].found).toContain(c1.clues[0].id)
   })
 })

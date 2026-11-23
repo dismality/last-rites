@@ -74,9 +74,9 @@ export function BootPrintsMinigame() {
     <MinigameShell id="2c" title="Boot Prints" captions={captions} result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="boots__intro">
-          Three plaster casts were poured at the Ames grave. Compare each with the suspects&apos; boots: tread, size
-          and hobnails. Click a cast and a pair of boots, then Pair them. Or use Up and Down to choose a cast, Left
-          and Right to choose boots, and Enter to pair.
+          <strong>Match each plaster cast from the Ames grave to a suspect&apos;s boots.</strong> Compare the{' '}
+          <strong>tread, size and hobnails</strong>. Click a cast and a pair of boots, then <strong>Pair them</strong>.
+          <span className="minigame-shell__sr"> Keyboard: Up and Down choose a cast, Left and Right choose boots, Enter pairs.</span>
         </p>
         <div
           ref={area}
@@ -139,7 +139,7 @@ export function BootPrintsMinigame() {
         </div>
         <div className="hymn__actions">
           <button type="button" className="hymn__act" tabIndex={-1} disabled={solved} onClick={pair}>
-            Pair them (Enter)
+            Pair them
           </button>
         </div>
       </div>

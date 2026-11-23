@@ -105,9 +105,9 @@ export function WatchLogMinigame() {
     <MinigameShell id="2b" title="The Watch Log" captions={captions} result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="timeline__intro">
-          The night pages of the watch-house log were torn out and scattered over the lodge table. Put them in
-          order through the night. Drag a page, or use Left and Right to choose one, Space to lift it, Left and
-          Right to move it, Space to set it down, and Enter to judge.
+          <strong>Drag the torn watch-log pages into order through the night.</strong> Each page names its
+          hour. <strong>Look for the hours nobody wrote down.</strong>
+          <span className="minigame-shell__sr"> Keyboard: Left and Right choose a page, Space lifts and sets it down, Enter judges.</span>
         </p>
 
         <div className="timeline__ends" aria-hidden="true">
@@ -189,7 +189,7 @@ export function WatchLogMinigame() {
             Later
           </button>
           <button type="button" className="timeline__act" tabIndex={-1} disabled={solved} onClick={confirm}>
-            Judge the log (Enter)
+            Judge the log
           </button>
         </div>
 

@@ -99,3 +99,19 @@
   font-family: var(--font-heading);
   font-size: 1.1rem;
 }
+
+/* Case 1: the answer is typed (playtest: options gave it away), then the keeper writes it up. */
+.altar-panel__typed { display: flex; flex-direction: column; gap: 0.4rem; margin: 0 0 0.75rem; }
+.altar-panel__typed .altar-panel__sentence { margin: 0; font-size: 1.35rem; font-weight: 700; line-height: 1.4; }
+.altar-panel__input {
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  font-size: 1.25rem;
+  color: var(--ink);
+  background: rgba(255, 248, 225, 0.85);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+}
+.altar-panel__input:focus-visible { outline: 3px solid var(--ember); outline-offset: 2px; }
+.altar-panel__summary-head { margin: 0 0 0.5rem; font-weight: 700; }
+.altar-panel__hand { margin-bottom: 0.75rem; }

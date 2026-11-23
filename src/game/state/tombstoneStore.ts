@@ -7,6 +7,7 @@ import { readTombstone } from '../systems/tombstones'
 import { useGameStore } from './gameStore'
 import { useInventoryStore } from './inventoryStore'
 import { useMysteryStore } from './mysteryStore'
+import { noteStoneRead } from './case1Story'
 
 interface TombstoneState {
   id: TombstoneId | null
@@ -32,6 +33,7 @@ export const useTombstoneStore = create<TombstoneState>((set, get) => ({
       readIds: s.readIds.includes(id) ? s.readIds : [...s.readIds, id],
     }))
     useGameStore.getState().setExamining(true)
+    noteStoneRead(id)
   },
   close: () => {
     if (!get().id) return

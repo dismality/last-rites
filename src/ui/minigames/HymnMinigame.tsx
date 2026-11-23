@@ -104,9 +104,9 @@ export function HymnMinigame() {
     <MinigameShell id="3a" title="The Hymn Board" captions={captions} result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="hymn__intro">
-          The board names five hymns. Find each in the vestry psalter and set its first letter on the brass
-          tiles. Left and Right choose a tile, Up and Down change its letter (or type one), Enter blows the
-          whistle.
+          <strong>Set each tile to the first letter of a hymn on the board</strong>, looked up in the vestry psalter.
+          Click a tile and type its letter, then <strong>Blow the whistle</strong>.
+          <span className="minigame-shell__sr"> Keyboard: Left and Right choose a tile, Up and Down change its letter, Enter blows the whistle.</span>
         </p>
 
         <div className="hymn__board" aria-label="The hymn board">
@@ -154,7 +154,7 @@ export function HymnMinigame() {
             Letter on
           </button>
           <button type="button" className="hymn__act" tabIndex={-1} disabled={solved} onClick={confirm}>
-            Blow the whistle (Enter)
+            Blow the whistle
           </button>
         </div>
 

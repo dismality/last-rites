@@ -25,6 +25,8 @@ import {
 import { CHAPEL_CENTER, MAUSOLEUM_ROW, avenueCrypts } from '../../data/cemeteryLayout'
 import { HYMN_BOARD_POSITION, HYMN_TILE_ROW, PSALTER_POSITION } from '../../data/chapelScenery'
 import { ALTAR_WHISTLE_OFFSET } from '../../data/gateHints'
+import { pullBellCord, type BellSound } from '../../game/state/case1Story'
+import { playRecorded } from '../../audio/AudioManager'
 import { useCaseStore } from '../../game/state/caseStore'
 import { useClueRevealStore } from '../../game/state/clueRevealStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
@@ -54,6 +56,14 @@ import { Interactable } from './Interactable'
 
 const POST_HEIGHT = 1.1
 
+/** A sound bell rings where it stands; a cut cord gives no sound at all. */
+const ringBell: BellSound = (id, rings) => {
+  const post = CASE_1_BELLS.find((p) => p.id === id)
+  if (!post || !rings) return
+  const [x, , z] = post.position
+  playRecorded('strange-hand-bell', { x, y: POST_HEIGHT, z }, 0.9, 30, 'ambience')
+}
+
 /** An iron post with a bell at the top, a rope hanging from it and a paper tag. */
 function BellPost({ post }: { post: BellPostDef }) {
   const cut = post.condition === 'rope-cut'
@@ -65,10 +75,7 @@ function BellPost({ post }: { post: BellPostDef }) {
         subject={post.id}
         runeHeight={POST_HEIGHT + 0.5}
         outlineRange={4}
-        onInteract={() => {
-          useOverlayStore.getState().setBellPostFocus(post.id)
-          useOverlayStore.getState().setMinigameOpen('1b')
-        }}
+        onInteract={() => pullBellCord(post.id, ringBell)}
       >
         <BellPostShape height={POST_HEIGHT} cut={cut} />
       </Interactable>
@@ -85,7 +92,13 @@ const openHymnBoard = () => useOverlayStore.getState().setMinigameOpen('3a')
 function HymnBoardHotspot() {
   return (
     <group position={[...HYMN_BOARD_POSITION]}>
-      <Interactable id="hymn-board" kind="hymn-board" runeHeight={0.6} outlineRange={4} onInteract={openHymnBoard}>
+      <Interactable
+        id="hymn-board"
+        kind="hymn-board"
+        runeHeight={0.6}
+        outlineRange={4}
+        onInteract={openHymnBoard}
+      >
         <mesh visible={false}>
           <boxGeometry args={[0.3, 0.8, 1.5]} />
         </mesh>
@@ -156,7 +169,9 @@ function EvidenceProp({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
         outlineRange={4}
         onInteract={() => {
           if (!useCaseStore.getState().findEvidence(id)) return
-          useToastStore.getState().push(`Evidence: ${CASE_3_EVIDENCE.find((e) => e.id === id)?.title ?? id}`)
+          useToastStore
+            .getState()
+            .push(`Evidence: ${CASE_3_EVIDENCE.find((e) => e.id === id)?.title ?? id}`)
         }}
       >
         <EvidenceShape id={id} />
@@ -173,7 +188,13 @@ function EvidenceProp({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
 function TimelineSlate() {
   return (
     <group position={[...CASE_3_CRYPT_PROPS.slate]} rotation={[0, Math.PI / 2 - 0.3, 0]}>
-      <Interactable id="timeline-slate" kind="timeline-slate" runeHeight={1.2} outlineRange={4} onInteract={openTimeline}>
+      <Interactable
+        id="timeline-slate"
+        kind="timeline-slate"
+        runeHeight={1.2}
+        outlineRange={4}
+        onInteract={openTimeline}
+      >
         <SlateShape />
       </Interactable>
     </group>
@@ -290,7 +311,13 @@ const LOOSE_PAGES: readonly (readonly [number, number, number])[] = [
 function WatchLogbook() {
   return (
     <group position={[...CASE_2_LOGBOOK_POSITION]} rotation={[0, 0.25, 0]}>
-      <Interactable id="watch-logbook" kind="watch-logbook" runeHeight={0.4} outlineRange={4} onInteract={openWatchLog}>
+      <Interactable
+        id="watch-logbook"
+        kind="watch-logbook"
+        runeHeight={0.4}
+        outlineRange={4}
+        onInteract={openWatchLog}
+      >
         <LogbookShape />
         {LOOSE_PAGES.map(([x, z, r], i) => (
           <group key={i} position={[x * 0.9 + 0.08, 0.001, z]} rotation={[0, r, 0]}>
@@ -341,9 +368,18 @@ function CrestTablet({ t }: { t: CrestTabletDef }) {
   if (!crypt) return null
   const west = crypt.position[0] < MAUSOLEUM_ROW.centerX
   const x = MAUSOLEUM_ROW.centerX + (west ? -1 : 1) * (MAUSOLEUM_ROW.width / 2 - 0.06)
-  const line = t.family + '. The ' + CREST_NAMES[t.crest].toLowerCase() + ' crest. The founder laid down in ' + t.year + '.'
+  const line =
+    t.family +
+    '. The ' +
+    CREST_NAMES[t.crest].toLowerCase() +
+    ' crest. The founder laid down in ' +
+    t.year +
+    '.'
   return (
-    <group position={[x, 1.15, crypt.position[2]]} rotation={[0, west ? Math.PI / 2 : -Math.PI / 2, 0]}>
+    <group
+      position={[x, 1.15, crypt.position[2]]}
+      rotation={[0, west ? Math.PI / 2 : -Math.PI / 2, 0]}
+    >
       <Interactable
         id={'crest-tablet-' + t.family}
         kind="crest-tablet"
@@ -376,7 +412,13 @@ function CrestNiche() {
   const [x, , z] = CASE_2_CREST_LOCK.niche
   return (
     <group position={[x, 0, z]} rotation={[0, Math.PI / 2, 0]}>
-      <Interactable id="crest-lock" kind="crest-lock" runeHeight={1.5} outlineRange={4} onInteract={openCrestLock}>
+      <Interactable
+        id="crest-lock"
+        kind="crest-lock"
+        runeHeight={1.5}
+        outlineRange={4}
+        onInteract={openCrestLock}
+      >
         <NichePierShape />
         <mesh position={[0, 0.45, 0.06]}>
           <boxGeometry args={[0.4, 0.3, 0.02]} />

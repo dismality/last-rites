@@ -22,7 +22,8 @@ describe('caseBoard', () => {
   })
 
   it('a listed pair gives its note and lowers the meter by one', () => {
-    const c = CASES[0]
+    // Case 1 has no links (its journal asks one question); Case 2 does.
+    const c = CASES[1]
     const n = c.notes[0]
     const r = addLink(EMPTY_BOARD, c, n.b, n.a)
     expect(r.note).toBe(n)

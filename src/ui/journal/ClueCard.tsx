@@ -5,13 +5,15 @@ import { clueIconUrl, type CardView } from './caseBoardView'
 interface Props {
   view: CardView
   selected: boolean
+  /** What the selected mark says; the case board question marks the card it asks about. */
+  selectedLabel?: string
   /** Strings already tied to this card, shown as text. */
   linkCount: number
   onPick: (id: string) => void
   onPointerDown: (id: string, e: React.PointerEvent<HTMLButtonElement>) => void
 }
 
-export function ClueCard({ view, selected, linkCount, onPick, onPointerDown }: Props) {
+export function ClueCard({ view, selected, selectedLabel, linkCount, onPick, onPointerDown }: Props) {
   const { clue, at, tiltDeg } = view
   return (
     <button
@@ -27,7 +29,7 @@ export function ClueCard({ view, selected, linkCount, onPick, onPointerDown }: P
       <img className="clue-card__icon" src={clueIconUrl(clue.icon)} alt="" width={32} height={32} draggable={false} />
       <span className="clue-card__title">{clue.title}</span>
       <span className="clue-card__line">{clue.line}</span>
-      {selected && <span className="clue-card__state">Selected: pick another card</span>}
+      {selected && <span className="clue-card__state">{selectedLabel ?? 'Selected: pick another card'}</span>}
       {linkCount > 0 && (
         <span className="clue-card__links">
           {linkCount} {linkCount === 1 ? 'string' : 'strings'}

@@ -95,7 +95,7 @@ describe('applyFlag', () => {
   })
   it('only the three right flags are ever accepted', () => {
     fc.assert(
-      fc.property(fc.constantFrom(...stoneIds), fc.constantFrom('date', 'plot', 'certificate' as const), (stone, kind) => {
+      fc.property(fc.constantFrom(...stoneIds), fc.constantFrom('date', 'plot', 'cause' as const), (stone, kind) => {
         const out = applyFlag(joinLine([], stone, own(stone)), stone, kind)
         const right = CASE_1_RIGHT_FLAGS.some((r) => r.stoneId === stone && r.kind === kind)
         expect(out.kind === 'right').toBe(right)

@@ -1,6 +1,6 @@
 // Mounts the open Minigame overlay (spec 10 task 3.2 onward). One flag in `overlayStore` says which.
+// Minigame 1b has no overlay: its bell cords are pulled in the world and its question is in the journal.
 import { useOverlayStore } from '../../game/state/overlayStore'
-import { BellsMinigame } from './BellsMinigame'
 import { BootPrintsMinigame } from './BootPrintsMinigame'
 import { CrestLockMinigame } from './CrestLockMinigame'
 import { HymnMinigame } from './HymnMinigame'
@@ -13,8 +13,6 @@ export function MinigameHost() {
   switch (open) {
     case '1a':
       return <LedgerMinigame />
-    case '1b':
-      return <BellsMinigame />
     case '2a':
       return <CrestLockMinigame />
     case '2b':

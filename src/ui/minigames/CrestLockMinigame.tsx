@@ -81,8 +81,9 @@ export function CrestLockMinigame() {
     <MinigameShell id="2a" title="The Crest Lock" captions={captions} result={result}>
       <div onKeyDown={onKeyDown}>
         <p className="crest__intro">
-          Four stone dials in the sexton&apos;s niche, each cut with family crests. Use ▲ and ▼ to turn a dial, or
-          Left and Right to choose a dial, Up and Down to turn it, and Enter to try the lock.
+          <strong>Set the four dials to the founders&apos; crests, oldest first.</strong> The years are listed
+          below. Turn a dial with ▲ and ▼, then <strong>Try the lock</strong>.
+          <span className="minigame-shell__sr"> Keyboard: Left and Right choose a dial, Up and Down turn it, Enter tries the lock.</span>
         </p>
         <blockquote className="crest__note">
           <span className="crest__note-from">A note from the lodge:</span> &ldquo;{CASE_2_CREST_LOCK.note}.&rdquo;
@@ -118,16 +119,12 @@ export function CrestLockMinigame() {
 
         <div className="hymn__actions">
           <button type="button" className="hymn__act" tabIndex={-1} disabled={solved} onClick={confirm}>
-            Try the lock (Enter)
+            Try the lock
           </button>
         </div>
 
         <section className="crest__tablets" aria-label="Crypt name tablets on Mausoleum Row">
           <h3 className="hymn__heading">The crypt name tablets, as read on the Row</h3>
-          <p className="crest__demo-note">
-            Demo aid: in the full game this list is not shown here. Each year is read from the tablet on its crypt and
-            noted in the journal. It is kept here so the demo can be finished quickly.
-          </p>
           <ul>
             {CASE_2_CREST_LOCK.tablets.map((t) => (
               <li key={t.family}>

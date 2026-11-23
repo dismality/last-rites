@@ -3,7 +3,7 @@
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
 import { crestTabletPosition, EVIDENCE_SEARCH, STAGE_DAY_RULES } from '../../data/objectiveRules'
-import { caseOfStage, CASE_1_BELLS, CASE_2_CREST_LOCK, CASE_3_BOOTS_CLUE, type EvidenceCardId, type MinigameId } from '../../data/cases'
+import { caseOfStage, CASE_1_BELLS, CASE_1_RIGHT_FLAGS, CASE_1_STONES, CASE_2_CREST_LOCK, CASE_3_BOOTS_CLUE, type EvidenceCardId, type MinigameId } from '../../data/cases'
 import { useGameStore } from './gameStore'
 import { stepAnnouncements, type StepWatch } from '../systems/stageSteps'
 import { useClueRevealStore } from './clueRevealStore'
@@ -209,10 +209,20 @@ const readStageDaySteps = (stage: 1 | 2 | 3): DayStep[] => {
   const solved = (id: MinigameId) => caseOfStage(stage).minigames.includes(id) && cases[caseOfStage(stage).id].minigames.includes(id)
   const one = (id: MinigameId) => ({ count: solved(id) ? 1 : 0, done: solved(id) })
   if (stage === 1) {
-    const examined = cases['saved-by-the-bell'].bellsExamined
+    const c1 = cases['saved-by-the-bell']
+    const examined = c1.bellsExamined
     const left = CASE_1_BELLS.filter((b) => !examined.includes(b.id)).map((b) => b.position)
+    const graves = CASE_1_RIGHT_FLAGS.map((f) => CASE_1_STONES.find((st) => st.id === f.stoneId)!)
+    const unread = graves.filter((g) => !c1.stonesRead.includes(g.id))
+    const stonesDone = solved('1a') || unread.length === 0
+    const marked = c1.ledgerLines.filter((l) => l.flag !== null).length
     return [
-      one('1a'),
+      {
+        count: stonesDone ? graves.length : graves.length - unread.length,
+        done: stonesDone,
+        ...(unread.length > 0 && !stonesDone ? { at: unread.map((g) => g.position) } : {}),
+      },
+      { count: solved('1a') ? graves.length : Math.min(graves.length, marked), done: solved('1a') },
       { count: solved('1b') ? 3 : Math.min(3, examined.length), done: solved('1b'), ...(left.length > 0 ? { at: left } : {}) },
     ]
   }

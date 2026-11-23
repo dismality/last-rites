@@ -41,6 +41,7 @@ function extractSettings(current: SettingsStoreState): Settings {
     plainJournalFont: current.plainJournalFont,
     lowGraphics: current.lowGraphics,
     showInfoDots: current.showInfoDots,
+    developerMode: current.developerMode,
     bindings: current.bindings,
   }
 }

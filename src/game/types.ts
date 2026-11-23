@@ -287,6 +287,8 @@ export interface Settings {
   lowGraphics: boolean
   /** Small "i" info dots with how-to-play tooltips (spec 11 H5, design bible §14.5) */
   showInfoDots: boolean
+  /** Developer mode: the Dev_Panel (`) and the "skip this step" key (]) for demos and judging */
+  developerMode: boolean
   /** Key bindings: action name → KeyboardEvent.code */
   bindings: Record<string, string>
 }

@@ -20,10 +20,14 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
     location: 'fx-page-1',
     title: 'The first week',
     text:
-      'Third night at Hollowmere and I have stopped pretending it is the foxes. ' +
-      'The graves along the north row were not dug from above. The soil is pushed up and outward, ' +
-      'as though something had been trying to leave. I checked the dates against the parish ledger ' +
-      'and they do not agree. Someone has been tidying the truth. I will keep the lantern lit.',
+      'Whoever finds this: you should know how the dead are kept here. ' +
+      'Doctors cannot always tell a deep sleep from death, and people have been buried alive. ' +
+      'So every grave at Hollowmere has a safety bell. A cord runs from the dead man’s hand, ' +
+      'up a pipe through the soil, to a little bell on a post above him. If he wakes below, ' +
+      'he pulls the cord, the bell rings, and the watchman digs him out. ' +
+      'Now listen. Pell’s grave is wrong. Someone has changed the parish ledger on the hut shelf. ' +
+      'Read the stones of John Pell, Esther Ames and Tobias Hale, and check each one against its entry. ' +
+      'If I am not back, do not trust the ink. Trust the stones.',
   },
   {
     id: 2,

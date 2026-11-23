@@ -44,12 +44,29 @@ export function handlePauseKey(code: string): void {
   if (!owned) useGameStore.getState().setPaused(true)
 }
 
+/** A lock lost this soon after an Esc that closed a screen belongs to that Esc, not to a pause. */
+export const ESC_CLOSE_GRACE_MS = 1500
+
+let escClosedAt = -Infinity
+
+/** Esc closed a screen (a puzzle, the journal, an examine view) instead of pausing. */
+export function noteEscClosed(now: number): void {
+  escClosedAt = now
+}
+
+/** True while a lock loss should be read as part of the Esc that closed a screen. */
+export function inEscCloseGrace(now: number): boolean {
+  return now - escClosedAt < ESC_CLOSE_GRACE_MS
+}
+
 /**
  * Pointer-lock-loss path. An 08 overlay releases the cursor deliberately, so that loss is not a
- * pause request (Esc still is, via the key path).
+ * pause request (Esc still is, via the key path). Nor is the loss that follows an Esc which
+ * closed a puzzle or another screen: that Esc was spent on closing it.
  */
-export function handlePointerLockLost(): void {
+export function handlePointerLockLost(now = performance.now()): void {
   if (escOwnedByOverlay() || isOverlayOpen()) return
+  if (inEscCloseGrace(now)) return
   // startEnding frees the cursor itself (the ending has buttons), and the lock-loss event lands
   // after the screen has switched. Pausing then froze the ending sequence's clock at 0.
   if (useGameStore.getState().screen !== 'game') return
@@ -71,6 +88,11 @@ export function lockChangeLosesLock(wasLocked: boolean, nowLocked: boolean): boo
 export function usePauseTriggers(): void {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => handlePauseKey(e.code)
+    // Capture phase, before any screen closes itself: if a screen is open, this Esc closes it.
+    const onEscCapture = (e: KeyboardEvent) => {
+      if (e.code !== 'Escape') return
+      if (escOwnedByOverlay() || isOverlayOpen()) noteEscClosed(performance.now())
+    }
     let locked = document.pointerLockElement !== null
     const onLockChange = () => {
       const now = document.pointerLockElement !== null
@@ -78,9 +100,11 @@ export function usePauseTriggers(): void {
       locked = now
       if (lost) handlePointerLockLost()
     }
+    window.addEventListener('keydown', onEscCapture, true)
     window.addEventListener('keydown', onKey)
     document.addEventListener('pointerlockchange', onLockChange)
     return () => {
+      window.removeEventListener('keydown', onEscCapture, true)
       window.removeEventListener('keydown', onKey)
       document.removeEventListener('pointerlockchange', onLockChange)
     }

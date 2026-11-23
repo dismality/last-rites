@@ -7,6 +7,8 @@ interface DevPanelState {
   enabled: boolean
   open: boolean
   enable: () => void
+  /** Developer mode turned off in Settings: the panel closes and cannot open again. */
+  disable: () => void
   toggle: () => void
   close: () => void
 }
@@ -15,6 +17,7 @@ export const useDevPanelStore = create<DevPanelState>((set, get) => ({
   enabled: false,
   open: false,
   enable: () => set({ enabled: true }),
+  disable: () => set({ enabled: false, open: false }),
   toggle: () => {
     if (!get().enabled) return
     set({ open: !get().open })

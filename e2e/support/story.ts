@@ -9,16 +9,33 @@ import { body, frames, log, lookAt, moveMouse, pressE, useProp, walkTo, type P2 
 // ---------------------------------------------------------------------------
 
 interface CaseSnap {
-  cases: Record<string, { minigames: string[]; found: string[]; wrongAnswers: number; evidenceFound?: string[] }>
+  cases: Record<
+    string,
+    { minigames: string[]; found: string[]; wrongAnswers: number; evidenceFound?: string[] }
+  >
   closed: string[]
 }
 export const world = (page: Page) =>
-  page.evaluate(() => window.__lastRites!.snapshot('world') as { phase: string; phaseTime: number; nightNumber: number })
-export const stageNo = (page: Page) => page.evaluate(() => (window.__lastRites!.stageState() as { stage: number }).stage)
-export const caseState = (page: Page) => page.evaluate(() => window.__lastRites!.caseState() as CaseSnap)
-export const solved = async (page: Page, caseId: string) => (await caseState(page)).cases[caseId].minigames
+  page.evaluate(
+    () =>
+      window.__lastRites!.snapshot('world') as {
+        phase: string
+        phaseTime: number
+        nightNumber: number
+      },
+  )
+export const stageNo = (page: Page) =>
+  page.evaluate(() => (window.__lastRites!.stageState() as { stage: number }).stage)
+export const caseState = (page: Page) =>
+  page.evaluate(() => window.__lastRites!.caseState() as CaseSnap)
+export const solved = async (page: Page, caseId: string) =>
+  (await caseState(page)).cases[caseId].minigames
 export const keyItems = (page: Page) =>
-  page.evaluate(() => (window.__lastRites!.snapshot('inventory') as { inventory: { keyItems: string[] } }).inventory.keyItems)
+  page.evaluate(
+    () =>
+      (window.__lastRites!.snapshot('inventory') as { inventory: { keyItems: string[] } }).inventory
+        .keyItems,
+  )
 export const shell = (page: Page) => page.locator('.minigame-shell')
 export const objective = (page: Page) => page.locator('.hud-objective__main')
 
@@ -82,7 +99,10 @@ export async function relock(page: Page): Promise<void> {
     await page.mouse.up()
     await frames(page, 6)
   }
-  expect(await page.evaluate(() => document.pointerLockElement !== null), 'pointer lock back on the canvas').toBe(true)
+  expect(
+    await page.evaluate(() => document.pointerLockElement !== null),
+    'pointer lock back on the canvas',
+  ).toBe(true)
 }
 
 export async function closeMinigame(page: Page): Promise<void> {
@@ -117,13 +137,18 @@ export async function newGame(page: Page): Promise<number> {
     await page.keyboard.press('Space')
     await page.waitForTimeout(1000)
   }
-  await page.waitForFunction(() => window.__lastRites!.body() !== null, undefined, { timeout: 120_000 })
+  await page.waitForFunction(() => window.__lastRites!.body() !== null, undefined, {
+    timeout: 120_000,
+  })
   await page.waitForFunction(
     () => (window.__lastRites!.snapshot('world') as { phaseTime: number }).phaseTime > 0.3,
     undefined,
     { timeout: 120_000 },
   )
-  expect((await page.evaluate(() => window.__lastRites!.snapshot('progression') as { mode: string })).mode).toBe('short-vigil')
+  expect(
+    (await page.evaluate(() => window.__lastRites!.snapshot('progression') as { mode: string }))
+      .mode,
+  ).toBe('short-vigil')
   await relock(page)
   return begun
 }
@@ -134,7 +159,8 @@ export async function godMode(page: Page): Promise<void> {
   const panel = page.getByRole('complementary', { name: 'Developer panel' })
   await expect(panel).toBeVisible()
   const cheats = panel.locator('details', { has: page.locator('summary', { hasText: 'Cheats' }) })
-  if (!(await cheats.evaluate((d) => (d as HTMLDetailsElement).open))) await click(page, cheats.locator('summary'))
+  if (!(await cheats.evaluate((d) => (d as HTMLDetailsElement).open)))
+    await click(page, cheats.locator('summary'))
   const toggle = panel.getByRole('button', { name: /God mode/ })
   await click(page, toggle)
   await expect(toggle).toHaveAttribute('aria-pressed', 'true')
@@ -145,10 +171,14 @@ export async function godMode(page: Page): Promise<void> {
 
 /** Waits (playing nothing) until the given phase arrives: the real clock, no skip. */
 export async function waitPhase(page: Page, phase: string, timeoutMs = 300_000): Promise<void> {
-  await page.waitForFunction((p) => (window.__lastRites!.snapshot('world') as { phase: string }).phase === p, phase, {
-    timeout: timeoutMs,
-    polling: 500,
-  })
+  await page.waitForFunction(
+    (p) => (window.__lastRites!.snapshot('world') as { phase: string }).phase === p,
+    phase,
+    {
+      timeout: timeoutMs,
+      polling: 500,
+    },
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -180,7 +210,9 @@ export async function pickBoon(page: Page): Promise<void> {
   await expect(card).toBeVisible({ timeout: 60_000 })
   await click(page, card)
   await page.waitForFunction(
-    () => (window.__lastRites!.snapshot('progression') as { pendingPick: unknown }).pendingPick === null,
+    () =>
+      (window.__lastRites!.snapshot('progression') as { pendingPick: unknown }).pendingPick ===
+      null,
   )
   await relock(page)
 }
@@ -190,69 +222,126 @@ export async function pickBoon(page: Page): Promise<void> {
 // ---------------------------------------------------------------------------
 
 const CASE1 = 'saved-by-the-bell'
-const result = (page: Page) => page.locator('.minigame-shell__result')
+const CASE1_GRAVES = ['pell', 'ames', 'hale'] as const
+/** What differs on each ledger line, as the button reads. */
+const LEDGER_MARKS = [
+  ['pell', 'The date differs'],
+  ['ames', 'The cause differs'],
+  ['hale', 'The plot differs'],
+] as const
+const case1 = async (page: Page) =>
+  (await page.evaluate(() => window.__lastRites!.caseState())) as {
+    cases: Record<string, { stonesRead: string[]; bellsExamined: string[] }>
+  }
+const stonesRead = async (page: Page) => (await case1(page)).cases[CASE1].stonesRead
+const bellsPulled = async (page: Page) => (await case1(page)).cases[CASE1].bellsExamined
+
+/** Opens the journal with J, goes to the Case board and answers "Which bell was cut?". */
+export async function answerCutBellInJournal(page: Page, bell: RegExp): Promise<void> {
+  await page.keyboard.press('KeyJ')
+  const tab = page.getByRole('tab', { name: 'Case board' })
+  await click(page, tab)
+  await expect(page.locator('.case1')).toBeVisible()
+  await click(page, page.locator('.case1__answer').filter({ hasText: bell }))
+  await expect(page.locator('.case1__jv')).toBeVisible()
+  await expect(page.locator('.case1__stamp-note')).toContainText('Josiah Vane')
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.case1')).toHaveCount(0)
+  await relock(page)
+}
+
+/** Types a name at the altar panel and gives it with Enter. */
+export async function typeAltarAnswer(page: Page, panel: Locator, name: string): Promise<void> {
+  const input = panel.locator('.altar-panel__input')
+  await click(page, input)
+  await page.keyboard.type(name, { delay: 20 })
+  await expect(input).toHaveValue(name)
+  await page.keyboard.press('Enter')
+}
 
 export async function stage1(page: Page, begun: number): Promise<{ firstMinigameS: number }> {
   await expectObjective(page, /Craft a weapon at the workbench|Read the page Elias left/)
 
   // Page 1 on the hut table.
   await useProp(page, 'fixed:fx-page-1', async () => {
-    const p = await page.evaluate(() => [...(window.__lastRites!.snapshot('mystery') as { mystery: { pages: Set<number> } }).mystery.pages])
+    const p = await page.evaluate(() => [
+      ...(window.__lastRites!.snapshot('mystery') as { mystery: { pages: Set<number> } }).mystery
+        .pages,
+    ])
     if (p.includes(1)) return true
     // The page may open its reading view: Escape puts it away.
-    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0) await page.keyboard.press('Escape')
+    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
+      await page.keyboard.press('Escape')
     return false
   })
-  if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0) await page.keyboard.press('Escape')
+  if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
+    await page.keyboard.press('Escape')
   await relock(page)
 
-  // 1a: the ledger page on the hut shelf.
+  // The three graves Elias named: read each stone with E (the rubbing opens, Esc puts it away).
+  await expectObjective(page, /Read the stones of Pell, Ames and Hale|Craft a weapon/)
+  for (const grave of CASE1_GRAVES) {
+    await useProp(page, `tombstone-${grave}`, async () => (await stonesRead(page)).includes(grave))
+    await expect(page.locator('.rubbing')).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.locator('.rubbing')).toHaveCount(0)
+    await relock(page)
+  }
+
+  // 1a: the ledger on the hut shelf. Each line is marked against its stone: what differs.
   await openMinigame(page, 'ledger-shelf')
   const firstMinigameS = (Date.now() - begun) / 1000
   log(`first Minigame open ${firstMinigameS.toFixed(1)} s after Begin`)
-  await expect(page.getByRole('dialog', { name: 'Ledger Cross-check' })).toBeVisible()
-  for (const [stone, entry, kind] of [
-    ['pell', 'l-pell', 'Date'],
-    ['ames', 'l-ames', 'Missing certificate'],
-    ['hale', 'l-hale', 'Plot'],
-  ] as const) {
-    await drag(page, page.locator(`[data-stone-id="${stone}"]`), page.locator(`[data-entry-id="${entry}"]`))
-    await expect(page.locator(`[data-stone-id="${stone}"]`)).toContainText('Joined')
-    await click(page, page.locator('.ledger__kind').filter({ hasText: kind }))
-    await click(page, page.getByRole('button', { name: /Flag mismatch/ }))
+  await expect(page.getByRole('dialog', { name: 'The parish ledger' })).toBeVisible()
+  for (const [grave, kind] of LEDGER_MARKS) {
+    const row = page.locator(`.ledger2__row[data-grave="${grave}"]`)
+    await click(page, row.getByRole('button', { name: kind }))
+    await expect(row.locator('.ledger2__verdict')).toBeVisible()
   }
-  await expect(result(page)).toContainText('Three burials do not add up')
+  await expect(page.locator('.ledger2__solved')).toContainText('J.V.')
   await expect.poll(() => solved(page, CASE1)).toContain('1a')
   await closeMinigame(page)
-  await expectObjective(page, /Examine the three bells|Craft a weapon/)
 
-  // 1b: the bell posts. Each post opens only its own bell, so visit all three.
+  // The bells: E pulls each cord. Ames and Hale ring; Pell's is cut.
+  await expectObjective(page, /Pull the bell cords|Craft a weapon/)
   for (const post of ['bell-hale', 'bell-ames', 'bell-pell']) {
-    await openMinigame(page, post)
-    for (const side of ['Turn the bell', 'Inspect the rope', 'Read the tag']) {
-      await click(page, page.locator('.bells__facet-btn').filter({ hasText: side }))
-      await click(page, page.locator('.bells__act').filter({ hasText: 'Inspect' }))
-    }
-    if (post !== 'bell-pell') await closeMinigame(page)
+    await useProp(page, post, async () => (await bellsPulled(page)).includes(post))
   }
-  // Still at Pell's post, the one that was cut.
-  await click(page, page.getByRole('button', { name: /This one/ }))
-  await expect.poll(() => solved(page, CASE1)).toContain('1b')
-  await closeMinigame(page)
 
-  // Night: the case is answered at the altar.
+  // The journal asks which bell was cut: Pell's. Its tag names J. Vane.
+  await expectObjective(page, /which bell was cut|Craft a weapon/)
+  await answerCutBellInJournal(page, /John Pell/)
+  await expect.poll(() => solved(page, CASE1)).toContain('1b')
+
+  // Night: the name is typed at the altar.
   await waitPhase(page, 'night')
-  await expectObjective(page, 'The curse holds. Solve the case at the altar.')
   const panel = await openAltar(page, 'The Altar')
-  await answerAltar(page, panel, ["Pell's grave", 'the bell rope was cut and the certificate was signed before the death'])
-  await page.waitForFunction(() => (window.__lastRites!.stageState() as { caseSolved: boolean }).caseSolved, undefined, {
-    timeout: 30_000,
-  })
+  await typeAltarAnswer(page, panel, 'josiah vane')
+  await page.waitForFunction(
+    () => (window.__lastRites!.stageState() as { caseSolved: boolean }).caseSolved,
+    undefined,
+    {
+      timeout: 30_000,
+    },
+  )
+  // The keeper writes the case up in the panel; Show it all, then Close.
+  await expect(panel.locator('.handwritten')).toBeVisible()
+  await click(page, panel.getByRole('button', { name: 'Show it all' }))
+  await expect(panel.locator('.handwritten')).toContainText(
+    'The Vanes bury people who know too much',
+  )
+  await click(page, panel.getByRole('button', { name: /Close/ }))
+  await expect(panel).toHaveCount(0)
+  await relock(page)
   await waitPhase(page, 'dawn', 60_000)
   await pickBoon(page)
-  await page.waitForFunction(() => (window.__lastRites!.stageState() as { stage: number }).stage === 2, undefined, {
-    timeout: 120_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.stageState() as { stage: number }).stage === 2,
+    undefined,
+    {
+      timeout: 120_000,
+    },
+  )
   return { firstMinigameS }
 }
 
@@ -261,7 +350,16 @@ export async function stage1(page: Page, begun: number): Promise<{ firstMinigame
 // ---------------------------------------------------------------------------
 
 const CASE2 = 'resurrection-men'
-const WATCH_ORDER = ['w-nine', 'w-ten', 'w-eleven', 'w-midnight', 'w-one', 'w-three', 'w-four', 'w-five']
+const WATCH_ORDER = [
+  'w-nine',
+  'w-ten',
+  'w-eleven',
+  'w-midnight',
+  'w-one',
+  'w-three',
+  'w-four',
+  'w-five',
+]
 /** Turns of each dial from unturned to the founders' crests (tower, leaf, star, moon). */
 const DIAL_TURNS = [2, 4, 3, 1]
 const found = async (page: Page, caseId: string) => (await caseState(page)).cases[caseId].found
@@ -271,7 +369,8 @@ export async function stage2(page: Page): Promise<void> {
 
   // Case 1's reward: the Rusted Crypt Key lies in Pell's grave.
   await useProp(page, 'fixed:fx-crypt-key', async () => {
-    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0) await page.keyboard.press('Escape')
+    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
+      await page.keyboard.press('Escape')
     return (await keyItems(page)).includes('rusted-crypt-key')
   })
   await relock(page)
@@ -279,17 +378,24 @@ export async function stage2(page: Page): Promise<void> {
   // The Row gate opens to the key.
   const gateOpen = () =>
     page.evaluate(
-      () => (window.__lastRites!.snapshot('mystery') as { mystery: { gates: Record<string, boolean> } }).mystery.gates['mausoleum-row'],
+      () =>
+        (window.__lastRites!.snapshot('mystery') as { mystery: { gates: Record<string, boolean> } })
+          .mystery.gates['mausoleum-row'],
     )
   await useProp(page, 'gate-mausoleum-row', gateOpen, { reach: 1.6 })
 
   // The surgeon's receipt on the lodge table.
-  await useProp(page, 'case-clue-surgeon-receipt', async () => (await found(page, CASE2)).includes('surgeon-receipt'))
+  await useProp(page, 'case-clue-surgeon-receipt', async () =>
+    (await found(page, CASE2)).includes('surgeon-receipt'),
+  )
   await relock(page)
 
   // 2b: the watch log, put in order with clicks on a page and the Earlier button.
   await openMinigame(page, 'watch-logbook')
-  const order = () => page.locator('[data-page]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.page ?? ''))
+  const order = () =>
+    page
+      .locator('[data-page]')
+      .evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.page ?? ''))
   for (let i = 0; i < WATCH_ORDER.length; i++) {
     const from = (await order()).indexOf(WATCH_ORDER[i])
     if (from === i) continue
@@ -304,13 +410,15 @@ export async function stage2(page: Page): Promise<void> {
   // 2a: the sexton's crest lock, then the whistle from the opened niche.
   await openMinigame(page, 'crest-lock')
   for (let i = 0; i < 4; i++) {
-    for (let k = 0; k < DIAL_TURNS[i]; k++) await click(page, page.getByRole('button', { name: `Turn dial ${i + 1} up` }))
+    for (let k = 0; k < DIAL_TURNS[i]; k++)
+      await click(page, page.getByRole('button', { name: `Turn dial ${i + 1} up` }))
   }
   await click(page, page.getByRole('button', { name: /Try the lock/ }))
   await expect.poll(() => solved(page, CASE2)).toContain('2a')
   await closeMinigame(page)
   await useProp(page, 'fixed:fx-bone-whistle', async () => {
-    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0) await page.keyboard.press('Escape')
+    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
+      await page.keyboard.press('Escape')
     return (await keyItems(page)).includes('bone-whistle')
   })
   await relock(page)
@@ -333,14 +441,22 @@ export async function stage2(page: Page): Promise<void> {
     'the matching boots',
     'the gap on his watch',
   ])
-  await page.waitForFunction(() => (window.__lastRites!.stageState() as { caseSolved: boolean }).caseSolved, undefined, {
-    timeout: 30_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.stageState() as { caseSolved: boolean }).caseSolved,
+    undefined,
+    {
+      timeout: 30_000,
+    },
+  )
   await waitPhase(page, 'dawn', 60_000)
   await pickBoon(page)
-  await page.waitForFunction(() => (window.__lastRites!.stageState() as { stage: number }).stage === 3, undefined, {
-    timeout: 120_000,
-  })
+  await page.waitForFunction(
+    () => (window.__lastRites!.stageState() as { stage: number }).stage === 3,
+    undefined,
+    {
+      timeout: 120_000,
+    },
+  )
 }
 
 // ---------------------------------------------------------------------------
@@ -348,21 +464,42 @@ export async function stage2(page: Page): Promise<void> {
 // ---------------------------------------------------------------------------
 
 const CASE3 = 'sealed-catacombs'
-const TIMELINE_ORDER = ['dry-boots', 'unsent-letter', 'cart-ruts', 'spilled-oil', 'hearse-pin', 'nail-marks']
+const TIMELINE_ORDER = [
+  'dry-boots',
+  'unsent-letter',
+  'cart-ruts',
+  'spilled-oil',
+  'hearse-pin',
+  'nail-marks',
+]
 /** Clicks of "Letter on" from an empty tile to B, E, L, O, W. */
 const BELOW_STEPS = [2, 5, 12, 15, 23]
-export const RITE_ORDER = ["Crane's Rosary", "Sexton's Bell Clapper", "Child's Locket", 'Burial Shroud', 'Reliquary Heart']
+export const RITE_ORDER = [
+  "Crane's Rosary",
+  "Sexton's Bell Clapper",
+  "Child's Locket",
+  'Burial Shroud',
+  'Reliquary Heart',
+]
 
 const evidence = async (page: Page) => (await caseState(page)).cases[CASE3].evidenceFound ?? []
 const relics = (page: Page) =>
-  page.evaluate(() => (window.__lastRites!.snapshot('inventory') as { inventory: { relics: string[] } }).inventory.relics)
+  page.evaluate(
+    () =>
+      (window.__lastRites!.snapshot('inventory') as { inventory: { relics: string[] } }).inventory
+        .relics,
+  )
 const clues = (page: Page) =>
-  page.evaluate(() => (window.__lastRites!.snapshot('mystery') as { mystery: { clues: string[] } }).mystery.clues)
+  page.evaluate(
+    () =>
+      (window.__lastRites!.snapshot('mystery') as { mystery: { clues: string[] } }).mystery.clues,
+  )
 
 /** Picks up a fixed item with E (dismissing its card), until the satchel holds it. */
 async function pickUp(page: Page, spawn: string, has: () => Promise<boolean>): Promise<void> {
   await useProp(page, `fixed:${spawn}`, async () => {
-    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0) await page.keyboard.press('Escape')
+    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
+      await page.keyboard.press('Escape')
     return has()
   })
   await relock(page)
@@ -390,14 +527,18 @@ export async function stage3Day(page: Page): Promise<void> {
   // 3b evidence: the letter in the hut, then the Row (ruts, oil, pin, nails), with the ledger and
   // the rosary on the way; the boots in the hut need the ledger to compare against.
   const examine = (card: string) =>
-    useProp(page, `evidence-${card}`, async () => (await evidence(page)).includes(card)).then(() => relock(page))
+    useProp(page, `evidence-${card}`, async () => (await evidence(page)).includes(card)).then(() =>
+      relock(page),
+    )
   await examine('unsent-letter')
   await examine('cart-ruts')
-  if (!(await hasKey(page, 'parish-ledger')())) await pickUp(page, 'fx-ledger', hasKey(page, 'parish-ledger'))
+  if (!(await hasKey(page, 'parish-ledger')()))
+    await pickUp(page, 'fx-ledger', hasKey(page, 'parish-ledger'))
   await pickUp(page, 'fx-rosary', hasRelic(page, 'crane-rosary'))
   for (const card of ['spilled-oil', 'hearse-pin', 'nail-marks']) await examine(card)
   await useProp(page, 'clue-clue-hut-boots', async () => {
-    if ((await page.getByRole('button', { name: /Put away|Close/ }).count()) > 0) await page.keyboard.press('Escape')
+    if ((await page.getByRole('button', { name: /Put away|Close/ }).count()) > 0)
+      await page.keyboard.press('Escape')
     return (await clues(page)).includes('clue-hut-boots')
   })
   await relock(page)
@@ -405,7 +546,10 @@ export async function stage3Day(page: Page): Promise<void> {
   // 3b: the slate at the crypt, its cards sorted with clicks and the Earlier button.
   await openMinigame(page, 'timeline-slate')
   await expect(page.locator('.timeline__card')).toHaveCount(6)
-  const order = () => page.locator('.timeline__card').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.card ?? ''))
+  const order = () =>
+    page
+      .locator('.timeline__card')
+      .evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.card ?? ''))
   for (let i = 0; i < TIMELINE_ORDER.length; i++) {
     const from = (await order()).indexOf(TIMELINE_ORDER[i])
     if (from === i) continue
@@ -419,23 +563,37 @@ export async function stage3Day(page: Page): Promise<void> {
 
   // The crypt opens on Elias, and the ossuary key with him.
   await pickUp(page, 'fx-ossuary-key', hasKey(page, 'iron-ossuary-key'))
-  await expectObjective(page, /Gather the relics of the rite|Finish the rite at the altar|Craft a weapon/)
+  await expectObjective(
+    page,
+    /Gather the relics of the rite|Finish the rite at the altar|Craft a weapon/,
+  )
   await pickUp(page, 'fx-bell-clapper', hasRelic(page, 'sextons-bell-clapper'))
   // The catacombs: in through the north gate the whistle opened, the shroud, the ossuary door, the heart.
   await pickUp(page, 'fx-shroud', hasRelic(page, 'burial-shroud'))
   const ossuaryOpen = () =>
-    page.evaluate(() => (window.__lastRites!.snapshot('mystery') as { mystery: { gates: Record<string, boolean> } }).mystery.gates.ossuary)
+    page.evaluate(
+      () =>
+        (window.__lastRites!.snapshot('mystery') as { mystery: { gates: Record<string, boolean> } })
+          .mystery.gates.ossuary,
+    )
   await useProp(page, 'gate-ossuary', ossuaryOpen, { reach: 1.4 })
   await pickUp(page, 'fx-heart', hasRelic(page, 'reliquary-heart'))
   log(`relics by day: ${(await relics(page)).join(', ')}`)
 }
 
 type Enemy = { uid: string; type: string; hp: number; pos: { x: number; z: number } }
-const bossStage = (page: Page) => page.evaluate(() => (window.__lastRites!.snapshot('boss') as { stage: string }).stage)
+const bossStage = (page: Page) =>
+  page.evaluate(() => (window.__lastRites!.snapshot('boss') as { stage: string }).stage)
 const crane = (page: Page) =>
-  page.evaluate(() => (window.__lastRites!.snapshot('enemies') as Enemy[]).find((e) => e.type === 'father-crane') ?? null)
-const endingStage = (page: Page) => page.evaluate(() => (window.__lastRites!.snapshot('ending') as { stage: string | null }).stage)
-const ended = (page: Page) => page.evaluate(() => (window.__lastRites!.snapshot('ending') as { ending: string | null }).ending)
+  page.evaluate(
+    () =>
+      (window.__lastRites!.snapshot('enemies') as Enemy[]).find((e) => e.type === 'father-crane') ??
+      null,
+  )
+const endingStage = (page: Page) =>
+  page.evaluate(() => (window.__lastRites!.snapshot('ending') as { stage: string | null }).stage)
+const ended = (page: Page) =>
+  page.evaluate(() => (window.__lastRites!.snapshot('ending') as { ending: string | null }).ending)
 
 /** Father Crane, fought with the held weapon: walk up, aim at his chest, real left clicks. */
 async function fightCrane(page: Page): Promise<void> {
@@ -474,7 +632,8 @@ async function fightCrane(page: Page): Promise<void> {
 export async function stage3Night(page: Page): Promise<void> {
   // The Child's Locket shows only at night.
   await waitPhase(page, 'night')
-  if (!(await hasRelic(page, 'childs-locket')())) await pickUp(page, 'fx-locket', hasRelic(page, 'childs-locket'))
+  if (!(await hasRelic(page, 'childs-locket')()))
+    await pickUp(page, 'fx-locket', hasRelic(page, 'childs-locket'))
   expect(await relics(page)).toHaveLength(5)
   await expectObjective(page, 'Finish the rite at the altar (5/5)')
 

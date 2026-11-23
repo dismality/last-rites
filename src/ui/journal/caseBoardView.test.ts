@@ -32,11 +32,15 @@ describe('caseBoardView', () => {
   })
 
   it('marks right and wrong strings and drops strings to missing cards', () => {
-    const cards = layoutCards(c1.clues, c1.clues)
-    const n = c1.notes[0]
+    // Case 1 has no links (its journal asks one question); Case 2 does.
+    const c2 = CASES[1]
+    const cards = layoutCards(c2.clues, c2.clues)
+    const n = c2.notes[0]
     const right = linkKey(n.a, n.b)
-    const wrong = linkKey('hale-fresh-flowers', 'marsh-stone-toppled')
-    const views = stringViews([right, wrong, 'x|y'], c1, cards)
+    const notes = new Set(c2.notes.map((x) => linkKey(x.a, x.b)))
+    const pairs = c2.clues.flatMap((a, i) => c2.clues.slice(i + 1).map((b) => linkKey(a.id, b.id)))
+    const wrong = pairs.find((k) => !notes.has(k))!
+    const views = stringViews([right, wrong, 'x|y'], c2, cards)
     expect(views.map((v) => v.correct)).toEqual([true, false])
     expect(views[0].path.startsWith('M ')).toBe(true)
   })
@@ -50,8 +54,11 @@ describe('caseBoardView', () => {
   })
 
   it('splits the final question around its slots', () => {
-    const segs = questionSegments(c1.final)
-    expect(segs.filter((s) => s.kind === 'slot').map((s) => s.slot)).toEqual([0, 1])
+    const c2 = CASES[1]
+    const segs = questionSegments(c2.final)
+    expect(segs.filter((s) => s.kind === 'slot').map((s) => s.slot)).toEqual(c2.final.slots.map((_, i) => i))
+    // A typed question (Case 1) is all text.
+    expect(questionSegments(c1.final).every((s) => s.kind === 'text')).toBe(true)
     expect(segs[0].kind).toBe('text')
   })
 
@@ -73,9 +80,10 @@ describe('caseBoardView', () => {
   })
 
   it('reports the curse as a number and a fraction', () => {
-    const n = c1.notes[0]
-    expect(curseView([], c1)).toEqual({ label: `Curse ${c1.curseSteps} / ${c1.curseSteps}`, fraction: 1 })
-    expect(curseView([linkKey(n.a, n.b)], c1).label).toBe(`Curse ${c1.curseSteps - 1} / ${c1.curseSteps}`)
+    const c2 = CASES[1]
+    const n = c2.notes[0]
+    expect(curseView([], c2)).toEqual({ label: `Curse ${c2.curseSteps} / ${c2.curseSteps}`, fraction: 1 })
+    expect(curseView([linkKey(n.a, n.b)], c2).label).toBe(`Curse ${c2.curseSteps - 1} / ${c2.curseSteps}`)
   })
 
   it('gives every clue of every case an icon url', () => {

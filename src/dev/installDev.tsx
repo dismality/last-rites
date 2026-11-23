@@ -10,6 +10,8 @@ import { setDevCheatFlags } from '../game/state/devCheats'
 import { isDevEnabled } from './devFlag'
 import { installDevKeys } from './devKeys'
 import { useDevPanelStore } from './devPanelStore'
+import { DevSkipChip } from './DevSkipChip'
+import { installSkipKey } from './skipKey'
 
 let installed = false
 
@@ -18,16 +20,18 @@ export interface InstallDevOptions {
   search?: string
   /** `import.meta.env.DEV`; defaults to the build's. */
   envDev?: boolean
+  /** Developer mode is on in Settings. */
+  setting?: boolean
 }
 
 /** Returns true when dev mode was switched on. */
 export function installDev(opts: InstallDevOptions = {}): boolean {
   const search = opts.search ?? (typeof location === 'undefined' ? '' : location.search)
-  if (!isDevEnabled(search, opts.envDev ?? import.meta.env.DEV)) return false
+  if (!isDevEnabled(search, opts.envDev ?? import.meta.env.DEV, opts.setting ?? false)) return false
+  useDevPanelStore.getState().enable()
   if (installed) return true
   installed = true
 
-  useDevPanelStore.getState().enable()
   // An open panel is an overlay: the game stops taking input and the cursor is freed so the
   // buttons can be clicked. Clicking the canvas after closing re-locks it as usual.
   useDevPanelStore.subscribe((s, prev) => {
@@ -36,6 +40,7 @@ export function installDev(opts: InstallDevOptions = {}): boolean {
     if (s.open && document.pointerLockElement) document.exitPointerLock()
   })
   installDevKeys(window)
+  installSkipKey(window)
   startCheatTicker()
   startDebugViews()
 
@@ -46,6 +51,7 @@ export function installDev(opts: InstallDevOptions = {}): boolean {
     <>
       <DevPanel />
       <DebugOverlay />
+      <DevSkipChip />
     </>,
   )
   return true

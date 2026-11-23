@@ -21,6 +21,7 @@ const caseSaveArb: fc.Arbitrary<CaseSave> = fc
         hints: fc.record({ revealed: fc.constantFrom(0, 1, 2, 3) as fc.Arbitrary<0 | 1 | 2 | 3> }),
         ledgerLines: fc.constant([]),
         bellsExamined: fc.constant([]),
+        stonesRead: c.id === 'saved-by-the-bell' ? fc.shuffledSubarray(['pell', 'ames', 'hale']) : fc.constant([]),
         tabletsRead:
           c.id === 'resurrection-men'
             ? fc.shuffledSubarray(CASE_2_CREST_LOCK.tablets.map((t) => t.family))

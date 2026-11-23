@@ -47,13 +47,23 @@ export function facetText(post: BellPostDef, facet: BellFacet): string {
   return post[facet]
 }
 
+/**
+ * The part of a post that is wrong, marked in the notes so the comparison reads at a glance: a cut
+ * cord, or a tag signed before the death.
+ */
+export function facetIsOdd(post: BellPostDef, facet: BellFacet): boolean {
+  if (facet === 'rope') return post.condition === 'rope-cut'
+  if (facet === 'bell') return false
+  return post.tagClueId !== undefined || /^No certificate/.test(post.tag)
+}
+
 /** The question opens only when every post has been examined (so all three clues can be pinned). */
 export function cutQuestionOpen(examined: readonly BellPostId[]): boolean {
   return POST_IDS.every((id) => examined.includes(id))
 }
 
 /** Clue-card titles shown once the bells are solved, so the player sees what was pinned. */
-export const PINNED_NOTE = 'Pinned to the case board: the cut rope, the rusted bell and the hasty tag.'
+export const PINNED_NOTE = 'Pinned to the case board: the cut cord, the two bells that ring and the signed tag.'
 
 /** View yaw of a facet in radians: the post model turns a third of a turn per facet. */
 export function facetYaw(index: number): number {

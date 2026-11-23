@@ -61,7 +61,8 @@ describe('stage data (design bible §8, §13)', () => {
   })
 
   it('has day rules for every stage and altar captions', () => {
-    expect(STAGE_DAY_RULES[1]).toHaveLength(2)
+    // Stage 1: read the three stones, check the ledger, pull the bell cords.
+    expect(STAGE_DAY_RULES[1]).toHaveLength(3)
     // Stage 2 starts with the Row gate's key, the gate and the tablets, then its three minigames.
     expect(STAGE_DAY_RULES[2]).toHaveLength(6)
     expect(STAGE_DAY_RULES[2][0].place.kind).toBe('area')
