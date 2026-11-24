@@ -5,7 +5,7 @@
 //   node tools/audio/generate.mjs --batch first
 //
 // Options:
-//   --batch <first|halloween|scares|strange|played|sfx|voice|ambience|music|all>   which files (default: first)
+//   --batch <first|halloween|scares|strange|keeper|played|sfx|voice|ambience|music|all>   which files (default: first)
 //   --only <name>        just this entry, e.g. --only zombie-groan (all its variants)
 //   --force              make it again even if the file already exists
 //   --dry-run            list what would be made and roughly how much text; no key needed
@@ -55,7 +55,7 @@ function chosen(args) {
     return e
   }
   const list = AUDIO.filter((e) => inBatch(e, args.batch))
-  if (list.length === 0) throw new Error(`Unknown batch "${args.batch}". Use first, halloween, scares, strange, played, sfx, voice, ambience, music or all.`)
+  if (list.length === 0) throw new Error(`Unknown batch "${args.batch}". Use first, halloween, scares, strange, keeper, played, sfx, voice, ambience, music or all.`)
   return list
 }
 
@@ -151,6 +151,8 @@ function sheet() {
     `**Elias's voice:** ${VOICES.elias.describe}.`,
     '',
     `**The dead's voice** (the whispered "keeper"): ${VOICES.dead.describe}.`,
+    '',
+    `**The keeper's voice** (thinking aloud through the cases): ${VOICES.keeper.describe}.`,
     '',
     '"Not played yet" files are listed so the set is complete; the game does not use them yet.',
     '',

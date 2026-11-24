@@ -2390,3 +2390,13 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - Pell's ledger date is the 11th and his stone the 12th; Ames's ledger cause is "A fall" against "fever" on her stone; Hale's plot differs. (2026-11-23)
   - The page-1 voice line has new text but was not regenerated, as that spends credits. It stays switched off until it is. (2026-11-23)
   - The altar panel no longer shows "ready" for a moment before a lock has run out, which made Answer refuse a right name (`AltarPanel.tsx`). (2026-11-23)
+
+
+### 2026-11-23: The keeper's voice
+- **Started:** Outside Kiro
+- **What happened:**
+  - The keeper's Case 1 narration can now be read aloud. A new `keeper` voice is added to the audio generator, using the voice the developer chose (`ELEVENLABS_VOICE_KEEPER` overrides it).
+  - All 39 lines are in `tools/audio/prompts.mjs` as batch `keeper` (`node tools/audio/generate.mjs --batch keeper`, about 3,000 characters). Each file is named after the line's place in `case1Narration.ts`, e.g. `voice/keeper-stone-pell.ogg`. A test keeps the text word for word the same as the game's.
+  - `KeeperNarration.tsx` plays a line's recording as the line appears, keeps the line up until the recording ends, and cuts it on a click or a new line. Without the files the lines stay silent, as before.
+- **What Kiro caught or sped up:** Nothing; done by hand.
+- **Decisions made unattended:** Elias and the narrator keep their voices; only the keeper's lines use the new one. (2026-11-23)

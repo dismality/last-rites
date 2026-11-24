@@ -31,6 +31,12 @@ export const VOICES = {
     // Low stability and high style push the read toward a ragged whisper.
     settings: { stability: 0.25, similarity_boost: 0.6, style: 0.7, speed: 0.75 },
   },
+  keeper: {
+    describe: 'The new keeper thinking aloud as he works it out, a plain English man, clear and steady, quietly uneasy',
+    env: 'ELEVENLABS_VOICE_KEEPER',
+    // The voice chosen for the keeper (2026-11-23). Replace via the env variable.
+    fallbackId: 'pn8ABB5WQQBNyhFA5uEG',
+  },
 }
 
 const sfx = (name, prompt, seconds, extra = {}) => ({ kind: 'sfx', folder: 'sfx', name, prompt, seconds, wired: true, ...extra })
@@ -184,9 +190,49 @@ export const AUDIO = [
   say('walkout-1', 'narrator', 'The fog thins as the sun climbs over Hollowmere.', { wired: false, source: 'walkout:0' }),
   say('walkout-2', 'narrator', 'Behind you, the graves are only graves again.', { wired: false, source: 'walkout:1' }),
   say('walkout-3', 'narrator', 'The lane is empty. You do not look back.', { wired: false, source: 'walkout:2' }),
+  // ── The keeper thinking aloud, Case 1 (src/data/case1Narration.ts, word for word) ──
+  say("keeper-page-1", 'keeper', "Elias says Pell’s grave is wrong, and that someone changed the parish ledger.", { wired: true, batch: 'keeper' }),
+  say("keeper-page-2", 'keeper', "I’ll read the stones of John Pell, Esther Ames and Tobias Hale, then check each one against the ledger in the hut.", { wired: true, batch: 'keeper' }),
+  say("keeper-stone-pell", 'keeper', "John Pell’s stone: died the 12th of March 1862, north row, plot 3, struck down by apoplexy. I’ll check that against his entry in the ledger.", { wired: true, batch: 'keeper' }),
+  say("keeper-stone-ames", 'keeper', "Esther Ames: died the 7th of November 1849, east row, plot 1, taken by fever. Now to see what the ledger says about her.", { wired: true, batch: 'keeper' }),
+  say("keeper-stone-hale", 'keeper', "Tobias Hale: died the 5th of November 1849, west row, plot 1, taken by cholera. I’ll compare it with his ledger entry.", { wired: true, batch: 'keeper' }),
+  say("keeper-stones-done", 'keeper', "That’s all three stones. Now the ledger on the hut shelf.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-open-1", 'keeper', "Three names marked here: John Pell, Esther Ames and Tobias Hale.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-open-2", 'keeper', "For each one I’ll check the stone, then mark whether the ledger agrees with it.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-pell-1", 'keeper', "John Pell’s stone says he died on the 12th of March. The ledger says the 11th.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-pell-2", 'keeper', "The ledger has him dead a day before his own gravestone does.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-ames-1", 'keeper', "Esther Ames. Her stone says fever took her. The ledger says a fall.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-ames-2", 'keeper', "Someone wrote over the cause of death.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-hale-1", 'keeper', "Tobias Hale. His stone stands in the west row, plot 1. The ledger puts him in the east row, plot 4.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-right-hale-2", 'keeper', "Someone moved him, on paper.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-not-agree", 'keeper', "Look again. Something on this line doesn’t match the stone.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-wrong-kind-date", 'keeper', "No, the dates agree. Something else is wrong.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-wrong-kind-plot", 'keeper', "No, the plot agrees. Something else is wrong.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-wrong-kind-cause", 'keeper', "No, the cause of death agrees. Something else is wrong.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-solved-1", 'keeper', "So that’s three entries changed: John Pell, Esther Ames and Tobias Hale.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-solved-2", 'keeper', "The same fresh ink on each, and each one initialled J.V. in the margin. Someone rewrote these after the burials.", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-solved-3", 'keeper', "Pell’s is the strangest. If the ledger has him dead a day early, was he buried before he was dead?", { wired: true, batch: 'keeper' }),
+  say("keeper-ledger-solved-4", 'keeper', "This is strange. Every grave here has a safety bell. Let me check the bells on these three graves and see if anything’s wrong.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-ames", 'keeper', "I pull Esther Ames’s cord. The bell rings clear. If she had woken, the watchman would have heard.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-hale", 'keeper', "Tobias Hale’s bell rings too. Nothing wrong with this one.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-pell-1", 'keeper', "Nothing. John Pell’s cord hangs loose. It’s been cut clean, with a knife, not rotted through.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-pell-2", 'keeper', "His is the only bell here that could never ring.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-again-ames", 'keeper', "Esther Ames’s bell still rings.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-again-hale", 'keeper', "Tobias Hale’s bell still rings.", { wired: true, batch: 'keeper' }),
+  say("keeper-bell-again-pell", 'keeper', "John Pell’s cord is still cut. Nothing rings.", { wired: true, batch: 'keeper' }),
+  say("keeper-bells-done", 'keeper', "Two bells ring and one doesn’t. I’ll write it down in my journal: which bell was cut?", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-wrong-ames", 'keeper', "No. Esther Ames’s bell rang when I pulled it.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-wrong-hale", 'keeper', "No. Tobias Hale’s bell rang when I pulled it.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-right-1", 'keeper', "John Pell’s. Someone cut his cord, so no one would ever hear him ring.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-right-2", 'keeper', "There’s a tag tied to the cut end: his death certificate, signed on the 11th of March by J. Vane, Undertaker.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-right-3", 'keeper', "The 11th. The same false date as the ledger. He was signed dead a day before his stone says he died.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-right-4", 'keeper', "J.V. The same initials as in the ledger margin. J. Vane, the undertaker: Josiah Vane.", { wired: true, batch: 'keeper' }),
+  say("keeper-cut-right-5", 'keeper', "Someone must have wanted him buried. When night falls, I’ll name him at the chapel altar.", { wired: true, batch: 'keeper' }),
+  say("keeper-solved-1", 'keeper', "Josiah Vane. He signed John Pell dead a day early, changed the ledger to cover it, and cut his bell cord so no one would hear him.", { wired: true, batch: 'keeper' }),
+  say("keeper-solved-2", 'keeper', "Elias worked this out before me. That must be why he went missing.", { wired: true, batch: 'keeper' }),
 ]
 
-/** Batches the generator understands: --batch first, halloween, sfx, voice, ambience, music, all. */
+/** Batches the generator understands: --batch first, halloween, scares, strange, keeper, played, sfx, voice, ambience, music, all. */
 export function inBatch(entry, batch) {
   if (batch === 'all') return true
   if (batch === 'first') return entry.batch === 'first'
@@ -194,6 +240,7 @@ export function inBatch(entry, batch) {
   if (batch === 'scares') return entry.batch === 'scares'
   if (batch === 'played') return entry.wired === true
   if (batch === 'strange') return entry.batch === 'strange'
+  if (batch === 'keeper') return entry.batch === 'keeper'
   if (batch === 'voice') return entry.kind === 'voice'
   if (batch === 'music') return entry.kind === 'music'
   if (batch === 'ambience') return entry.folder === 'ambience'
