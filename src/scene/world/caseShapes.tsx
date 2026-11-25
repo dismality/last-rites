@@ -1,8 +1,11 @@
 // The case props' looks, built in code (spec 10 props). Each shape is a few merged meshes, so a
-// detailed prop still costs a handful of draw calls. No lights and no colliders here: CaseProps
-// wraps these in their Interactables. Rendering only.
+// detailed prop still costs a handful of draw calls. Stage 3's crypt door, hearse pin, Elias and the
+// tipped lantern are Blender models instead (tools/blender/props.py). No lights and no colliders here:
+// CaseProps wraps these in their Interactables. Rendering only.
+import { Clone, useGLTF } from '@react-three/drei'
 import { useMemo } from 'react'
 import * as THREE from 'three'
+import { DRACO_PATH, propModelUrl, type PropId } from '../../data/assets'
 import type { SoleDef } from '../../data/cases'
 import { lathe, merge, once, place, slab, type V3 } from '../assets/shapeKit'
 
@@ -22,6 +25,11 @@ const OIL = '#14110f'
 const CLAY = '#c8931a'
 
 const Y_UP: V3 = [0, 0, 0]
+
+/** A prop's Blender model, shared and cloned (preloaded with the other props). */
+function PropGlb({ id }: { id: PropId }) {
+  return <Clone object={useGLTF(propModelUrl(id), DRACO_PATH).scene} />
+}
 const FLAT: V3 = [-Math.PI / 2, 0, 0]
 const SIDEWAYS: V3 = [0, 0, Math.PI / 2]
 
@@ -245,38 +253,10 @@ export function RutsShape({ length, gauge }: { length: number; gauge: number }) 
   )
 }
 
-const pinGeo = once(() => ({
-  iron: merge([
-    // A thick iron bar about 40 cm long, through both hasps, with a forged head and a ring.
-    place(new THREE.CylinderGeometry(0.018, 0.014, 0.4, 8), [0, 0, 0], [0, 0, Math.PI / 2]),
-    place(new THREE.CylinderGeometry(0.032, 0.03, 0.03, 10), [-0.21, 0, 0], [0, 0, Math.PI / 2]),
-    place(new THREE.TorusGeometry(0.045, 0.008, 6, 16), [-0.25, 0, 0.0], [0, Math.PI / 2, 0]),
-  ]),
-  // The two hasps on the door and frame the bar runs through.
-  hasps: merge([
-    place(new THREE.BoxGeometry(0.05, 0.08, 0.04), [-0.08, 0, -0.02]),
-    place(new THREE.BoxGeometry(0.05, 0.08, 0.04), [0.1, 0, -0.02]),
-  ]),
-  // The raven stamped on the ring head, picked out pale so it reads.
-  raven: place(new THREE.CircleGeometry(0.018, 10), [-0.226, 0, 0], [0, -Math.PI / 2, 0]),
-}))
-
-/** The iron hearse pin pushed through the Crane crypt door's hasps, along X, ring head at -X. */
+/** The iron hearse pin pushed through the Crane crypt door's hasps, along X, ring head at -X, the Vane
+ * raven on its head (props/hearse-pin.glb, from tools/blender/props.py). */
 export function HearsePinShape() {
-  const g = pinGeo()
-  return (
-    <>
-      <mesh geometry={g.iron}>
-        <meshStandardMaterial color={IRON} roughness={0.7} metalness={0.6} emissive="#3a3a40" emissiveIntensity={0.15} />
-      </mesh>
-      <mesh geometry={g.hasps}>
-        <meshStandardMaterial color="#2a2a2e" roughness={0.8} metalness={0.5} />
-      </mesh>
-      <mesh geometry={g.raven}>
-        <meshStandardMaterial color="#d8d2c4" roughness={1} emissive="#d8d2c4" emissiveIntensity={0.2} side={THREE.DoubleSide} />
-      </mesh>
-    </>
-  )
+  return <PropGlb id="hearse-pin" />
 }
 
 /** Groups of four deep, pale scratches gouged into dark oak at hand height; the lower ones stained. */
@@ -319,67 +299,17 @@ export function NailMarksShape() {
   )
 }
 
-const slumpGeo = once(() => ({
-  // Elias slumped against the inside of the door, in his dark coat: sitting, back to the door.
-  coat: merge([
-    place(new THREE.CapsuleGeometry(0.18, 0.4, 6, 12), [0, 0.42, 0.12], [0.35, 0, 0]),
-    place(new THREE.CapsuleGeometry(0.07, 0.42, 4, 8), [-0.12, 0.12, 0.42], [Math.PI / 2 - 0.1, 0, 0.1]),
-    place(new THREE.CapsuleGeometry(0.07, 0.42, 4, 8), [0.12, 0.12, 0.42], [Math.PI / 2 - 0.1, 0, -0.1]),
-    place(new THREE.CapsuleGeometry(0.05, 0.36, 4, 8), [-0.24, 0.35, 0.22], [0.6, 0, 0.15]),
-    place(new THREE.CapsuleGeometry(0.05, 0.36, 4, 8), [0.24, 0.35, 0.22], [0.6, 0, -0.15]),
-  ]),
-  skin: merge([
-    place(new THREE.SphereGeometry(0.11, 12, 10), [0.04, 0.82, 0.22], Y_UP, [1, 1.1, 1]),
-    place(new THREE.SphereGeometry(0.04, 8, 6), [-0.26, 0.18, 0.38]),
-    place(new THREE.SphereGeometry(0.04, 8, 6), [0.26, 0.18, 0.38]),
-  ]),
-}))
-
-/** Elias Thorne, found slumped against the inside of the Crane crypt door. PLACEHOLDER figure. */
+/** Elias Thorne, found slumped against the inside of the Crane crypt door: seated, back to the door (-Z),
+ * legs toward +Z, origin on the ground under his hips (props/elias-body.glb). */
 export function SlumpedBodyShape() {
-  const g = slumpGeo()
-  return (
-    <>
-      <mesh geometry={g.coat}>
-        <meshStandardMaterial color="#26221d" roughness={1} />
-      </mesh>
-      <mesh geometry={g.skin}>
-        <meshStandardMaterial color="#b8ad98" roughness={1} />
-      </mesh>
-    </>
-  )
+  return <PropGlb id="elias-body" />
 }
 
-const doorGeo = once(() => ({
-  // Five vertical planks with gaps, on a frame.
-  planks: merge(
-    [-0.32, -0.16, 0, 0.16, 0.32].map((x, i) => place(new THREE.BoxGeometry(0.15, 1.95 - (i % 2) * 0.02, 0.05), [x, 0, 0])),
-  ),
-  iron: merge([
-    // Strap hinges, studs and a ring pull.
-    place(new THREE.BoxGeometry(0.75, 0.06, 0.012), [0.02, 0.65, 0.031]),
-    place(new THREE.BoxGeometry(0.75, 0.06, 0.012), [0.02, -0.65, 0.031]),
-    ...[-0.3, -0.1, 0.1, 0.3].flatMap((x) => [0.65, -0.65].map((y) => place(new THREE.SphereGeometry(0.012, 6, 4), [x, y, 0.04]))),
-    place(new THREE.TorusGeometry(0.05, 0.008, 6, 16), [-0.28, -0.05, 0.045]),
-    place(new THREE.CylinderGeometry(0.025, 0.025, 0.012, 10), [-0.28, 0, 0.034], [Math.PI / 2, 0, 0]),
-  ]),
-}))
-
-/** The crypt's door leaf, swung back: oak planks, iron straps, studs and a ring pull. */
+/** The crypt's oak door leaf, 1.2 m by 2.05 m, origin at its bottom centre, iron on its outer (+Z) face and the
+ * middle of its inner face left plain for the nail marks (props/crane-crypt-door.glb). */
 export function CryptDoorShape() {
-  const g = doorGeo()
-  return (
-    <>
-      <mesh geometry={g.planks}>
-        <meshStandardMaterial color={DARK_OAK} roughness={0.95} />
-      </mesh>
-      <mesh geometry={g.iron}>
-        <meshStandardMaterial color={IRON} roughness={0.7} metalness={0.6} />
-      </mesh>
-    </>
-  )
+  return <PropGlb id="crane-crypt-door" />
 }
-
 
 // ---- Walk clues ----
 
@@ -475,13 +405,8 @@ const bundleGeo = once(() => ({
 
 export type WalkClueLook = 'spade' | 'posy' | 'oil' | 'note' | 'bundle' | 'ruts'
 
-/** The tipped lantern at the Lowe crypt, and the sheen on its spilled oil. */
+/** The sheen on the spilled oil at the Lowe crypt. */
 const tippedLanternGeo = once(() => ({
-  lantern: merge([
-    place(new THREE.CylinderGeometry(0.06, 0.07, 0.18, 10, 1, true), [0.18, 0.07, 0.05], [0, 0, Math.PI / 2 - 0.15]),
-    place(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 10), [0.28, 0.07, 0.05], [0, 0, Math.PI / 2 - 0.15]),
-    place(new THREE.TorusGeometry(0.05, 0.006, 6, 12, Math.PI), [0.08, 0.08, 0.05], [0, Math.PI / 2, Math.PI / 2]),
-  ]),
   sheen: merge([
     place(new THREE.RingGeometry(0.16, 0.19, 24), [0, 0.006, 0], [-Math.PI / 2, 0, 0]),
     place(new THREE.BoxGeometry(0.02, 0.004, 0.18), [-0.05, 0.004, 0.24]),
@@ -540,9 +465,10 @@ export function WalkClueShape({ look }: { look: WalkClueLook }) {
         <mesh geometry={g.sheen}>
           <meshStandardMaterial color="#6fa8a0" roughness={0.1} metalness={0.3} emissive="#7a6ab0" emissiveIntensity={0.45} />
         </mesh>
-        <mesh geometry={g.lantern}>
-          <meshStandardMaterial color="#5a4a30" roughness={0.6} metalness={0.6} />
-        </mesh>
+        {/* The lantern itself on its side, base toward +X (props/tipped-lantern.glb). */}
+        <group position={[0.18, 0, 0.05]}>
+          <PropGlb id="tipped-lantern" />
+        </group>
       </>
     )
   }

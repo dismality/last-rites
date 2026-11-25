@@ -832,6 +832,249 @@ def bat_flying(k):
     bat_body(k, True)
 
 
+
+# --- Stage 3 story pass: the Crane crypt door, the hearse pin, the tipped lantern and Elias ---------------------------
+COAT = flat((30, 28, 27), 0.22, 6)
+TROUSER = flat((46, 42, 38), 0.2, 7)
+SHIRT = flat((206, 198, 182), 0.1, 8)
+SKIN = flat((188, 170, 156), 0.12, 9)
+BLOOD = flat((96, 22, 18), 0.25, 12)
+HAIR = flat((54, 42, 32), 0.3, 14)
+LEATHER = flat((36, 27, 21), 0.25, 8)
+
+
+def crane_crypt_door(k):
+    """The Crane crypt's oak door leaf, 1.2 x 2.05 x 0.08, origin at the bottom centre. The outer face (+Z) carries
+    the strap hinges (on the +X edge, where it hangs), studs, the hasp and a ring pull; the inner face (-Z) is plain oak
+    with two ledges top and bottom, leaving the middle clear for the fingernail marks the game draws there."""
+    W, H, D = 1.2, 2.05, 0.08
+    bm = new()
+    n = 6
+    for i in range(n):
+        h = H - R.uniform(0, 0.025)
+        box(bm, (-W / 2 + W / n * (i + 0.5), h / 2, R.uniform(-0.003, 0.003)), (W / n - 0.007, h, D * 0.7))
+    for y in (0.22, H - 0.24):                                   # ledges on the inner face
+        box(bm, (0, y, -D * 0.35 - 0.012), (W - 0.06, 0.14, 0.025))
+    bevel(bm, 0.004)
+    k.add(bm, Matrix.Identity(4), 'wood', wood((60, 42, 30), 0.35, weather=0.15, grime_h=0.5), 301, name='wood')
+    ir = new()
+    zf = D * 0.35 + 0.008
+    for y in (0.36, H - 0.4):                                    # strap hinges from the hanging edge
+        box(ir, (W / 2 - 0.36, y, zf), (0.72, 0.065, 0.012))
+        append(ir, lathe([(0.0, -0.035), (0.045, -0.035), (0.045, 0.035), (0.0, 0.035)], 8), T(-0.02, y, zf) @ RX(math.pi / 2))
+        append(ir, cyl(0.022, 0.16, 8, -0.08), T(W / 2 + 0.01, y, 0))
+        for x in (0.5, 0.35, 0.2, 0.05):
+            append(ir, sphere(0.012, (x, y, zf + 0.008), 6, 3))
+    for x in (-0.45, -0.25):                                     # studs down the latch side
+        for y in (0.7, 1.0, 1.3):
+            append(ir, sphere(0.013, (x, y, zf + 0.002), 6, 3))
+    box(ir, (-W / 2 + 0.09, 1.0, zf + 0.01), (0.07, 0.1, 0.03))     # the hasp the hearse pin went through
+    append(ir, lathe([(0.055, -0.007), (0.065, -0.007), (0.065, 0.007), (0.055, 0.007)], 14), T(-0.3, 0.95, zf + 0.03) @ RX(math.pi / 2))
+    append(ir, cyl(0.03, 0.012, 10), T(-0.3, 1.01, zf) @ RX(math.pi / 2))
+    k.add(ir, Matrix.Identity(4), 'iron', iron(0.5, (34, 32, 30)), 302, name='iron')
+    moss = new()
+    box(moss, (0, 0.04, zf - 0.002), (W - 0.02, 0.08, 0.012))
+    jitter(moss, 0.012, 3, 9)
+    k.add(moss, Matrix.Identity(4), 'cloth', flat((58, 70, 38), 0.35, 10), 303, name='moss')
+
+
+def hearse_pin(k):
+    """The iron hearse pin through the door's two hasps, along X with its ring head at -X; origin at the bar's middle.
+    The ring head's flat face carries the Vane raven on a coffin, in relief. Matches HearsePinShape in the game."""
+    bar = new()
+    append(bar, cyl(0.016, 0.4, 10, -0.2, 0.013), RZ(math.pi / 2))
+    append(bar, cyl(0.034, 0.03, 12, -0.015), T(-0.215, 0, 0) @ RZ(math.pi / 2))
+    append(bar, lathe([(0.04, -0.009), (0.052, -0.009), (0.052, 0.009), (0.04, 0.009)], 16), T(-0.26, 0, 0) @ RY(math.pi / 2) @ RX(math.pi / 2))
+    jitter(bar, 0.0015, 2, 30)
+    k.add(bar, Matrix.Identity(4), 'iron', iron(0.18, (58, 56, 56)), 311, name='iron', smooth=True)
+    hs = new()
+    for x in (-0.08, 0.1):                                       # a hasp on the door, one on the frame
+        box(hs, (x, 0, -0.025), (0.05, 0.09, 0.012))
+        append(hs, lathe([(0.018, -0.02), (0.025, -0.02), (0.025, 0.02), (0.018, 0.02)], 10), T(x, 0, 0) @ RZ(math.pi / 2))
+    k.add(hs, Matrix.Identity(4), 'iron', iron(0.35, (40, 38, 38)), 312, name='hasps')
+    rv = new()
+    xf = -0.232
+    box(rv, (xf, -0.012, 0), (0.006, 0.012, 0.04))                # the coffin
+    append(rv, sphere(0.009, (xf, 0.006, -0.004), 6, 4, 1.3))      # the raven's body, head and beak
+    append(rv, sphere(0.005, (xf, 0.016, 0.006), 5, 3))
+    box(rv, (xf, 0.016, 0.013), (0.005, 0.003, 0.008))
+    box(rv, (xf, 0.008, -0.016), (0.005, 0.004, 0.012), RX(0.4))
+    k.add(rv, Matrix.Identity(4), 'brass', flat((200, 190, 168), 0.15), 313, name='raven')
+
+
+def tipped_lantern(k):
+    """An iron hand lantern on its side at the Lowe crypt, base toward +X, burnt out; origin on the ground under its
+    middle. The game lays the oil pool round it."""
+    sub = Kit()
+    lantern(sub, (0, 0, 0), 321, 0.75, glass='night-glass')
+    # Lay it down: rotate about the game Z axis and lift so its side rests on the ground.
+    M = T(0.0, 0.08, 0.0) @ RZ(math.pi / 2 - 0.12) @ T(0, -0.14, 0)
+    for key, b in sub.batches.items():
+        b['v'] = [M @ v for v in b['v']]
+        k.batches[key] = b
+
+
+def loft(rings, segs=14):
+    """A closed body through horizontal elliptical rings: each ring is ((x, y, z) game centre, half-width along X,
+    half-depth along Z, lean about X). Capped at both ends."""
+    bm = new()
+    loops = []
+    for (cx, cy, cz), w, d, lean in rings:
+        loop = []
+        for i in range(segs):
+            a = 2 * math.pi * i / segs
+            x, z = w * math.cos(a), d * math.sin(a)
+            y = -z * math.sin(lean)
+            z = z * math.cos(lean)
+            loop.append(bm.verts.new(G(cx + x, cy + y, cz + z)))
+        loops.append(loop)
+    for a, b in zip(loops, loops[1:]):
+        for i in range(segs):
+            j = (i + 1) % segs
+            bm.faces.new([a[i], a[j], b[j], b[i]])
+    bm.faces.new(list(reversed(loops[0])))
+    bm.faces.new(loops[-1])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    return bm
+
+
+# Elias's spine, hips to neck: (centre, half-width, half-depth, lean back). He sits against the door, slumped.
+ELIAS_SPINE = [((0.0, 0.08, 0.12), 0.15, 0.12, 0.0), ((0.0, 0.16, 0.1), 0.18, 0.14, -0.15), ((0.01, 0.32, 0.05), 0.16, 0.12, -0.25),
+               ((0.03, 0.5, 0.0), 0.19, 0.125, -0.3), ((0.05, 0.64, -0.035), 0.21, 0.11, -0.3), ((0.06, 0.71, -0.05), 0.1, 0.075, -0.3)]
+
+
+def _spine_at(y):
+    """Centre (x, z) and half-depth of the torso at height y, from ELIAS_SPINE."""
+    pts = ELIAS_SPINE
+    for (c0, _, d0, _), (c1, _, d1, _) in zip(pts, pts[1:]):
+        if c0[1] <= y <= c1[1]:
+            t = (y - c0[1]) / (c1[1] - c0[1])
+            return c0[0] + (c1[0] - c0[0]) * t, c0[2] + (c1[2] - c0[2]) * t, d0 + (d1 - d0) * t
+    c, _, d, _ = pts[-1] if y > pts[-1][0][1] else pts[0]
+    return c[0], c[2], d
+
+
+def elias_coat_paint(L, P, N, s, g):
+    """The frock coat, open down the front over a dark waistcoat and, at the top, the shirt front."""
+    gx, gy, gz = P.x, P.z, -P.y
+    c = COAT(L, P, N, s, g)
+    if -N.y > 0.35 and 0.26 < gy < 0.7:
+        sx, _, _ = _spine_at(gy)
+        half = 0.015 + 0.05 * smoothstep(0.26, 0.66, gy)
+        if abs(gx - sx) < half:
+            c = SHIRT(L, P, N, s, g) if gy > 0.63 and abs(gx - sx) < half * 0.45 else srgb(62, 58, 54) * (0.9 + 0.15 * noise.noise(P * 9))
+    return c
+
+
+def elias_face_paint(L, P, N, s, g):
+    """Head-local paint (L: Blender axes, so game x = L.x, up = L.z, forward = -L.y): pallid skin, sunken shadowed
+    eyes, grey lips, a day's stubble and dark brows."""
+    x, up, fwd = L.x, L.z, -L.y
+    c = srgb(192, 176, 164) * (0.93 + 0.08 * noise.noise(L * 18))
+    for ex in (-0.034, 0.034):
+        d = math.sqrt((x - ex) ** 2 + ((up - 0.014) * 1.5) ** 2)
+        if fwd > 0.03:
+            c = lerp(c, srgb(112, 92, 94), 0.85 * (1 - smoothstep(0.012, 0.03, d)))
+            if abs(up - 0.036) < 0.006 and 0.012 < abs(x) < 0.055 and abs(x - ex) < 0.024:
+                c = HAIR(L, P, N, s, g)
+    if fwd > 0.04 and abs(x) < 0.022 and abs(up + 0.05) < 0.006:
+        c = lerp(c, srgb(128, 104, 108), 0.8)
+    if up < -0.035 and fwd > -0.02:
+        c = lerp(c, srgb(118, 108, 102), 0.35 * smoothstep(-0.035, -0.07, up))
+    return c
+
+
+def elias_body(k):
+    """Elias Thorne slumped against the inside of the Crane crypt door: seated on the sill, back to the door (-Z),
+    legs out toward +Z, head dropped to his right shoulder, arms limp with the hands on the stone. Origin on the ground
+    under his hips. Seated height about 1.1 m. His fingertips are torn from the door; nothing else is shown."""
+    coat, trou, shirt, skin, blood, hair, boot, brass = (new() for _ in range(8))
+    torso = loft(ELIAS_SPINE)
+    jitter(torso, 0.005, 1, 12)
+    k.add(torso, Matrix.Identity(4), 'cloth', elias_coat_paint, 330, name='coat', smooth=True)
+    for sgn in (-1, 1):
+        append(coat, sphere(0.075, (0.05 + 0.19 * sgn, 0.655, -0.04), 10, 7, 0.85))    # shoulders
+    # Coat tails spread on the stone either side of the hips.
+    for sgn in (-1, 1):
+        t = tube([(0.12 * sgn, 0.1, 0.0), (0.24 * sgn, 0.03, 0.06), (0.3 * sgn, 0.015, 0.18)], 0.1, 10, 0.06)
+        for v in t.verts:
+            v.co.z = 0.02 + (v.co.z - 0.02) * 0.35
+        append(coat, t)
+    for y in (0.34, 0.41, 0.48):                                        # waistcoat buttons on the front
+        sx, sz, d = _spine_at(y)
+        append(brass, sphere(0.008, (sx, y, sz + d + 0.004), 6, 3))
+    # Arms hang limp: shoulder, elbow, wrist; the hands rest palm-down on the stone.
+    for sgn, lift in ((-1, 0.0), (1, 0.04)):
+        sh = (0.05 + 0.21 * sgn, 0.64, -0.04)
+        el = (0.05 + 0.28 * sgn, 0.38 + lift, 0.04)
+        wr = (0.05 + 0.32 * sgn, 0.11 + lift * 0.5, 0.2)
+        append(coat, tube([sh, ((sh[0] + el[0]) / 2 + 0.01 * sgn, (sh[1] + el[1]) / 2, (sh[2] + el[2]) / 2), el], 0.058, 10, 0.05))
+        append(coat, tube([el, wr], 0.052, 10, 0.046))
+        append(shirt, tube([wr, (wr[0], wr[1] - 0.012, wr[2] + 0.022)], 0.041, 10))   # cuff
+        hx, hy, hz = wr[0], 0.026, wr[2] + 0.075
+        append(skin, sphere(0.042, (hx, hy, hz), 10, 6, 0.42))
+        for f in range(4):
+            fx = hx + (f - 1.5) * 0.019 * sgn
+            reach = 0.075 - abs(f - 1.5) * 0.008
+            append(skin, tube([(fx, hy, hz + 0.03), (fx + 0.003 * sgn, 0.018, hz + reach - 0.012)], 0.0085, 6, 0.0075))
+            append(blood, sphere(0.0078, (fx + 0.003 * sgn, 0.016, hz + reach - 0.006), 6, 4))
+        append(skin, tube([(hx - 0.035 * sgn, hy, hz - 0.01), (hx - 0.055 * sgn, 0.018, hz + 0.035)], 0.0095, 6, 0.008))
+    # Legs: his left knee drawn up, his right leg out flat and splayed.
+    legs = [((-0.09, 0.13, 0.15), (-0.12, 0.38, 0.42), (-0.15, 0.1, 0.66)),
+            ((0.09, 0.12, 0.15), (0.23, 0.1, 0.52), (0.35, 0.08, 0.9))]
+    for hip, knee, ankle in legs:
+        append(trou, tube([hip, knee], 0.088, 12, 0.068))
+        append(trou, sphere(0.07, knee, 10, 7))
+        append(trou, tube([knee, ankle], 0.066, 12, 0.052))
+        ax, ay, az = ankle
+        append(boot, tube([(ax, ay + 0.07, az - 0.03), (ax, ay - 0.01, az + 0.02)], 0.054, 10))
+        append(boot, tube([(ax, ay - 0.025, az - 0.01), (ax + 0.008, ay - 0.012, az + 0.14), (ax + 0.012, ay + 0.035, az + 0.21)],
+                          0.046, 10, 0.034))
+    # Neck and collar.
+    append(shirt, tube([(0.055, 0.69, -0.05), (0.08, 0.76, -0.025)], 0.058, 12))
+    append(skin, tube([(0.065, 0.72, -0.04), (0.1, 0.8, -0.005)], 0.042, 10))
+    # The head, dropped toward his right shoulder (+X), chin down. Painted in its own space (elias_face_paint).
+    face = T(0.13, 0.875, 0.03) @ RZ(-0.42) @ RX(0.32)
+    head = sphere(0.098, (0, 0, 0), 40, 30, 1.2)                   # dense, so the painted eyes and mouth hold
+    for v in head.verts:
+        up, fwd = v.co.z, -v.co.y
+        if up < -0.02:                                                 # a narrower jaw and chin
+            t = smoothstep(-0.02, -0.11, up)
+            v.co.x *= 1 - 0.28 * t
+            v.co.y -= 0.012 * t                                        # and the chin a little forward
+        if fwd > 0.065:                                                # a flatter face
+            v.co.y = -(0.065 + (fwd - 0.065) * 0.55)
+        if fwd < -0.03:                                                # a fuller back of the skull
+            v.co.y *= 1.06
+        v.co.x *= 0.92
+    append(head, sphere(0.04, (0, 0, 0), 10, 6, 0.3), T(0, 0.036, 0.05) @ S(1.6, 1, 0.5))   # brow ridge
+    append(head, sphere(0.012, (0, -0.006, 0.079), 10, 8, 2.0))                    # nose
+    append(head, sphere(0.012, (0, -0.026, 0.086), 10, 8))                          # its tip
+    for ex in (-1, 1):
+        append(head, sphere(0.02, (0.087 * ex, 0.0, -0.005), 8, 6, 1.45))            # ears
+    append(head, sphere(0.026, (0, -0.088, 0.052), 10, 8, 0.8))                     # chin
+    k.add(head, face, 'wax', elias_face_paint, 334, name='face', smooth=True)
+    # Hair: a cap over the crown and the back of the head, pulled inside the head at the face and below the ears.
+    cap = sphere(0.104, (0, 0, 0), 16, 10, 1.12)
+    for v in cap.verts:
+        up, fwd = v.co.z, -v.co.y
+        if (fwd > 0.035 and up < 0.055) or up < -0.055:
+            v.co *= 0.78
+    jitter(cap, 0.006, 5, 22)
+    append(hair, cap, face @ T(0, 0.028, -0.014))
+    for ex in (-1, 1):                                                   # sideburns
+        box(hair, (0.083 * ex, -0.025, 0.012), (0.016, 0.06, 0.035), face)
+    for bm, seed in ((coat, 331), (trou, 332)):
+        jitter(bm, 0.004, seed, 14)                                     # cloth folds
+    k.add(coat, Matrix.Identity(4), 'cloth', COAT, 331, name='coat', smooth=True)
+    k.add(trou, Matrix.Identity(4), 'cloth', TROUSER, 332, name='trousers', smooth=True)
+    k.add(shirt, Matrix.Identity(4), 'cloth', SHIRT, 333, name='shirt', smooth=True)
+    k.add(skin, Matrix.Identity(4), 'wax', SKIN, 334, name='face', smooth=True)
+    k.add(blood, Matrix.Identity(4), 'cloth', BLOOD, 335, name='blood', smooth=True)
+    k.add(hair, Matrix.Identity(4), 'cloth', HAIR, 336, name='hair', smooth=True)
+    k.add(boot, Matrix.Identity(4), 'wax', LEATHER, 337, name='boots', smooth=True)
+    k.add(brass, Matrix.Identity(4), 'brass', BRASS, 339, name='brass')
+
 PROPS = {
     'workbench': workbench, 'lamp-post': lamp_post, 'coffin-broken': coffin_broken,
     'gate-catacombs': gate_catacombs, 'gate-mausoleum-row': gate_mausoleum, 'iron-railing': iron_railing,
@@ -842,6 +1085,8 @@ PROPS = {
     'clue-cat-ledger-seal': clue_sealed_entry, 'clue-elias-body': clue_coat, 'clue-cat-scratches': clue_scratches,
     'clue-cat-names': clue_names_in_bone, 'clue-row-statues': clue_statue_plinth, 'clue-west-hill-glint': clue_west_hill,
     'vending-machine': vending_machine, 'bat-perched': bat_perched, 'bat-flying': bat_flying,
+    'crane-crypt-door': crane_crypt_door, 'hearse-pin': hearse_pin, 'tipped-lantern': tipped_lantern,
+    'elias-body': elias_body,
 }
 
 

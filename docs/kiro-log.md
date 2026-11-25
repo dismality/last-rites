@@ -2447,3 +2447,22 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The name is given first at the altar, then the rite; the rite's places stay hidden until the name is right. (2026-11-25)
   - Elias's figure, the raven stamp, the ruts and the handwriting glyphs are placeholder art. (2026-11-25)
   - The 20 new keeper lines need recording. They were not generated, as that spends credits; they stay silent until they are. (2026-11-25)
+
+### 2026-11-26: Stage 3 props as Blender models
+- **Started:** Outside Kiro
+- **What happened:**
+  - Four Stage 3 props are now Blender models built in `tools/blender/props.py` and exported as Draco GLBs to `public/assets/models/props/`. They replace the code-built placeholder shapes.
+  - **crane-crypt-door:** a 1.2 m oak door leaf of six weathered planks. The outer face has strap hinges, studs, a hasp and a ring pull; the inner face has ledges, with its middle left plain for the nail marks. Its origin is the bottom centre, so the old scale hack is gone.
+  - **hearse-pin:** an iron bar with a forged head and a ring, the two hasps it runs through, and the Vane raven-on-coffin stamp in pale brass on the head.
+  - **tipped-lantern:** the Row lantern lying on its side by the Lowe crypt's oil. The pool and its sheen stay code-drawn.
+  - **elias-body:** Elias Thorne slumped against the inner face of the door, built from lofted rings:
+    - a dark frock coat open over a waistcoat and shirt;
+    - one knee drawn up and the other leg out flat;
+    - his head dropped to his right shoulder: a pallid face with closed, sunken eyes and grey lips;
+    - bloodied fingertips.
+  - Elias has a hidden hit box over his torso and lap, because the model is open between his arms and knee and the crosshair needs something solid to land on.
+  - All four are listed in `PROP_IDS`, so the loading screen preloads them. The asset allow-list test names them.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's case props, Interactables, nail marks, ruts and oil pool are kept.
+- **Decisions made unattended:**
+  - Elias is stylised, not realistic: a code-built figure can't match a sculpted or generated model. He reads as a slumped man in a dark coat at play distance. (2026-11-26)
+  - The e2e case 3 spec fails at the cart ruts ("crosshair reaches case-clue-hearse-cart-ruts") with and without this change, so that failure is older than this work. It is left for its own fix. (2026-11-26)

@@ -206,18 +206,23 @@ function CryptOpened() {
       </mesh>
       {/* The leaf swung out about its right-hand hinge, so its scratched inner face turns to the avenue. */}
       <group
-        position={[hingeX - half * Math.cos(DOOR_SWING), 1.0, openZ + half * Math.sin(DOOR_SWING)]}
+        position={[hingeX - half * Math.cos(DOOR_SWING), 0, openZ + half * Math.sin(DOOR_SWING)]}
         rotation={[0, DOOR_SWING, 0]}
-        scale={[OPEN_DOORWAY_W / 0.8, 1.03, 1.4]}
       >
         <CryptDoorShape />
-        <group position={[0, 0, -0.03]} rotation={[0, Math.PI, 0]} scale={[0.8 / OPEN_DOORWAY_W, 1, 1]}>
+        {/* On the leaf's plain inner face, just off the oak (the leaf is 8 cm thick). */}
+        <group position={[0, 1.0, -0.045]} rotation={[0, Math.PI, 0]}>
           <NailMarksShape />
         </group>
       </group>
       <group position={[body[0], body[1], body[2] - 0.7]}>
         <Interactable id="elias" kind="elias" runeHeight={1.1} outlineRange={4} onInteract={searchElias}>
           <SlumpedBodyShape />
+          {/* His model is open between the arms and the drawn-up knee, so a hidden box over his torso and
+              lap gives the crosshair something solid to land on. */}
+          <mesh visible={false} position={[0.05, 0.45, 0.15]}>
+            <boxGeometry args={[0.6, 0.9, 0.5]} />
+          </mesh>
         </Interactable>
       </group>
     </>

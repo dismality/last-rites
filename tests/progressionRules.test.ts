@@ -182,7 +182,7 @@ describe('structure rule: this spec adds no binary assets', () => {
   /** Scene pieces and props from tools/blender (chapel, hut, catacombs, props.py), credited in docs/CREDITS.md. */
   for (const s of ['catacombs', 'chapel-exterior', 'chapel-interior', 'hut']) ALLOWED.add(`models/scene/${s}.glb`)
   const PROPS = (
-    'bat-flying bat-perched candle-stub clue-cat-ledger-seal clue-cat-names clue-cat-scratches clue-elias-body ' +
+    'bat-flying bat-perched candle-stub clue-cat-ledger-seal crane-crypt-door elias-body hearse-pin tipped-lantern clue-cat-names clue-cat-scratches clue-elias-body ' +
     'clue-empty-graves clue-hut-boots clue-ledger-week clue-row-statues clue-west-hill-glint coffin-broken ' +
     'gate-catacombs gate-mausoleum-row grave-dug grave-hand grave-mound iron-railing lamp-post lodge-table ' +
     'merchant-cart ossuary-door sabre-plinth scare-door statue-mourner vending-machine woodpile workbench'

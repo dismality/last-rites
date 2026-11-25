@@ -259,6 +259,11 @@ export const PROP_IDS = [
   // Loaded for the horror pass (spec 11 H4), not placed yet.
   'bat-perched',
   'bat-flying',
+  // Stage 3 on the Row: the Crane crypt door, its hearse pin, Elias and the Lowe crypt's tipped lantern.
+  'crane-crypt-door',
+  'hearse-pin',
+  'elias-body',
+  'tipped-lantern',
 ] as const
 export type PropId = (typeof PROP_IDS)[number]
 export const propModelUrl = (id: PropId): string => `${PROP_DIR}/${id}.glb`
