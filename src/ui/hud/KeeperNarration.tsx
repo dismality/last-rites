@@ -7,7 +7,7 @@
 import { useEffect } from 'react'
 import { playRecorded } from '../../audio/AudioManager'
 import { sampleBuffer } from '../../audio/samples'
-import { keeperVoiceFor } from '../../data/case1Narration'
+import { keeperVoiceFor } from '../../data/keeperVoice'
 import { useGameStore } from '../../game/state/gameStore'
 import { lineSeconds, useNarrationStore } from '../../game/state/narrationStore'
 import './keeperNarration.css'

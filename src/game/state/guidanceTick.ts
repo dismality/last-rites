@@ -2,8 +2,8 @@
 // Called once per fixed step from GameLoop; reads stores, never holds game rules itself.
 
 import { DAY_DURATION_S, DUSK_DURATION_S } from '../../data/balance'
-import { crestTabletPosition, EVIDENCE_SEARCH, STAGE_DAY_RULES } from '../../data/objectiveRules'
-import { caseOfStage, CASE_1_BELLS, CASE_1_RIGHT_FLAGS, CASE_1_STONES, CASE_2_CREST_LOCK, CASE_3_BOOTS_CLUE, type EvidenceCardId, type MinigameId } from '../../data/cases'
+import { STAGE_DAY_RULES } from '../../data/objectiveRules'
+import { caseOfStage, CASE_1_BELLS, CASE_1_RIGHT_FLAGS, CASE_1_STONES, CASE_2_FRESH_GRAVES, type MinigameId } from '../../data/cases'
 import { useGameStore } from './gameStore'
 import { stepAnnouncements, type StepWatch } from '../systems/stageSteps'
 import { useClueRevealStore } from './clueRevealStore'
@@ -198,8 +198,6 @@ const tickHunch = (dt: number): void => {
 /** Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). */
 type DayStep = { count: number; done: boolean; at?: readonly (readonly [number, number, number])[] }
 
-const ALL_CARDS: readonly EvidenceCardId[] = Object.keys(EVIDENCE_SEARCH) as EvidenceCardId[]
-
 /**
  * Progress on the stage's day steps, in `STAGE_DAY_RULES` order (spec 10, design bible §11). A
  * step with several things to do points at the nearest one not yet done (`at`).
@@ -227,39 +225,42 @@ const readStageDaySteps = (stage: 1 | 2 | 3): DayStep[] => {
     ]
   }
   if (stage === 2) {
-    // The case lies behind the Mausoleum Row gate: first its key (Pell's grave), then the gate,
-    // then the tablets that the crest lock needs.
+    // First the Row gate (its key is in Pell's grave), then the fresh graves by the lodge, the
+    // register, the watch log, the print, the boots and Kerr's locker.
     const gateOpen = useMysteryStore.getState().mystery.gates['mausoleum-row']
     const hasKey = gateOpen || useInventoryStore.getState().inventory.keyItems.includes('rusted-crypt-key')
     const flag = (done: boolean) => ({ count: done ? 1 : 0, done })
-    const read = cases['resurrection-men'].tabletsRead
-    const tablets = CASE_2_CREST_LOCK.tablets
-    const tabletsDone = solved('2a') || tablets.every((t) => read.includes(t.family))
-    const unread = tablets.filter((t) => !read.includes(t.family)).map(crestTabletPosition)
+    const c2 = cases['resurrection-men']
+    const graves = CASE_2_FRESH_GRAVES
+    const unseen = graves.filter((g) => !c2.gravesSeen.includes(g.id))
+    const gravesDone = solved('2a') || unseen.length === 0
     return [
       flag(hasKey),
       flag(gateOpen),
       {
-        count: tabletsDone ? tablets.length : Math.min(tablets.length, read.length),
-        done: tabletsDone,
-        ...(unread.length > 0 ? { at: unread } : {}),
+        count: gravesDone ? graves.length : graves.length - unseen.length,
+        done: gravesDone,
+        ...(unseen.length > 0 && !gravesDone ? { at: unseen.map((g) => g.position) } : {}),
       },
-      one('2a'),
+      { count: solved('2a') ? graves.length : Math.min(graves.length, c2.registerMarked.length), done: solved('2a') },
       one('2b'),
+      flag(c2.printTaken || solved('2c')),
       one('2c'),
+      one('2d'),
     ]
   }
   const inv = useInventoryStore.getState().inventory
   const relics = countRelics(inv.relics, useMysteryStore.getState().mystery.relics)
-  // Elias's evidence: the cards examined, and the dry boots through their hut clue.
-  const found = new Set<EvidenceCardId>(cases['sealed-catacombs'].evidenceFound)
-  if (useMysteryStore.getState().mystery.clues.has(CASE_3_BOOTS_CLUE)) found.add('dry-boots')
-  const cardsDone = solved('3b') || found.size >= ALL_CARDS.length
-  const missing = ALL_CARDS.filter((c) => !found.has(c)).map((c) => EVIDENCE_SEARCH[c])
+  // The ruts at the Row gate are a walk clue; following them is done once found (or the door is open).
+  const c3 = cases['sealed-catacombs']
+  const rutsDone = solved('3b') || c3.found.includes('hearse-cart-ruts')
+  const seen = solved('3d') ? 4 : Math.min(4, c3.handSeen.length)
   return [
     one('3a'),
-    { count: cardsDone ? ALL_CARDS.length : found.size, done: cardsDone, ...(missing.length > 0 ? { at: missing } : {}) },
+    { count: rutsDone ? 1 : 0, done: rutsDone },
     one('3b'),
+    one('3c'),
+    { count: seen, done: solved('3d') },
     { count: relics, done: relics >= 5 },
   ]
 }

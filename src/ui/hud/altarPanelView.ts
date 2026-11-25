@@ -57,16 +57,22 @@ export function verdictMessage(v: AltarVerdict | { kind: 'incomplete' }): string
   }
 }
 
-export const ACCUSATION_RIGHT_MESSAGE = 'The altar holds the name. It will be read at sunrise.'
+export const ACCUSATION_RIGHT_MESSAGE = 'The altar holds the name. Now lay the relics for the rite.'
 
 /** Words for what the altar said to an accusation. Wrong ones are gentle: nothing stirs. */
-export function accusationMessage(v: AltarVerdict | { kind: 'incomplete' } | { kind: 'closed' } | { kind: 'already' }): string {
+export function accusationMessage(
+  v: AltarVerdict | { kind: 'incomplete' } | { kind: 'closed' } | { kind: 'already' } | { kind: 'ask'; reply: string },
+): string {
   switch (v.kind) {
     case 'solved':
     case 'already':
       return ACCUSATION_RIGHT_MESSAGE
+    case 'ask':
+      return v.reply
+    case 'incomplete':
+      return 'Type a name before you answer.'
     case 'closed':
-      return 'The altar hears accusations only at night.'
+      return 'The altar hears the name only at night.'
     default:
       return verdictMessage(v) ?? ''
   }

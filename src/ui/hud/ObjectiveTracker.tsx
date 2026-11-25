@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { readTutorialPrompt } from '../../game/state/guidanceTick'
-import { STORY_GOAL_LINE } from '../../data/objectiveRules'
+import { STORY_GOAL_FOUND_LINE, STORY_GOAL_LINE } from '../../data/objectiveRules'
 import { MODES } from '../../data/modes'
 import { useGameStore } from '../../game/state/gameStore'
 import { useProgressionStore } from '../../game/state/progressionStore'
 import { useStageStore } from '../../game/state/stageStore'
+import { useCaseStore } from '../../game/state/caseStore'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { useSettingsStore } from '../../game/state/settingsStore'
 import { composeSecondLine, journalKeyWord } from '../../game/systems/objective'
@@ -37,6 +38,8 @@ export function ObjectiveTracker() {
   // The story's one goal sits above every step (playtest story pass): each case is one trail.
   const story = useProgressionStore((s) => MODES[s.mode].story)
   const stage = useStageStore((s) => s.stage)
+  // Once the Crane crypt is open, the goal is met: Elias is found.
+  const found = useCaseStore((s) => s.cases['sealed-catacombs'].minigames.includes('3b'))
 
   useEffect(() => {
     const read = () => setPrompt(readTutorialPrompt())
@@ -52,7 +55,7 @@ export function ObjectiveTracker() {
 
   return (
     <div className="hud-objective">
-      {story && <p className="hud-objective__goal">{STORY_GOAL_LINE.replace('{n}', String(stage))}</p>}
+      {story && <p className="hud-objective__goal">{stage === 3 && found ? STORY_GOAL_FOUND_LINE : STORY_GOAL_LINE.replace('{n}', String(stage))}</p>}
       <div className="hud-objective__live" role="status" aria-live="polite" aria-atomic="true">
         {/* Keyed so a new objective remounts the span and replays the fade-in. */}
         <span key={`${objective.rule}:${objective.main}`} className="hud-objective__main">

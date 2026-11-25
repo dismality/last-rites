@@ -53,6 +53,17 @@ import { useAccusationStore } from '../game/state/accusationStore'
 import { useRiteStore } from '../game/state/riteStore'
 import { useCaseStore } from '../game/state/caseStore'
 import { answerCutBell, pullBellCord } from '../game/state/case1Story'
+import {
+  checkCountersign,
+  compareBootWithPrint,
+  inspectFreshGrave,
+  markRegisterLine,
+  takeBootPrint,
+  turnLockerKey,
+} from '../game/state/case2Story'
+import { compareHandSample, pullCryptPin, searchElias } from '../game/state/case3Story'
+import type { BootId, FreshGraveId, HandSampleId, MinigameId, VaneCrestId } from '../data/cases'
+import type { RegisterMark } from '../game/systems/caseMinigames'
 import { useNarrationStore } from '../game/state/narrationStore'
 import type { EnemyId } from '../data/enemies'
 import type { WeaponPickupId } from '../data/weaponPickups'
@@ -445,6 +456,50 @@ export const api = {
   answerCutBell(id: BellPostId): string {
     return answerCutBell(id).kind
   },
+  /** Opens a minigame screen as its prop's E does (null closes it). */
+  openMinigame(id: MinigameId | null): void {
+    useOverlayStore.getState().setMinigameOpen(id)
+  },
+  /** Case 2: look at a fresh grave as E does. */
+  inspectGrave(id: FreshGraveId): void {
+    inspectFreshGrave(id)
+  },
+  /** Case 2 (2a): mark one register line. */
+  markRegister(id: FreshGraveId, mark: RegisterMark): string {
+    return markRegisterLine(id, mark)
+  },
+  /** Case 2 (2b): click a countersign box (0-based round). */
+  clickCountersign(round: number): string {
+    return checkCountersign(round)
+  },
+  /** Case 2: take the print at the robbed grave. */
+  takePrint(): void {
+    takeBootPrint()
+  },
+  /** Case 2 (2c): hold a pair of boots against the print. */
+  compareBoot(id: BootId): string {
+    return compareBootWithPrint(id)
+  },
+  /** Case 2 (2d): turn the locker key with a crest under the arrow. */
+  turnLockerKey(crest: VaneCrestId): string {
+    return turnLockerKey(crest)
+  },
+  /** Case 3 (3b): pull the hearse pin from the Crane crypt door as E does. */
+  pullPin(): boolean {
+    return pullCryptPin()
+  },
+  /** Case 3 (3c): search Elias as E does. */
+  searchElias(): boolean {
+    return searchElias()
+  },
+  /** Case 3 (3d): click one handwriting sample in the journal. */
+  compareHand(id: HandSampleId): string {
+    return compareHandSample(id)
+  },
+  /** Case 3: type a name at the altar and press Answer. Returns the outcome's kind. */
+  accuse(text: string): string {
+    return useAccusationStore.getState().give(text).kind
+  },
   /** What the keeper is saying now, and everything said this run. */
   narration(): { now: string | null; heard: string[] } {
     const n = useNarrationStore.getState()
@@ -750,9 +805,9 @@ export const api = {
   riteState(): unknown {
     return toSnapshot(useRiteStore.getState().rite)
   },
-  /** JSON-safe copy of the accusation: chosen options and what the altar said. */
+  /** JSON-safe copy of the accusation: the name given and whether the altar took it. */
   accusationState(): unknown {
-    return toSnapshot(useAccusationStore.getState())
+    return toSnapshot(useAccusationStore.getState().record)
   },
   /** Opens or closes the altar answer panel. */
   setAltarPanel(open: boolean): string {

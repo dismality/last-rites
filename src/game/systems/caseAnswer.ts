@@ -37,9 +37,20 @@ export function checkFinalAnswer(c: CaseDef, answer: SlotAnswer, typed = ''): bo
   return matches(c.final, answer)
 }
 
-/** The optional Stage 3 accusation. A case without one never accepts. */
-export function checkAccusation(c: CaseDef, answer: SlotAnswer): boolean {
+/** The Stage 3 accusation. A case without one never accepts; a typed one is checked as typed. */
+export function checkAccusation(c: CaseDef, answer: SlotAnswer, typed = ''): boolean {
+  if (c.accusation?.typed) return checkTypedAnswer(c.accusation, typed)
   return c.accusation !== undefined && matches(c.accusation, answer)
+}
+
+/**
+ * The reply for a typed answer that is neither right nor wrong (a bare "Vane" when the question
+ * wants one Vane), or null. The altar asks again and counts nothing.
+ */
+export function typedAskReply(q: FinalQuestionDef, text: string): string | null {
+  const said = normalizeAnswer(text)
+  if (!q.typed?.ask || said === '') return null
+  return q.typed.ask.forms.some((f) => normalizeAnswer(f) === said) ? q.typed.ask.reply : null
 }
 
 /** True when every slot has a choice, so the player may give the answer. */

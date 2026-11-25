@@ -8,6 +8,8 @@ import App from './App'
 import { installAutosave, installNewDaySave } from './game/state/gameSave'
 import { installRunStats } from './game/state/endingStore'
 import { installCase1Story } from './game/state/case1Story'
+import { installCase2Story } from './game/state/case2Story'
+import { installCase3Story } from './game/state/case3Story'
 import { installCaseSolvedWatcher } from './game/state/caseSolvedWatcher'
 import { installCombatWatchers } from './game/state/combatWatchers'
 import { installGuidanceWatchers } from './game/state/guidanceTick'
@@ -28,6 +30,8 @@ installGuidanceWatchers()
 installProgressionWatchers()
 installCaseSolvedWatcher()
 installCase1Story()
+installCase2Story()
+installCase3Story()
 installNewDaySave()
 installAutosave()
 // After the progression watchers, like the new-day save, so the morning holds the dealt stock.

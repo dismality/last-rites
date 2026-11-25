@@ -12,23 +12,15 @@ import {
   bellClues,
   bellPosts,
   candidateGraves,
-  evidenceTimeline,
+  handwritingSolved,
   hymnAnswer,
   hymnTiles,
   ledgerFlags,
   type LedgerFlagInput,
 } from './caseMinigames'
-import { CASE_3_EVIDENCE, CASE_3_TIMELINE_ORDER, type EvidenceCardId } from '../../data/cases'
-import {
-  CASE_2_BOOTS,
-  CASE_2_CASTS,
-  CASE_2_CREST_LOCK,
-  CASE_2_CREST_ORDER,
-  CASE_2_WATCH_ORDER,
-  CASE_2_WATCH_SHELF,
-  type CrestId,
-} from '../../data/cases'
-import { bootMatch, crestDials, watchOrder } from './caseMinigames'
+import { CASE_3_HAND_SAMPLES, type HandSampleId } from '../../data/cases'
+import { CASE_2_BOOTS, CASE_2_CRESTS, CASE_2_FRESH_GRAVES } from '../../data/cases'
+import { bootMatch, crestTurns, isRightRegisterMark, registerSolved } from './caseMinigames'
 
 const rightFlags = (): LedgerFlagInput[] =>
   CASE_1_RIGHT_FLAGS.map((r) => ({
@@ -165,104 +157,42 @@ describe('hymnTiles (3a)', () => {
   })
 })
 
-describe('evidenceTimeline (3b)', () => {
-  it('accepts the right order of the six cards', () => {
-    expect(CASE_3_EVIDENCE).toHaveLength(6)
-    expect(evidenceTimeline(CASE_3_TIMELINE_ORDER)).toEqual({ ok: true })
+describe('handwritingSolved (3d)', () => {
+  const ids = CASE_3_HAND_SAMPLES.map((h) => h.id)
+  it('is solved once all four hands are compared, in any order', () => {
+    expect(handwritingSolved([])).toBe(false)
+    expect(handwritingSolved(ids.slice(0, 3))).toBe(false)
+    expect(handwritingSolved([...ids].reverse())).toBe(true)
   })
 
-  it('reports the first card out of place', () => {
-    const swapped = [...CASE_3_TIMELINE_ORDER]
-    ;[swapped[3], swapped[4]] = [swapped[4], swapped[3]]
-    expect(evidenceTimeline(swapped)).toEqual({ ok: false, firstWrong: 3 })
-  })
-
-  // Feature: 10-curse-stages, Property 16: Right answers accepted, wrong answers rejected
-  it('Property 16 (3b): only the right order is accepted; first-wrong is the first difference', () => {
-    // Validates: Requirements 16.2, 16.4
-    const ids = CASE_3_EVIDENCE.map((c) => c.id)
+  it('is solved exactly when every sample has been seen', () => {
     fc.assert(
-      fc.property(
-        fc.oneof(
-          fc.shuffledSubarray(ids, { minLength: 0, maxLength: 6 }),
-          fc.array(fc.constantFrom<EvidenceCardId>(...ids), { maxLength: 8 }),
-        ),
-        (order) => {
-          const v = evidenceTimeline(order)
-          const same =
-            order.length === CASE_3_TIMELINE_ORDER.length &&
-            order.every((c, i) => c === CASE_3_TIMELINE_ORDER[i])
-          expect(v.ok).toBe(same)
-          if (!same) {
-            let first = 0
-            while (order[first] === CASE_3_TIMELINE_ORDER[first]) first++
-            expect(v.firstWrong).toBe(first)
-          }
-        },
-      ),
+      fc.property(fc.array(fc.constantFrom<HandSampleId>(...ids), { maxLength: 8 }), (seen) => {
+        expect(handwritingSolved(seen)).toBe(ids.every((id) => seen.includes(id)))
+      }),
       { numRuns: 200 },
     )
   })
 })
 
-describe('crestDials (2a)', () => {
-  it('opens for the founders by year: tower, leaf, star, moon', () => {
-    expect(CASE_2_CREST_ORDER).toEqual(['tower', 'leaf', 'star', 'moon'])
-    expect(crestDials(['tower', 'leaf', 'star', 'moon'])).toEqual({ ok: true })
+describe('register (2a)', () => {
+  it('wants agrees for the two quiet graves and disturbed for Finch', () => {
+    expect(isRightRegisterMark('cobb', 'agrees')).toBe(true)
+    expect(isRightRegisterMark('reade', 'disturbed')).toBe(false)
+    expect(isRightRegisterMark('finch', 'disturbed')).toBe(true)
+    expect(isRightRegisterMark('finch', 'agrees')).toBe(false)
   })
-
-  it('rejects a wrong or unfinished setting with "The lock does not give"', () => {
-    const r = crestDials(['tower', 'star', 'leaf', 'moon'])
-    expect(r).toMatchObject({ ok: false, firstWrong: 1, message: 'The lock does not give' })
-    expect(crestDials(['tower', 'leaf', null, null])).toMatchObject({ ok: false, firstWrong: 2 })
-  })
-
-  it('Property 16 (2a): only the founders order is accepted', () => {
-    const dial = fc.option(fc.constantFrom<CrestId>(...CASE_2_CREST_LOCK.dialCrests), { nil: null })
-    fc.assert(
-      fc.property(fc.array(dial, { minLength: 4, maxLength: 4 }), (dials) => {
-        const right = dials.every((d, i) => d === CASE_2_CREST_ORDER[i])
-        expect(crestDials(dials).ok).toBe(right)
-      }),
-    )
+  it('is solved only once all three lines are right', () => {
+    expect(registerSolved(['cobb', 'finch'])).toBe(false)
+    expect(registerSolved(CASE_2_FRESH_GRAVES.map((g) => g.id))).toBe(true)
   })
 })
 
-describe('watchOrder (2b)', () => {
-  it('accepts the night in order and rejects the shelf order', () => {
-    expect(watchOrder(CASE_2_WATCH_ORDER)).toEqual({ ok: true })
-    expect(watchOrder(CASE_2_WATCH_SHELF)).toMatchObject({ ok: false, firstWrong: 0 })
+describe('bootMatch (2c) and crestTurns (2d)', () => {
+  it("accepts Kerr's boots only", () => {
+    expect(CASE_2_BOOTS.filter((b) => bootMatch(b.id).ok).map((b) => b.id)).toEqual(['kerr'])
   })
-
-  it('Property 16 (2b): only the right order; first-wrong is the first difference', () => {
-    fc.assert(
-      fc.property(fc.shuffledSubarray([...CASE_2_WATCH_ORDER], { minLength: 8, maxLength: 8 }), (order) => {
-        const v = watchOrder(order)
-        const diff = order.findIndex((id, i) => id !== CASE_2_WATCH_ORDER[i])
-        expect(v.ok).toBe(diff < 0)
-        if (diff >= 0) expect(v.firstWrong).toBe(diff)
-      }),
-    )
-  })
-})
-
-describe('bootMatch (2c)', () => {
-  it('matches the full print to the lodge keeper only', () => {
-    expect(bootMatch('cast-full', 'lodge-keeper')).toEqual({ ok: true })
-    expect(bootMatch('cast-full', 'gravedigger')).toMatchObject({ ok: false, message: 'The hobnails do not agree.' })
-  })
-
-  it('names the first feature that disagrees, or says the cast is too worn', () => {
-    expect(bootMatch('cast-full', 'sexton').message).toBe('The tread does not agree.')
-    expect(bootMatch('cast-narrow', 'doctor').message).toBe('The size does not agree.')
-    expect(bootMatch('cast-heel', 'sexton').message).toBe('This cast is too worn to match anything.')
-  })
-
-  it('Property 16 (2c): exactly one pair of the 12 is accepted', () => {
-    const ok = CASE_2_CASTS.flatMap((c) => CASE_2_BOOTS.map((b) => [c.id, b.owner] as const)).filter(
-      ([c, b]) => bootMatch(c, b).ok,
-    )
-    expect(ok).toEqual([['cast-full', 'lodge-keeper']])
-    for (const c of CASE_2_CASTS) for (const b of CASE_2_BOOTS) if (!bootMatch(c.id, b.owner).ok) expect(bootMatch(c.id, b.owner).message).toBeTruthy()
+  it('turns the key only on the raven on a coffin', () => {
+    expect(CASE_2_CRESTS.filter((c) => crestTurns(c.id)).map((c) => c.id)).toEqual(['raven-coffin'])
   })
 })

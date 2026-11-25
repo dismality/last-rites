@@ -14,16 +14,22 @@ export const CLOSED_CASE_PAGES: Readonly<Record<CaseId, readonly string[]>> = {
     'He changed the entries for Esther Ames and Tobias Hale too, to hide Pell among them.',
     'What this proves: Elias found it first. The Vanes bury people who know too much.',
   ],
+  // Case 2 is the keeper's write-up too, written across the page at the altar.
   'resurrection-men': [
-    'Anatomy schools needed bodies, and the law gave them far too few.',
-    'Men who dug up the newly buried and sold them were called resurrection men, and families answered with iron mortsafes and watch-houses.',
-    'At Hollowmere the watch itself was for sale, and a gap in the log shows when the lodge door stood open.',
-    'The robbed rest, and their names are spoken again.',
+    'The grave buried on the 14th, Arthur Finch’s, was robbed.',
+    'Kerr was out alone from midnight to 2 am, with no countersign.',
+    'His boots match the print, with the grave’s yellow clay still on them.',
+    'His locker opened to the Vane crest, and inside was a receipt.',
+    'Vane & Sons paid Kerr to dig up the dead and sell them.',
+    'What this proves: the keeper digs, the Vanes pay, and Elias was getting close.',
   ],
+  // Case 3 is the keeper's write-up as well, written across the page when the altar holds the name.
   'sealed-catacombs': [
-    'In the cholera winter of 1849 the parish feared the sick more than it feared its own conscience.',
-    'Father Crane sealed living people in the catacombs, and the church that kept the doors closed has kept the ledger closed since.',
-    'An undertaker was paid for burials that never took place, and the keeper before you learned too much.',
-    'The rite is finished, the doors are open, and the names are written where they can be read.',
+    'Elias followed the Vanes from John Pell’s grave to the stolen bodies.',
+    'Silas Vane wrote to him and asked to meet at the Crane crypt.',
+    'He shut the door on him and pinned it from outside with his own hearse pin.',
+    'Elias was alive. He tried to claw his way out.',
+    'Silas Vane sealed him in.',
+    'What this proves: one hand wrote the ledger, the receipt and the note. The son kept the books, and the son shut the door.',
   ],
 }

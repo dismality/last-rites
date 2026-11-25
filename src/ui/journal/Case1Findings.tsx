@@ -3,7 +3,9 @@
 // "J.V." is stamped large as soon as the ledger shows it, and is named once the tag is read.
 // Reads the Case_Store; the answer goes through `answerCutBell` (case1Story).
 import { useState } from 'react'
-import { CASE_1_BELLS, CASE_1_STONES, type BellPostId } from '../../data/cases'
+import { CASE_1_BELLS, CASE_1_STONES, CASE_2_VANE_CREST, type BellPostId } from '../../data/cases'
+import { CrestBadge } from '../minigames/case2Drawings'
+import '../minigames/case2.css'
 import { answerCutBell } from '../../game/state/case1Story'
 import { useCaseStore } from '../../game/state/caseStore'
 import { candidateGraves } from '../../game/systems/caseMinigames'
@@ -93,6 +95,14 @@ export function Case1Findings() {
                   <strong>John Pell’s cord was cut</strong>, so no one would hear him ring. Tied to the cut end:
                 </p>
                 <blockquote className="case1__tag">{PELL_TAG}</blockquote>
+                <div className="case2__print">
+                  <span className="case2__crest">
+                    <CrestBadge crest={CASE_2_VANE_CREST} name="The wax seal on the tag: a raven on a coffin" />
+                  </span>
+                  <p>
+                    <strong>Vane family crest</strong> (remember this).
+                  </p>
+                </div>
               </>
             )}
           </li>

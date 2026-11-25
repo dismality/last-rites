@@ -1,8 +1,8 @@
 import { test, expect, type Page } from '@playwright/test'
 
 // Spec 10 task 2.7: the case board, the hint buttons, the altar panel and the Closed cases tab in
-// real Chrome. Linking clues is Case 2's board (Case 1 is written up as findings instead, and its
-// altar takes a typed name). Real mouse and keyboard do the playing; the dev hook only sets up (gives clues and
+// real Chrome. Linking clues is Case 3's board (Cases 1 and 2 are written up as findings instead,
+// and their altars take a typed name). Real mouse and keyboard do the playing; the dev hook only sets up (gives clues and
 // coins, moves the clock). Waits are polled state or rendered-frame counts, never fixed sleeps.
 
 const SHOTS = 'e2e/screenshots'
@@ -103,15 +103,23 @@ async function shoot(page: Page, name: string): Promise<void> {
   await frames(page, 4)
 }
 
-/** Case 2, The Resurrection Men: the first two blanks of its final question. */
-const RIGHT_WHO = 'the lodge keeper'
-const RIGHT_MOTIVE = "the surgeon's receipt in his hand"
+/** Case 3, The Sealed Catacombs: the first relic of the rite. */
+const FIRST_RELIC = "Crane's Rosary"
 
-/** Starts Stage 2 by day with all of its clues pinned. */
-async function caseTwo(page: Page): Promise<void> {
-  await page.evaluate(() => window.__lastRites!.skipToStage(2))
-  await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).stage === 2)
+/** Starts Stage 3 by day with all of its clues pinned. */
+async function caseThree(page: Page): Promise<void> {
+  await page.evaluate(() => window.__lastRites!.skipToStage(3))
+  await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).stage === 3)
   await page.evaluate(() => window.__lastRites!.giveAllClues())
+}
+
+/** Moves keyboard focus to a card with Tab (or Shift+Tab), as a keyboard player would. */
+async function tabTo(page: Page, id: string, key: 'Tab' | 'Shift+Tab' = 'Tab'): Promise<void> {
+  const c = card(page, id)
+  for (let i = 0; i < 20 && !(await c.evaluate((el) => el === document.activeElement)); i++) {
+    await page.keyboard.press(key)
+  }
+  await expect(c).toBeFocused()
 }
 
 test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint tier', async ({
@@ -119,25 +127,25 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
 }) => {
   test.setTimeout(300_000)
   const errors = await boot(page)
-  await caseTwo(page)
+  await caseThree(page)
   await openCaseTab(page)
 
-  // Six clue cards are pinned, and the curse meter starts full.
-  await expect(page.locator('.clue-card')).toHaveCount(6)
+  // Eight clue cards are pinned, and the curse meter starts full.
+  await expect(page.locator('.clue-card')).toHaveCount(8)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 10 / 10')
 
   // A right pair by mouse drag: a solid string with a check, the deduction note and the meter.
-  await dragCard(page, 'boot-print-match', 'watch-log-gap')
+  await dragCard(page, 'hearse-pin-hasp', 'hearse-cart-ruts')
   await expect(page.locator('.case-tag--right')).toHaveCount(1)
   await expect(page.locator('.case-tag--right')).toHaveText('✓')
   await expect(page.locator('.case-note')).toContainText('Right link')
   await expect(page.locator('.case-notes li')).toHaveCount(1)
-  await expect(page.locator('.case-notes li').first()).toContainText('whose watch went quiet')
+  await expect(page.locator('.case-notes li').first()).toContainText('A hearse cart came and went')
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
 
   // A wrong pair differs by shape and words: a dashed string with a cross that sags and falls away,
   // no note, meter unchanged (playtest 11r).
-  await dragCard(page, 'spade-fresh-clay', 'doctor-school-letter')
+  await dragCard(page, 'oil-other-crypt', 'old-bishops-seal')
   await expect(page.locator('.case-tag--wrong')).toHaveCount(1)
   await expect(page.locator('.case-tag--wrong')).toHaveText('✗')
   await expect(page.locator('.case-string--wrong')).toHaveCount(1)
@@ -157,19 +165,19 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
   expect(style.wrong.width).toBeLessThan(style.right.width)
   // Then it falls away, and trying the pair again says so.
   await expect(page.locator('.case-string--wrong')).toHaveCount(0, { timeout: 4000 })
-  await dragCard(page, 'spade-fresh-clay', 'doctor-school-letter')
+  await dragCard(page, 'oil-other-crypt', 'old-bishops-seal')
   await expect(page.locator('.case-note')).toContainText('tried already')
 
-  // A second right pair by keyboard. The board's question marks the card it is about (the gap),
-  // so Enter on the card that answers it (the watch ledger) ties the two.
-  await expect(card(page, 'watch-log-gap')).toHaveAttribute('aria-pressed', 'true')
-  await card(page, 'sexton-watch-ledger').focus()
+  // A second right pair by keyboard. The board's question marks the card it is about (the flyleaf),
+  // so Enter on the card that answers it (the Vane receipt) ties the two.
+  await expect(card(page, 'vane-ledger-flyleaf')).toHaveAttribute('aria-pressed', 'true')
+  await card(page, 'vane-receipt').focus()
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-tag--right')).toHaveCount(2)
   await expect(page.locator('.case-notes li')).toHaveCount(2)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 8 / 10')
   // Linking the same pair again changes nothing.
-  await dragCard(page, 'boot-print-match', 'watch-log-gap')
+  await dragCard(page, 'hearse-pin-hasp', 'hearse-cart-ruts')
   await expect(page.locator('.case-note')).toContainText('already joined')
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 8 / 10')
 
@@ -177,11 +185,9 @@ test('mouse drag, a wrong string, keyboard link, curse meter, slots and a hint t
 
   // The final-question slots are real selects.
   const slots = page.locator('.case-final__slot')
-  await expect(slots).toHaveCount(4)
-  await slots.nth(0).selectOption({ label: RIGHT_WHO })
-  await slots.nth(1).selectOption({ label: RIGHT_MOTIVE })
-  await expect.poll(() => caseJson(page)).toContain('surgeon')
-  expect(await caseJson(page)).toContain(RIGHT_WHO)
+  await expect(slots).toHaveCount(5)
+  await slots.nth(0).selectOption({ label: FIRST_RELIC })
+  await expect.poll(() => caseJson(page)).toContain(FIRST_RELIC)
 
   // Hints: with no coins the button is off and says why; with coins tier 1 costs 5 and reveals.
   await page.evaluate(() => window.__lastRites!.setCoins(0))
@@ -207,7 +213,7 @@ test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots 
 }) => {
   test.setTimeout(300_000)
   const errors = await boot(page)
-  await caseTwo(page)
+  await caseThree(page)
 
   await page.keyboard.press('KeyJ')
   await expect(page.getByRole('dialog', { name: 'Journal' })).toBeVisible()
@@ -224,26 +230,18 @@ test('keyboard only: J, arrow to the Case tab, Tab to cards, Enter links, slots 
   )
   await expect(page.locator('.case-board')).toBeVisible()
 
-  // The board's question marks the card it is about; Enter on the card that answers it ties the
-  // two. Tab walks into the first card (the watch ledger, which answers the first question); the
-  // scrollable panel and the header's info dots take Tab stops first.
-  const firstCard = card(page, 'sexton-watch-ledger')
-  for (
-    let i = 0;
-    i < 10 && !(await firstCard.evaluate((el) => el === document.activeElement));
-    i++
-  ) {
-    await page.keyboard.press('Tab')
-  }
-  await expect(firstCard).toBeFocused()
+  // The board's question marks the card it is about (the flyleaf); Enter on the card that answers
+  // it (the Vane receipt) ties the two. Tab walks into the cards; the scrollable panel and the
+  // header's info dots take Tab stops first.
+  await tabTo(page, 'vane-receipt')
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-notes li')).toHaveCount(1)
   await expect(page.locator('.case-curse__label')).toHaveText('Curse 9 / 10')
   await expect(page.locator('.case-note')).toContainText('Right link')
 
-  // The second question is about the boots; the gap, one Tab on, answers it.
-  await page.keyboard.press('Tab')
-  await expect(card(page, 'watch-log-gap')).toBeFocused()
+  // The second question is about Elias's letter; the flyleaf, one card back, answers it.
+  await expect(card(page, 'elias-unsent-letter')).toHaveAttribute('aria-pressed', 'true')
+  await tabTo(page, 'vane-ledger-flyleaf', 'Shift+Tab')
   await page.keyboard.press('Enter')
   await expect(page.locator('.case-tag--right')).toHaveCount(2)
 

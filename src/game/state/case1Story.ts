@@ -66,7 +66,7 @@ export function answerCutBell(id: BellPostId): CutAnswer {
   }
   if (!p.minigames.includes('1b')) {
     useCaseStore.getState().submitMinigame('1b', true)
-    narrate(CASE1_SAY.cutRight)
+    narrate([...CASE1_SAY.cutRight, CASE1_SAY.seal])
   }
   return { kind: 'right' }
 }

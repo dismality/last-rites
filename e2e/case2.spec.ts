@@ -1,11 +1,11 @@
 import { test, expect, type Page } from '@playwright/test'
 
-// Spec 10 task 5.8: Stage 2 (The Resurrection Men) in real Chrome. Minigames 2a (The Crest Lock),
-// 2b (The Watch Log) and 2c (Boot Prints) are opened with a real E press at the real props and
-// solved with the real mouse and keyboard, a wrong answer first. The surgeon's receipt is found by
-// walking to the lodge table; the whistle is taken from the opened niche. At night the altar is
-// given a wrong answer, then the right one. The dev hook only sets up (start, stage, positioning,
-// clock, kill stragglers) and reads state; no Dev_Panel solve action touches an answer.
+// Stage 2 (The Resurrection Men) in real Chrome, after the playtest story pass. The three fresh
+// graves are looked at with E; minigames 2a (the burial register), 2b (the watch log), 2c (the boots)
+// and 2d (Kerr's locker) are opened with a real E at the real props and solved with the real mouse,
+// or keyboard only, a wrong answer first. The print is taken at the robbed grave and the whistle
+// from the opened locker. At night the altar is given a wrong name, then the right one. The dev hook
+// only sets up (start, stage, positioning, clock, kill stragglers) and reads state.
 
 const SHOTS = 'e2e/screenshots'
 const SIZES = [
@@ -13,9 +13,9 @@ const SIZES = [
   { width: 800, height: 600 },
 ] as const
 const CASE_ID = 'resurrection-men'
-const WATCH_ORDER = ['w-nine', 'w-ten', 'w-eleven', 'w-midnight', 'w-one', 'w-three', 'w-four', 'w-five']
-/** Turning order on every dial: moon, tower, star, leaf. The founders: tower, leaf, star, moon. */
-const DIAL_TURNS_UP_FROM_UNTURNED = [2, 4, 3, 1]
+const GRAVES = ['cobb', 'reade', 'finch'] as const
+/** Clicks of "Turn on" from the first crest (owl on a book) to the Vane raven on a coffin. */
+const RAVEN_TURNS = 2
 
 interface WorldSnap {
   phase: string
@@ -26,7 +26,10 @@ interface StageSnap {
   altar: { lockedUntil: number; wrong: number }
 }
 interface CaseSnap {
-  cases: Record<string, { found: string[]; minigames: string[]; wrongAnswers: number }>
+  cases: Record<
+    string,
+    { found: string[]; minigames: string[]; wrongAnswers: number; gravesSeen: string[]; printTaken: boolean }
+  >
   closed: string[]
   doubt: { doubt: number }
 }
@@ -157,10 +160,15 @@ async function shoot(page: Page, name: string): Promise<void> {
 }
 
 const result = (page: Page) => page.locator('.minigame-shell__result')
-const pageOrder = (page: Page) =>
-  page.locator('[data-page]').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.page ?? ''))
 
-/** Takes the whistle from the opened niche: E shows its examine view, Esc puts it away into the satchel. */
+/** Looks at the three fresh graves with E, as every route needs them. */
+async function walkTheGraves(page: Page): Promise<void> {
+  for (const g of GRAVES) {
+    await usePropUntil(page, `fresh-grave-${g}`, async () => (await progress(page)).gravesSeen.includes(g))
+  }
+}
+
+/** Takes the whistle from the opened locker: E shows its examine view, Esc puts it away into the satchel. */
 async function takeWhistle(page: Page): Promise<void> {
   const putAway = page.getByRole('button', { name: /Put away/ })
   await usePropUntil(
@@ -172,79 +180,63 @@ async function takeWhistle(page: Page): Promise<void> {
   await expect.poll(() => keyItems(page)).toContain('bone-whistle')
 }
 
-test('mouse: watch log, crest lock and boot prints wrong then right, then both altar answers', async ({ page }) => {
-  test.setTimeout(240_000)
+test('mouse: graves, register, watch log, boots and locker wrong then right, then both altar answers', async ({
+  page,
+}) => {
+  test.setTimeout(300_000)
   const { errors } = await boot(page)
+  await walkTheGraves(page)
 
-  // The receipt is a walk clue on the lodge table.
-  await usePropUntil(page, 'case-clue-surgeon-receipt', async () =>
-    (await progress(page)).found.includes('surgeon-receipt'),
-  )
+  // 2a: Thomas Reade's grave marked wrong first, then every line right.
+  await openMinigame(page, 'burial-register')
+  await expect(page.getByRole('dialog', { name: 'The burial register' })).toBeVisible()
+  const row = (g: string) => page.locator(`.register__row[data-grave="${g}"]`)
+  await row('reade').getByRole('button', { name: 'It doesn’t match' }).click()
+  await expect.poll(async () => (await progress(page)).wrongAnswers).toBe(1)
+  await expect(row('reade').locator('.register__verdict')).toHaveCount(0)
+  await row('cobb').getByRole('button', { name: 'The grave agrees' }).click()
+  await row('reade').getByRole('button', { name: 'The grave agrees' }).click()
+  await shoot(page, 'case2-2a')
+  await row('finch').getByRole('button', { name: 'It doesn’t match' }).click()
+  await expect.poll(async () => (await progress(page)).minigames).toContain('2a')
+  expect((await progress(page)).found).toContain('robbed-grave')
+  await closeMinigame(page)
 
-  // 2b: judge the table order (wrong), then drag and use the Earlier button.
+  // 2b: a signed box first (nothing wrong there), then the empty midnight box.
   await openMinigame(page, 'watch-logbook')
-  await page.getByRole('button', { name: /Judge the log/ }).click()
-  await expect(result(page)).toContainText('do not run in order')
-  await expect(page.locator('[data-wrong="true"]')).toContainText('Out of place')
-  expect((await progress(page)).wrongAnswers).toBe(1)
-  expect((await caseState(page)).doubt.doubt).toBe(1)
-  await shoot(page, 'case2-2b-wrong')
-  await page.locator('[data-page="w-nine"]').dragTo(page.locator('.timeline__slot').first())
-  expect((await pageOrder(page))[0]).toBe('w-nine')
-  for (let i = 1; i < WATCH_ORDER.length; i++) {
-    const from = (await pageOrder(page)).indexOf(WATCH_ORDER[i])
-    if (from === i) continue
-    await page.locator(`[data-page="${WATCH_ORDER[i]}"]`).click()
-    for (let k = from; k > i; k--) await page.getByRole('button', { name: 'Earlier' }).click()
-  }
-  expect(await pageOrder(page)).toEqual(WATCH_ORDER)
-  await page.getByRole('button', { name: /Judge the log/ }).click()
+  await page.locator('.watch__sign').first().click()
+  expect((await progress(page)).minigames).not.toContain('2b')
+  await page.locator('.watch__sign--empty').first().click()
   await expect.poll(async () => (await progress(page)).minigames).toContain('2b')
-  await expect(page.locator('.watchlog__verdict')).toContainText('the lodge keeper')
-  expect((await progress(page)).found).toContain('watch-log-gap')
   await shoot(page, 'case2-2b')
   await closeMinigame(page)
 
-  // A crypt name tablet reads out its family and year. Reveals queue, so let the 2b ones finish first.
-  await expect(page.locator('.clue-reveal')).toHaveCount(0, { timeout: 20_000 })
-  await usePropUntil(page, 'crest-tablet-Marlowe', async () =>
-    (await page.locator('.clue-reveal').allTextContents()).some((t) => t.includes('1752')),
-  )
+  // The print at Arthur Finch's grave.
+  await usePropUntil(page, 'boot-print', async () => (await progress(page)).printTaken)
 
-  // 2a: all four dials to the moon (wrong), then the founders' order with the ▲ buttons.
-  await openMinigame(page, 'crest-lock')
-  for (let i = 1; i <= 4; i++) await page.getByRole('button', { name: `Turn dial ${i} up` }).click()
-  await page.getByRole('button', { name: /Try the lock/ }).click()
-  await expect(result(page)).toContainText('The lock does not give')
-  expect((await progress(page)).wrongAnswers).toBe(2)
-  await shoot(page, 'case2-2a-wrong')
-  // Each dial is on the moon (1 turn); turn on to tower (+1), leaf (+3), star (+2), moon (+0).
-  for (let i = 0; i < 4; i++) {
-    for (let k = 1; k < DIAL_TURNS_UP_FROM_UNTURNED[i]; k++) {
-      await page.getByRole('button', { name: `Turn dial ${i + 1} up` }).click()
-    }
-  }
-  await page.getByRole('button', { name: /Try the lock/ }).click()
-  await expect.poll(async () => (await progress(page)).minigames).toContain('2a')
-  expect((await progress(page)).found).toContain('sexton-watch-ledger')
-  await shoot(page, 'case2-2a')
-  await closeMinigame(page)
-  await takeWhistle(page)
-
-  // 2c: the full print against the sexton's boots (wrong), then the lodge keeper's.
-  await openMinigame(page, 'boot-cast-cast-full')
-  await page.locator('[data-cast="cast-full"]').click()
-  await page.locator('[data-boot="sexton"]').click()
-  await page.getByRole('button', { name: /Pair them/ }).click()
-  await expect(result(page)).toContainText('The tread does not agree')
-  expect((await progress(page)).wrongAnswers).toBe(3)
+  // 2c: the visitor's boot first, then Kerr's.
+  await openMinigame(page, 'lodge-boots')
+  await page.getByRole('button', { name: "A visitor's narrow boot" }).click()
+  await expect(result(page)).toContainText('No.')
   await shoot(page, 'case2-2c-wrong')
-  await page.locator('[data-boot="lodge-keeper"]').click()
-  await page.getByRole('button', { name: /Pair them/ }).click()
+  await page.getByRole('button', { name: "Kerr's work boots" }).click()
   await expect.poll(async () => (await progress(page)).minigames).toContain('2c')
   expect((await progress(page)).found).toContain('boot-print-match')
   await shoot(page, 'case2-2c')
   await closeMinigame(page)
+
+  // 2d: the key with the wrong crest, then the dial on to the raven.
+  await openMinigame(page, 'crest-lock')
+  await page.getByRole('button', { name: 'Turn the key' }).click()
+  await expect(result(page)).toContainText('Won’t turn')
+  for (let k = 0; k < RAVEN_TURNS; k++) await page.getByRole('button', { name: 'Turn on' }).click()
+  await expect(page.locator('.crestlock__now')).toHaveText(/raven on a coffin/i)
+  await page.getByRole('button', { name: 'Turn the key' }).click()
+  await expect.poll(async () => (await progress(page)).minigames).toContain('2d')
+  await expect(page.locator('.crestlock__receipt')).toContainText('Paid to Kerr')
+  await shoot(page, 'case2-2d')
+  await closeMinigame(page)
+  await takeWhistle(page)
 
   // The two red herrings are walk clues too.
   for (const id of ['spade-fresh-clay', 'doctor-school-letter']) {
@@ -258,28 +250,26 @@ test('mouse: watch log, crest lock and boot prints wrong then right, then both a
   await page.evaluate(() => window.__lastRites!.setAltarPanel(true))
   const panel = page.getByRole('dialog', { name: 'The Altar' })
   await expect(panel).toBeVisible()
-  const slots = panel.locator('.altar-panel__slot')
-  await expect(slots).toHaveCount(4)
-  // Wrong: the gravedigger with the red herrings.
-  await slots.nth(0).selectOption({ label: 'the gravedigger' })
-  await slots.nth(1).selectOption({ label: 'the fresh clay on the spade' })
-  await slots.nth(2).selectOption({ label: 'the matching boots' })
-  await slots.nth(3).selectOption({ label: 'the legal grave he dug' })
+  await expect(panel).toContainText('Who paid for the stolen bodies?')
+  const input = panel.locator('.altar-panel__input')
+
+  // Wrong: Kerr dug, but he did not pay.
+  await input.fill('Kerr')
   await panel.getByRole('button', { name: 'Answer' }).click()
   await expect(panel.locator('.altar-panel__status')).toContainText('The altar is silent: 0:')
   expect((await stage(page)).caseSolved).toBe(false)
   expect((await stage(page)).altar.wrong).toBe(1)
 
-  // Wait the lock out, then the lodge keeper with motive, means and opportunity.
+  // Wait the lock out, then who paid.
   await page.evaluate(() => window.__lastRites!.killAll())
-  await expect(panel.locator('.altar-panel__status')).toContainText('Check each blank', { timeout: 60_000 })
-  await slots.nth(0).selectOption({ label: 'the lodge keeper' })
-  await slots.nth(1).selectOption({ label: "the surgeon's receipt in his hand" })
-  await slots.nth(2).selectOption({ label: 'the matching boots' })
-  await slots.nth(3).selectOption({ label: 'the gap on his watch' })
-  await shoot(page, 'case2-board')
+  await expect(panel.locator('.altar-panel__status')).toContainText('Type the name', { timeout: 60_000 })
+  await input.fill('vane & sons')
   await panel.getByRole('button', { name: 'Answer' }).click()
   await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).caseSolved)
+  await expect(panel.locator('.handwritten')).toBeVisible()
+  await panel.getByRole('button', { name: 'Show it all' }).click()
+  await expect(panel.locator('.handwritten')).toContainText('Vane & Sons paid Kerr to dig up the dead')
+  await shoot(page, 'case2-summary')
   await expect.poll(async () => (await caseState(page)).closed).toContain(CASE_ID)
   // The whistle is carried on into stage 3.
   expect(await keyItems(page)).toContain('bone-whistle')
@@ -287,56 +277,53 @@ test('mouse: watch log, crest lock and boot prints wrong then right, then both a
   expect(errors).toEqual([])
 })
 
-test('keyboard only: watch log, crest lock and boot prints', async ({ page }) => {
-  test.setTimeout(180_000)
+test('keyboard only: register, watch log, boots and locker', async ({ page }) => {
+  test.setTimeout(240_000)
   const { errors } = await boot(page)
+  await walkTheGraves(page)
 
-  // 2b: Left/Right choose, Space lifts, Left carries, Space sets down, Enter judges.
-  await openMinigame(page, 'watch-logbook')
-  await page.locator('.timeline__track').focus()
-  let cursor = 0
-  for (let i = 0; i < WATCH_ORDER.length; i++) {
-    const j = (await pageOrder(page)).indexOf(WATCH_ORDER[i])
-    if (j === i) continue
-    for (let k = 0; k < Math.abs(j - cursor); k++) await page.keyboard.press(j > cursor ? 'ArrowRight' : 'ArrowLeft')
-    await page.keyboard.press('Space')
-    for (let k = 0; k < j - i; k++) await page.keyboard.press('ArrowLeft')
-    await page.keyboard.press('Space')
-    cursor = i
+  /**
+   * Tabs to a button by its name and presses Enter on it, as a keyboard player would. The test hook
+   * fakes pointer lock and the game swallows Tab while locked; a real player's cursor is free with a
+   * screen open, so the fake lock is dropped for the browser's own Tab focus.
+   */
+  const press = async (name: string | RegExp, within = page.locator('.minigame-shell')) => {
+    await page.evaluate(() => window.__lastRites!.lockless(false))
+    const b = within.getByRole('button', { name }).first()
+    for (let i = 0; i < 40 && !(await b.evaluate((el) => el === document.activeElement)); i++)
+      await page.keyboard.press('Tab')
+    await expect(b).toBeFocused()
+    await page.keyboard.press('Enter')
   }
-  expect(await pageOrder(page)).toEqual(WATCH_ORDER)
-  await page.keyboard.press('Enter')
-  await expect.poll(async () => (await progress(page)).minigames).toContain('2b')
-  await closeMinigame(page)
 
-  // 2a: Up turns the chosen dial, Right moves on, Enter tries the lock; a wrong try first.
-  await openMinigame(page, 'crest-lock')
-  await page.locator('.crest__dials').focus()
-  for (let i = 0; i < 4; i++) {
-    await page.keyboard.press('ArrowUp')
-    await page.keyboard.press('ArrowRight')
-  }
-  await page.keyboard.press('Enter')
-  await expect(result(page)).toContainText('The lock does not give')
-  for (let i = 0; i < 4; i++) await page.keyboard.press('ArrowLeft')
-  for (let i = 0; i < 4; i++) {
-    for (let k = 1; k < DIAL_TURNS_UP_FROM_UNTURNED[i]; k++) await page.keyboard.press('ArrowUp')
-    await page.keyboard.press('ArrowRight')
-  }
-  await page.keyboard.press('Enter')
+  await openMinigame(page, 'burial-register')
+  const row = (g: string) => page.locator(`.register__row[data-grave="${g}"]`)
+  await press('The grave agrees', row('cobb'))
+  await press('The grave agrees', row('reade'))
+  await press('It doesn’t match', row('finch'))
   await expect.poll(async () => (await progress(page)).minigames).toContain('2a')
   await closeMinigame(page)
 
-  // 2c: Up/Down choose a cast, Left/Right choose boots, Enter pairs.
-  await openMinigame(page, 'boot-cast-cast-heel')
-  await page.locator('.boots__spread').focus()
-  await page.keyboard.press('Enter')
-  await expect(result(page)).toContainText('too worn')
-  await page.keyboard.press('ArrowDown')
-  for (let i = 0; i < 2; i++) await page.keyboard.press('ArrowRight')
-  await page.keyboard.press('Enter')
+  await openMinigame(page, 'watch-logbook')
+  await press('12 am: countersign box, empty')
+  await expect.poll(async () => (await progress(page)).minigames).toContain('2b')
+  await closeMinigame(page)
+
+  await usePropUntil(page, 'boot-print', async () => (await progress(page)).printTaken)
+
+  await openMinigame(page, 'lodge-boots')
+  await press("Dale's porter's shoes")
+  await expect(result(page)).toContainText('Not Dale')
+  await press("Kerr's work boots")
   await expect.poll(async () => (await progress(page)).minigames).toContain('2c')
-  expect((await progress(page)).wrongAnswers).toBe(2)
+  await closeMinigame(page)
+
+  await openMinigame(page, 'crest-lock')
+  for (let k = 0; k < RAVEN_TURNS; k++) await press('Turn on')
+  await press('Turn the key')
+  await expect.poll(async () => (await progress(page)).minigames).toContain('2d')
+  // A wrong pair of boots costs nothing (only a wrong register mark does).
+  expect((await progress(page)).wrongAnswers).toBe(0)
   await closeMinigame(page)
 
   expect(errors).toEqual([])

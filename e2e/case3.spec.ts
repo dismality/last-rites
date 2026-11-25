@@ -1,13 +1,15 @@
 import { test, expect, type Page } from '@playwright/test'
 
-// Spec 10 task 4.8: Stage 3 (The Sealed Catacombs) in real Chrome. Minigames 3a (Hymn Board) and 3b
-// (Elias's Last Night) are opened with a real E press at the real props and solved with the real
-// mouse and keyboard, a wrong answer first. At night the Rite is worked at the altar panel (a wrong
-// relic, then the right order with Crane rising on the first), and the Accusation is given wrong and
-// then right; killing Crane finishes the rite and the Justice for Elias epilogue plays. The dev hook
-// only sets up (start, stage, positioning, ledger, clock, relics in the satchel, kill stragglers)
-// and reads state; no Dev_Panel solve action touches an answer. Waits are polled state or rendered
-// frame counts, never fixed sleeps (apart from the held E key).
+// Spec 10 task 4.8, playtest story pass: Stage 3 (The Sealed Catacombs) in real Chrome. The hymn
+// board (3a) is set with the real mouse and keyboard, a wrong row first. Then the cart ruts at the
+// Row gate, the hearse pin out of the Crane crypt door (3b) and Elias searched (3c), each by a real
+// E press at the real prop, and the four hands compared in the journal (3d) by clicks or keys. At
+// night the altar takes the name first ("Vane" is asked again, a wrong name costs nothing), then the
+// rite (a wrong relic, then the right order with Crane rising on the first); killing Crane finishes
+// it and the Justice for Elias epilogue plays. The dev hook only sets up (start, stage, positioning,
+// clock, relics in the satchel, kill stragglers) and reads state; no Dev_Panel solve action touches
+// an answer. Waits are polled state or rendered frame counts, never fixed sleeps (apart from the
+// held E key).
 
 const SHOTS = 'e2e/screenshots'
 const SIZES = [
@@ -15,8 +17,7 @@ const SIZES = [
   { width: 800, height: 600 },
 ] as const
 const CASE_ID = 'sealed-catacombs'
-const TIMELINE_ORDER = ['dry-boots', 'unsent-letter', 'cart-ruts', 'spilled-oil', 'hearse-pin', 'nail-marks']
-const EVIDENCE_PROPS = ['unsent-letter', 'cart-ruts', 'spilled-oil', 'hearse-pin', 'nail-marks']
+const HAND_SAMPLES = ['ledger', 'receipt', 'note', 'signature']
 
 interface WorldSnap {
   phase: string
@@ -28,7 +29,7 @@ interface StageSnap {
   altar: { lockedUntil: number; wrong: number }
 }
 interface CaseSnap {
-  cases: Record<string, { minigames: string[]; wrongAnswers: number; evidenceFound: string[] }>
+  cases: Record<string, { minigames: string[]; wrongAnswers: number; found: string[] }>
 }
 interface MysterySnap {
   mystery: { gates: { catacombs: boolean }; clues: string[] }
@@ -63,7 +64,7 @@ function frames(page: Page, n: number): Promise<void> {
   )
 }
 
-/** Starts a run at the start of stage 3's day (with the ledger, as a player who got here holds it). */
+/** Starts a run at the start of stage 3's day. */
 async function boot(page: Page): Promise<{ errors: string[] }> {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
@@ -79,8 +80,6 @@ async function boot(page: Page): Promise<{ errors: string[] }> {
   await page.evaluate(() => window.__lastRites!.keepAlive(true))
   await page.evaluate(() => window.__lastRites!.skipToStage(3))
   await page.waitForFunction(() => (window.__lastRites!.stageState() as StageSnap).stage === 3)
-  // Elias's boots need the parish ledger to compare against (the same rule as every clue spot).
-  await page.evaluate(() => window.__lastRites!.give('parish-ledger'))
   return { errors }
 }
 
@@ -160,17 +159,19 @@ async function openMinigame(page: Page, id: string): Promise<void> {
   await expect.poll(() => page.evaluate(() => document.pointerLockElement === null)).toBe(true)
 }
 
-/** Examines the five evidence props and the boots with real E presses (the six cards of 3b). */
-async function gatherEvidence(page: Page): Promise<void> {
-  for (const card of EVIDENCE_PROPS) {
-    await usePropUntil(page, `evidence-${card}`, async () =>
-      (await caseState(page)).cases[CASE_ID].evidenceFound.includes(card),
-    )
-  }
-  await usePropUntil(page, 'clue-clue-hut-boots', async () => (await mystery(page)).mystery.clues.includes('clue-hut-boots'))
-  // Examining may raise the clue card; clear anything that holds the cursor.
+/** The ruts at the Row gate, the pin out of the Crane crypt door and Elias searched, by real E presses. */
+async function walkToElias(page: Page): Promise<void> {
+  await usePropUntil(page, 'case-clue-hearse-cart-ruts', async () =>
+    (await caseState(page)).cases[CASE_ID].found.includes('hearse-cart-ruts'),
+  )
+  await page.evaluate(() => window.__lastRites!.releaseAll())
+  await usePropUntil(page, 'crypt-pin', async () => (await solved(page)).includes('3b'))
+  await expect.poll(() => heard(page)).toContain('Vane raven')
+  await usePropUntil(page, 'elias', async () => (await solved(page)).includes('3c'))
   await page.evaluate(() => window.__lastRites!.releaseAll())
 }
+
+const heard = (page: Page) => page.evaluate(() => window.__lastRites!.narration().heard.join(' '))
 
 async function shoot(page: Page, name: string): Promise<void> {
   await frames(page, 30)
@@ -185,22 +186,27 @@ async function shoot(page: Page, name: string): Promise<void> {
 
 const result = (page: Page) => page.locator('.minigame-shell__result')
 const tiles = (page: Page) => page.locator('.hymn__tile')
-const cardOrder = (page: Page) =>
-  page.locator('.timeline__card').evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.card ?? ''))
+const sample = (page: Page, id: string) => page.locator(`.hand__sample[data-sample="${id}"]`)
+const RITE = ["Crane's Rosary", "Sexton's Bell Clapper", "Child's Locket", 'Burial Shroud', 'Reliquary Heart']
 
-/** Sorts the timeline cards into the right order with the Earlier buttons. Returns nothing. */
-async function sortByMouse(page: Page): Promise<void> {
-  for (let i = 0; i < TIMELINE_ORDER.length; i++) {
-    const now = await cardOrder(page)
-    const from = now.indexOf(TIMELINE_ORDER[i])
-    if (from === i) continue
-    await page.locator(`.timeline__card[data-card="${TIMELINE_ORDER[i]}"]`).click()
-    for (let k = from; k > i; k--) await page.getByRole('button', { name: 'Earlier' }).click()
-  }
-  expect(await cardOrder(page)).toEqual(TIMELINE_ORDER)
+/** Kills what is left until the rite ends the run, then checks the epilogue plays before the walk-out. */
+async function finishRun(page: Page, skipKey: string): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        await page.evaluate(() => window.__lastRites!.killAll())
+        return (await ending(page)).ending
+      },
+      { timeout: 60_000, intervals: [500] },
+    )
+    .toBe('rest')
+  await expect.poll(async () => (await ending(page)).stage).toBe('epilogue')
+  await expect(page.getByLabel('Justice for Elias')).toBeVisible()
+  await page.keyboard.press(skipKey)
+  await expect.poll(async () => (await ending(page)).stage).toBe('sequence')
 }
 
-test('mouse: hymn board and timeline wrong then right, the rite and the accusation at night', async ({ page }) => {
+test('mouse: hymn board wrong then right, the crypt, the handwriting, the name and the rite at night', async ({ page }) => {
   test.setTimeout(600_000)
   const { errors } = await boot(page)
   expect((await stage(page)).stage).toBe(3)
@@ -240,35 +246,56 @@ test('mouse: hymn board and timeline wrong then right, the rite and the accusati
   await page.keyboard.press('Escape')
   await expect(page.locator('.minigame-shell')).toHaveCount(0)
 
-  // 3b: six pieces of evidence by real E presses, then the slate.
-  await gatherEvidence(page)
-  expect((await caseState(page)).cases[CASE_ID].evidenceFound.length).toBe(5)
-  await openMinigame(page, 'timeline-slate')
-  await expect(page.getByRole('dialog', { name: "Elias's Last Night" })).toBeVisible()
-  await expect(page.locator('.timeline__card')).toHaveCount(6)
-  await page.getByRole('button', { name: /Judge the night/ }).click()
-  await expect(result(page)).toContainText('out of place')
-  await expect(page.locator('.timeline__flag')).toBeVisible()
-  expect((await caseState(page)).cases[CASE_ID].wrongAnswers).toBe(2)
-  // One real drag with the mouse: the last card to the front, then the buttons do the rest.
-  const last = page.locator('.timeline__card').nth(5)
-  await last.dragTo(page.locator('.timeline__slot').nth(0))
-  await sortByMouse(page)
-  await shoot(page, 'case3-timeline')
-  await page.getByRole('button', { name: /Judge the night/ }).click()
-  await expect.poll(async () => solved(page)).toContain('3b')
-  await expect(page.locator('.timeline__replay')).toBeVisible()
-  await page.keyboard.press('Escape')
-  await expect(page.locator('.minigame-shell')).toHaveCount(0)
-  // The crypt stands open with Elias in it.
+  // The ruts, the pin (3b) and Elias (3c), with the cursor in free-look as in the keyboard run.
+  // The open crypt shows the door's inner face and Elias.
+  await page.evaluate(() => window.__lastRites!.lockless(true))
+  await walkToElias(page)
   await expect.poll(() => page.evaluate(() => window.__lastRites!.meshesUnder('case-props'))).toBeGreaterThan(0)
+  await shoot(page, 'case3-crypt')
 
-  // Night: the rite. A wrong relic first (30 s lock and an instant wave), then the right order.
+  // 3d: the four hands in the journal, clicked one by one; each circles its letters.
+  await page.keyboard.press('KeyJ')
+  await page.getByRole('tab', { name: 'Case board' }).click()
+  await expect(sample(page, 'ledger')).toBeVisible()
+  for (const id of HAND_SAMPLES.slice(0, 3)) await sample(page, id).click()
+  await expect(sample(page, 'note')).toHaveAttribute('aria-pressed', 'true')
+  await expect(sample(page, 'note').locator('.hand__glyph.is-circled')).not.toHaveCount(0)
+  expect(await solved(page)).not.toContain('3d')
+  await sample(page, 'signature').click()
+  await expect.poll(async () => solved(page)).toContain('3d')
+  await expect(sample(page, 'signature')).toContainText('No loop on the V')
+  await expect(page.locator('.case1')).toContainText('Silas Vane')
+  await sample(page, 'signature').scrollIntoViewIfNeeded()
+  await shoot(page, 'case3-handwriting')
+  await page.keyboard.press('Escape')
+
+  // Night: the name first. No relic place shows until the altar holds it.
   await page.evaluate(() => window.__lastRites!.giveAllRelics())
   await intoNight(page)
   await page.evaluate(() => window.__lastRites!.setAltarPanel(true))
   const panel = page.getByRole('dialog', { name: 'The Rite of Rest' })
   await expect(panel).toBeVisible()
+  await expect(panel.locator('.rite-panel__slot')).toHaveCount(0)
+  const answer = async (text: string) => {
+    await panel.locator('.altar-panel__input').fill(text)
+    await panel.getByRole('button', { name: 'Answer' }).click()
+  }
+  // A bare "Vane" is asked again; a wrong name is gentle (no wave, no lock).
+  await answer('Vane')
+  await expect(panel.locator('.altar-panel__accusation .altar-panel__result')).toHaveText('Which Vane?')
+  await answer('Josiah Vane')
+  await expect(panel.locator('.altar-panel__accusation .altar-panel__result')).toContainText('✕')
+  expect((await stage(page)).altar.wrong).toBe(0)
+  expect((await stage(page)).altar.lockedUntil).toBe(0)
+  await answer('Silas Vane')
+  await expect(panel.locator('.altar-panel__summary')).toBeVisible()
+  await expect(panel.locator('.altar-panel__accusation .altar-panel__result')).toContainText('Now lay the relics')
+  await expect.poll(() => heard(page)).toContain('Elias, I found you')
+  expect((await stage(page)).caseSolved).toBe(false)
+  await panel.locator('.altar-panel__accusation').scrollIntoViewIfNeeded()
+  await shoot(page, 'case3-accusation')
+
+  // The rite. A wrong relic first (30 s lock and an instant wave), then the right order.
   const slot = (n: number) => panel.locator('.rite-panel__slot').nth(n)
   const pick = async (n: number, name: string) => {
     await slot(n).locator('select').selectOption({ label: name })
@@ -282,57 +309,21 @@ test('mouse: hymn board and timeline wrong then right, the rite and the accusati
   await page.evaluate(() => window.__lastRites!.killAll())
   await expect(panel.locator('.altar-panel__status')).not.toContainText('silent', { timeout: 60_000 })
 
-  // The Accusation: a wrong one is gentle (no wave, no lock), the right one is only recorded.
-  const acc = (label: string, option: string) =>
-    panel.getByLabel(new RegExp(`Accusation, ${label},`)).selectOption({ label: option })
-  await acc('Who', 'Father Crane')
-  await acc('Motive', 'a licence')
-  await acc('Means', 'a spade')
-  await acc('Opportunity', 'the flowers')
-  await panel.getByRole('button', { name: 'Accuse' }).click()
-  await expect(panel.locator('.altar-panel__result').last()).toContainText('rings false')
-  expect((await stage(page)).altar.wrong).toBe(1)
-  expect((await stage(page)).caseSolved).toBe(false)
-  await acc('Who', 'Silas Vane')
-  await acc('Motive', 'the handwriting')
-  await acc('Means', 'the hearse-pin')
-  await acc('Opportunity', 'the cart ruts')
-
   // The rite in order. The first relic starts Crane's 10 s clock.
-  const order = ["Crane's Rosary", "Sexton's Bell Clapper", "Child's Locket", 'Burial Shroud', 'Reliquary Heart']
-  await pick(0, order[0])
+  await pick(0, RITE[0])
   await expect(slot(0)).toContainText('First the prayer')
   await expect.poll(async () => (await boss(page)).stage, { timeout: 45_000 }).toBe('risen')
-  for (let i = 1; i < order.length; i++) await pick(i, order[i])
+  for (let i = 1; i < RITE.length; i++) await pick(i, RITE[i])
   await expect(panel.locator('.altar-panel__status')).not.toContainText('sour note')
   expect((await stage(page)).caseSolved).toBe(false) // Crane lives: the placed relics wait for him
   await shoot(page, 'case3-rite')
-  await panel.getByRole('button', { name: 'Accuse' }).click()
-  await expect(panel.locator('.altar-panel__result').last()).toContainText('altar holds the name')
-  await panel.locator('.altar-panel__accusation').scrollIntoViewIfNeeded()
-  await shoot(page, 'case3-accusation')
 
-  // Crane falls, the rite finishes, and the right accusation adds the epilogue before the walk-out.
-  await expect
-    .poll(
-      async () => {
-        await page.evaluate(() => window.__lastRites!.killAll())
-        return (await ending(page)).ending
-      },
-      { timeout: 60_000, intervals: [500] },
-    )
-    .toBe('rest')
-  await expect.poll(async () => (await ending(page)).ending).toBe('rest')
-  await expect.poll(async () => (await ending(page)).stage).toBe('epilogue')
-  await expect(page.getByLabel('Justice for Elias')).toBeVisible()
-  await shoot(page, 'case3-epilogue')
-  await page.keyboard.press('Space')
-  await expect.poll(async () => (await ending(page)).stage).toBe('sequence')
-
+  // Crane falls, the rite finishes, and the name given adds the epilogue before the walk-out.
+  await finishRun(page, 'Space')
   expect(errors).toEqual([])
 })
 
-test('keyboard only: hymn tiles, timeline cards, relic places and the accusation', async ({ page }) => {
+test('keyboard only: hymn tiles, the crypt by E, the handwriting, the name and the relic places', async ({ page }) => {
   test.setTimeout(600_000)
   const { errors } = await boot(page)
   const key = async (code: string, times = 1) => {
@@ -353,35 +344,25 @@ test('keyboard only: hymn tiles, timeline cards, relic places and the accusation
   await key('Escape')
   await expect(page.locator('.minigame-shell')).toHaveCount(0)
 
-  // 3b: the evidence by E (cursor free-look again), then Space and arrows lift and move cards.
+  // The ruts, the pin and Elias by E (cursor free-look again).
   await page.evaluate(() => window.__lastRites!.lockless(true))
-  await gatherEvidence(page)
-  await openMinigame(page, 'timeline-slate')
-  await page.evaluate(() => window.__lastRites!.lockless(false))
-  await expect(page.locator('.timeline__track')).toBeFocused()
-  await key('Enter')
-  await expect(result(page)).toContainText('out of place')
-  // Selection sort: for each place, walk the cursor to the card, lift it, carry it left, put it down.
-  let cursor = 0
-  for (let i = 0; i < TIMELINE_ORDER.length; i++) {
-    const from = (await cardOrder(page)).indexOf(TIMELINE_ORDER[i])
-    if (from === i) {
-      cursor = i
-      continue
-    }
-    await key(from > cursor ? 'ArrowRight' : 'ArrowLeft', Math.abs(from - cursor))
-    await key('Space')
-    await key('ArrowLeft', from - i)
-    await key('Space')
-    cursor = i
-  }
-  expect(await cardOrder(page)).toEqual(TIMELINE_ORDER)
-  await key('Enter')
-  await expect.poll(async () => solved(page)).toContain('3b')
-  await key('Escape')
-  await expect(page.locator('.minigame-shell')).toHaveCount(0)
+  await walkToElias(page)
 
-  // Night: relics by select type-ahead, Tab and Enter; focus must come back after each placement.
+  // 3d: the journal by J, each sample reached by Tab and compared with Enter.
+  await page.evaluate(() => window.__lastRites!.lockless(false))
+  await key('KeyJ')
+  await page.getByRole('tab', { name: 'Case board' }).focus()
+  await key('Enter')
+  for (const id of HAND_SAMPLES) {
+    await sample(page, id).focus()
+    await expect(sample(page, id)).toBeFocused()
+    await key('Enter')
+    await expect(sample(page, id)).toHaveAttribute('aria-pressed', 'true')
+  }
+  await expect.poll(async () => solved(page)).toContain('3d')
+  await key('Escape')
+
+  // Night: the name typed in the first control, Enter; focus moves to the first relic place.
   await page.evaluate(() => window.__lastRites!.lockless(true))
   await page.evaluate(() => window.__lastRites!.giveAllRelics())
   await intoNight(page)
@@ -389,6 +370,12 @@ test('keyboard only: hymn tiles, timeline cards, relic places and the accusation
   await page.evaluate(() => window.__lastRites!.lockless(false))
   const panel = page.getByRole('dialog', { name: 'The Rite of Rest' })
   await expect(panel).toBeVisible()
+  await expect(panel.locator('.altar-panel__input')).toBeFocused()
+  await page.keyboard.type('the son', { delay: 20 })
+  await key('Enter')
+  await expect(panel.locator('.altar-panel__summary')).toBeVisible()
+
+  // Relics by select type-ahead, Tab and Enter; focus must come back after each placement.
   const placedNames = ['Crane', 'Sexton', 'Child', 'Burial', 'Reliquary']
   for (const name of placedNames) {
     await expect(panel.locator('select').first()).toBeFocused()
@@ -397,32 +384,9 @@ test('keyboard only: hymn tiles, timeline cards, relic places and the accusation
     await key('Enter')
     await expect(panel.locator('.rite-panel__done')).toHaveCount(placedNames.indexOf(name) + 1, { timeout: 10_000 })
   }
-  await expect.poll(async () => (await page.evaluate(() => window.__lastRites!.riteState())) as { placed: object }).toMatchObject({})
   expect(Object.keys(((await page.evaluate(() => window.__lastRites!.riteState())) as { placed: object }).placed)).toHaveLength(5)
   expect((await stage(page)).altar.wrong).toBe(0)
 
-  // The accusation: the four selects are now the first controls; type-ahead, Tab, Enter on Accuse.
-  await expect(panel.getByLabel(/Accusation, Who,/)).toBeFocused()
-  for (const [i, text] of ['Silas', 'the h', 'the hea', 'the c'].entries()) {
-    await page.keyboard.type(text)
-    await key('Tab')
-    if (i === 3) await expect(panel.getByRole('button', { name: 'Accuse' })).toBeFocused()
-  }
-  await key('Enter')
-  await expect(panel.locator('.altar-panel__result').last()).toContainText('altar holds the name')
-
-  await expect
-    .poll(
-      async () => {
-        await page.evaluate(() => window.__lastRites!.killAll())
-        return (await ending(page)).ending
-      },
-      { timeout: 60_000, intervals: [500] },
-    )
-    .toBe('rest')
-  await expect.poll(async () => (await ending(page)).stage).toBe('epilogue')
-  await key('Enter')
-  await expect.poll(async () => (await ending(page)).stage).toBe('sequence')
-
+  await finishRun(page, 'Enter')
   expect(errors).toEqual([])
 })

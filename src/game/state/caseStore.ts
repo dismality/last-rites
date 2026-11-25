@@ -8,13 +8,13 @@ import {
   CASES,
   caseOfStage,
   type BellPostId,
+  type BootId,
   type CaseDef,
   type CaseId,
-  type CrestId,
   type DeductionNote,
-  type EvidenceCardId,
+  type HandSampleId,
+  type FreshGraveId,
   type MinigameId,
-  type WatchEntryId,
 } from '../../data/cases'
 import type { AltarVerdict } from '../systems/altarAnswer'
 import { addLink, correctLinkCount, curseMeter, EMPTY_BOARD, visibleClues } from '../systems/caseBoard'
@@ -25,10 +25,7 @@ import {
   CASE_PERSISTED,
   freshCaseSave,
   type CaseProgress,
-  sanitizeCardIds,
-  sanitizeCrestDials,
   sanitizeHymnTiles,
-  sanitizeWatchLog,
   type LedgerLine,
   type CaseSave,
 } from '../systems/caseSave'
@@ -58,22 +55,22 @@ interface CaseStoreState extends CaseSave {
   submitMinigame: (id: MinigameId, correct: boolean) => void
   /** Replace the minigame 1a draft lines (kept when the overlay closes). */
   setLedgerLines: (lines: LedgerLine[]) => void
-  /** Minigame 2a: keep the four dials as turned (kept when the overlay closes). */
-  setCrestDials: (dials: readonly (CrestId | null)[]) => void
-  /** Minigame 2b: keep the arrangement of torn log pages (kept when the overlay closes). */
-  setWatchLog: (order: readonly WatchEntryId[]) => void
+  /** Case 2: record a fresh grave as inspected. */
+  seeGrave: (id: FreshGraveId) => void
+  /** Minigame 2a: record a register line as marked right. */
+  markRegister: (id: FreshGraveId) => void
+  /** Case 2: the print at the robbed grave is taken into the journal. */
+  takePrint: () => void
+  /** Minigame 2c: record a boot as held up against the print. */
+  compareBoot: (id: BootId) => void
   /** Minigame 3a: keep the five tiles as set (kept when the overlay closes). */
   setHymnTiles: (tiles: readonly (string | null)[]) => void
-  /** Minigame 3b: record an evidence card as examined in the world. False for a card already held. */
-  findEvidence: (id: EvidenceCardId) => boolean
-  /** Minigame 3b: keep the arrangement of cards on the slate (kept when the overlay closes). */
-  setTimeline: (order: readonly EvidenceCardId[]) => void
+  /** Minigame 3d: record a handwriting sample as looked at. False for one already seen. */
+  seeHandSample: (id: HandSampleId) => boolean
   /** Minigame 1b: record a bell post as fully examined (bell, rope and tag read). */
   examineBell: (id: BellPostId) => void
   /** Case 1: record a stone as read at its grave. */
   readStone: (id: string) => void
-  /** Stage 2: record a crypt tablet as read (by family). */
-  readTablet: (family: string) => void
   /**
    * Give the altar the filled Final_Question; the real check (`checkFinalAnswer`) decides. A typed
    * question (Case 1) takes the player's words as `typed`.
@@ -156,33 +153,35 @@ export const useCaseStore = create<CaseStoreState>((set, get) => ({
     if (grew) addScore(-DOUBT_SCORE_PENALTY)
   },
 
-  setCrestDials: (dials) =>
-    patchProgress(set, 'resurrection-men', (p) => ({ ...p, crestDials: sanitizeCrestDials(dials) })),
+  seeGrave: (id) =>
+    patchProgress(set, 'resurrection-men', (p) => (p.gravesSeen.includes(id) ? p : { ...p, gravesSeen: [...p.gravesSeen, id] })),
 
-  setWatchLog: (order) =>
-    patchProgress(set, 'resurrection-men', (p) => ({ ...p, watchLog: sanitizeWatchLog(order) })),
+  markRegister: (id) =>
+    patchProgress(set, 'resurrection-men', (p) =>
+      p.registerMarked.includes(id) ? p : { ...p, registerMarked: [...p.registerMarked, id] },
+    ),
+
+  takePrint: () => patchProgress(set, 'resurrection-men', (p) => (p.printTaken ? p : { ...p, printTaken: true })),
+
+  compareBoot: (id) =>
+    patchProgress(set, 'resurrection-men', (p) =>
+      p.bootsCompared.includes(id) ? p : { ...p, bootsCompared: [...p.bootsCompared, id] },
+    ),
 
   setHymnTiles: (tiles) =>
     patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, hymnTiles: sanitizeHymnTiles(tiles) })),
 
-  findEvidence: (id) => {
-    if (get().cases['sealed-catacombs'].evidenceFound.includes(id)) return false
-    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, evidenceFound: [...p.evidenceFound, id] }))
+  seeHandSample: (id) => {
+    if (get().cases['sealed-catacombs'].handSeen.includes(id)) return false
+    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, handSeen: [...p.handSeen, id] }))
     return true
   },
-
-  setTimeline: (order) =>
-    patchProgress(set, 'sealed-catacombs', (p) => ({ ...p, timeline: sanitizeCardIds(order) })),
 
   setLedgerLines: (lines) => patchProgress(set, 'saved-by-the-bell', (p) => ({ ...p, ledgerLines: lines })),
 
   readStone: (id) =>
     patchProgress(set, 'saved-by-the-bell', (p) => (p.stonesRead.includes(id) ? p : { ...p, stonesRead: [...p.stonesRead, id] })),
 
-  readTablet: (family) =>
-    patchProgress(set, 'resurrection-men', (p) =>
-      p.tabletsRead.includes(family) ? p : { ...p, tabletsRead: [...p.tabletsRead, family] },
-    ),
   examineBell: (id) =>
     patchProgress(set, 'saved-by-the-bell', (p) =>
       p.bellsExamined.includes(id) ? p : { ...p, bellsExamined: [...p.bellsExamined, id] },

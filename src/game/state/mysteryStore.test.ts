@@ -48,7 +48,7 @@ describe('key item locations', () => {
   it('places each key in its design-bible zone', () => {
     const zoneOf = (item: string) => FIXED_SPAWNS.find((s) => s.item === item)?.zone
     expect(zoneOf('rusted-crypt-key')).toBe('grounds')
-    expect(zoneOf('bone-whistle')).toBe('mausoleum-row')
+    expect(zoneOf('bone-whistle')).toBe('grounds')
     expect(zoneOf('iron-ossuary-key')).toBe('mausoleum-row')
   })
 })

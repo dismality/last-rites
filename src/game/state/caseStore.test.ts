@@ -19,10 +19,14 @@ import { useProgressionStore } from './progressionStore'
 import { useStageStore, tickStageClock } from './stageStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
+import { lendFixtureNotes } from '../../../tests/helpers/caseNotes'
+
+// No story case links clues any more; the linking rules are tested on lent notes.
+lendFixtureNotes()
 
 const c1 = CASES[0]
-// Case 1 has no board links (its journal asks one question), so linking is tested on Case 2.
-const c2 = CASES[1]
+// Cases 1 and 2 have no board links (their journals ask one question), so linking is tested on Case 3.
+const c3 = CASES[2]
 
 function fakeStorage(): Storage {
   const m = new Map<string, string>()
@@ -61,8 +65,8 @@ describe('caseStore', () => {
   })
 
   it('finds each clue once and links only found clues, with note and curse', () => {
-    useStageStore.setState({ stage: 2 })
-    const n = c2.notes[0]
+    useStageStore.setState({ stage: 3 })
+    const n = c3.notes[0]
     expect(useCaseStore.getState().findClue('not-a-clue')).toBe(false)
     expect(useCaseStore.getState().link(n.a, n.b).added).toBe(false)
     expect(useCaseStore.getState().findClue(n.a)).toBe(true)
@@ -72,8 +76,8 @@ describe('caseStore', () => {
     expect(r.added).toBe(true)
     expect(r.note?.text).toBe(n.text)
     expect(useCaseStore.getState().link(n.b, n.a).added).toBe(false)
-    expect(selectCorrectLinks(useCaseStore.getState(), 2)).toBe(1)
-    expect(selectCurse(useCaseStore.getState(), 2).value).toBe(c2.curseSteps - 1)
+    expect(selectCorrectLinks(useCaseStore.getState(), 3)).toBe(1)
+    expect(selectCurse(useCaseStore.getState(), 3).value).toBe(c3.curseSteps - 1)
   })
 
   it('a wrong day answer adds Doubt, costs 50 score and feeds the next night', () => {
@@ -133,8 +137,8 @@ describe('caseStore', () => {
   })
 
   it('Continue rebuilds the store from the save', () => {
-    useStageStore.setState({ stage: 2 })
-    const n = c2.notes[0]
+    useStageStore.setState({ stage: 3 })
+    const n = c3.notes[0]
     useCaseStore.getState().findClue(n.a)
     useCaseStore.getState().findClue(n.b)
     useCaseStore.getState().link(n.a, n.b)

@@ -2,6 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { caseOfStage } from '../../data/cases'
 import { linkKey } from './caseBoard'
 import { nextQuestion } from './caseQuestions'
+import { lendFixtureNotes } from '../../../tests/helpers/caseNotes'
+
+// No story case links clues any more; the linking rules are tested on lent notes.
+lendFixtureNotes()
 
 const STAGES = [1, 2, 3] as const
 
@@ -32,7 +36,7 @@ describe('case board questions', () => {
   })
 
   it('skips a question whose cards are not found yet, and waits when none is ready', () => {
-    const def = caseOfStage(2)
+    const def = caseOfStage(3)
     const first = def.notes[0]
     const found = new Set([first.a])
     expect(nextQuestion(def, found, [], (id) => id)).toEqual({ kind: 'wait', left: def.notes.length })
@@ -42,7 +46,7 @@ describe('case board questions', () => {
   })
 
   it('ignores wrong strings: they are not earned links', () => {
-    const def = caseOfStage(2)
+    const def = caseOfStage(3)
     const found = new Set(def.clues.map((c) => c.id))
     const s = nextQuestion(def, found, [linkKey(def.clues[0].id, 'nonsense')], (id) => id)
     expect(s.kind === 'ask' && s.question.number).toBe(1)

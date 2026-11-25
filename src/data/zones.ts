@@ -187,11 +187,11 @@ export const FIXED_SPAWNS: readonly FixedSpawn[] = [
   },
   {
     id: 'fx-bone-whistle',
-    zone: 'mausoleum-row',
-    position: [-20.7, 0.3, -52.5],
+    zone: 'grounds',
+    position: [-25.1, 0.3, -37.3],
     item: 'bone-whistle',
-    // In the sexton's niche, which opens when the crest lock is solved (spec 10 task 5.4).
-    revealedBy: '2a',
+    // In Kerr's locker by the lodge, which opens when the crest lock is solved (playtest story pass).
+    revealedBy: '2d',
   },
   { id: 'fx-page-3', zone: 'mausoleum-row', position: [-20, 0.3, -55], item: 'journal-page-3' },
   { id: 'fx-ledger', zone: 'mausoleum-row', position: [-19, 0.3, -54], item: 'parish-ledger' },

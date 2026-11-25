@@ -34,13 +34,15 @@ export type InteractableKind =
   | 'bell-post'
   | 'hymn-board'
   | 'psalter'
-  | 'evidence-card'
-  | 'timeline-slate'
+  | 'crypt-pin'
+  | 'elias'
   | 'case-clue'
   | 'watch-logbook'
   | 'crest-lock'
-  | 'crest-tablet'
+  | 'fresh-grave'
+  | 'burial-register'
   | 'boot-cast'
+  | 'boot-pair'
 
 /** Things that react to Interact by proximity and draw no prompt, rune or outline of their own. */
 export type ProximityKind = 'chapel-repair-point' | 'chapel-altar-heal'
@@ -265,28 +267,28 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     resetsOn: 'New Game',
     idlePrompt: 'The psalter is read',
   },
-  // Spec 10 task 4.4: a piece of Elias's last night. Examining it takes the card; it is used up once held.
-  'evidence-card': {
-    kind: 'evidence-card',
+  // Story pass: the iron hearse pin through the Crane crypt door's hasps. Pulling it opens the door (3b).
+  'crypt-pin': {
+    kind: 'crypt-pin',
     action: 'examine',
     category: 'used-up',
     hold: false,
     fadesBody: true,
     file: 'CaseProps.tsx',
-    endsWhen: 'the evidence card is in hand',
+    endsWhen: 'the pin is pulled (minigame 3b solved)',
     resetsOn: 'New Game',
   },
-  // Spec 10 task 4.4: the slate at the Crane crypt opens minigame 3b, the timeline of Elias's last night.
-  'timeline-slate': {
-    kind: 'timeline-slate',
-    action: 'read',
+  // Story pass: Elias, behind the opened door. Searching him finds the letter and the note (3c).
+  elias: {
+    kind: 'elias',
+    action: 'examine',
     category: 'repeatable',
     hold: false,
     fadesBody: false,
     file: 'CaseProps.tsx',
-    endsWhen: "Elias's night is in order (minigame 3b solved), or the story is not in stage 3",
+    endsWhen: 'his coat is searched (minigame 3c solved), or the story is not in stage 3',
     resetsOn: 'New Game',
-    idlePrompt: "Elias's night is in order",
+    idlePrompt: 'Elias Thorne, found',
   },
   // Spec 10 task 5: a case clue found by walking to it (the cases' `found: { kind: 'walk' }`).
   'case-clue': {
@@ -299,7 +301,30 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     endsWhen: 'the clue is on the case board',
     resetsOn: 'New Game',
   },
-  // Spec 10 task 5.3: the watch-house logbook on the lodge table opens minigame 2b.
+  // Story pass: a fresh grave by the lodge; looking at it says what it shows (Case 2).
+  'fresh-grave': {
+    kind: 'fresh-grave',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the story is not in stage 2',
+    resetsOn: 'New Game',
+  },
+  // Story pass: the burial register on the lodge table opens minigame 2a.
+  'burial-register': {
+    kind: 'burial-register',
+    action: 'read',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: 'the register is checked (minigame 2a solved), or the story is not in stage 2',
+    resetsOn: 'New Game',
+    idlePrompt: 'The register is checked',
+  },
+  // The watch log for the night of the 14th on the lodge table opens minigame 2b.
   'watch-logbook': {
     kind: 'watch-logbook',
     action: 'read',
@@ -307,35 +332,11 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     hold: false,
     fadesBody: false,
     file: 'CaseProps.tsx',
-    endsWhen: 'the watch log is in order (minigame 2b solved), or the story is not in stage 2',
+    endsWhen: 'the empty countersign is found (minigame 2b solved), or the story is not in stage 2',
     resetsOn: 'New Game',
-    idlePrompt: 'The watch log is in order',
+    idlePrompt: 'The watch log is read',
   },
-  // Spec 10 task 5.4: the crest dials in the sexton's niche open minigame 2a.
-  'crest-lock': {
-    kind: 'crest-lock',
-    action: 'examine',
-    category: 'repeatable',
-    hold: false,
-    fadesBody: false,
-    file: 'CaseProps.tsx',
-    endsWhen: "the niche is open (minigame 2a solved), or the story is not in stage 2",
-    resetsOn: 'New Game',
-    idlePrompt: 'The niche is open',
-  },
-  // Spec 10 task 5.4: a crypt name tablet on Mausoleum Row; reading it says the family, crest and year.
-  'crest-tablet': {
-    kind: 'crest-tablet',
-    action: 'read',
-    category: 'repeatable',
-    hold: false,
-    fadesBody: false,
-    file: 'CaseProps.tsx',
-    endsWhen: "the niche is open (minigame 2a solved), or the story is not in stage 2",
-    resetsOn: 'New Game',
-    idlePrompt: 'A crypt name tablet',
-  },
-  // Spec 10 task 5.5: a plaster cast at the Ames grave opens minigame 2c.
+  // The print in the mud at the robbed grave: taking it sketches it into the journal.
   'boot-cast': {
     kind: 'boot-cast',
     action: 'examine',
@@ -343,9 +344,33 @@ export const INTERACTABLES: Readonly<Record<InteractableKind, InteractableDef>> 
     hold: false,
     fadesBody: false,
     file: 'CaseProps.tsx',
-    endsWhen: 'the boots are matched (minigame 2c solved), or the story is not in stage 2',
+    endsWhen: 'the print is in the journal, or the story is not in stage 2',
     resetsOn: 'New Game',
-    idlePrompt: 'The boots are matched',
+    idlePrompt: 'The print is in your journal',
+  },
+  // The boots by the lodge table open minigame 2c.
+  'boot-pair': {
+    kind: 'boot-pair',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: "Kerr's boots are matched (minigame 2c solved), or the story is not in stage 2",
+    resetsOn: 'New Game',
+    idlePrompt: "Kerr's boots match the print",
+  },
+  // Kerr's crest-locked locker opens minigame 2d once the boots give up its key.
+  'crest-lock': {
+    kind: 'crest-lock',
+    action: 'examine',
+    category: 'repeatable',
+    hold: false,
+    fadesBody: false,
+    file: 'CaseProps.tsx',
+    endsWhen: "Kerr's locker is open (minigame 2d solved), or the story is not in stage 2",
+    resetsOn: 'New Game',
+    idlePrompt: "Kerr's locker is open",
   },
   workbench: {
     kind: 'workbench',

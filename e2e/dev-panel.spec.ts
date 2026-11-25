@@ -45,12 +45,12 @@ test('backquote opens the panel, and its controls drive the real game', async ({
   const after = await feet(page)
   expect(Math.hypot(after[0] - before[0], after[2] - before[2])).toBeLessThan(0.05)
 
-  // Teleport: the whistle spot (the sexton's niche) stands 1 m south of (-20.7, -52.5).
+  // Teleport: the whistle spot (Kerr's locker) stands 1 m south of (-25.1, -37.3).
   await section(page, 'Teleport')
-  await panel(page).getByRole('button', { name: 'Bone whistle, sexton niche (-20.7, -52.5)' }).click()
+  await panel(page).getByRole('button', { name: 'Bone whistle, Kerr’s locker (-25.1, -37.3)' }).click()
   await page.waitForFunction(() => {
     const f = window.__lastRites!.body()!.feet
-    return Math.hypot(f[0] + 20.7, f[2] + 51.5) < 0.3
+    return Math.hypot(f[0] + 25.1, f[2] + 36.3) < 0.3
   })
 
   // Time: Dusk puts the clock at the end of the day; the next tick enters dusk.

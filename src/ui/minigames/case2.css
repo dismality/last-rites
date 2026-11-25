@@ -1,0 +1,144 @@
+/* Case 2's screens (playtest story pass): the burial register, the watch log, the boots and the
+   crest lock. Marks carry words and borders, not colour alone. */
+
+/* 2a: the register, laid out like the Case 1 ledger. */
+.register__count { margin: 0 0 0.5rem; font-family: var(--font-body); font-size: 1rem; }
+.register__rows { margin: 0; padding: 0; list-style: none; display: grid; gap: 0.75rem; }
+.register__row {
+  padding: 0.5rem 0.75rem 0.65rem;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid var(--parchment-dark);
+  border-radius: 3px;
+}
+.register__row.is-done { border-left: 4px solid var(--blood); }
+.register__name { margin: 0 0 0.25rem; font-family: var(--font-heading); font-size: 1.3rem; }
+.register__pair { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.register__side p { margin: 0.15rem 0 0; font-size: 1.05rem; line-height: 1.5; }
+.register__label { margin: 0; font-family: var(--font-body); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.8; }
+.register__odd { font-weight: 700; }
+.register__unread { font-style: italic; }
+.register__choices { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.register__choice {
+  padding: 0.3rem 0.75rem;
+  font: inherit;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--ink);
+  background: transparent;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.register__choice:hover:not(:disabled) { border-color: var(--ember); background: rgba(232, 145, 58, 0.15); }
+.register__choice:disabled { opacity: 0.45; cursor: not-allowed; }
+.register__verdict { margin: 0.4rem 0 0; font-weight: 700; }
+
+/* 2b: one open page of the watch log. Empty countersign boxes are drawn as plain boxes. */
+.watch__page { width: 100%; border-collapse: collapse; font-size: 1.05rem; }
+.watch__date { margin-bottom: 0.4rem; font-family: var(--font-heading); font-size: 1.2rem; text-align: left; }
+.watch__page th,
+.watch__page td { padding: 0.35rem 0.5rem; border-bottom: 1px solid var(--parchment-dark); text-align: left; }
+.watch__page thead th { font-family: var(--font-body); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.8; }
+.watch__hand { font-style: italic; }
+.watch__sign {
+  min-width: 7rem;
+  min-height: 2rem;
+  padding: 0.2rem 0.5rem;
+  font: inherit;
+  font-style: italic;
+  color: var(--ink);
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  cursor: pointer;
+}
+.watch__sign:hover { border-color: var(--ember); }
+.watch__sign--empty { border: 2px dashed var(--ink); }
+.watch__page tr.is-odd { background: rgba(140, 30, 20, 0.12); }
+.watch__page tr.is-odd .watch__sign { font-weight: 700; font-style: normal; }
+
+/* 2c: the print and a sole side by side. */
+.boots__compare { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: start; margin: 0 0 0.75rem; }
+.boots__missing { margin: 2rem 0; font-style: italic; text-align: center; }
+.sole { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+.sole svg { width: min(11rem, 100%); height: auto; }
+.sole figcaption { font-family: var(--font-heading); font-size: 1.05rem; }
+.boots__pairs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.boots__pair {
+  padding: 0.4rem 0.8rem;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: var(--parchment);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.boots__pair.is-held { border-width: 5px; }
+.boots__pair:disabled { opacity: 0.45; cursor: default; }
+
+/* 2d: the brass dial plate, six crests round a keyhole, an arrow at the top. */
+.crestlock__layout { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; justify-content: center; }
+.crestlock__plate { position: relative; display: flex; flex-direction: column; align-items: center; }
+.crestlock__arrow { font-size: 1.6rem; line-height: 1; color: var(--ink); }
+.crestlock__dial {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  padding: 0;
+  border: 6px solid #6b4f1d;
+  border-radius: 50%;
+  background: radial-gradient(circle, #d8b65e 0%, #b48a33 70%, #8a6a24 100%);
+  cursor: pointer;
+}
+.crestlock__dial:disabled { cursor: default; }
+.crestlock__crest {
+  position: absolute;
+  left: calc(50% - 32px);
+  top: calc(50% - 38px);
+  width: 64px;
+  height: 76px;
+  transition: transform 0.25s ease;
+}
+.crestlock__crest.is-top { filter: drop-shadow(0 0 4px #fff3c4); }
+.crestlock__keyhole {
+  position: absolute;
+  left: calc(50% - 12px);
+  top: calc(50% - 20px);
+  width: 24px;
+  height: 40px;
+  background: #1b130a;
+  border-radius: 12px 12px 4px 4px;
+}
+.crestlock__now { margin: 0.4rem 0 0; font-family: var(--font-heading); font-size: 1.15rem; text-transform: capitalize; }
+.crestlock__seal { max-width: 11rem; padding: 0.5rem; border: 2px dashed var(--parchment-dark); text-align: center; }
+.crestlock__seal svg { width: 6rem; height: auto; }
+.crestlock__seal p { margin: 0.25rem 0 0; font-style: italic; }
+.crest-badge { width: 100%; height: 100%; }
+.crestlock__actions { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 0.75rem; }
+.crestlock__btn {
+  padding: 0.4rem 0.9rem;
+  font: inherit;
+  font-size: 1.05rem;
+  color: var(--ink);
+  background: transparent;
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.crestlock__btn--key { border-width: 3px; font-weight: 700; }
+.crestlock__receipt { margin: 0.75rem auto 0; max-width: 34rem; padding: 0.6rem 0.9rem; font-style: italic; font-size: 1.1rem; border-left: 3px solid var(--ink); }
+
+/* The journal's Case 2 findings: a small drawing beside a line of text. */
+.case2__print { display: flex; gap: 0.75rem; align-items: center; }
+.case2__print .sole svg { width: 5.5rem; }
+.case2__crest { display: inline-block; flex: none; width: 3.5rem; height: 4.2rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  .crestlock__crest { transition: none; }
+}
+@media (max-width: 640px) {
+  .register__pair,
+  .boots__compare { grid-template-columns: 1fr; }
+  .crestlock__dial { width: 240px; height: 240px; }
+}

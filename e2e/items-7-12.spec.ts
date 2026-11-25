@@ -90,7 +90,7 @@ const RELIC_NAMES = ["Crane's Rosary", "Sexton's Bell Clapper", "Child's Locket"
 /**
  * Spec 10 task 4.9: the old night-five setup (clear every wave, then hold Interact 45 s) is gone.
  * The last night is stage 3's, its waves never clear, and the rite is relic placement at the altar
- * panel. Setup only (dev hook): skip to stage 3, mark its two minigames solved (case3.spec.ts plays
+ * panel. Setup only (dev hook): skip to stage 3, mark its first minigames solved (case3.spec.ts plays
  * them for real), hand over `relics` relics in rite order, and go to the night.
  */
 async function riteReady(page: Page, relics: number) {
@@ -111,6 +111,8 @@ async function riteReady(page: Page, relics: number) {
  * here"), then closes the panel so the HUD is in view. The first relic starts Crane's 10 s clock.
  */
 async function placeRelics(page: Page, n: number) {
+  // The relic places open once the altar holds the name (case3.spec.ts types it for real).
+  await page.evaluate(() => window.__lastRites!.accuse('Silas Vane'))
   await page.evaluate(() => window.__lastRites!.setAltarPanel(true))
   const panel = page.getByRole('dialog', { name: 'The Rite of Rest' })
   await expect(panel).toBeVisible()
@@ -493,6 +495,11 @@ test('item 10b: no rune or hover cue during an ending (Rest, reached through the
   // once the ending screen is up and the scene has rendered after it, or the first sample reads the
   // last gameplay frame (seen once: 1 rune and a stale hover, then 7 clean samples).
   await until(page, () => (window.__lastRites!.snapshot('game') as { screen: string }).screen === 'ending', null, 30_000)
+  // The name was given, so Justice for Elias plays first: Space moves on to the walk-out sequence.
+  if ((await snap<EndingSnap>(page, 'ending')).stage === 'epilogue') {
+    await page.keyboard.press('Space')
+    await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).stage === 'sequence', null, 30_000)
+  }
   await renderedFrames(page, 2)
   const samples: Awaited<ReturnType<typeof cueState>>[] = []
   for (let i = 0; i < 8; i++) {
@@ -574,6 +581,10 @@ test('item 11: Rest ending reaches the summary unskipped (real rite, 5 relics)',
   test.setTimeout(1_500_000)
   const errors = await boot(page)
   await playRiteToEnding(page)
+  // The name was given before the rite, so Justice for Elias plays first and waits for a key; the
+  // walk-out sequence after it is what runs unskipped to the summary.
+  await until(page, () => (window.__lastRites!.snapshot('ending') as EndingSnap).ending !== null, null, 120_000)
+  if ((await snap<EndingSnap>(page, 'ending')).stage === 'epilogue') await page.keyboard.press('Space')
   await measureEnding(page, 'rest')
   expect(errors).toEqual([])
 })

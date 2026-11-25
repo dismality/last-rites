@@ -1,10 +1,12 @@
-// The rite at the altar (spec 10 task 4.5, Req 17.1-17.7): five places in the order of Crane's
-// confession, one select and one button per empty place. Everything works by keyboard (Tab,
+// The rite at the altar (spec 10 task 4.5, Req 17.1-17.7): first the name of who sealed Elias in
+// (playtest story pass), then five places in the order of Crane's confession, one select and one
+// button per empty place. Everything works by keyboard (Tab,
 // arrow keys on a select, Enter on the button); Esc steps back. Like the answer panel it never
 // freezes the night. Reads stores and calls `riteStore.place`; the rules are in systems/rite.ts.
 import { InfoDot } from '../theme/InfoDot'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { RELICS, RELIC_MAP, RITE_ORDER, RITE_STEP_LINES } from '../../data/relics'
+import { useAccusationStore } from '../../game/state/accusationStore'
 import { useBossStore } from '../../game/state/bossStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
@@ -19,7 +21,7 @@ import { clock } from './altarPanelView'
 import { ALL_PLACED_MESSAGE, CRANE_WAITS_MESSAGE, placeMessage } from './ritePanelView'
 import './altarPanel.css'
 
-const FOCUSABLE = 'select, button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
+const FOCUSABLE = 'input, select, button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])'
 
 export function RitePanelBody({ onClose }: { onClose: () => void }) {
   const rite = useRiteStore((s) => s.rite)
@@ -30,6 +32,8 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
   // Quarter-second steps, like the answer panel, so the countdown is live without a render a tick.
   const now = useStageStore((s) => Math.ceil(s.nightElapsed * 4) / 4)
   const solved = useStageStore((s) => s.caseSolved)
+  // The relics wait until the altar holds the name.
+  const named = useAccusationStore((s) => s.record.correct)
   const [result, setResult] = useState('')
   const [choice, setChoice] = useState<Partial<Record<number, RelicId>>>({})
   const root = useRef<HTMLDivElement>(null)
@@ -40,9 +44,17 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
   const lockedFor = Math.max(0, Math.ceil(lockedUntil - now))
   const allPlaced = placedCount(rite) === RITE_ORDER.length
 
+  // The first control to fill (the name box, or the first relic place), not the info button.
   useEffect(() => {
-    root.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus()
+    const r = root.current
+    ;(r?.querySelector<HTMLElement>('input, select') ?? r?.querySelector<HTMLElement>(FOCUSABLE))?.focus()
   }, [])
+
+  // Once the altar holds the name the name box goes; put focus on the first relic place, so Tab
+  // and Enter carry on without a mouse.
+  useEffect(() => {
+    if (named) requestAnimationFrame(() => root.current?.querySelector<HTMLElement>('select')?.focus())
+  }, [named])
 
   // The rite is done: the ending takes over, so the panel steps out of the way.
   useEffect(() => {
@@ -86,9 +98,10 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
     setResult(placeMessage(out, RELIC_MAP[relic].name))
     if (out.kind === 'placed' || out.kind === 'wrong') setChoice((c) => ({ ...c, [slot]: undefined }))
     // A placed relic replaces its select and button with text, which drops keyboard focus to the
-    // page. Put it back on the first control left, so Tab and Enter carry on without a mouse.
+    // page. Put it back on the next relic place (or the first control left), so Tab and Enter carry
+    // on without a mouse.
     if (out.kind === 'placed') {
-      requestAnimationFrame(() => root.current?.querySelector<HTMLElement>(FOCUSABLE)?.focus())
+      requestAnimationFrame(() => (root.current?.querySelector<HTMLElement>('select') ?? root.current?.querySelector<HTMLElement>(FOCUSABLE))?.focus())
     }
   }
 
@@ -101,6 +114,10 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
         </h2>
         <InfoDot tipKey="hud-relics" label="About relics" />
         </div>
+        <AccusationSection />
+
+        {named && (
+          <>
         <p className="altar-panel__case">Lay the relics in the order Crane confessed. Relics held: {held}/5</p>
 
         <ol className="rite-panel__slots">
@@ -156,8 +173,8 @@ export function RitePanelBody({ onClose }: { onClose: () => void }) {
         <p className="altar-panel__result" role="status" aria-live="assertive">
           {result}
         </p>
-
-        <AccusationSection />
+          </>
+        )}
 
         <div className="altar-panel__actions">
           <button type="button" className="altar-panel__btn altar-panel__btn--quiet" onClick={onClose}>

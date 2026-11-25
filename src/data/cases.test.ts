@@ -8,17 +8,18 @@ import {
   CASE_1_STONES,
   CASE_2_BOOTS,
   CASE_2_BOOT_MATCH,
-  CASE_2_CASTS,
-  CASE_2_CREST_LOCK,
-  CASE_2_SUSPECTS,
-  CASE_2_WATCH_GAP,
-  CASE_2_WATCH_LOG,
-  CASE_2_WATCH_ORDER,
-  CASE_2_WATCH_SHELF,
-  CASE_3_EVIDENCE,
+  CASE_2_CRESTS,
+  CASE_2_FRESH_GRAVES,
+  CASE_2_LOCKER_POSITION,
+  CASE_2_PEOPLE,
+  CASE_2_PRINT,
+  CASE_2_VANE_CREST,
+  CASE_2_WATCH_ROUNDS,
+  CASE_2_RECEIPT,
+  CASE_3_CRYPT_PROPS,
+  CASE_3_HAND_SAMPLES,
   CASE_3_HYMN_BOARD,
-  CASE_3_TIMELINE_ORDER,
-  CASE_3_VANE_PAPERS,
+  CASE_3_RUTS,
   CASE_MAP,
   HINT_COSTS,
   caseOfStage,
@@ -35,7 +36,6 @@ import { TOMBSTONE_MAP, type TombstoneId } from './tombstones'
 import { CLOSED_CASE_PAGES } from './caseText'
 import { STAGES, type StageNumber } from './stages'
 import { FIXED_SPAWNS, type ZoneId } from './zones'
-import { avenueCrypts } from './cemeteryLayout'
 import { zoneAt } from '../game/systems/zoneAt'
 
 /** Zones a player can walk in by stage (Mausoleum Row needs the key from case 1, the
@@ -225,16 +225,22 @@ describe('case 3 data', () => {
     expect(word).toBe(CASE_3_HYMN_BOARD.letters)
     expect(CASE_3_HYMN_BOARD.confession).toBe('What I hid, I hid beneath the Word.')
   })
-  it('has six evidence cards and one right order covering each exactly once', () => {
-    expect(CASE_3_EVIDENCE).toHaveLength(6)
-    expect([...CASE_3_TIMELINE_ORDER].sort()).toEqual(CASE_3_EVIDENCE.map((e) => e.id).sort())
-    const times = CASE_3_TIMELINE_ORDER.map((id) => CASE_3_EVIDENCE.find((e) => e.id === id)!)
-    expect(times[0].time).toBe('Midnight')
-    expect(times[5].time).toBe('Before dawn')
-    for (const e of CASE_3_EVIDENCE) {
-      expect(e.beat.length).toBeGreaterThan(0)
-      if (e.clueId) expect(c3.clues.some((k) => k.id === e.clueId)).toBe(true)
+  it('runs the cart ruts down the Row to the Crane crypt step, under the pin', () => {
+    expect(CASE_3_RUTS.fromZ).toBeGreaterThan(CASE_3_RUTS.toZ)
+    expect(CASE_3_RUTS.start[2]).toBeLessThanOrEqual(CASE_3_RUTS.fromZ)
+    expect(CASE_3_RUTS.start[2]).toBeGreaterThan(CASE_3_RUTS.toZ)
+    expect(Math.abs(CASE_3_RUTS.toZ - CASE_3_CRYPT_PROPS.doorFaceZ)).toBeLessThan(1)
+    expect(Math.abs(CASE_3_CRYPT_PROPS.pin[0] - CASE_3_CRYPT_PROPS.doorX)).toBeLessThan(1)
+  })
+  it('lays four hands side by side: three careful ones share the Vane loop, Josiah’s is plain', () => {
+    expect(CASE_3_HAND_SAMPLES.map((h) => h.id)).toEqual(['ledger', 'receipt', 'note', 'signature'])
+    for (const h of CASE_3_HAND_SAMPLES) {
+      expect(h.text.includes('{V}')).toBe(h.careful)
+      expect(h.text.includes('{v}')).toBe(!h.careful)
+      expect(h.feature.length).toBeGreaterThan(0)
     }
+    const receipt = CASE_3_HAND_SAMPLES.find((h) => h.id === 'receipt')!
+    expect(receipt.text.replace(/\{([Vsv])\}/g, (_m, l: string) => l.toUpperCase() === 'V' ? 'V' : 's')).toBe(CASE_2_RECEIPT)
   })
   it("takes the relics in the confession's order and names them in the final answer", () => {
     expect(RITE_ORDER).toHaveLength(5)
@@ -248,16 +254,12 @@ describe('case 3 data', () => {
     expect(at.every((i) => i >= 0)).toBe(true)
     expect([...at].sort((a, b) => a - b)).toEqual(at)
   })
-  it('links the Vane hand across letter, flyleaf and receipt, and has the two red herrings', () => {
-    expect(CASE_3_VANE_PAPERS.letter).toContain("undertaker's family")
-    expect(CASE_3_VANE_PAPERS.flyleaf).toContain('Josiah Vane')
-    expect(CASE_3_VANE_PAPERS.receipt).toContain('Vane & Sons')
-    expect(c3.accusation?.answer).toEqual([
-      'Silas Vane',
-      'the handwriting',
-      'the hearse-pin',
-      'the cart ruts',
-    ])
+  it('asks who sealed Elias, takes Silas in any short form, and has the two red herrings', () => {
+    const q = c3.accusation!
+    expect(q.template).toBe('Who sealed Elias Thorne in the Crane crypt?')
+    expect(q.typed?.accept).toEqual(expect.arrayContaining(['Silas Vane', 'Silas', 'S Vane', 'SV', 'the son', 'Vanes son']))
+    expect(q.typed?.ask?.forms).toContain('Vane')
+    expect(q.typed?.ask?.reply).toBe('Which Vane?')
     expect(c3.clues.filter((k) => k.redHerring).map((k) => k.id)).toEqual([
       'oil-other-crypt',
       'old-bishops-seal',
@@ -273,46 +275,38 @@ describe('case 3 data', () => {
 describe('case 2 data', () => {
   const c = CASE_MAP['resurrection-men']
 
-  it('has four suspects, and the Who options are exactly them', () => {
-    expect(Object.values(CASE_2_SUSPECTS)).toEqual(c.final.slots[0].options)
+  it('has three fresh graves, and only Arthur Finch, buried the 14th, was robbed', () => {
+    expect(CASE_2_FRESH_GRAVES).toHaveLength(3)
+    expect(CASE_2_FRESH_GRAVES.filter((g) => g.robbed).map((g) => g.id)).toEqual(['finch'])
   })
 
-  it('puts six tablets on the six avenue crypts, with four founders on the dials', () => {
-    const t = CASE_2_CREST_LOCK.tablets
-    expect(t).toHaveLength(6)
-    expect(new Set(t.map((x) => x.crypt)).size).toBe(6)
-    expect(Math.max(...t.map((x) => x.crypt))).toBeLessThan(avenueCrypts().length)
-    expect(new Set(t.map((x) => x.crest)).size).toBe(6)
-    expect(new Set(t.map((x) => x.year)).size).toBe(6)
-    expect(CASE_2_CREST_LOCK.dialCrests).toHaveLength(4)
-    for (const d of CASE_2_CREST_LOCK.dialCrests) expect(t.some((x) => x.crest === d)).toBe(true)
-    expect(CASE_2_CREST_LOCK.note).toBe('Turn them in the order the founders were laid down')
+  it('leaves the midnight and 2 am countersigns empty, and only those', () => {
+    expect(CASE_2_WATCH_ROUNDS.filter((r) => r.countersign === null).map((r) => r.time)).toEqual(['12 am', '2 am'])
+    for (const r of CASE_2_WATCH_ROUNDS) expect(r.watchman).toBe(CASE_2_PEOPLE.keeper)
   })
 
-  it('has 8 watch entries, one right order, a scrambled shelf and the gap on the lodge keeper', () => {
-    expect(CASE_2_WATCH_LOG).toHaveLength(8)
-    expect([...CASE_2_WATCH_ORDER].sort()).toEqual(CASE_2_WATCH_LOG.map((e) => e.id).sort())
-    expect([...CASE_2_WATCH_SHELF].sort()).toEqual([...CASE_2_WATCH_ORDER].sort())
-    expect(CASE_2_WATCH_SHELF).not.toEqual(CASE_2_WATCH_ORDER)
-    const at = (id: string) => CASE_2_WATCH_ORDER.indexOf(id as never)
-    expect(at(CASE_2_WATCH_GAP.before)).toBe(at(CASE_2_WATCH_GAP.after) + 1)
-    expect(CASE_2_WATCH_LOG.find((e) => e.id === CASE_2_WATCH_GAP.after)!.watchman).toBe(CASE_2_WATCH_GAP.keeper)
-    expect(CASE_2_SUSPECTS[CASE_2_WATCH_GAP.keeper]).toBe(c.final.answer[0])
+  it("has three pairs of boots and only Kerr's match the print", () => {
+    expect(CASE_2_BOOTS).toHaveLength(3)
+    const same = (b: (typeof CASE_2_BOOTS)[number]) =>
+      b.heel === CASE_2_PRINT.heel && b.nails === CASE_2_PRINT.nails && b.sole === CASE_2_PRINT.sole && b.clay === CASE_2_PRINT.clay
+    expect(CASE_2_BOOTS.filter(same).map((b) => b.id)).toEqual([CASE_2_BOOT_MATCH])
   })
 
-  it('has 3 casts and 4 boots; the one match is the answer and its twin differs only in hobnails', () => {
-    expect(CASE_2_CASTS).toHaveLength(3)
-    expect(CASE_2_BOOTS).toHaveLength(4)
-    expect(CASE_2_SUSPECTS[CASE_2_BOOT_MATCH.boot]).toBe(c.final.answer[0])
-    const cast = CASE_2_CASTS.find((x) => x.id === CASE_2_BOOT_MATCH.cast)!
-    const boot = CASE_2_BOOTS.find((x) => x.owner === CASE_2_BOOT_MATCH.boot)!
-    expect([cast.tread, cast.size, cast.hobnails]).toEqual([boot.tread, boot.size, boot.hobnails])
+  it('rings the dial with six different crests, the Vane one not first', () => {
+    expect(new Set(CASE_2_CRESTS.map((x) => x.id)).size).toBe(6)
+    expect(CASE_2_CRESTS.some((x) => x.id === CASE_2_VANE_CREST)).toBe(true)
+    expect(CASE_2_CRESTS[0].id).not.toBe(CASE_2_VANE_CREST)
   })
 
-  it('gives the whistle at the niche once 2a is solved, and keeps the spade and school letter as red herrings', () => {
+  it('asks who paid at the altar and takes forms of Vane and Sons', () => {
+    for (const a of ['Vane and Sons', 'vane & sons', 'the Vanes']) expect(checkTypedAnswer(c.final, a)).toBe(true)
+    expect(checkTypedAnswer(c.final, 'Kerr')).toBe(false)
+  })
+
+  it("gives the whistle in Kerr's locker once 2d is solved, and keeps the spade and school letter as red herrings", () => {
     const w = FIXED_SPAWNS.find((s) => s.item === 'bone-whistle')!
-    expect(w.revealedBy).toBe('2a')
-    expect(Math.hypot(w.position[0] - CASE_2_CREST_LOCK.niche[0], w.position[2] - CASE_2_CREST_LOCK.niche[2])).toBeLessThan(1)
+    expect(w.revealedBy).toBe('2d')
+    expect(Math.hypot(w.position[0] - CASE_2_LOCKER_POSITION[0], w.position[2] - CASE_2_LOCKER_POSITION[2])).toBeLessThan(1.5)
     const rh = c.clues.filter((k) => k.redHerring).map((k) => k.id)
     expect(rh).toEqual(['spade-fresh-clay', 'doctor-school-letter'])
   })

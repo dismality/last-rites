@@ -88,6 +88,8 @@ export const CASE1_SAY = {
     'J.V. The same initials as in the ledger margin. J. Vane, the undertaker: Josiah Vane.',
     'Someone must have wanted him buried. When night falls, I’ll name him at the chapel altar.',
   ],
+  /** Said after `cutRight`: the wax seal on the tag, which Case 2's locker needs. */
+  seal: 'Pressed into the tag is a red wax seal: a raven standing on a coffin, inside a shield. The Vane family crest. I’ll remember that.',
   /** The altar question answered right. */
   solved: [
     'Josiah Vane. He signed John Pell dead a day early, changed the ledger to cover it, and cut his bell cord so no one would hear him.',
@@ -95,34 +97,3 @@ export const CASE1_SAY = {
   ],
 } as const
 
-/** "ledgerRight" -> "ledger-right"; a bell post id drops its "bell-" ("bell-ames" -> "ames"). */
-const slug = (key: string): string =>
-  key.replace(/^bell-/, '').replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)
-
-/**
- * Every line the keeper can say in Case 1, each with the recording that reads it
- * (public/assets/audio/voice/<name>.ogg, made from tools/audio/prompts.mjs, batch "keeper").
- * Names follow the place in CASE1_SAY, so they stay put when a line's words change.
- */
-export function keeperVoiceLines(): { name: string; text: string }[] {
-  const out: { name: string; text: string }[] = []
-  const walk = (name: string, v: unknown): void => {
-    if (typeof v === 'string') {
-      if (v !== '') out.push({ name, text: v })
-    } else if (typeof v === 'function') {
-      for (const kind of ['date', 'plot', 'cause'] as const)
-        walk(`${name}-${kind}`, (v as (k: LedgerFlagKind) => string)(kind))
-    } else if (Array.isArray(v)) {
-      v.forEach((line, i) => walk(v.length > 1 ? `${name}-${i + 1}` : name, line))
-    } else if (v && typeof v === 'object') {
-      for (const [k, sub] of Object.entries(v)) walk(`${name}-${slug(k)}`, sub)
-    }
-  }
-  for (const [k, v] of Object.entries(CASE1_SAY)) walk(`keeper-${slug(k)}`, v)
-  return out
-}
-
-const VOICE_BY_TEXT = new Map(keeperVoiceLines().map((l) => [l.text, l.name]))
-
-/** The recording that reads this line, or null for a line with none. */
-export const keeperVoiceFor = (text: string): string | null => VOICE_BY_TEXT.get(text) ?? null

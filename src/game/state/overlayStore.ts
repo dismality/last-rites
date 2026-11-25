@@ -1,7 +1,7 @@
 // Flags for the 08 overlays. They do not own Esc; they only count as open menus.
 
 import { create } from 'zustand'
-import type { BellPostId, CastId, MinigameId } from '../../data/cases'
+import type { BellPostId, MinigameId } from '../../data/cases'
 
 interface OverlayState {
   merchantOpen: boolean
@@ -19,9 +19,6 @@ interface OverlayState {
   /** Which bell post the 1b overlay opens on: the post the player used in the world. */
   bellPostFocus: BellPostId | null
   setBellPostFocus: (id: BellPostId | null) => void
-  /** Which plaster cast the 2c overlay opens on: the cast the player used in the world. */
-  castFocus: CastId | null
-  setCastFocus: (id: CastId | null) => void
   setMerchantOpen: (open: boolean) => void
   setAchievementsOpen: (open: boolean) => void
   setModeSelectOpen: (open: boolean) => void
@@ -39,8 +36,6 @@ export const useOverlayStore = create<OverlayState>((set) => ({
   setMinigameOpen: (minigameOpen) => set({ minigameOpen }),
   bellPostFocus: null,
   setBellPostFocus: (bellPostFocus) => set({ bellPostFocus }),
-  castFocus: null,
-  setCastFocus: (castFocus) => set({ castFocus }),
   setMerchantOpen: (merchantOpen) => set({ merchantOpen }),
   setAchievementsOpen: (achievementsOpen) => set({ achievementsOpen }),
   setModeSelectOpen: (modeSelectOpen) => set({ modeSelectOpen }),

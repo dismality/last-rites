@@ -28,7 +28,7 @@ import { ContractsTab } from './ContractsTab'
 import { JournalMap } from './Map'
 import { InfoDot } from '../theme/InfoDot'
 import type { InfoTipKey } from '../../data/infoTips'
-import { CASE_ALTAR_LINE, CASE_LINK_LINE } from '../../data/objectiveRules'
+import { CASE_3_HAND_LINE, CASE_ALTAR_LINE, CASE_LINK_LINE } from '../../data/objectiveRules'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import './journal.css'
 
@@ -47,7 +47,7 @@ type TabId = (typeof TABS)[number]['id']
 /** The objective sends the player to the case board: linking clues, or the answer for the altar. */
 function objectiveNeedsCaseBoard(): boolean {
   const main = useGuidanceStore.getState().objective?.main ?? ''
-  return main.startsWith(CASE_LINK_LINE.split(' (')[0]) || main === CASE_ALTAR_LINE
+  return main.startsWith(CASE_LINK_LINE.split(' (')[0]) || main === CASE_ALTAR_LINE || main.startsWith(CASE_3_HAND_LINE)
 }
 
 const ZONE_LABEL: Record<string, string> = {

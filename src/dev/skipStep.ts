@@ -4,10 +4,9 @@
 
 import { candidateGraves } from '../game/systems/caseMinigames'
 import { caseOfStage } from '../data/cases'
-import { CASE_2_CREST_LOCK } from '../data/cases'
-import { EVIDENCE_SEARCH, PREPARE_WEAPON_RULE, STAGE_DAY_RULES } from '../data/objectiveRules'
+import { CASE_2_FRESH_GRAVES } from '../data/cases'
+import { PREPARE_WEAPON_RULE, STAGE_DAY_RULES } from '../data/objectiveRules'
 import { MODES } from '../data/modes'
-import type { EvidenceCardId } from '../data/cases'
 import { useCaseStore } from '../game/state/caseStore'
 import { useGuidanceStore } from '../game/state/guidanceStore'
 import { useMysteryStore } from '../game/state/mysteryStore'
@@ -57,14 +56,18 @@ function doStageStep(stage: 1 | 2 | 3, at: number): string {
     return 'Opened the Mausoleum Row gate'
   }
   if (stage === 2 && at === 2) {
-    CASE_2_CREST_LOCK.tablets.forEach((t) => useCaseStore.getState().readTablet(t.family))
-    return 'Read every crypt tablet'
+    CASE_2_FRESH_GRAVES.forEach((g) => useCaseStore.getState().seeGrave(g.id))
+    return 'Looked at the three fresh graves'
+  }
+  if (stage === 2 && at === 5) {
+    useCaseStore.getState().takePrint()
+    return 'Took the boot print'
   }
   if (stage === 3 && at === 1) {
-    ;(Object.keys(EVIDENCE_SEARCH) as EvidenceCardId[]).forEach((c) => useCaseStore.getState().findEvidence(c))
-    return 'Found all of Elias’s evidence'
+    useCaseStore.getState().findClue('hearse-cart-ruts')
+    return 'Found the cart ruts'
   }
-  if (stage === 3 && at === 3) {
+  if (stage === 3 && at === 5) {
     RELIC_IDS.forEach(giveRelic)
     return 'Gave all five relics'
   }

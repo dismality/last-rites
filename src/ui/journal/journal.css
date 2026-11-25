@@ -441,3 +441,35 @@ button.clue-back:hover, button.clue-back:focus-visible { opacity: 1; outline: 2p
 }
 .case1__answer:hover { border-color: var(--ember); background: rgba(232, 145, 58, 0.15); }
 .case1__tag { margin: 0.3rem 0; padding: 0.4rem 0.75rem; font-style: italic; border: 1px dashed var(--ink); background: rgba(240, 228, 196, 0.6); }
+
+/* Case 3's handwriting, side by side (3d). Each sample is a button; once compared its tell-tale letters
+   are circled and "✓" plus the words say what they show, never colour alone. */
+.hand__samples { margin: 0.4rem 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.5rem; }
+.hand__sample {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+  height: 100%;
+  padding: 0.45rem 0.6rem;
+  font: inherit;
+  text-align: left;
+  color: var(--ink);
+  background: rgba(240, 228, 196, 0.6);
+  border: 2px solid var(--ink);
+  border-radius: 3px;
+  cursor: pointer;
+}
+.hand__sample:hover { border-color: var(--ember); }
+.hand__sample[aria-pressed='true'] { border-width: 3px; }
+.hand__title { font-family: var(--font-heading); font-size: 1rem; }
+.hand__text { font-family: var(--font-journal, var(--font-body)); font-size: 1.15rem; line-height: 1.5; }
+.hand__text--careful { font-family: var(--font-body); font-style: italic; font-size: 1.25rem; }
+.hand__text--plain { letter-spacing: 0.04em; transform: skewX(4deg); display: inline-block; opacity: 0.85; }
+.hand__glyph { padding: 0 0.06em; border: 2px solid transparent; border-radius: 50%; }
+.hand__glyph--loop { font-size: 1.1em; line-height: 1; }
+.hand__glyph--long { font-size: 1.1em; }
+.hand__glyph.is-circled { border-color: var(--blood); animation: hand-circle 0.5s ease-out; }
+.hand__feature { font-size: 0.95rem; font-weight: 600; }
+@keyframes hand-circle { from { transform: scale(1.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .hand__glyph.is-circled { animation: none; } }

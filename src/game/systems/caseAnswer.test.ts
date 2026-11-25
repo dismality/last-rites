@@ -1,7 +1,7 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import { CASES, type CaseDef, type FinalQuestionDef } from '../../data/cases'
-import { checkAccusation, checkFinalAnswer, checkTypedAnswer, fillSlot, isAnswerComplete, normalizeAnswer } from './caseAnswer'
+import { checkAccusation, checkFinalAnswer, checkTypedAnswer, fillSlot, isAnswerComplete, normalizeAnswer, typedAskReply } from './caseAnswer'
 
 // Case 1 is typed (no slots); the slot properties run on the others.
 const SLOTTED = CASES.filter((c) => !c.final.typed)
@@ -38,7 +38,11 @@ describe('caseAnswer', () => {
   it('only stage 3 has an accusation', () => {
     expect(checkAccusation(CASES[0], CASES[0].final.answer)).toBe(false)
     const c3 = CASES[2]
-    expect(checkAccusation(c3, c3.accusation!.answer)).toBe(true)
+    expect(checkAccusation(c3, [], 'Silas Vane')).toBe(true)
+    expect(checkAccusation(c3, [], 'the son')).toBe(true)
+    expect(checkAccusation(c3, [], 'Josiah Vane')).toBe(false)
+    expect(typedAskReply(c3.accusation!, 'vane')).toBe('Which Vane?')
+    expect(typedAskReply(c3.accusation!, 'Silas')).toBeNull()
   })
 
   it('fillSlot fills, clears and ignores options the slot does not offer', () => {
@@ -67,18 +71,6 @@ describe('caseAnswer', () => {
           expect(checkFinalAnswer(c, c.final.answer)).toBe(true)
         },
       ),
-      { numRuns: 200 },
-    )
-  })
-
-  it('Property 16: the accusation answer is accepted and every other combination is rejected', () => {
-    const c = CASES[2]
-    const q = c.accusation!
-    fc.assert(
-      fc.property(picks(q), (idx) => {
-        const answer = idx.map((i, s) => q.slots[s].options[i])
-        expect(checkAccusation(c, answer)).toBe(answer.every((o, s) => o === q.answer[s]))
-      }),
       { numRuns: 200 },
     )
   })

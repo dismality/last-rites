@@ -78,7 +78,7 @@ export const TELEPORT_GROUPS: readonly TeleportGroup[] = [
     title: 'Story spots',
     points: [
       fixedSpot('rusted-crypt-key', 'Crypt key (-12, -18)'),
-      fixedSpot('bone-whistle', 'Bone whistle, sexton niche (-20.7, -52.5)'),
+      fixedSpot('bone-whistle', 'Bone whistle, Kerr’s locker (-25.1, -37.3)'),
       fixedSpot('iron-ossuary-key', 'Iron ossuary key'),
       { id: 'catacomb-stair', label: 'Catacomb stair (behind altar)', x: CRANE_SPAWN.stair[0], z: CRANE_SPAWN.stair[2] - 1.5, yaw: S },
     ],

@@ -9,7 +9,6 @@
 // Continue and New Game need no cue reset of their own.
 
 import { DOORS } from '../../data/barricades'
-import type { EvidenceCardId } from '../../data/cases'
 import { GATE_DEFS } from '../../data/gateHints'
 import { EARLY_DUSK_VERB } from '../../data/objectiveRules'
 import { earlyDuskReady } from './guidanceTick'
@@ -156,22 +155,28 @@ export function readCueFacts(kind: InteractableKind, subject = ''): CueFacts {
       const p = useCaseStore.getState().cases['sealed-catacombs']
       return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3a') }
     }
-    case 'evidence-card':
-      return { usedUp: useCaseStore.getState().cases['sealed-catacombs'].evidenceFound.includes(subject as EvidenceCardId) }
-    case 'timeline-slate': {
+    case 'crypt-pin':
+      return { usedUp: useCaseStore.getState().cases['sealed-catacombs'].minigames.includes('3b') }
+    case 'elias': {
       const p = useCaseStore.getState().cases['sealed-catacombs']
-      return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3b') }
+      return { usedUp: false, idle: useStageStore.getState().stage !== 3 || p.minigames.includes('3c') }
     }
     case 'case-clue': {
       const found = Object.values(useCaseStore.getState().cases).some((p) => p.found.includes(subject))
       return { usedUp: found }
     }
-    case 'watch-logbook':
-    case 'crest-lock':
-    case 'crest-tablet':
+    case 'fresh-grave':
+      return { usedUp: false, idle: useStageStore.getState().stage !== 2 }
     case 'boot-cast': {
       const p = useCaseStore.getState().cases['resurrection-men']
-      const id = kind === 'watch-logbook' ? '2b' : kind === 'boot-cast' ? '2c' : '2a'
+      return { usedUp: false, idle: useStageStore.getState().stage !== 2 || p.printTaken }
+    }
+    case 'burial-register':
+    case 'watch-logbook':
+    case 'boot-pair':
+    case 'crest-lock': {
+      const p = useCaseStore.getState().cases['resurrection-men']
+      const id = kind === 'burial-register' ? '2a' : kind === 'watch-logbook' ? '2b' : kind === 'boot-pair' ? '2c' : '2d'
       return { usedUp: false, idle: useStageStore.getState().stage !== 2 || p.minigames.includes(id) }
     }
     case 'workbench':

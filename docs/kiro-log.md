@@ -2400,3 +2400,50 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - `KeeperNarration.tsx` plays a line's recording as the line appears, keeps the line up until the recording ends, and cuts it on a click or a new line. Without the files the lines stay silent, as before.
 - **What Kiro caught or sped up:** Nothing; done by hand.
 - **Decisions made unattended:** Elias and the narrator keep their voices; only the keeper's lines use the new one. (2026-11-23)
+
+
+### 2026-11-24: Stage 2 story pass (The Resurrection Men)
+- **Started:** Outside Kiro
+- **What happened:**
+  - Stage 2 is rebuilt as a step-by-step trail, like Stage 1. The crypt tablets, the founders' dials, the shuffled watch pages and the boot casts are gone. The crypt key and the Row gate still come first.
+  - **Fresh graves:** three new graves by the lodge (Ellen Cobb, Thomas Reade, Arthur Finch). E on each says what it shows. Finch's, buried the 14th, is dug open, with yellow clay on the grass and the lid showing.
+  - **2a, the burial register** on the lodge table: each grave is marked "agrees" or "doesn't match", like the Case 1 ledger. A wrong mark adds Doubt.
+  - **2b, the watch log** for the night of the 14th. It is read-only: Kerr walks every round and Dale countersigns, except at 12 am and 2 am. Clicking an empty box solves it.
+  - **The print:** E on the plaster print at Finch's grave sketches it into the journal.
+  - **2c, the boots** by the lodge table: the visitor's, Dale's and Kerr's. Clicking a pair turns its sole over beside the print. Only Kerr's match, and a locker key falls out. Wrong pairs cost nothing.
+  - **2d, Kerr's locker:** a Vane & Sons crest lock. The dial turns through six crests, with the seal from John Pell's tag beside it. The raven on a coffin opens it, showing the Vane & Sons receipt and the bone whistle, which moved here from the sexton's niche.
+  - **The altar** asks "Who paid for the stolen bodies?" and accepts forms of Vane and Sons. The keeper's write-up then writes itself on the panel.
+  - **Journal:**
+    - The Case board shows Case 2's findings step by step.
+    - Case 1's findings now show the Vane crest sketch ("remember this").
+    - Elias's page 2 is now "The fresh graves".
+  - **Narration:** the keeper's Case 2 lines are in `src/data/case2Narration.ts`, with the story in `src/game/state/case2Story.ts`. The keeper voice batch now lists all 80 lines, Case 1 and Case 2 (`src/data/keeperVoice.ts`).
+  - Cases 1 and 2 have no clue links now, so the link tests use Case 3.
+  - The e2e specs for Case 2, the case board and the playthrough's Stage 2 follow the new flow.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's crypt key and Row gate steps, the case data shape, the store actions and the save format are kept and extended.
+- **Decisions made unattended:**
+  - The names are placeholders: Kerr (the lodge keeper), Dale (the night porter), Dr. Hollis (the surgeon), and the three buried. (2026-11-24)
+  - The boots, the locker and the crest drawings are placeholder art. (2026-11-24)
+  - The page-2 voice line has new text and the 41 new keeper lines need recording. Neither was generated, as that spends credits; they stay silent until they are. (2026-11-24)
+
+### 2026-11-25: Stage 3 story pass (The Sealed Catacombs)
+- **Started:** Outside Kiro
+- **What happened:**
+  - Stage 3 is rebuilt as a step-by-step trail, like Stages 1 and 2. The six evidence cards, the timeline slate and the four-blank accusation are gone. The hymn board, the relics, the rite and the Crane fight stay.
+  - **3a, the hymn board:** unchanged. The keeper now reads BELOW aloud, sees the stair open, and turns to the cart ruts at the Row gate.
+  - **Cart ruts:** two real grooves of dark mud with pale crushed-stone ridges, from the Row gate down the avenue to the Crane crypt step. E at the gate end notes them.
+  - **Lantern oil (false lead):** a tipped lantern and a glossy pool at the Lowe crypt, with no ruts going to it.
+  - **3b, the Crane crypt door:** pinned shut from outside with an iron hearse pin stamped with the Vane raven. E pulls it. The door swings open, with fingernail marks gouged into its inner face (the lower ones stained) and a torn nail on the sill.
+  - **3c, Elias:** slumped in the doorway. E on him finds his unsent letter and the note that called him to the crypt. The goal line now reads "Elias Thorne: found".
+  - **3d, the handwriting:** on the journal's Case board, four samples side by side: the changed ledger entry, the Vane & Sons receipt, the note, and Josiah Vane's signature on Pell's tag. Clicking each one circles its letters. Three share a looped V and a long s; Josiah's is plain. Once all four are compared, the keeper names Silas Vane.
+  - **The altar, last night:** "Who sealed Elias Thorne in the Crane crypt?" comes first, typed. It accepts Silas Vane and short forms (Silas, S. Vane, SV, the son). A bare "Vane" gets "Which Vane?" and does not count. A wrong name costs nothing. The keeper's write-up then writes itself, the keeper says "Silas Vane. Elias, I found you. You can rest now.", and the relic places open for the rite.
+  - **Narration:** the keeper's Case 3 lines are in `src/data/case3Narration.ts`, with the story in `src/game/state/case3Story.ts`. The keeper voice batch now lists all 100 lines.
+  - No case links clues now, so the link tests lend Case 3 three made-up notes (`tests/helpers/caseNotes.ts`).
+  - The keeper's name label in the narration box is 1rem, to meet the HUD's 1rem floor.
+  - The e2e specs for Case 3, the playthrough's Stage 3 and the items 7-12 rite setup follow the new flow.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's hymn board, relics, rite panel, Crane fight, epilogue, case data shape, store actions and save format are kept and extended.
+- **Decisions made unattended:**
+  - The Crane crypt stays at the end of Mausoleum Row (not in the catacombs), so the ruts run down the Row from its gate. The oil lies at a Row crypt named Lowe. (2026-11-25)
+  - The name is given first at the altar, then the rite; the rite's places stay hidden until the name is right. (2026-11-25)
+  - Elias's figure, the raven stamp, the ruts and the handwriting glyphs are placeholder art. (2026-11-25)
+  - The 20 new keeper lines need recording. They were not generated, as that spends credits; they stay silent until they are. (2026-11-25)

@@ -5,18 +5,17 @@ import {
   CASE_1_BELLS,
   CASE_1_RIGHT_FLAGS,
   CASE_1_STONES,
-  CASE_2_CASTS,
-  CASE_2_CREST_LOCK,
+  CASE_2_BOOTS_POSITION,
+  CASE_2_FRESH_GRAVES,
+  CASE_2_LOCKER_POSITION,
   CASE_2_LOGBOOK_POSITION,
-  CASE_3_BOOTS_CLUE,
+  CASE_2_PRINT_POSITION,
+  CASE_2_REGISTER_POSITION,
   CASE_3_CRYPT_PROPS,
-  CASE_3_EVIDENCE_SPOTS,
-  type CrestTabletDef,
-  type EvidenceCardId,
+  CASE_3_RUTS,
   type MinigameId,
 } from './cases'
-import { avenueCrypts, MAUSOLEUM_ROW, POWDER_TIN_HUT } from './cemeteryLayout'
-import { CLUE_SPOTS } from './tombstones'
+import { MAUSOLEUM_ROW, POWDER_TIN_HUT } from './cemeteryLayout'
 import { HYMN_BOARD_POSITION } from './chapelScenery'
 
 export type ObjectiveRuleId = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
@@ -171,6 +170,10 @@ export const CASE_NAME_ALTAR_WHY = 'The altar listens at night: type the name th
 
 /** The story's one goal, shown above every objective in a story run (playtest story pass). */
 export const STORY_GOAL_LINE = 'Find Elias Thorne (trail {n} of 3)'
+/** The goal line once the Crane crypt is open and Elias is found (Stage 3, 3b). */
+export const STORY_GOAL_FOUND_LINE = 'Elias Thorne: found'
+/** Stage 3's journal step: the handwriting comparison on the Case tab. */
+export const CASE_3_HAND_LINE = 'In your journal: compare the handwriting'
 
 /**
  * Objectives that need the journal to piece things together show its key under them (11s). Any
@@ -221,32 +224,6 @@ const CRYPT_KEY_SEARCH: StageDayPlace = { kind: 'area', at: [-11, 0, -19.5], rad
 /** The Mausoleum Row gate across the avenue mouth on the north fence (Gates.tsx). */
 export const ROW_GATE_POSITION: Point = [MAUSOLEUM_ROW.centerX, 0, MAUSOLEUM_ROW.entranceZ]
 
-/** Where a crypt tablet hangs: on the avenue railing in front of its crypt (CaseProps.tsx). */
-export function crestTabletPosition(t: CrestTabletDef): Point {
-  const crypt = avenueCrypts()[t.crypt]
-  const z = crypt ? crypt.position[2] : MAUSOLEUM_ROW.entranceZ
-  const west = crypt ? crypt.position[0] < MAUSOLEUM_ROW.centerX : true
-  return [MAUSOLEUM_ROW.centerX + (west ? -1 : 1) * (MAUSOLEUM_ROW.width / 2), 0, z]
-}
-
-/**
- * Where each of Elias's evidence cards lies, as a search area centre: a little off the thing
- * itself, so the ring says "around here". The dry boots are the hut's boots clue.
- */
-const EVIDENCE_AREA_OFFSET: Point = [1.2, 0, 1]
-const offsetArea = (p: readonly [number, number, number]): Point => [p[0] + EVIDENCE_AREA_OFFSET[0], 0, p[2] + EVIDENCE_AREA_OFFSET[2]]
-const BOOTS_AT = CLUE_SPOTS.find((c) => c.clueId === CASE_3_BOOTS_CLUE)?.position ?? POWDER_TIN_HUT
-export const EVIDENCE_SEARCH: Readonly<Record<EvidenceCardId, Point>> = {
-  'dry-boots': offsetArea(BOOTS_AT),
-  'unsent-letter': offsetArea(CASE_3_EVIDENCE_SPOTS['unsent-letter'].position),
-  'cart-ruts': offsetArea(CASE_3_EVIDENCE_SPOTS['cart-ruts'].position),
-  'spilled-oil': offsetArea(CASE_3_EVIDENCE_SPOTS['spilled-oil'].position),
-  'hearse-pin': offsetArea(CASE_3_EVIDENCE_SPOTS['hearse-pin'].position),
-  'nail-marks': offsetArea(CASE_3_EVIDENCE_SPOTS['nail-marks'].position),
-}
-/** Radius of each evidence search ring (metres). */
-export const EVIDENCE_RADIUS_M = 4
-
 /** The three graves Elias named in Case 1: the stones that carry a ledger mismatch. */
 const CASE_1_GRAVES = CASE_1_RIGHT_FLAGS.map((f) => CASE_1_STONES.find((s) => s.id === f.stoneId)!)
 
@@ -290,7 +267,7 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
       target: 1,
       marker: 'Search here',
       place: CRYPT_KEY_SEARCH,
-      why: 'With the curse lifted, Pell’s grave gave something up. The next case lies past that gate.',
+      why: 'With the curse lifted, Pell’s grave gave something up.',
       done: 'The Rusted Crypt Key. It fits the Mausoleum Row gate on the north fence.',
     },
     {
@@ -298,71 +275,106 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
       target: 1,
       marker: 'Row gate',
       place: { kind: 'point', at: ROW_GATE_POSITION },
-      why: 'The crypt key fits the Mausoleum Row gate on the north fence.',
-      done: 'The gate lifts. Six crypt tablets hang on the avenue railings.',
+      why: 'The crypt key fits the Mausoleum Row gate on the north fence, by the lodge.',
+      done: 'The Row is open. Elias wrote to watch the fresh graves: there are three by the lodge.',
     },
     {
-      main: 'Read the crypt tablets',
-      target: CASE_2_CREST_LOCK.tablets.length,
-      marker: 'Tablet',
-      place: { kind: 'nearest', at: CASE_2_CREST_LOCK.tablets.map(crestTabletPosition) },
-      why: 'Graves were robbed in 1849, and the sexton locked his records away. The tablets hold the key.',
-      done: 'Each tablet gives a family, a crest and a year. The sexton’s crest lock is in the west niche.',
+      main: 'Look at the three fresh graves by the lodge',
+      target: CASE_2_FRESH_GRAVES.length,
+      marker: 'Fresh grave',
+      place: { kind: 'nearest', at: CASE_2_FRESH_GRAVES.map((g) => g.position) },
+      why: 'Elias thought bodies were being taken from new graves. See what each one shows.',
+      done: 'All three seen. Now check them against the burial register on the lodge table.',
     },
     {
       minigame: '2a',
-      main: "Open the sexton's crest lock",
-      target: 1,
-      marker: 'Crest lock',
-      place: { kind: 'point', at: CASE_2_CREST_LOCK.niche },
-      why: 'Turn the founders’ crests in the order they were laid down, from the tablets’ years.',
-      done: 'Inside: the sexton’s bone whistle and his watch ledger. Its torn pages lie in the lodge.',
+      main: 'Check the fresh graves against the register',
+      target: CASE_2_FRESH_GRAVES.length,
+      marker: 'Register',
+      place: { kind: 'point', at: CASE_2_REGISTER_POSITION },
+      why: 'For each grave, mark whether it agrees with the burial register.',
+      done: 'Arthur Finch’s grave, buried the 14th, was dug up and emptied.',
     },
     {
       minigame: '2b',
-      main: 'Put the watch log in order',
+      main: 'Read the watch log for the night of the 14th',
       target: 1,
       marker: 'Watch log',
       place: { kind: 'point', at: CASE_2_LOGBOOK_POSITION },
-      why: 'The watch ledger is torn. Its pages lie in the gatekeeper’s lodge: put that night in order.',
-      done: 'The log falls silent for two hours, the night the Ames grave was robbed.',
+      why: 'The lodge keeper, Kerr, logs every round, and the porter, Dale, countersigns it.',
+      done: 'Kerr walked the midnight and 2 am rounds alone. Dale never signed.',
+    },
+    {
+      main: 'Take the boot print at Arthur Finch’s grave',
+      target: 1,
+      marker: 'Print',
+      place: { kind: 'point', at: CASE_2_PRINT_POSITION },
+      why: 'Whoever dug up the grave left a print in the mud at its foot.',
+      done: 'The print is in your journal. Compare it with the boots by the lodge table.',
     },
     {
       minigame: '2c',
-      main: 'Compare the boot prints',
+      main: 'Compare the boots by the lodge with the print',
       target: 1,
-      marker: 'Casts',
-      place: { kind: 'point', at: CASE_2_CASTS[1].position },
-      why: 'The log falls silent the night the Ames grave was robbed. Its boot prints will say who.',
-      done: 'One cast matches a pair of boots. The case board can name the body snatcher now.',
+      marker: 'Boots',
+      place: { kind: 'point', at: CASE_2_BOOTS_POSITION },
+      why: 'Hold each pair of boots against the print from the robbed grave.',
+      done: 'Kerr’s boots match the print. A locker key fell out of one.',
+    },
+    {
+      minigame: '2d',
+      main: 'Open Kerr’s locker',
+      target: 1,
+      marker: 'Locker',
+      place: { kind: 'point', at: CASE_2_LOCKER_POSITION },
+      why: 'A Vane & Sons crest lock: the key turns only with the right family crest.',
+      done: 'A receipt: Vane & Sons paid Kerr for bodies. Name who paid at the altar tonight.',
     },
   ],
   3: [
     {
       minigame: '3a',
-      main: 'Set the hymn tiles at the altar',
+      main: 'Read the hymn board in the chapel',
       target: 1,
       marker: 'Hymn board',
       place: { kind: 'point', at: HYMN_BOARD_POSITION },
-      why: 'Crane hid something "beneath the Word". The hymn board and the vestry psalter spell it out.',
-      done: 'The tiles spell BELOW. With the sexton’s whistle, the stair behind the altar opens.',
+      why: 'Elias went below the chapel. The hymn board has been changed: the vestry psalter explains it.',
+      done: 'The hymns spell BELOW. The stair behind the altar is open. Now follow the cart ruts.',
     },
     {
-      main: 'Find what happened to Elias',
-      target: 6,
-      marker: 'Search here',
-      place: { kind: 'area', at: EVIDENCE_SEARCH['cart-ruts'], radiusM: EVIDENCE_RADIUS_M },
-      why: 'Elias went to the Crane crypt and never came back. Six things he left tell his last night.',
-      done: 'Six pieces of his last night. Lay them in order on the slate by the Crane crypt.',
+      main: 'Follow the cart ruts from the Row gate',
+      target: 1,
+      marker: 'Ruts',
+      place: { kind: 'point', at: CASE_3_RUTS.start },
+      why: 'Elias’s page named the Crane crypt. A heavy cart came down the Row. See where it went.',
+      done: 'A hearse cart came down the Row. Its ruts run to the Crane crypt at the far end.',
     },
     {
       minigame: '3b',
-      main: "Reconstruct Elias's last night",
+      main: 'Open the Crane crypt door',
       target: 1,
-      marker: 'Slate',
-      place: { kind: 'point', at: CASE_3_CRYPT_PROPS.slate },
-      why: 'Set the six pieces in the order they happened, from midnight to dawn.',
-      done: 'He was sealed in alive. The crypt is open: Elias, and the Iron Ossuary Key.',
+      marker: 'Crane crypt',
+      place: { kind: 'point', at: CASE_3_CRYPT_PROPS.pin },
+      why: 'The ruts stop at the Crane crypt. Something holds its door shut from outside.',
+      done: 'The door was pinned from outside with a Vane hearse pin. Elias is inside.',
+    },
+    {
+      minigame: '3c',
+      main: 'Search Elias',
+      target: 1,
+      marker: 'Elias',
+      place: { kind: 'point', at: CASE_3_CRYPT_PROPS.body },
+      why: 'Elias came to the crypt to meet someone. See what he carried.',
+      done: 'His unsent letter, and the note that called him here. Compare the hands in your journal.',
+    },
+    {
+      minigame: '3d',
+      main: CASE_3_HAND_LINE,
+      target: 4,
+      marker: 'Elias',
+      place: { kind: 'point', at: CASE_3_CRYPT_PROPS.body },
+      why: 'Lay the note beside the ledger, the receipt and Josiah’s signature on the Case tab.',
+      done: 'One hand wrote the ledger, the receipt and the note: Silas Vane. Name him at the altar tonight.',
     },
     {
       main: 'Gather the relics of the rite',
@@ -378,7 +390,7 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
 /** Shown once when a stage's first day begins (not on a load): where the new case starts. */
 export const STAGE_OPENING: Readonly<Partial<Record<1 | 2 | 3, string>>> = {
   2: 'Something glints in Pell’s grave.',
-  3: 'Two cases closed. Elias’s own story is the last.',
+  3: 'Two cases closed. Elias’s last page says to look for the Crane crypt.',
 }
 
 /** Both tracker lines are cut to this many characters. */

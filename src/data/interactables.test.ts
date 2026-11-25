@@ -79,6 +79,6 @@ describe('interaction audit table', () => {
 
   it('items you take fade with their cues; places and people stay', () => {
     const fades = INTERACTABLE_KINDS.filter((k) => INTERACTABLES[k].fadesBody).sort()
-    expect(fades).toEqual(['case-clue', 'clue-spot', 'dropped-stack', 'evidence-card', 'fixed-spawn', 'material-pickup', 'weapon-pickup'])
+    expect(fades).toEqual(['case-clue', 'clue-spot', 'crypt-pin', 'dropped-stack', 'fixed-spawn', 'material-pickup', 'weapon-pickup'])
   })
 })

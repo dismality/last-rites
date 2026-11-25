@@ -12,6 +12,10 @@ import {
   visibleClues,
   type BoardState,
 } from './caseBoard'
+import { lendFixtureNotes } from '../../../tests/helpers/caseNotes'
+
+// No story case links clues any more; the linking rules are tested on lent notes.
+lendFixtureNotes()
 
 const caseArb = fc.constantFrom<CaseDef>(...CASES)
 const stageArb = fc.constantFrom<StageNumber>(...STAGES.map((s) => s.stage))
@@ -22,8 +26,8 @@ describe('caseBoard', () => {
   })
 
   it('a listed pair gives its note and lowers the meter by one', () => {
-    // Case 1 has no links (its journal asks one question); Case 2 does.
-    const c = CASES[1]
+    // Cases 1 and 2 have no links (their journals ask one question); Case 3 does.
+    const c = CASES[2]
     const n = c.notes[0]
     const r = addLink(EMPTY_BOARD, c, n.b, n.a)
     expect(r.note).toBe(n)

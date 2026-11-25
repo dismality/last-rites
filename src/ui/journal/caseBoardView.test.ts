@@ -15,6 +15,10 @@ import {
   questionSegments,
   stringViews,
 } from './caseBoardView'
+import { lendFixtureNotes } from '../../../tests/helpers/caseNotes'
+
+// No story case links clues any more; the linking rules are tested on lent notes.
+lendFixtureNotes()
 
 const c1 = CASES[0]
 
@@ -32,8 +36,8 @@ describe('caseBoardView', () => {
   })
 
   it('marks right and wrong strings and drops strings to missing cards', () => {
-    // Case 1 has no links (its journal asks one question); Case 2 does.
-    const c2 = CASES[1]
+    // Cases 1 and 2 have no links (their journals ask one question); Case 3 does.
+    const c2 = CASES[2]
     const cards = layoutCards(c2.clues, c2.clues)
     const n = c2.notes[0]
     const right = linkKey(n.a, n.b)
@@ -54,7 +58,7 @@ describe('caseBoardView', () => {
   })
 
   it('splits the final question around its slots', () => {
-    const c2 = CASES[1]
+    const c2 = CASES[2]
     const segs = questionSegments(c2.final)
     expect(segs.filter((s) => s.kind === 'slot').map((s) => s.slot)).toEqual(c2.final.slots.map((_, i) => i))
     // A typed question (Case 1) is all text.
@@ -80,7 +84,7 @@ describe('caseBoardView', () => {
   })
 
   it('reports the curse as a number and a fraction', () => {
-    const c2 = CASES[1]
+    const c2 = CASES[2]
     const n = c2.notes[0]
     expect(curseView([], c2)).toEqual({ label: `Curse ${c2.curseSteps} / ${c2.curseSteps}`, fraction: 1 })
     expect(curseView([linkKey(n.a, n.b)], c2).label).toBe(`Curse ${c2.curseSteps - 1} / ${c2.curseSteps}`)

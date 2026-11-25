@@ -1,4 +1,4 @@
-import { CASE_2_CREST_LOCK } from '../../data/cases'
+import { CASE_2_LOCKER_POSITION, CASE_3_CRYPT_PROPS } from '../../data/cases'
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
 import { CHAPEL_ALTAR } from '../../data/cemeteryLayout'
@@ -456,44 +456,53 @@ describe('selectObjective in story stages (spec 10)', () => {
     const open = { count: 0, done: false }
     const done = { count: 1, done: true }
     // Stage 2: the Row gate's key first, as a search area, then the gate.
-    const key = st(2, [open, open, open, open, open, open])
+    const o8 = () => [open, open, open, open, open, open, open, open]
+    const upTo = (n: number) => o8().map((x, i) => (i < n ? done : x))
+    const key = st(2, o8())
     expect(key.main).toBe('Find the key to the Mausoleum Row gate (0/1)')
     expect(key.areaM).toBeGreaterThan(0)
     expect(key.why).toMatch(/Pell/)
-    const gate = st(2, [done, open, open, open, open, open])
+    const gate = st(2, upTo(1))
     expect(gate.main).toBe('Open the Mausoleum Row gate (0/1)')
     expect(gate.areaM).toBeUndefined()
-    // Then the six tablets, pointing at the nearest one not yet read.
+    // Then the three fresh graves, pointing at the nearest one not yet seen.
     const far: [number, number, number] = [99, 0, 99]
-    const tablets = st(2, [done, done, { count: 2, done: false, at: [far, base.playerPos] }, open, open, open])
-    expect(tablets.main).toBe('Read the crypt tablets (2/6)')
-    expect(tablets.position).toEqual(base.playerPos)
-    const o = st(2, [done, done, done, open, open, open])
-    expect(o.main).toBe("Open the sexton's crest lock (0/1)")
-    expect(o.marker).toBe('Crest lock')
-    expect(o.position).toEqual(CASE_2_CREST_LOCK.niche)
-    expect(st(2, [done, done, done, done, open, open]).main).toBe('Put the watch log in order (0/1)')
-    expect(st(2, [done, done, done, done, done, open]).main).toBe('Compare the boot prints (0/1)')
-    expect(st(2, [done, done, done, done, done, done]).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
+    const s3 = upTo(2)
+    s3[2] = { count: 1, done: false, at: [far, base.playerPos] } as never
+    const graves = st(2, s3)
+    expect(graves.main).toBe('Look at the three fresh graves by the lodge (1/3)')
+    expect(graves.position).toEqual(base.playerPos)
+    expect(st(2, upTo(3)).main).toBe('Check the fresh graves against the register (0/3)')
+    expect(st(2, upTo(4)).main).toBe('Read the watch log for the night of the 14th (0/1)')
+    expect(st(2, upTo(5)).main).toBe('Take the boot print at Arthur Finch’s grave (0/1)')
+    expect(st(2, upTo(6)).main).toBe('Compare the boots by the lodge with the print (0/1)')
+    const o = st(2, upTo(7))
+    expect(o.main).toBe('Open Kerr’s locker (0/1)')
+    expect(o.marker).toBe('Locker')
+    expect(o.position).toEqual(CASE_2_LOCKER_POSITION)
+    expect(st(2, upTo(8)).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
     // Stage 1: the three stones, the ledger, then the bell cords.
     expect(st(1, [{ count: 1, done: false }, open, open]).main).toBe('Read the stones of Pell, Ames and Hale (1/3)')
     expect(st(1, [done, { count: 2, done: false }, open]).main).toBe('Check the ledger against the stones (2/3)')
     expect(st(1, [done, done, { count: 2, done: false }]).main).toBe('Pull the bell cords at the three graves (2/3)')
     // All three pulled but the journal question not yet answered: say what is left, not a stuck 3/3.
     expect(st(1, [done, done, { count: 3, done: false }]).main).toBe('In your journal: which bell was cut?')
-    const evidence = st(3, [done, { count: 4, done: false }, open, open])
-    expect(evidence.main).toBe('Find what happened to Elias (4/6)')
-    expect(evidence.areaM).toBeGreaterThan(0)
-    expect(st(3, [done, done, open, open]).main).toBe("Reconstruct Elias's last night (0/1)")
-    expect(st(3, [done, done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
+    // Stage 3: the hymn board, the ruts, the crypt pin, Elias, the handwriting, the relics.
+    expect(st(3, [done, open, open, open, open, open]).main).toBe('Follow the cart ruts from the Row gate (0/1)')
+    const pin = st(3, [done, done, open, open, open, open])
+    expect(pin.main).toBe('Open the Crane crypt door (0/1)')
+    expect(pin.position).toEqual(CASE_3_CRYPT_PROPS.pin)
+    expect(st(3, [done, done, done, open, open, open]).main).toBe('Search Elias (0/1)')
+    expect(st(3, [done, done, done, done, { count: 2, done: false }, open]).main).toBe('In your journal: compare the handwriting (2/4)')
+    expect(st(3, [done, done, done, done, done, { count: 3, done: false }]).main).toBe('Gather the relics of the rite (3/5)')
     // The weapon rule keeps the step on its second line; night keeps the curse line.
     const armed = selectObjective({
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, done, open, open, open] },
+      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, done, open, open, open, open, open] },
     })
-    expect(armed.second).toBe("Open the sexton's crest lock (0/1)")
+    expect(armed.second).toBe('Check the fresh graves against the register (0/3)')
     const night = selectObjective({ ...day, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] } })
     expect(night.rule).toBe(1)
   })
@@ -510,7 +519,7 @@ describe('selectObjective in story stages (spec 10)', () => {
     const done = { count: 1, done: true }
     const steps = [done, done, done, done, done, done]
     const at = (curseLinks: number) =>
-      selectObjective({ ...day, stage: { stage: 2, curseLinks, altarLockedS: 0, linksTotal: 5, day: steps } })
+      selectObjective({ ...day, stage: { stage: 3, curseLinks, altarLockedS: 0, linksTotal: 5, day: steps } })
     expect(at(2).main).toBe('Link clues on the case board in your journal (2/5)')
     expect(at(2).position).toBeUndefined()
     expect(at(2).why).toMatch(/curse/)
@@ -523,7 +532,7 @@ describe('selectObjective in story stages (spec 10)', () => {
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 2, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: steps },
+      stage: { stage: 3, curseLinks: 1, altarLockedS: 0, linksTotal: 5, day: steps },
     })
     expect(armed.second).toBe('Link clues on the case board in your journal (1/5)')
     // A case with no links (Case 1) goes straight to the altar, to type the name.

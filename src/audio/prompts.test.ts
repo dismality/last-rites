@@ -12,7 +12,7 @@ import { WIN_SEQUENCE } from '../data/winCutscene'
 import { SOUND_IDS } from '../data/sounds'
 import { CAPTIONS } from '../data/captions'
 import { sampleName } from './sampleManifest'
-import { keeperVoiceLines } from '../data/case1Narration'
+import { keeperVoiceLines } from '../data/keeperVoice'
 
 const byName = new Map(AUDIO.map((e) => [e.name, e]))
 
@@ -42,7 +42,7 @@ describe('audio prompt sheet', () => {
     }
   })
 
-  it("reads every one of the keeper's Case 1 lines word for word, in the keeper's voice", () => {
+  it("reads every one of the keeper's lines word for word, in the keeper's voice", () => {
     const lines = keeperVoiceLines()
     const sheet = AUDIO.filter((e) => e.batch === 'keeper')
     expect(sheet.map((e) => e.name)).toEqual(lines.map((l) => l.name))

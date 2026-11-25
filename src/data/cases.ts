@@ -12,7 +12,7 @@ import type { ZoneId } from './zones'
 
 export type { CaseId } from './stages'
 
-export type MinigameId = '1a' | '1b' | '2a' | '2b' | '2c' | '3a' | '3b'
+export type MinigameId = '1a' | '1b' | '2a' | '2b' | '2c' | '2d' | '3a' | '3b' | '3c' | '3d'
 
 /** Clue ids are kebab-case literals, one union per case. */
 export type Case1ClueId =
@@ -24,18 +24,18 @@ export type Case1ClueId =
   | 'hale-fresh-flowers'
   | 'marsh-stone-toppled'
 export type Case2ClueId =
-  | 'sexton-watch-ledger'
+  | 'robbed-grave'
   | 'watch-log-gap'
   | 'boot-print-match'
-  | 'surgeon-receipt'
+  | 'vane-sons-receipt'
   | 'spade-fresh-clay'
   | 'doctor-school-letter'
 export type Case3ClueId =
   | 'hymn-letters-below'
-  | 'elias-unsent-letter'
   | 'hearse-cart-ruts'
   | 'hearse-pin-hasp'
-  | 'vane-ledger-flyleaf'
+  | 'elias-unsent-letter'
+  | 'silas-handwriting'
   | 'vane-receipt'
   | 'oil-other-crypt'
   | 'old-bishops-seal'
@@ -81,14 +81,18 @@ export interface FinalQuestionDef {
   template: string
   slots: readonly FinalSlotDef[]
   answer: readonly string[]
-  /** The Stage 3 accusation does not affect the win. */
+  /** Not judged as the case answer (the Stage 3 accusation, given before the rite). */
   optional?: boolean
   /**
    * Typed at the altar instead of chosen (playtest: options gave the answer away). `template` is
    * then the whole question, `slots` and `answer` are empty, and any of these forms is right.
    * Matching ignores case, spaces and punctuation (`normalizeAnswer` in caseAnswer.ts).
    */
-  typed?: { accept: readonly string[] }
+  typed?: {
+    accept: readonly string[]
+    /** Forms that are neither right nor wrong: the altar asks again with `reply` and counts nothing. */
+    ask?: { forms: readonly string[]; reply: string }
+  }
 }
 
 export interface HintTierDef {
@@ -364,229 +368,170 @@ export const CASE_1_REWARD = {
   position: [-8.4, 0, -21.6],
 } as const satisfies { item: ItemId; stone: string; position: readonly [number, number, number] }
 
-// ---- Case 2 minigame data (spec 10 task 5.1) ----
+// ---- Case 2 minigame data (story pass) ----
+// Fresh graves by the lodge are checked against the burial register (2a), the watch log for the
+// night of the robbery is read (2b), the print from the robbed grave is compared with the boots by
+// the lodge table (2c), and the key from Kerr's boot opens his crest-locked locker (2d).
 
-export type Case2SuspectId = 'sexton' | 'doctor' | 'lodge-keeper' | 'gravedigger'
+/** The lodge keeper and the night porter who countersigns his rounds. PLACEHOLDER names. */
+export const CASE_2_PEOPLE = { keeper: 'Kerr', porter: 'Dale' } as const
 
-export const CASE_2_SUSPECTS: Readonly<Record<Case2SuspectId, string>> = {
-  sexton: 'the sexton',
-  doctor: 'the doctor',
-  'lodge-keeper': 'the lodge keeper',
-  gravedigger: 'the gravedigger',
-}
+export type FreshGraveId = 'cobb' | 'reade' | 'finch'
 
-export type CrestId = 'tower' | 'leaf' | 'star' | 'moon' | 'cross' | 'swords'
-
-/** A crypt name tablet on Mausoleum Row: family, crest and the year the founder was laid down. */
-export interface CrestTabletDef {
-  family: string
-  crest: CrestId
-  year: number
-  /** The avenue crypt it hangs on, as an index into `avenueCrypts()` (two per row, west first). */
-  crypt: number
-}
-
-/** Crest glyphs, drawn as text so they read on any screen (text presentation, never emoji). */
-export const CREST_GLYPHS: Readonly<Record<CrestId, string>> = {
-  tower: '♜︎',
-  leaf: '❦︎',
-  star: '✦︎',
-  moon: '☾︎',
-  cross: '✠︎',
-  swords: '⚔︎',
-}
-
-export const CREST_NAMES: Readonly<Record<CrestId, string>> = {
-  tower: 'Tower',
-  leaf: 'Leaf',
-  star: 'Star',
-  moon: 'Moon',
-  cross: 'Cross',
-  swords: 'Swords',
-}
-
-export interface CrestLockDef {
-  /** The sexton's niche on the west side of the avenue. */
-  niche: readonly [number, number, number]
-  note: string
-  tablets: readonly CrestTabletDef[]
-  /** What each dial can be turned to, in turning order. */
-  dialCrests: readonly CrestId[]
-  wrongMessage: string
-}
-
-/**
- * Minigame 2a, The Crest Lock (Req 19). Six tablets on the six avenue crypts; the four founding
- * families' crests are on the dials. The two later families are only there to be read past.
- */
-export const CASE_2_CREST_LOCK: CrestLockDef = {
-  niche: [-21.2, 0, -52.5],
-  note: 'Turn them in the order the founders were laid down',
-  tablets: [
-    { family: 'Ashby', crest: 'moon', year: 1767, crypt: 0 },
-    { family: 'Whitlock', crest: 'cross', year: 1803, crypt: 1 },
-    { family: 'Marlowe', crest: 'tower', year: 1752, crypt: 2 },
-    { family: 'Penrose', crest: 'swords', year: 1811, crypt: 3 },
-    { family: 'Kestrel', crest: 'star', year: 1761, crypt: 4 },
-    { family: 'Thorne', crest: 'leaf', year: 1758, crypt: 5 },
-  ],
-  dialCrests: ['moon', 'tower', 'star', 'leaf'],
-  wrongMessage: 'The lock does not give',
-}
-
-/** The four dials, left to right: the founders' crests by the year each was laid down. */
-export const CASE_2_CREST_ORDER: readonly CrestId[] = CASE_2_CREST_LOCK.dialCrests
-  .map((c) => CASE_2_CREST_LOCK.tablets.find((t) => t.crest === c)!)
-  .sort((a, b) => a.year - b.year)
-  .map((t) => t.crest)
-
-export type WatchEntryId =
-  | 'w-nine'
-  | 'w-ten'
-  | 'w-eleven'
-  | 'w-midnight'
-  | 'w-one'
-  | 'w-three'
-  | 'w-four'
-  | 'w-five'
-
-/** A torn page of the watch-house log (minigame 2b). Times are in words, as a watchman wrote them. */
-export interface WatchEntryDef {
-  id: WatchEntryId
-  text: string
-  /** Who held the watch when it was written. */
-  watchman: Case2SuspectId
-}
-
-/** The night of 9 November 1849, two nights after Esther Ames was buried. */
-export const CASE_2_WATCH_LOG: readonly WatchEntryDef[] = [
-  {
-    id: 'w-nine',
-    text: 'The church strikes nine. Gate locked, lantern trimmed. The sexton gives the watch to the gravedigger.',
-    watchman: 'gravedigger',
-  },
-  { id: 'w-ten', text: 'Ten bells. Rain on the north path. Nothing stirring.', watchman: 'gravedigger' },
-  { id: 'w-eleven', text: 'Eleven. A fox at the new graves on the east rows, chased off.', watchman: 'gravedigger' },
-  {
-    id: 'w-midnight',
-    text: 'Midnight. The gravedigger goes to his bed. The lodge keeper takes the watch.',
-    watchman: 'lodge-keeper',
-  },
-  { id: 'w-one', text: 'One bell past midnight. Round of the walls walked. All quiet.', watchman: 'lodge-keeper' },
-  { id: 'w-three', text: 'Three of the morning. All quiet. Lantern refilled.', watchman: 'lodge-keeper' },
-  { id: 'w-four', text: 'The fourth hour. The lodge keeper gives the watch to the sexton.', watchman: 'sexton' },
-  {
-    id: 'w-five',
-    text: 'Five, first grey light. The Ames grave is found opened and empty. Sent for the constable.',
-    watchman: 'sexton',
-  },
-]
-
-/** Earliest first. The gap is between one and three, on the lodge keeper's watch. */
-export const CASE_2_WATCH_ORDER: readonly WatchEntryId[] = [
-  'w-nine',
-  'w-ten',
-  'w-eleven',
-  'w-midnight',
-  'w-one',
-  'w-three',
-  'w-four',
-  'w-five',
-]
-
-export const CASE_2_WATCH_GAP: { after: WatchEntryId; before: WatchEntryId; keeper: Case2SuspectId; text: string } = {
-  after: 'w-one',
-  before: 'w-three',
-  keeper: 'lodge-keeper',
-  text: "Nothing was written between one and three: two hours on the lodge keeper's watch, the night the Ames grave was robbed.",
-}
-
-/** How the torn pages lie on the lodge table before the player moves any. Not the right order. */
-export const CASE_2_WATCH_SHELF: readonly WatchEntryId[] = [
-  'w-three',
-  'w-ten',
-  'w-five',
-  'w-midnight',
-  'w-nine',
-  'w-four',
-  'w-one',
-  'w-eleven',
-]
-
-/** The logbook on the lodge table (top 0.8) opens minigame 2b; the shotgun lies at the table's centre. */
-export const CASE_2_LOGBOOK_POSITION = [-23.45, 0.81, -36.45] as const
-
-/** What a print or a boot shows: tread, size and hobnails (minigame 2c). `null` size: too worn to tell. */
-export interface PrintDetails {
-  tread: string
-  size: number | null
-  hobnails: string
-}
-
-export type CastId = 'cast-heel' | 'cast-full' | 'cast-narrow'
-
-export interface CastDef extends PrintDetails {
-  id: CastId
-  title: string
-  /** Where it was poured, as the plaster label says. */
-  label: string
+/** A fresh grave near the lodge and its line in the burial register on the lodge table (2a). */
+export interface FreshGraveDef {
+  id: FreshGraveId
+  name: string
+  /** Day of October 1891 it was buried; the register and the grave's marker agree on it. */
+  buried: number
+  /** What the register says. */
+  register: string
+  /** What the grave shows when it is inspected. */
+  looks: string
+  robbed: boolean
+  /** The foot of the mound; the marker stands at its head, 1 m north. */
   position: readonly [number, number, number]
 }
 
-export interface BootDef extends PrintDetails {
-  owner: Case2SuspectId
-  title: string
-  size: number
+/** October 1891, three weeks after Elias went missing. Finch's is the robbed grave. */
+export const CASE_2_FRESH_GRAVES: readonly FreshGraveDef[] = [
+  {
+    id: 'cobb',
+    name: 'Ellen Cobb',
+    buried: 9,
+    register: 'Buried the 9th of October. Grave filled and settled.',
+    looks: 'The soil is settled, and grass is coming through. Nobody has touched it.',
+    robbed: false,
+    position: [-30.2, 0, -31],
+  },
+  {
+    id: 'reade',
+    name: 'Thomas Reade',
+    buried: 11,
+    register: 'Buried the 11th of October. Grave filled and settled.',
+    looks: 'The soil is settled and firm. Nobody has touched it.',
+    robbed: false,
+    position: [-28, 0, -31],
+  },
+  {
+    id: 'finch',
+    name: 'Arthur Finch',
+    buried: 14,
+    register: 'Buried the 14th of October. Grave filled and settled.',
+    looks: 'Loose soil, yellow clay spread on the grass, and the coffin lid showing through. The coffin is empty.',
+    robbed: true,
+    position: [-25.8, 0, -31],
+  },
+]
+
+export const CASE_2_ROBBED_GRAVE: FreshGraveDef = CASE_2_FRESH_GRAVES.find((g) => g.robbed)!
+
+/** The burial register on the lodge table, beside the watch log. */
+export const CASE_2_REGISTER_POSITION = [-24.25, 0.81, -36.6] as const
+
+/** One round in the watch log for the night of the 14th (2b). Read only: nothing to put in order. */
+export interface WatchRoundDef {
+  time: string
+  text: string
+  watchman: string
+  /** The night porter's countersign, or null where the box is empty. */
+  countersign: string | null
 }
 
-/** Three casts in front of the Ames stone (16.4, -22.6). Flat props with no collider. */
-export const CASE_2_CASTS: readonly CastDef[] = [
-  {
-    id: 'cast-heel',
-    title: 'A heel, smudged',
-    label: 'By the headstone',
-    tread: 'worn smooth',
-    size: null,
-    hobnails: 'none to see',
-    position: [15.7, 0.01, -21.5],
-  },
-  {
-    id: 'cast-full',
-    title: 'A full print',
-    label: 'On the opened grave',
-    tread: 'cross-cut',
-    size: 11,
-    hobnails: 'a ring of nine, one missing at the heel',
-    position: [16.4, 0.01, -21.2],
-  },
-  {
-    id: 'cast-narrow',
-    title: 'A narrow print',
-    label: 'By the path',
-    tread: 'fine, a town heel',
-    size: 7,
-    hobnails: 'none',
-    position: [17.1, 0.01, -21.5],
-  },
+export const CASE_2_WATCH_ROUNDS: readonly WatchRoundDef[] = [
+  { time: '8 pm', text: 'Rounds, all quiet.', watchman: 'Kerr', countersign: 'Dale' },
+  { time: '10 pm', text: 'Rounds, all quiet.', watchman: 'Kerr', countersign: 'Dale' },
+  { time: '12 am', text: 'Rounds, all quiet.', watchman: 'Kerr', countersign: null },
+  { time: '2 am', text: 'Rounds, all quiet.', watchman: 'Kerr', countersign: null },
+  { time: '4 am', text: 'Rounds, all quiet.', watchman: 'Kerr', countersign: 'Dale' },
 ]
 
+/** The watch log lies open on the lodge table (top 0.8); the shotgun lies at the table's centre. */
+export const CASE_2_LOGBOOK_POSITION = [-23.45, 0.81, -36.45] as const
+
+/** What a boot sole or the print shows. Each feature reads on Low graphics in the drawing. */
+export interface SoleDef {
+  heel: string
+  nails: string
+  sole: string
+  /** Yellow clay from the robbed grave caked in the tread. */
+  clay: boolean
+}
+
+export type BootId = 'visitor' | 'dale' | 'kerr'
+
+export interface BootDef extends SoleDef {
+  id: BootId
+  title: string
+}
+
+/** The print cast in the mud at the foot of the robbed grave. */
+export const CASE_2_PRINT: SoleDef = {
+  heel: 'square, iron-tipped',
+  nails: 'a full ring of hobnails',
+  sole: 'cracked straight across',
+  clay: true,
+}
+
+export const CASE_2_PRINT_POSITION = [-25.4, 0.01, -30.1] as const
+
+/** The three pairs by the lodge table, left to right. Kerr's match the print. */
 export const CASE_2_BOOTS: readonly BootDef[] = [
-  { owner: 'sexton', title: "The sexton's boots", tread: 'worn smooth', size: 9, hobnails: 'none' },
-  { owner: 'doctor', title: "The doctor's shoes", tread: 'fine, a town heel', size: 8, hobnails: 'none' },
   {
-    owner: 'lodge-keeper',
-    title: "The lodge keeper's boots",
-    tread: 'cross-cut',
-    size: 11,
-    hobnails: 'a ring of nine, one missing at the heel',
+    id: 'visitor',
+    title: "A visitor's narrow boot",
+    heel: 'narrow, a town heel',
+    nails: 'none',
+    sole: 'smooth, no crack',
+    clay: false,
   },
-  { owner: 'gravedigger', title: "The gravedigger's boots", tread: 'cross-cut', size: 11, hobnails: 'a full ring of ten' },
+  {
+    id: 'dale',
+    title: "Dale's porter's shoes",
+    heel: 'broad and low',
+    nails: 'a few, worn flat',
+    sole: 'whole, no crack',
+    clay: false,
+  },
+  {
+    id: 'kerr',
+    title: "Kerr's work boots",
+    ...CASE_2_PRINT,
+  },
 ]
 
-/** The one cast that matches one pair of boots. */
-export const CASE_2_BOOT_MATCH: { cast: CastId; boot: Case2SuspectId } = { cast: 'cast-full', boot: 'lodge-keeper' }
+export const CASE_2_BOOT_MATCH: BootId = 'kerr'
 
-export const CAST_TOO_WORN_MESSAGE = 'This cast is too worn to match anything.'
+/** Where the boots stand, on the ground at the east end of the lodge table. */
+export const CASE_2_BOOTS_POSITION = [-22.1, 0, -35.6] as const
+
+export type VaneCrestId = 'raven-coffin' | 'owl-book' | 'stag-gate' | 'hound-lantern' | 'lion-spade' | 'dove-bell'
+
+export interface CrestDef {
+  id: VaneCrestId
+  beast: string
+  object: string
+}
+
+/** The six crests on the locker's dial plate, clockwise from the top. */
+export const CASE_2_CRESTS: readonly CrestDef[] = [
+  { id: 'owl-book', beast: 'owl', object: 'book' },
+  { id: 'stag-gate', beast: 'stag', object: 'gate' },
+  { id: 'raven-coffin', beast: 'raven', object: 'coffin' },
+  { id: 'hound-lantern', beast: 'hound', object: 'lantern' },
+  { id: 'lion-spade', beast: 'lion', object: 'spade' },
+  { id: 'dove-bell', beast: 'dove', object: 'bell' },
+]
+
+/** The Vane family crest, from the wax seal on John Pell's tag. */
+export const CASE_2_VANE_CREST: VaneCrestId = 'raven-coffin'
+
+/** Kerr's locker, a Vane & Sons tool locker at the west end of the lodge table. */
+export const CASE_2_LOCKER_POSITION = [-25.6, 0, -37.3] as const
+
+/** What the receipt in the locker says. PLACEHOLDER: the surgeon's name and the sum. */
+export const CASE_2_RECEIPT =
+  'Received of Vane & Sons, for three subjects delivered to Dr. Hollis, surgeon: £12. Paid to Kerr.'
 
 // Walk clue positions stand beside their real stones (tombstones.ts).
 const CASE_1: CaseDef = {
@@ -677,37 +622,36 @@ const CASE_2: CaseDef = {
   title: 'The Resurrection Men',
   clues: [
     {
-      id: 'sexton-watch-ledger',
-      title: "Sexton's watch ledger",
-      line: 'Who held the night watch, week by week.',
-      icon: 'read',
+      id: 'robbed-grave',
+      title: 'The robbed grave',
+      line: 'Arthur Finch, buried the 14th: loose soil, yellow clay on the grass, and an empty coffin.',
+      icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '2a' },
     },
     {
       id: 'watch-log-gap',
-      title: 'The two-hour gap',
-      line: 'On the night the Ames grave was robbed, the lodge keeper logged nothing for two hours.',
+      title: 'No countersign',
+      line: 'On the night of the 14th, Kerr walked the midnight and 2 am rounds alone. Dale never signed.',
       icon: 'read',
       redHerring: false,
       found: { kind: 'minigame', id: '2b' },
     },
     {
       id: 'boot-print-match',
-      title: 'Matching boots',
-      line: 'One cast at the grave matches one pair of hobnailed boots.',
+      title: "Kerr's boots",
+      line: 'Kerr’s hobnailed boots match the print at the grave: the nails, the crack, the yellow clay.',
       icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '2c' },
     },
     {
-      id: 'surgeon-receipt',
-      title: "Surgeon's receipt",
-      line: 'A receipt for "subjects", in the lodge keeper\'s hand.',
+      id: 'vane-sons-receipt',
+      title: 'The Vane & Sons receipt',
+      line: 'Vane & Sons paid Kerr £12 for three “subjects”, delivered to a surgeon.',
       icon: 'read',
       redHerring: false,
-      // On the lodge table (top 0.8), at the end away from the logbook.
-      found: { kind: 'walk', spot: 'grounds', position: [-24.2, 0.81, -36.55] },
+      found: { kind: 'minigame', id: '2d' },
     },
     {
       id: 'spade-fresh-clay',
@@ -726,86 +670,27 @@ const CASE_2: CaseDef = {
       found: { kind: 'walk', spot: 'mausoleum-row', position: [-20, 0, -48] },
     },
   ],
-  notes: [
-    {
-      a: 'watch-log-gap',
-      b: 'sexton-watch-ledger',
-      text: 'The ledger puts the lodge keeper on watch in that gap.',
-      question: 'Nothing was logged for two hours. Which record says whose watch it was?',
-    },
-    {
-      a: 'boot-print-match',
-      b: 'watch-log-gap',
-      text: 'The boots at the grave belong to the man whose watch went quiet.',
-      question: 'The boots at the grave match one man. What shows his watch went quiet that night?',
-    },
-    {
-      a: 'surgeon-receipt',
-      b: 'boot-print-match',
-      text: 'The one who was paid is the one who left the prints.',
-      question: 'Someone was paid for "subjects". What puts that man at the robbed grave?',
-    },
-  ],
-  minigames: ['2a', '2b', '2c'],
+  // No board links: the findings are written up in the journal, as in Case 1 (playtest).
+  notes: [],
+  minigames: ['2a', '2b', '2c', '2d'],
   final: {
-    template: 'The bodies were sold by {0}. Motive: {1}. Means: {2}. Opportunity: {3}.',
-    slots: [
-      {
-        label: 'Who',
-        options: ['the sexton', 'the doctor', 'the lodge keeper', 'the gravedigger'],
-      },
-      {
-        label: 'Motive',
-        options: [
-          "the surgeon's receipt in his hand",
-          'the anatomy school letter',
-          'the fresh clay on the spade',
-          "the sexton's watch ledger",
-        ],
-      },
-      {
-        label: 'Means',
-        options: ['the matching boots', 'the cut rope', 'the iron hearse-pin', 'a licence'],
-      },
-      {
-        label: 'Opportunity',
-        options: [
-          'the gap on his watch',
-          'the legal grave he dug',
-          'the flowers on Hale',
-          'the cold hearth',
-        ],
-      },
-    ],
-    answer: [
-      'the lodge keeper',
-      "the surgeon's receipt in his hand",
-      'the matching boots',
-      'the gap on his watch',
-    ],
+    template: 'Who paid for the stolen bodies?',
+    slots: [],
+    answer: [],
+    typed: {
+      accept: ['Vane and Sons', 'Vane & Sons', 'Vane Sons', 'Vanes', 'the Vanes', 'Vane', 'Vane and Son', 'the Vane family'],
+    },
   },
   hints: [
-    {
-      cost: 5,
-      text: 'The receipt, the boots and the gap matter. The spade and the school letter do not.',
-    },
-    {
-      cost: 10,
-      text: 'Look for who was paid, whose boots were there and whose watch was empty. It is one man.',
-    },
-    {
-      cost: 20,
-      text: 'The lodge keeper: the receipt, the matching boots and the gap on his watch.',
-    },
+    { cost: 5, text: 'Inspect the three fresh graves by the lodge, then check each one against the burial register.' },
+    { cost: 10, text: 'Read the watch log for the night of the 14th, then compare the boots with the print from the robbed grave.' },
+    { cost: 20, text: 'Kerr’s locker opens to the Vane crest, the raven on a coffin. The receipt inside names who paid.' },
   ],
   closedPage: CLOSED_CASE_PAGES['resurrection-men'],
   curseSteps: DEFAULT_CURSE_STEPS,
 }
 
 // ---- Case 3 minigame data (spec 10 task 4.1) ----
-
-export type EvidenceCardId =
-  'dry-boots' | 'unsent-letter' | 'cart-ruts' | 'spilled-oil' | 'nail-marks' | 'hearse-pin'
 
 /** The hymn board in the chapel (minigame 3a). The board numbers are also painted in the chapel model. */
 export interface HymnBoardDef {
@@ -819,30 +704,6 @@ export interface HymnBoardDef {
   confession: string
   /** Shown on a wrong tile setting (requirement 15.3). */
   wrongMessage: string
-}
-
-/** One evidence card of minigame 3b. */
-export interface EvidenceCardDef {
-  id: EvidenceCardId
-  title: string
-  /** What the player reads on the card. */
-  text: string
-  zone: ZoneId
-  /** Where it lies, in words; the props are placed in task 4.4. */
-  place: string
-  /** The time of night this card belongs to, on the midnight-to-dawn timeline. */
-  time: string
-  /** Caption shown when the right order replays the night (one beat per card). */
-  beat: string
-  /** The clue this card gives when it is also a clue on the board. */
-  clueId?: Case3ClueId
-}
-
-/** Texts of the three papers that tie the Vanes to the ledger (requirement 18.1). */
-export interface VanePapersDef {
-  letter: string
-  flyleaf: string
-  receipt: string
 }
 
 const HYMN_NUMBERS = [4, 19, 2, 41, 23] as const
@@ -922,134 +783,87 @@ export const CASE_3_HYMN_BOARD: HymnBoardDef = {
   wrongMessage: 'The tiles do not sit true',
 }
 
-/** The six cards in the right order, midnight to dawn. The pin goes in before the nails scratch. */
-export const CASE_3_TIMELINE_ORDER: readonly EvidenceCardId[] = [
-  'dry-boots',
-  'unsent-letter',
-  'cart-ruts',
-  'spilled-oil',
-  'hearse-pin',
-  'nail-marks',
-]
-
-export const CASE_3_EVIDENCE: readonly EvidenceCardDef[] = [
-  {
-    id: 'dry-boots',
-    title: "Elias's dry boots",
-    text: 'His boots stand by the hut hearth, dry. He had not yet been out in the wet grass.',
-    zone: 'grounds',
-    place: "the keeper's hut",
-    time: 'Midnight',
-    beat: '[midnight: Elias sits in the hut, his boots dry]',
-  },
-  {
-    id: 'unsent-letter',
-    title: 'The unsent letter',
-    text: 'A letter to the Bishop, folded and hidden in the hut bench. It speaks of "the undertaker\'s family".',
-    zone: 'grounds',
-    place: 'the hut bench',
-    time: 'Past midnight',
-    beat: '[he writes to the Bishop, and hides the letter]',
-    clueId: 'elias-unsent-letter',
-  },
-  {
-    id: 'cart-ruts',
-    title: 'Hearse-cart ruts',
-    text: 'Deep wheel ruts in the soft ground at the Row gate, where no cart should come at night.',
-    zone: 'mausoleum-row',
-    place: 'the Row gate',
-    time: 'One in the morning',
-    beat: '[a hearse cart creaks to the Row gate]',
-    clueId: 'hearse-cart-ruts',
-  },
-  {
-    id: 'spilled-oil',
-    title: 'Spilled lantern oil',
-    text: 'Lamp oil dark on the Crane crypt step. A lantern was dropped in a struggle.',
-    zone: 'mausoleum-row',
-    place: 'the Crane crypt step',
-    time: 'Two in the morning',
-    beat: '[a lantern falls on the crypt step]',
-  },
-  {
-    id: 'hearse-pin',
-    title: 'The iron hearse-pin',
-    text: "An iron hearse-pin pushed through the crypt door's outer hasp. It came off a hearse cart.",
-    zone: 'mausoleum-row',
-    place: 'the crypt door hasp',
-    time: 'Three in the morning',
-    beat: '[an iron pin is driven into the hasp]',
-    clueId: 'hearse-pin-hasp',
-  },
-  {
-    id: 'nail-marks',
-    title: 'Fingernail marks',
-    text: 'Long scratches low on the inside of the crypt door. Someone inside tried to open it, and could not.',
-    zone: 'mausoleum-row',
-    place: 'inside the crypt door',
-    time: 'Before dawn',
-    beat: '[scratching, then silence, until the dawn]',
-  },
-]
+// ---- Case 3: the ruts, the Crane crypt, Elias and the handwriting (playtest story pass) ----
 
 /**
- * Where the evidence cards lie in the world (spec 10 task 4.4, Req 16.1). The dry boots are the
- * existing hut clue spot, so the card counts as found once that clue is in the journal. The rest
- * are props mounted by CaseProps. The Mausoleum Row avenue is 3.5 m wide (x -21.75 to -18.25) and
- * ends at the Crane crypt's front face at z -60.
+ * The hearse cart's ruts: two grooves from just inside the Row gate (z -40) down the avenue to the
+ * Crane crypt's step. The walk clue that names them lies where they start.
  */
-export const CASE_3_BOOTS_CLUE = 'clue-hut-boots'
+export const CASE_3_RUTS = {
+  start: [-20, 0, -41.2] as const,
+  /** The two wheel lines (x), the cart's track about 0.9 m. */
+  wheels: [-20.45, -19.55] as const,
+  fromZ: -38.4,
+  toZ: -59.4,
+} as const
 
-export const CASE_3_EVIDENCE_SPOTS: Readonly<
-  Record<Exclude<EvidenceCardId, 'dry-boots'>, { position: readonly [number, number, number]; label: string }>
-> = {
-  // Hut west table (top 0.78), beside the powder tin at x -1.8.
-  'unsent-letter': { position: [-2.35, 0.79, -1.15], label: 'Folded letter' },
-  // Two wheel ruts just inside the Row gate (z -40).
-  'cart-ruts': { position: [-20.6, 0, -38.6], label: 'Cart ruts' },
-  // The east edge of the avenue end, in front of the crypt step.
-  'spilled-oil': { position: [-18.6, 0.01, -57.2], label: 'Spilled oil' },
-  // On the crypt door's face, about hasp height.
-  'hearse-pin': { position: [-19.3, 1.0, -59.95], label: 'Iron pin in the hasp' },
-  // Low on the same door face.
-  'nail-marks': { position: [-20.7, 0.5, -59.95], label: 'Scratches on the door' },
-}
-
-/** The slate that opens minigame 3b, and where Elias lies once the pin is pulled. */
+/** The Crane crypt door: the hearse pin in its outer hasps, Elias behind it once the pin is out. */
 export const CASE_3_CRYPT_PROPS = {
-  slate: [-21.3, 0, -58.6] as const,
+  pin: [-19.3, 1.0, -59.95] as const,
   body: [-20.0, 0.02, -59.0] as const,
   /** The crypt door is 1.77 m wide, centred on the avenue. */
   doorX: -20,
   doorFaceZ: -60,
 } as const
 
-/**
- * The order cards first lie on the slate, before the player moves any. It is not the right order
- * (a property test checks), so a card found in walking order still has to be thought about.
- */
-export const CASE_3_CARD_SHELF: readonly EvidenceCardId[] = [
-  'hearse-pin',
-  'dry-boots',
-  'nail-marks',
-  'cart-ruts',
-  'unsent-letter',
-  'spilled-oil',
-]
+/** The other crypt on the Row, where the oil is spilled. Its family name is on its lintel. */
+export const CASE_3_OIL_CRYPT = 'Lowe'
 
-/** What the vane papers say. The hand is the same careful hand in all three. */
-export const CASE_3_VANE_PAPERS: VanePapersDef = {
-  letter:
-    'My lord Bishop. The ledger of 1849 is false. Thirty-one were buried that week who were not yet dead, ' +
-    "and the one who was paid for it was the undertaker's family. I am going to the Crane crypt to find proof. " +
-    'If I do not return, look to them.',
-  flyleaf:
-    'Josiah Vane, parish undertaker. Paid in full for thirty-one funerals, 1849. ' +
-    'Written in the careful hand that also keeps the parish ledger.',
-  receipt:
-    'Vane & Sons, undertakers. Received of the keeper, one purchase, with thanks. ' +
-    'Written in the careful hand that also keeps the parish ledger.',
+/** The note that called Elias to the Crane crypt, found in his coat with his letter. */
+export const CASE_3_NOTE =
+  'Mr. Thorne. Meet me at the Crane crypt at midnight, and come alone. You will see what the Vanes have done.'
+
+/** Elias's unsent letter, in his coat. */
+export const CASE_3_LETTER =
+  'My lord Bishop. The Vanes are burying the living and selling the dead. A man has asked to meet me at the ' +
+  'Crane crypt tonight; he says he has proof. If I do not come back, look to the Vanes.'
+
+export type HandSampleId = 'ledger' | 'receipt' | 'note' | 'signature'
+
+/**
+ * One handwriting sample in the journal (minigame 3d). In `text`, `{V}` is a looped capital V and
+ * `{s}` a long, sloping s; `{v}` is a plain V. They are what is circled when the sample is clicked.
+ */
+export interface HandSampleDef {
+  id: HandSampleId
+  title: string
+  text: string
+  /** The careful hand (looped V, long s), or Josiah's plain, shaky one. */
+  careful: boolean
+  /** What the circle says. */
+  feature: string
 }
+
+export const CASE_3_HAND_SAMPLES: readonly HandSampleDef[] = [
+  {
+    id: 'ledger',
+    title: 'The changed ledger entry (John Pell)',
+    text: 'Pell, John. Died the 11th of March 1862. Entry {s}igned J.{V}.',
+    careful: true,
+    feature: 'A looped V and a long, sloping s.',
+  },
+  {
+    id: 'receipt',
+    title: 'The receipt from Kerr’s locker',
+    text: 'Received of {V}ane & Son{s}, for three {s}ubjects delivered to Dr. Hollis, surgeon: £12. Paid to Kerr.',
+    careful: true,
+    feature: 'A looped V and a long, sloping s.',
+  },
+  {
+    id: 'note',
+    title: 'The note in Elias’s coat',
+    text: 'Mr. Thorne. Meet me at the Crane crypt at midnight, and come alone. You will {s}ee what the {V}ane{s} have done.',
+    careful: true,
+    feature: 'A looped V and a long, sloping s.',
+  },
+  {
+    id: 'signature',
+    title: 'Josiah Vane’s signature (John Pell’s tag)',
+    text: 'J. {v}ane, Undertaker.',
+    careful: false,
+    feature: 'Plain and shaky. No loop on the V.',
+  },
+]
 
 /** The rite's relic names in rite order, taken from the relic data so the two cannot drift apart. */
 const RELIC_NAMES = RITE_ORDER.map((id) => RELIC_MAP[id].name)
@@ -1062,43 +876,42 @@ const CASE_3: CaseDef = {
     {
       id: 'hymn-letters-below',
       title: 'Hymn letters',
-      line: 'The first letters of the hymns spell BELOW.',
+      line: 'The first letters of the hymns spell BELOW. The stair behind the altar is open.',
       icon: 'read',
       redHerring: false,
       found: { kind: 'minigame', id: '3a' },
     },
     {
-      id: 'elias-unsent-letter',
-      title: "Elias's letter",
-      line: 'An unsent letter to the Bishop that names "the undertaker\'s family".',
-      icon: 'read',
-      redHerring: false,
-      found: { kind: 'minigame', id: '3b' },
-    },
-    {
       id: 'hearse-cart-ruts',
       title: 'Cart ruts',
-      line: 'Hearse-cart ruts at the Row gate, the night Elias vanished.',
+      line: 'Hearse-cart ruts run from the Row gate to the Crane crypt, and back out.',
       icon: 'examine',
       redHerring: false,
-      found: { kind: 'minigame', id: '3b' },
+      found: { kind: 'walk', spot: 'mausoleum-row', position: CASE_3_RUTS.start },
     },
     {
       id: 'hearse-pin-hasp',
-      title: 'The hearse-pin',
-      line: "An iron hearse-pin still in the crypt door's outer hasp.",
+      title: 'The hearse pin',
+      line: 'An iron hearse pin, stamped with the Vane raven, pinned the Crane crypt shut from outside.',
       icon: 'examine',
       redHerring: false,
       found: { kind: 'minigame', id: '3b' },
     },
     {
-      id: 'vane-ledger-flyleaf',
-      title: 'Flyleaf name',
-      line: 'Josiah Vane, parish undertaker, written in the same careful hand as the ledger.',
+      id: 'elias-unsent-letter',
+      title: "Elias's letter and the note",
+      line: 'His unsent letter, and the note that called him to the Crane crypt at midnight.',
       icon: 'read',
       redHerring: false,
-      // A loose flyleaf on the catacomb floor, past the scratch marks (the old spot lay outside the map).
-      found: { kind: 'walk', spot: 'catacombs', position: [25.4, 0.04, 49] },
+      found: { kind: 'minigame', id: '3c' },
+    },
+    {
+      id: 'silas-handwriting',
+      title: 'The same hand',
+      line: 'The ledger, the receipt and the note share one hand. Not Josiah’s: his son Silas’s.',
+      icon: 'read',
+      redHerring: false,
+      found: { kind: 'minigame', id: '3d' },
     },
     {
       id: 'vane-receipt',
@@ -1110,8 +923,8 @@ const CASE_3: CaseDef = {
     },
     {
       id: 'oil-other-crypt',
-      title: 'Oil at another crypt',
-      line: 'Lamp oil is spilled on the step of a different crypt. The sexton filled his lamps here.',
+      title: 'Oil at the Lowe crypt',
+      line: 'Spilled lantern oil at the Lowe crypt, but no cart ruts lead there.',
       icon: 'examine',
       redHerring: true,
       // On the avenue at the railing gate of the crypt at z -49.9 (the old spot was inside it).
@@ -1127,74 +940,30 @@ const CASE_3: CaseDef = {
       found: { kind: 'walk', spot: 'chapel', position: [7.9, 0.895, 7.25] },
     },
   ],
-  notes: [
-    {
-      a: 'vane-ledger-flyleaf',
-      b: 'vane-receipt',
-      text: 'The same careful hand: father and son.',
-      question: 'The flyleaf names Josiah Vane, in a careful hand. What else is written in that hand?',
-    },
-    {
-      a: 'elias-unsent-letter',
-      b: 'vane-ledger-flyleaf',
-      text: '"The undertaker\'s family" is the Vane family.',
-      question: 'Elias wrote of "the undertaker\'s family". Which clue names the undertaker?',
-    },
-    {
-      a: 'hearse-cart-ruts',
-      b: 'hearse-pin-hasp',
-      text: 'A hearse cart came and went, and the pin that held the door came from it.',
-      question: 'A hearse cart came the night Elias vanished. What did it leave at the crypt door?',
-    },
-    {
-      a: 'hymn-letters-below',
-      b: 'elias-unsent-letter',
-      text: 'What was hidden below, Elias wrote of before he was sealed in.',
-      question: 'The hymns spell BELOW. Who wrote about what was hidden below?',
-    },
-  ],
-  minigames: ['3a', '3b'],
+  // The playtest story pass writes Case 3 up as findings, like Cases 1 and 2: no board links.
+  notes: [],
+  minigames: ['3a', '3b', '3c', '3d'],
   // The rite is the winning answer; the relic slots are filled in order on the altar.
   final: {
     template: 'The rite: {0}, {1}, {2}, {3}, {4}.',
     slots: RITE_ORDER.map((_, i) => ({ label: `Relic ${i + 1}`, options: RELIC_NAMES })),
     answer: RELIC_NAMES,
   },
+  // Named at the altar on the last night, before the rite can be laid.
   accusation: {
-    template: 'Elias was sealed in by {0}. Motive: {1}. Means: {2}. Opportunity: {3}.',
-    slots: [
-      { label: 'Who', options: ['Silas Vane', 'Father Crane', 'the sexton', 'the lodge keeper'] },
-      {
-        label: 'Motive',
-        options: [
-          'the handwriting',
-          "the old bishop's seal",
-          'the oil at the other crypt',
-          'a licence',
-        ],
-      },
-      {
-        label: 'Means',
-        options: ['the hearse-pin', 'the cut rope', 'the matching boots', 'a spade'],
-      },
-      {
-        label: 'Opportunity',
-        options: ['the cart ruts', 'the gap on his watch', 'the flowers', 'the hymn board'],
-      },
-    ],
-    answer: ['Silas Vane', 'the handwriting', 'the hearse-pin', 'the cart ruts'],
+    template: 'Who sealed Elias Thorne in the Crane crypt?',
+    slots: [],
+    answer: [],
     optional: true,
+    typed: {
+      accept: ['Silas Vane', 'Silas', 'S Vane', 'S. Vane', 'SV', 'S.V.', 'the son', 'Vane’s son', 'Vanes son', 'Silas Vane the son'],
+      ask: { forms: ['Vane', 'the Vanes', 'Mr Vane', 'Vanes', 'Vane and Sons', 'Vane & Sons'], reply: 'Which Vane?' },
+    },
   },
   hints: [
-    {
-      cost: 5,
-      text: "The hymn letters, the letter, the ruts, the pin and the Vane hands matter. The seal and the other crypt's oil do not.",
-    },
-    {
-      cost: 10,
-      text: 'Follow the handwriting: ledger, flyleaf and receipt. Then the cart and the pin show how.',
-    },
-    { cost: 20, text: 'Silas Vane: the handwriting, the hearse-pin and the cart ruts.' },
+    { cost: 5, text: 'The hymn board in the chapel spells a word. Then follow the cart ruts from the Row gate.' },
+    { cost: 10, text: 'Pull the pin from the Crane crypt door, search Elias, then compare the handwriting in your journal.' },
+    { cost: 20, text: 'The careful hand is not Josiah’s. His son, Silas Vane, sealed Elias in.' },
   ],
   closedPage: CLOSED_CASE_PAGES['sealed-catacombs'],
   curseSteps: DEFAULT_CURSE_STEPS,

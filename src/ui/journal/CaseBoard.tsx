@@ -25,6 +25,8 @@ import {
   type Pt,
 } from './caseBoardView'
 import { Case1Findings } from './Case1Findings'
+import { Case2Findings } from './Case2Findings'
+import { Case3Findings } from './Case3Findings'
 import { ClueCard } from './ClueCard'
 import { MissingCard } from './MissingCard'
 import { RedString } from './RedString'
@@ -189,7 +191,7 @@ export function CaseBoard() {
         )}
       </header>
 
-      {!linking && <Case1Findings />}
+      {!linking && (stage === 3 ? <Case3Findings /> : stage === 2 ? <Case2Findings /> : <Case1Findings />)}
 
       {linking && (
         <div className="case-question" role="status" aria-live="polite">

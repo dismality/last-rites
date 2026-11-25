@@ -9,21 +9,17 @@ import {
   CASE_1_STONES,
   CASE_2_BOOTS,
   CASE_2_BOOT_MATCH,
-  CASE_2_CASTS,
-  CASE_2_CREST_LOCK,
-  CASE_2_CREST_ORDER,
-  CASE_2_WATCH_ORDER,
-  CAST_TOO_WORN_MESSAGE,
+  CASE_2_FRESH_GRAVES,
+  CASE_2_VANE_CREST,
   CASE_3_HYMN_BOARD,
-  CASE_3_TIMELINE_ORDER,
+  CASE_3_HAND_SAMPLES,
   LEDGER_WRONG_FLAG_MESSAGE,
   type BellPostId,
   type Case1ClueId,
-  type Case2SuspectId,
-  type CastId,
-  type CrestId,
-  type WatchEntryId,
-  type EvidenceCardId,
+  type BootId,
+  type FreshGraveId,
+  type VaneCrestId,
+  type HandSampleId,
   type LedgerFlagKind,
 } from '../../data/cases'
 
@@ -124,65 +120,31 @@ export function hymnTiles(tiles: readonly (string | null)[]): MinigameVerdict {
   return { ok: true }
 }
 
-/**
- * Minigame 3b. `order` lists the card ids on the timeline, earliest first. Only the full right
- * order is accepted. `firstWrong` is the first position that differs from the right order; a
- * correct but short prefix reports the first empty position, and a repeated or extra card
- * differs at its own position.
- */
-export function evidenceTimeline(order: readonly EvidenceCardId[]): MinigameVerdict {
-  const want = CASE_3_TIMELINE_ORDER
-  const len = Math.max(want.length, order.length)
-  for (let i = 0; i < len; i++) {
-    if (order[i] !== want[i]) return { ok: false, firstWrong: i }
-  }
-  return { ok: true }
+/** Minigame 3d: solved once every handwriting sample has been looked at side by side. */
+export function handwritingSolved(seen: readonly HandSampleId[]): boolean {
+  return CASE_3_HAND_SAMPLES.every((h) => seen.includes(h.id))
 }
 
-/**
- * Minigame 2a. `dials` holds the crest each of the four dials shows, left to right (null for a
- * dial not yet turned). Only the founders' order is accepted; anything else is "The lock does not
- * give". `firstWrong` is kept for tests and never shown, so the lock does not teach by elimination.
- */
-export function crestDials(dials: readonly (CrestId | null)[]): MinigameVerdict {
-  const want = CASE_2_CREST_ORDER
-  const len = Math.max(want.length, dials.length)
-  for (let i = 0; i < len; i++) {
-    if (dials[i] !== want[i]) return { ok: false, firstWrong: i, message: CASE_2_CREST_LOCK.wrongMessage }
-  }
-  return { ok: true }
+/** What the player marks on a register line: the grave agrees, or it has been disturbed. */
+export type RegisterMark = 'agrees' | 'disturbed'
+
+/** Minigame 2a, one line. Right when an untouched grave "agrees" and the robbed one is "disturbed". */
+export function isRightRegisterMark(grave: FreshGraveId, mark: RegisterMark): boolean {
+  const g = CASE_2_FRESH_GRAVES.find((x) => x.id === grave)
+  return g !== undefined && (mark === 'disturbed') === g.robbed
 }
 
-/**
- * Minigame 2b. `order` lists the torn log pages, earliest first. Only the full right order is
- * accepted; `firstWrong` is the first position that differs, which the overlay marks.
- */
-export function watchOrder(order: readonly WatchEntryId[]): MinigameVerdict {
-  const want = CASE_2_WATCH_ORDER
-  const len = Math.max(want.length, order.length)
-  for (let i = 0; i < len; i++) {
-    if (order[i] !== want[i]) return { ok: false, firstWrong: i }
-  }
-  return { ok: true }
+/** Minigame 2a is solved once every line is marked right. */
+export function registerSolved(marked: readonly FreshGraveId[]): boolean {
+  return CASE_2_FRESH_GRAVES.every((g) => marked.includes(g.id))
 }
 
-const FEATURE_MESSAGES = {
-  tread: 'The tread does not agree.',
-  size: 'The size does not agree.',
-  hobnails: 'The hobnails do not agree.',
-} as const
+/** Minigame 2c. Only Kerr's boots match the print (the keeper says what differs on the others). */
+export function bootMatch(boot: BootId): MinigameVerdict {
+  return CASE_2_BOOTS.some((b) => b.id === boot) && boot === CASE_2_BOOT_MATCH ? { ok: true } : { ok: false, firstWrong: 0 }
+}
 
-/**
- * Minigame 2c. A cast paired with a pair of boots. Only the one true pair is accepted. A wrong
- * pair is told the first feature that disagrees (tread, then size, then hobnails), or that the
- * cast is too worn when it cannot match anything. `firstWrong` is 0 for the cast.
- */
-export function bootMatch(cast: CastId, boot: Case2SuspectId): MinigameVerdict {
-  if (cast === CASE_2_BOOT_MATCH.cast && boot === CASE_2_BOOT_MATCH.boot) return { ok: true }
-  const c = CASE_2_CASTS.find((x) => x.id === cast)
-  const b = CASE_2_BOOTS.find((x) => x.owner === boot)
-  if (!c || !b || c.size === null) return { ok: false, firstWrong: 0, message: CAST_TOO_WORN_MESSAGE }
-  const off = (['tread', 'size', 'hobnails'] as const).find((k) => c[k] !== b[k])
-  const message = off ? FEATURE_MESSAGES[off] : 'They agree, but this is not the print from the opened grave.'
-  return { ok: false, firstWrong: 0, message }
+/** Minigame 2d. The key turns only with the Vane crest, the raven on a coffin, under the arrow. */
+export function crestTurns(crest: VaneCrestId): boolean {
+  return crest === CASE_2_VANE_CREST
 }

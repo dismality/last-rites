@@ -3,7 +3,7 @@
 // wraps these in their Interactables. Rendering only.
 import { useMemo } from 'react'
 import * as THREE from 'three'
-import type { CastDef, EvidenceCardId } from '../../data/cases'
+import type { SoleDef } from '../../data/cases'
 import { lathe, merge, once, place, slab, type V3 } from '../assets/shapeKit'
 
 const IRON = '#2a2623'
@@ -18,6 +18,8 @@ const DARK_OAK = '#33251a'
 const STONE = '#6e675c'
 const PLASTER = '#e2ddd0'
 const OIL = '#14110f'
+/** The yellow clay of the robbed grave: bright, so it reads on Low graphics. */
+const CLAY = '#c8931a'
 
 const Y_UP: V3 = [0, 0, 0]
 const FLAT: V3 = [-Math.PI / 2, 0, 0]
@@ -207,203 +209,142 @@ export function HymnTileShape({ lit }: { lit: boolean }) {
   )
 }
 
-// ---- Case 3 crypt: the evidence, the slate and the opened crypt ----
+// ---- Case 3 crypt: the cart ruts, the hearse pin, the fingernail marks and Elias ----
+// Every one is real geometry in strong colours, so it reads on Low graphics with no shadows.
 
-const letterGeo = once(() => ({
-  paper: merge([
-    place(new THREE.BoxGeometry(0.2, 0.004, 0.13), [0, 0.002, 0]),
-    // The envelope's flap, a shallow triangle folded over.
-    place(
-      slab(
-        [
-          [-0.1, -0.065],
-          [0.1, -0.065],
-          [0, 0.01],
-        ],
-        0.002,
-      ),
-      [0, 0.004, 0],
-    ),
-  ]),
-  seal: merge([place(new THREE.CylinderGeometry(0.016, 0.018, 0.005, 12), [0, 0.0065, -0.012])]),
-  ink: merge(
-    [0.025, 0.04].map((z, i) => place(new THREE.BoxGeometry(0.09 - i * 0.03, 0.001, 0.004), [0.015, 0.0045, z])),
-  ),
-}))
+/** Pale crushed stone at the edges of a rut. */
+const CRUSHED = '#cfc6b0'
+/** Dark wet mud in the bottom of a rut. */
+const MUD = '#140f0b'
 
-const rutGeo = once(() => {
-  const mud: THREE.BufferGeometry[] = []
-  const ridge: THREE.BufferGeometry[] = []
-  for (const x of [-0.55, 0.55]) {
-    mud.push(place(new THREE.BoxGeometry(0.2, 0.012, 2.4), [x, 0.002, 0]))
-    // The squeezed-up mud along both edges, broken into lumps.
-    for (let i = 0; i < 8; i++) {
+/**
+ * Two wheel ruts along -Z from the origin, `length` m long, `gauge` m apart: dark mud in each
+ * groove with ridges of pale crushed stone pushed up either side (about 10 cm wide, 3 cm high).
+ */
+export function RutsShape({ length, gauge }: { length: number; gauge: number }) {
+  const g = useMemo(() => {
+    const mud: THREE.BufferGeometry[] = []
+    const ridge: THREE.BufferGeometry[] = []
+    for (const x of [-gauge / 2, gauge / 2]) {
+      mud.push(place(new THREE.BoxGeometry(0.1, 0.006, length), [x, 0.003, -length / 2]))
       for (const side of [-1, 1]) {
-        ridge.push(
-          place(new THREE.SphereGeometry(0.05, 6, 4), [x + side * 0.12, 0.008, -1.1 + i * 0.31 + side * 0.07], [0, i, 0], [1, 0.35, 2.2]),
-        )
+        ridge.push(place(new THREE.BoxGeometry(0.035, 0.03, length), [x + side * 0.07, 0.012, -length / 2], [0, 0, side * 0.35]))
       }
     }
-  }
-  // A puddle standing in one rut.
-  const water = merge([place(slab(blob(0.08, 0.3, 0.15, 2), 0.002), [0.55, 0.009, 0.4])])
-  return { mud: merge(mud), ridge: merge(ridge), water }
-})
-
-const oilGeo = once(() => ({
-  pool: merge([place(slab(blob(0.42, 0.34, 0.12, 1.7, 24), 0.004), [0, 0, 0])]),
-  // The keeper's oil can on its side, its spout towards the pool.
-  can: merge([
-    place(
-      lathe([
-        [0, -0.07],
-        [0.06, -0.07],
-        [0.065, -0.06],
-        [0.065, 0.04],
-        [0.045, 0.065],
-        [0.012, 0.08],
-        [0, 0.08],
-      ]),
-      [-0.34, 0.065, 0.22],
-      [0, 0, Math.PI / 2 - 0.1],
-      [1, 1, 1],
-    ),
-    place(new THREE.CylinderGeometry(0.006, 0.01, 0.14, 8), [-0.43, 0.05, 0.22], [0, 0, Math.PI / 2 + 0.3]),
-    place(new THREE.TorusGeometry(0.035, 0.005, 6, 12, Math.PI), [-0.33, 0.12, 0.22], [Math.PI / 2, 0, Math.PI / 2]),
-  ]),
-}))
+    return { mud: merge(mud), ridge: merge(ridge) }
+  }, [length, gauge])
+  return (
+    <>
+      <mesh geometry={g.mud}>
+        <meshStandardMaterial color={MUD} roughness={0.35} metalness={0.2} />
+      </mesh>
+      <mesh geometry={g.ridge}>
+        <meshStandardMaterial color={CRUSHED} roughness={1} emissive={CRUSHED} emissiveIntensity={0.08} />
+      </mesh>
+    </>
+  )
+}
 
 const pinGeo = once(() => ({
   iron: merge([
-    // A tapered iron pin with a forged head and a ring through it.
-    place(new THREE.CylinderGeometry(0.018, 0.012, 0.36, 8), [0, 0, 0.02], [Math.PI / 2, 0, 0]),
-    place(new THREE.ConeGeometry(0.012, 0.05, 8), [0, 0, 0.225], [Math.PI / 2, 0, 0]),
-    place(new THREE.CylinderGeometry(0.03, 0.028, 0.03, 8), [0, 0, -0.17], [Math.PI / 2, 0, 0]),
-    place(new THREE.TorusGeometry(0.035, 0.006, 6, 16), [0, 0.015, -0.2], [0.3, 0, 0]),
+    // A thick iron bar about 40 cm long, through both hasps, with a forged head and a ring.
+    place(new THREE.CylinderGeometry(0.018, 0.014, 0.4, 8), [0, 0, 0], [0, 0, Math.PI / 2]),
+    place(new THREE.CylinderGeometry(0.032, 0.03, 0.03, 10), [-0.21, 0, 0], [0, 0, Math.PI / 2]),
+    place(new THREE.TorusGeometry(0.045, 0.008, 6, 16), [-0.25, 0, 0.0], [0, Math.PI / 2, 0]),
   ]),
+  // The two hasps on the door and frame the bar runs through.
+  hasps: merge([
+    place(new THREE.BoxGeometry(0.05, 0.08, 0.04), [-0.08, 0, -0.02]),
+    place(new THREE.BoxGeometry(0.05, 0.08, 0.04), [0.1, 0, -0.02]),
+  ]),
+  // The raven stamped on the ring head, picked out pale so it reads.
+  raven: place(new THREE.CircleGeometry(0.018, 10), [-0.226, 0, 0], [0, -Math.PI / 2, 0]),
 }))
 
-const scratchGeo = once(() => ({
-  splinter: merge(
-    [-0.1, 0, 0.1].map((x, i) =>
-      place(new THREE.BoxGeometry(0.03, 0.4 - i * 0.04, 0.008), [x, -i * 0.02, 0], [0, 0, 0.15 + i * 0.04]),
-    ),
-  ),
-  groove: merge(
-    [-0.1, 0, 0.1].map((x, i) =>
-      place(new THREE.BoxGeometry(0.008, 0.38 - i * 0.04, 0.004), [x, -i * 0.02, 0.005], [0, 0, 0.15 + i * 0.04]),
-    ),
-  ),
-}))
-
-/** Each evidence prop of Elias's last night. */
-export function EvidenceShape({ id }: { id: Exclude<EvidenceCardId, 'dry-boots'> }) {
-  switch (id) {
-    case 'unsent-letter': {
-      const g = letterGeo()
-      return (
-        <group rotation={[0, 0.5, 0]}>
-          <mesh geometry={g.paper}>
-            <meshStandardMaterial color={PAPER} roughness={1} />
-          </mesh>
-          <mesh geometry={g.seal}>
-            <meshStandardMaterial color="#7a1c18" roughness={0.5} />
-          </mesh>
-          <mesh geometry={g.ink}>
-            <meshStandardMaterial color={INK} roughness={1} />
-          </mesh>
-        </group>
-      )
-    }
-    case 'cart-ruts': {
-      const g = rutGeo()
-      return (
-        <>
-          <mesh geometry={g.mud}>
-            <meshStandardMaterial color="#1d1813" roughness={1} />
-          </mesh>
-          <mesh geometry={g.ridge}>
-            <meshStandardMaterial color="#2c241b" roughness={1} />
-          </mesh>
-          <mesh geometry={g.water}>
-            <meshStandardMaterial color="#20262a" roughness={0.1} metalness={0.4} />
-          </mesh>
-        </>
-      )
-    }
-    case 'spilled-oil': {
-      const g = oilGeo()
-      return (
-        <>
-          <mesh geometry={g.pool}>
-            <meshStandardMaterial color={OIL} roughness={0.15} metalness={0.4} />
-          </mesh>
-          <mesh geometry={g.can}>
-            <meshStandardMaterial color="#5a4a30" roughness={0.6} metalness={0.6} side={THREE.DoubleSide} />
-          </mesh>
-        </>
-      )
-    }
-    case 'hearse-pin': {
-      const g = pinGeo()
-      return (
-        <mesh geometry={g.iron}>
-          <meshStandardMaterial color={IRON} roughness={0.75} metalness={0.6} />
-        </mesh>
-      )
-    }
-    case 'nail-marks': {
-      const g = scratchGeo()
-      return (
-        <>
-          <mesh geometry={g.splinter}>
-            <meshStandardMaterial color={OLD_PAPER} roughness={1} />
-          </mesh>
-          <mesh geometry={g.groove}>
-            <meshStandardMaterial color="#5a4632" roughness={1} />
-          </mesh>
-        </>
-      )
-    }
-  }
-}
-
-const slateGeo = once(() => ({
-  wood: merge([
-    // An easel: two front legs, a back leg, a cross bar and a ledge.
-    place(new THREE.BoxGeometry(0.04, 1.2, 0.03), [-0.28, 0.58, 0.05], [-0.15, 0, -0.08]),
-    place(new THREE.BoxGeometry(0.04, 1.2, 0.03), [0.28, 0.58, 0.05], [-0.15, 0, 0.08]),
-    place(new THREE.BoxGeometry(0.035, 1.15, 0.03), [0, 0.55, -0.22], [0.3, 0, 0]),
-    place(new THREE.BoxGeometry(0.62, 0.03, 0.06), [0, 0.64, 0.08], [-0.35, 0, 0]),
-    // The slate's wooden frame.
-    place(new THREE.BoxGeometry(0.76, 0.04, 0.05), [0, 1.13, 0.01], [-0.35, 0, 0]),
-    place(new THREE.BoxGeometry(0.76, 0.04, 0.05), [0, 0.7, 0.16], [-0.35, 0, 0]),
-    place(new THREE.BoxGeometry(0.04, 0.48, 0.05), [-0.36, 0.915, 0.085], [-0.35, 0, 0]),
-    place(new THREE.BoxGeometry(0.04, 0.48, 0.05), [0.36, 0.915, 0.085], [-0.35, 0, 0]),
-  ]),
-  slate: merge([place(new THREE.BoxGeometry(0.7, 0.45, 0.02), [0, 0.915, 0.085], [-0.35, 0, 0])]),
-  chalk: merge([
-    // Chalk lines scrawled across the board, and a stub on the ledge.
-    ...[0.1, 0.02, -0.07].map((y, i) =>
-      place(new THREE.BoxGeometry(0.4 - i * 0.08, 0.008, 0.002), [-0.05 + i * 0.03, 0.915 + y * 0.94, 0.085 + 0.012 + y * 0.34], [-0.35, 0, 0.03 * (i - 1)]),
-    ),
-    place(new THREE.CylinderGeometry(0.008, 0.008, 0.05, 6), [0.18, 0.68, 0.16], SIDEWAYS),
-  ]),
-}))
-
-/** The slate on its easel where the six cards are laid out, with chalk marks. */
-export function SlateShape() {
-  const g = slateGeo()
+/** The iron hearse pin pushed through the Crane crypt door's hasps, along X, ring head at -X. */
+export function HearsePinShape() {
+  const g = pinGeo()
   return (
     <>
-      <mesh geometry={g.wood}>
-        <meshStandardMaterial color={OAK} roughness={0.9} />
+      <mesh geometry={g.iron}>
+        <meshStandardMaterial color={IRON} roughness={0.7} metalness={0.6} emissive="#3a3a40" emissiveIntensity={0.15} />
       </mesh>
-      <mesh geometry={g.slate}>
-        <meshStandardMaterial color="#2f2e2c" roughness={0.85} />
+      <mesh geometry={g.hasps}>
+        <meshStandardMaterial color="#2a2a2e" roughness={0.8} metalness={0.5} />
       </mesh>
-      <mesh geometry={g.chalk}>
-        <meshStandardMaterial color="#d8d4c8" roughness={1} />
+      <mesh geometry={g.raven}>
+        <meshStandardMaterial color="#d8d2c4" roughness={1} emissive="#d8d2c4" emissiveIntensity={0.2} side={THREE.DoubleSide} />
+      </mesh>
+    </>
+  )
+}
+
+/** Groups of four deep, pale scratches gouged into dark oak at hand height; the lower ones stained. */
+const scratchGeo = once(() => {
+  const pale: THREE.BufferGeometry[] = []
+  const stain: THREE.BufferGeometry[] = []
+  const groups: [number, number, number][] = [
+    [-0.25, 0.25, 0.2],
+    [0.05, 0.15, -0.15],
+    [0.25, -0.15, 0.1],
+    [-0.1, -0.35, -0.05],
+    [0.2, -0.5, 0.2],
+  ]
+  groups.forEach(([x, y, tilt], gi) => {
+    for (let i = 0; i < 4; i++) {
+      const len = 0.28 - i * 0.03
+      const geo = place(new THREE.BoxGeometry(0.012, len, 0.006), [x + i * 0.035, y - i * 0.01, 0.004], [0, 0, tilt])
+      ;(gi >= 3 ? stain : pale).push(geo)
+    }
+  })
+  return { pale: merge(pale), stain: merge(stain) }
+})
+
+/** The fingernail marks on the inside of the crypt door, and a torn nail on the sill below. */
+export function NailMarksShape() {
+  const g = scratchGeo()
+  return (
+    <>
+      <mesh geometry={g.pale}>
+        <meshStandardMaterial color="#e8dcc4" roughness={1} emissive="#e8dcc4" emissiveIntensity={0.25} />
+      </mesh>
+      <mesh geometry={g.stain}>
+        <meshStandardMaterial color="#5a1712" roughness={1} emissive="#5a1712" emissiveIntensity={0.2} />
+      </mesh>
+      <mesh position={[0.05, -0.97, 0.05]} rotation={[-Math.PI / 2, 0, 0.4]}>
+        <circleGeometry args={[0.012, 8]} />
+        <meshStandardMaterial color="#e8dcc4" roughness={1} />
+      </mesh>
+    </>
+  )
+}
+
+const slumpGeo = once(() => ({
+  // Elias slumped against the inside of the door, in his dark coat: sitting, back to the door.
+  coat: merge([
+    place(new THREE.CapsuleGeometry(0.18, 0.4, 6, 12), [0, 0.42, 0.12], [0.35, 0, 0]),
+    place(new THREE.CapsuleGeometry(0.07, 0.42, 4, 8), [-0.12, 0.12, 0.42], [Math.PI / 2 - 0.1, 0, 0.1]),
+    place(new THREE.CapsuleGeometry(0.07, 0.42, 4, 8), [0.12, 0.12, 0.42], [Math.PI / 2 - 0.1, 0, -0.1]),
+    place(new THREE.CapsuleGeometry(0.05, 0.36, 4, 8), [-0.24, 0.35, 0.22], [0.6, 0, 0.15]),
+    place(new THREE.CapsuleGeometry(0.05, 0.36, 4, 8), [0.24, 0.35, 0.22], [0.6, 0, -0.15]),
+  ]),
+  skin: merge([
+    place(new THREE.SphereGeometry(0.11, 12, 10), [0.04, 0.82, 0.22], Y_UP, [1, 1.1, 1]),
+    place(new THREE.SphereGeometry(0.04, 8, 6), [-0.26, 0.18, 0.38]),
+    place(new THREE.SphereGeometry(0.04, 8, 6), [0.26, 0.18, 0.38]),
+  ]),
+}))
+
+/** Elias Thorne, found slumped against the inside of the Crane crypt door. PLACEHOLDER figure. */
+export function SlumpedBodyShape() {
+  const g = slumpGeo()
+  return (
+    <>
+      <mesh geometry={g.coat}>
+        <meshStandardMaterial color="#26221d" roughness={1} />
+      </mesh>
+      <mesh geometry={g.skin}>
+        <meshStandardMaterial color="#b8ad98" roughness={1} />
       </mesh>
     </>
   )
@@ -439,38 +380,6 @@ export function CryptDoorShape() {
   )
 }
 
-const bodyGeo = once(() => ({
-  // A body wrapped in a winding sheet, lying along X: head at +X, the cloth tied at neck and feet.
-  shroud: merge([
-    place(new THREE.CapsuleGeometry(0.17, 0.62, 6, 12), [0.05, 0.15, 0], [0, 0, Math.PI / 2], [1, 1, 0.75]),
-    place(new THREE.CapsuleGeometry(0.12, 0.42, 6, 10), [-0.55, 0.11, 0], [0, 0, Math.PI / 2], [1, 1, 0.85]),
-    place(new THREE.SphereGeometry(0.13, 12, 10), [0.66, 0.15, 0], Y_UP, [1.05, 0.95, 0.9]),
-    // The hands folded on the chest, under the cloth.
-    place(new THREE.SphereGeometry(0.07, 8, 6), [0.22, 0.28, 0], Y_UP, [1.4, 0.6, 1.1]),
-    // The toes lifting the cloth.
-    place(new THREE.SphereGeometry(0.06, 8, 6), [-0.82, 0.18, 0], Y_UP, [0.7, 1, 1.6]),
-  ]),
-  cord: merge([
-    place(new THREE.TorusGeometry(0.105, 0.012, 6, 16), [0.5, 0.15, 0], [0, Math.PI / 2, 0], [1, 1, 0.85]),
-    place(new THREE.TorusGeometry(0.135, 0.012, 6, 16), [0.02, 0.15, 0], [0, Math.PI / 2, 0], [1, 1, 0.75]),
-    place(new THREE.TorusGeometry(0.1, 0.012, 6, 16), [-0.72, 0.11, 0], [0, Math.PI / 2, 0], [1, 1, 0.85]),
-  ]),
-}))
-
-/** Elias, laid in the crypt in a winding sheet tied with cord. */
-export function ShroudedBodyShape() {
-  const g = bodyGeo()
-  return (
-    <>
-      <mesh geometry={g.shroud}>
-        <meshStandardMaterial color="#9a8f7c" roughness={1} />
-      </mesh>
-      <mesh geometry={g.cord}>
-        <meshStandardMaterial color="#4a4036" roughness={1} />
-      </mesh>
-    </>
-  )
-}
 
 // ---- Walk clues ----
 
@@ -564,9 +473,23 @@ const bundleGeo = once(() => ({
   ]),
 }))
 
-export type WalkClueLook = 'spade' | 'posy' | 'oil' | 'note' | 'bundle'
+export type WalkClueLook = 'spade' | 'posy' | 'oil' | 'note' | 'bundle' | 'ruts'
 
-/** A walk clue's look: a spade with fresh clay, a posy, a slick of oil, a folded note or a tied bundle. */
+/** The tipped lantern at the Lowe crypt, and the sheen on its spilled oil. */
+const tippedLanternGeo = once(() => ({
+  lantern: merge([
+    place(new THREE.CylinderGeometry(0.06, 0.07, 0.18, 10, 1, true), [0.18, 0.07, 0.05], [0, 0, Math.PI / 2 - 0.15]),
+    place(new THREE.CylinderGeometry(0.075, 0.075, 0.02, 10), [0.28, 0.07, 0.05], [0, 0, Math.PI / 2 - 0.15]),
+    place(new THREE.TorusGeometry(0.05, 0.006, 6, 12, Math.PI), [0.08, 0.08, 0.05], [0, Math.PI / 2, Math.PI / 2]),
+  ]),
+  sheen: merge([
+    place(new THREE.RingGeometry(0.16, 0.19, 24), [0, 0.006, 0], [-Math.PI / 2, 0, 0]),
+    place(new THREE.BoxGeometry(0.02, 0.004, 0.18), [-0.05, 0.004, 0.24]),
+    place(new THREE.BoxGeometry(0.015, 0.004, 0.12), [0.06, 0.004, 0.22]),
+  ]),
+}))
+
+/** A walk clue's look: a spade with fresh clay, a posy, a slick of oil, a folded note, a bundle or cart ruts. */
 export function WalkClueShape({ look }: { look: WalkClueLook }) {
   if (look === 'spade') {
     const g = spadeGeo()
@@ -607,12 +530,23 @@ export function WalkClueShape({ look }: { look: WalkClueLook }) {
     )
   }
   if (look === 'oil') {
+    const g = tippedLanternGeo()
     return (
-      <mesh geometry={puddleGeo()}>
-        <meshStandardMaterial color={OIL} roughness={0.15} metalness={0.4} />
-      </mesh>
+      <>
+        <mesh geometry={puddleGeo()}>
+          <meshStandardMaterial color={OIL} roughness={0.05} metalness={0.6} />
+        </mesh>
+        {/* The sheen: a bright, thin edge round the pool, and drip trails down the step. */}
+        <mesh geometry={g.sheen}>
+          <meshStandardMaterial color="#6fa8a0" roughness={0.1} metalness={0.3} emissive="#7a6ab0" emissiveIntensity={0.45} />
+        </mesh>
+        <mesh geometry={g.lantern}>
+          <meshStandardMaterial color="#5a4a30" roughness={0.6} metalness={0.6} />
+        </mesh>
+      </>
     )
   }
+  if (look === 'ruts') return <RutsShape length={1.4} gauge={0.9} />
   if (look === 'note') {
     const g = noteGeo()
     return (
@@ -713,46 +647,6 @@ export function LoosePageShape() {
   )
 }
 
-const nicheGeo = once(() =>
-  merge([
-    // A stone pier: plinth, shaft and a moulded cap.
-    place(new THREE.BoxGeometry(0.8, 0.14, 0.4), [0, 0.07, -0.1]),
-    place(new THREE.BoxGeometry(0.7, 1.0, 0.3), [0, 0.64, -0.1]),
-    place(new THREE.BoxGeometry(0.82, 0.06, 0.4), [0, 1.17, -0.1]),
-    place(new THREE.BoxGeometry(0.74, 0.05, 0.34), [0, 1.225, -0.1]),
-    // A frame round the niche's door.
-    place(new THREE.BoxGeometry(0.48, 0.04, 0.03), [0, 0.62, 0.05]),
-    place(new THREE.BoxGeometry(0.48, 0.04, 0.03), [0, 0.28, 0.05]),
-    place(new THREE.BoxGeometry(0.04, 0.38, 0.03), [-0.22, 0.45, 0.05]),
-    place(new THREE.BoxGeometry(0.04, 0.38, 0.03), [0.22, 0.45, 0.05]),
-  ]),
-)
-
-/** The sexton's niche pier (the dials and the door are drawn by CaseProps, which tracks their state). */
-export function NichePierShape() {
-  return (
-    <mesh geometry={nicheGeo()}>
-      <meshStandardMaterial color={STONE} roughness={0.95} />
-    </mesh>
-  )
-}
-
-/** A crest dial: a stone disc with a pointer notch. */
-const dialGeo = once(() =>
-  merge([
-    place(new THREE.CylinderGeometry(0.06, 0.062, 0.03, 16), [0, 0, 0], [Math.PI / 2, 0, 0]),
-    place(new THREE.TorusGeometry(0.06, 0.006, 6, 18), [0, 0, 0.012]),
-    place(new THREE.BoxGeometry(0.012, 0.04, 0.012), [0, 0.03, 0.018]),
-  ]),
-)
-export function DialShape({ glow }: { glow: number }) {
-  return (
-    <mesh geometry={dialGeo()}>
-      <meshStandardMaterial color="#8a8170" roughness={0.8} emissive="#e8913a" emissiveIntensity={glow} />
-    </mesh>
-  )
-}
-
 /** Half the width of a boot sole at `t` along it (0 heel, 1 toe), for a sole of width `w`. */
 function soleHalfWidth(t: number, w: number): number {
   const pts: readonly (readonly [number, number])[] = [
@@ -786,82 +680,170 @@ function soleOutline(len: number, w: number, t0: number, t1: number, n = 16): [n
 }
 
 /**
- * One plaster cast with the print set in it, drawn from its details: a smooth smudged heel; a full
- * cross-cut print with a ring of nine hobnails, one missing at the heel; or a narrow town shoe.
+ * The print in the mud at the foot of the robbed grave, set in plaster, drawn from its sole: a square
+ * iron-tipped heel, a full ring of hobnails, a crack straight across and yellow clay in the tread.
+ * Real geometry in high-contrast colours, so it reads with no shadows (Low graphics).
  */
-export function BootCastShape({ cast }: { cast: CastDef }) {
+export function BootCastShape({ sole }: { sole: SoleDef }) {
   const g = useMemo(() => {
-    const plaster = merge([place(slab(blob(0.12, 0.19, 0.05, cast.position[0], 20), 0.03, 0.01), [0, 0, 0])])
-    const narrow = cast.tread.startsWith('fine')
-    const len = cast.size === null ? 0.27 : 0.18 + cast.size * 0.01
-    const w = narrow ? 0.29 * len : 0.36 * len
-    const print: THREE.BufferGeometry[] = []
-    const tread: THREE.BufferGeometry[] = []
+    const plaster = merge([place(slab(blob(0.13, 0.2, 0.05, 3, 20), 0.03, 0.01), [0, 0, 0])])
+    const len = 0.3
+    const w = 0.36 * len
     const top = 0.041
-    if (cast.size === null) {
-      // Only a heel came out, worn smooth and smeared.
-      print.push(place(slab(soleOutline(len, w, 0, 0.34), 0.002), [0, top, 0.05]))
-      print.push(place(slab(blob(0.03, 0.05, 0.3, 3), 0.002), [0.02, top, 0.13]))
-    } else if (narrow) {
-      // A town shoe: a separate heel block and a slim forepart.
-      print.push(place(slab(soleOutline(len, w, 0, 0.24), 0.002), [0, top, 0]))
-      print.push(place(slab(soleOutline(len, w, 0.42, 1), 0.002), [0, top, 0]))
-      for (let i = 0; i < 10; i++) {
-        const t = 0.48 + i * 0.05
-        const hw = soleHalfWidth(t, w) * 0.75
-        tread.push(place(new THREE.BoxGeometry(hw * 2, 0.0015, 0.0018), [0, top + 0.002, (t - 0.5) * len]))
-      }
-    } else {
-      print.push(place(slab(soleOutline(len, w, 0, 1), 0.002), [0, top, 0]))
-      // Cross-cut tread across the forepart.
-      for (let i = 0; i < 7; i++) {
-        const t = 0.48 + i * 0.065
-        const hw = soleHalfWidth(t, w) * 0.7
-        for (const dir of [-1, 1]) {
-          tread.push(place(new THREE.BoxGeometry(hw * 2, 0.0015, 0.004), [0, top + 0.002, (t - 0.5) * len], [0, dir * 0.55, 0]))
+    const print = place(slab(soleOutline(len, w, 0, 1), 0.002), [0, top, 0])
+    const nails: THREE.BufferGeometry[] = []
+    if (sole.nails.startsWith('a full ring')) {
+      for (let i = 0; i < 18; i++) {
+        const t = 0.04 + (i / 18) * 0.92
+        const hw = soleHalfWidth(t, w) * 0.78
+        for (const side of [-1, 1]) {
+          if (i % 2 === (side > 0 ? 0 : 1)) nails.push(place(new THREE.CylinderGeometry(0.007, 0.007, 0.003, 8), [side * hw, top + 0.002, (t - 0.5) * len]))
         }
       }
-      // Hobnails round the edge: ten places, the heel's last one missing.
-      for (let i = 0; i < 10; i++) {
-        if (i === 0) continue
-        const t = 0.05 + (i / 10) * 0.9
-        const side = i % 2 === 0 ? 1 : -1
-        const hw = soleHalfWidth(t, w) * 0.72
-        tread.push(place(new THREE.CylinderGeometry(0.006, 0.006, 0.002, 8), [side * hw, top + 0.002, (t - 0.5) * len]))
+    }
+    if (sole.sole.startsWith('cracked')) {
+      // The crack: a jagged dark line straight across the ball of the foot.
+      for (let i = 0; i < 4; i++) {
+        nails.push(place(new THREE.BoxGeometry(0.035, 0.003, 0.006), [-0.05 + i * 0.033, top + 0.003, 0.03 + (i % 2) * 0.008], [0, (i % 2 ? 0.4 : -0.4), 0]))
       }
     }
-    return { plaster, print: merge(print), tread: tread.length ? merge(tread) : null }
-  }, [cast])
+    const clay = sole.clay
+      ? merge([
+          place(slab(blob(0.03, 0.02, 0.2, 1), 0.003), [0.015, top + 0.001, 0.07]),
+          place(slab(blob(0.02, 0.025, 0.2, 2), 0.003), [-0.02, top + 0.001, -0.09]),
+          place(slab(blob(0.05, 0.03, 0.3, 4), 0.003), [0.09, 0.03, -0.12]),
+        ])
+      : null
+    return { plaster, print, nails: nails.length ? merge(nails) : null, clay }
+  }, [sole])
   return (
     <>
       <mesh geometry={g.plaster}>
         <meshStandardMaterial color={PLASTER} roughness={1} />
       </mesh>
       <mesh geometry={g.print}>
-        <meshStandardMaterial color="#8d8576" roughness={1} />
+        <meshStandardMaterial color="#6f6658" roughness={1} />
       </mesh>
-      {g.tread && (
-        <mesh geometry={g.tread}>
-          <meshStandardMaterial color="#b8b1a2" roughness={1} />
+      {g.nails && (
+        <mesh geometry={g.nails}>
+          <meshStandardMaterial color={INK} roughness={0.8} />
+        </mesh>
+      )}
+      {g.clay && (
+        <mesh geometry={g.clay}>
+          <meshStandardMaterial color={CLAY} roughness={1} emissive={CLAY} emissiveIntensity={0.15} />
         </mesh>
       )}
     </>
   )
 }
 
-/** Four rivets for a tablet's iron frame. */
-const rivetGeo = once(() =>
-  merge(
-    ([[-0.27, 0.16], [0.27, 0.16], [-0.27, -0.16], [0.27, -0.16]] as const).map(([x, y]) =>
-      place(new THREE.SphereGeometry(0.012, 8, 6), [x, y, 0.002], Y_UP, [1, 1, 0.5]),
-    ),
-  ),
+// ---- Case 2: the fresh graves, the boots and Kerr's locker ----
+
+/** A grave mound 1.8 m long, foot towards +Z, with a wooden marker at its head. */
+const moundGeo = once(() => place(slab(blob(0.45, 0.95, 0.04, 7, 20), 0.18, 0.12), [0, 0, -0.95]))
+/** The robbed grave dug out and thrown back loosely: a low, rough ring of soil the lid shows through. */
+const dugGeo = once(() => place(slab(blob(0.5, 1.0, 0.18, 8, 20), 0.06, 0.03), [0, 0, -0.95]))
+const markerGeo = once(() =>
+  merge([
+    place(new THREE.BoxGeometry(0.06, 0.8, 0.05), [0, 0.4, -1.95]),
+    place(new THREE.BoxGeometry(0.42, 0.24, 0.03), [0, 0.62, -1.92]),
+  ]),
 )
-export function TabletRivets() {
+/** The robbed grave's spoil: yellow clay heaped and spread on the grass, and the coffin lid showing. */
+const spoilGeo = once(() =>
+  merge([
+    place(slab(blob(0.5, 0.35, 0.25, 11), 0.12, 0.08), [0.75, 0, -1.1]),
+    place(slab(blob(0.3, 0.2, 0.3, 12), 0.02), [0.6, 0, -0.25]),
+    place(slab(blob(0.25, 0.18, 0.3, 13), 0.02), [-0.6, 0, -1.6]),
+  ]),
+)
+const lidGeo = once(() => place(new THREE.BoxGeometry(0.42, 0.04, 1.1), [0, 0.075, -0.95]))
+
+/** A fresh grave: a settled mound, or the robbed one dug open with clay all round it. */
+export function FreshGraveShape({ robbed }: { robbed: boolean }) {
   return (
-    <mesh geometry={rivetGeo()}>
-      <meshStandardMaterial color={IRON} roughness={0.6} metalness={0.6} />
-    </mesh>
+    <>
+      <mesh geometry={robbed ? dugGeo() : moundGeo()}>
+        <meshStandardMaterial color={robbed ? '#3a2a1c' : '#4a3a26'} roughness={1} />
+      </mesh>
+      <mesh geometry={markerGeo()}>
+        <meshStandardMaterial color={OAK} roughness={0.9} />
+      </mesh>
+      {robbed && (
+        <>
+          <mesh geometry={spoilGeo()}>
+            <meshStandardMaterial color={CLAY} roughness={1} emissive={CLAY} emissiveIntensity={0.12} />
+          </mesh>
+          <mesh geometry={lidGeo()}>
+            <meshStandardMaterial color={DARK_OAK} roughness={0.8} />
+          </mesh>
+        </>
+      )}
+    </>
   )
 }
+
+/** One boot standing upright: sole, upper and shaft. PLACEHOLDER until the detailed models are made. */
+const bootGeo = (narrow: boolean) =>
+  merge([
+    place(slab(soleOutline(0.28, narrow ? 0.08 : 0.1, 0, 1), 0.025), [0, 0, 0]),
+    place(new THREE.BoxGeometry(narrow ? 0.07 : 0.09, 0.08, 0.2), [0, 0.065, 0.03]),
+    place(new THREE.CylinderGeometry(narrow ? 0.04 : 0.05, narrow ? 0.045 : 0.055, 0.2, 10), [0, 0.15, -0.07]),
+  ])
+const BOOT_GEO = { narrow: once(() => bootGeo(true)), wide: once(() => bootGeo(false)) }
+
+/** A pair of boots side by side; Kerr's carry yellow clay on the toes. */
+export function BootPairShape({ narrow, clay }: { narrow: boolean; clay: boolean }) {
+  const geo = narrow ? BOOT_GEO.narrow() : BOOT_GEO.wide()
+  return (
+    <>
+      {[-0.07, 0.07].map((x) => (
+        <group key={x} position={[x, 0, 0]}>
+          <mesh geometry={geo}>
+            <meshStandardMaterial color={narrow ? '#1c1714' : LEATHER} roughness={0.85} />
+          </mesh>
+          {clay && (
+            <mesh position={[0, 0.03, 0.11]}>
+              <boxGeometry args={[0.1, 0.05, 0.06]} />
+              <meshStandardMaterial color={CLAY} roughness={1} emissive={CLAY} emissiveIntensity={0.15} />
+            </mesh>
+          )}
+        </group>
+      ))}
+    </>
+  )
+}
+
+/** Kerr's tool locker: an oak cabinet with iron bands and a round brass dial on the door. */
+const lockerGeo = once(() =>
+  merge([
+    place(new THREE.BoxGeometry(0.7, 1.3, 0.45), [0, 0.65, 0]),
+    place(new THREE.BoxGeometry(0.74, 0.05, 0.49), [0, 1.32, 0]),
+  ]),
+)
+const lockerBandGeo = once(() =>
+  merge([
+    place(new THREE.BoxGeometry(0.72, 0.04, 0.02), [0, 0.3, 0.23]),
+    place(new THREE.BoxGeometry(0.72, 0.04, 0.02), [0, 1.05, 0.23]),
+  ]),
+)
+const lockerDialGeo = once(() => place(new THREE.CylinderGeometry(0.11, 0.11, 0.03, 24), [0, 0.75, 0.235], [Math.PI / 2, 0, 0]))
+
+export function LockerShape({ open }: { open: boolean }) {
+  return (
+    <>
+      <mesh geometry={lockerGeo()}>
+        <meshStandardMaterial color={open ? DARK_OAK : OAK} roughness={0.9} />
+      </mesh>
+      <mesh geometry={lockerBandGeo()}>
+        <meshStandardMaterial color={IRON} roughness={0.6} metalness={0.5} />
+      </mesh>
+      <mesh geometry={lockerDialGeo()}>
+        <meshStandardMaterial color="#c9a24a" roughness={0.4} metalness={0.7} emissive="#c9a24a" emissiveIntensity={0.1} />
+      </mesh>
+    </>
+  )
+}
+
 

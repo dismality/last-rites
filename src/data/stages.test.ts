@@ -63,8 +63,9 @@ describe('stage data (design bible §8, §13)', () => {
   it('has day rules for every stage and altar captions', () => {
     // Stage 1: read the three stones, check the ledger, pull the bell cords.
     expect(STAGE_DAY_RULES[1]).toHaveLength(3)
-    // Stage 2 starts with the Row gate's key, the gate and the tablets, then its three minigames.
-    expect(STAGE_DAY_RULES[2]).toHaveLength(6)
+    // Stage 2: the Row gate's key and the gate, the fresh graves, the register, the watch log, the
+    // print, the boots and Kerr's locker.
+    expect(STAGE_DAY_RULES[2]).toHaveLength(8)
     expect(STAGE_DAY_RULES[2][0].place.kind).toBe('area')
     for (const stage of [1, 2, 3] as const) {
       const ms = STAGE_DAY_RULES[stage].flatMap((r) => (r.minigame ? [r.minigame] : []))
@@ -75,9 +76,9 @@ describe('stage data (design bible §8, §13)', () => {
       expect(r.why.length).toBeGreaterThan(0)
       expect(r.why.length).toBeLessThanOrEqual(OBJECTIVE_WHY_MAX)
     }
-    // Stage 3: hymn, Elias's evidence (a search area), slate, relics.
-    expect(STAGE_DAY_RULES[3]).toHaveLength(4)
-    expect(STAGE_DAY_RULES[3][1].place.kind).toBe('area')
+    // Stage 3: hymn, the cart ruts, the crypt pin, Elias, the handwriting, the relics.
+    expect(STAGE_DAY_RULES[3]).toHaveLength(6)
+    expect(STAGE_DAY_RULES[3].map((r) => r.minigame ?? null)).toEqual(['3a', null, '3b', '3c', '3d', null])
     // Every step says what it found when it finishes.
     for (const r of Object.values(STAGE_DAY_RULES).flat()) expect(r.done.length).toBeGreaterThan(0)
     expect(CAPTIONS.find((c) => c.id === 'altar-wrong')?.text).toBe('[a sour note from the altar]')

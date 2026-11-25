@@ -11,7 +11,7 @@ import { body, frames, log, lookAt, moveMouse, pressE, useProp, walkTo, type P2 
 interface CaseSnap {
   cases: Record<
     string,
-    { minigames: string[]; found: string[]; wrongAnswers: number; evidenceFound?: string[] }
+    { minigames: string[]; found: string[]; wrongAnswers: number }
   >
   closed: string[]
 }
@@ -350,22 +350,19 @@ export async function stage1(page: Page, begun: number): Promise<{ firstMinigame
 // ---------------------------------------------------------------------------
 
 const CASE2 = 'resurrection-men'
-const WATCH_ORDER = [
-  'w-nine',
-  'w-ten',
-  'w-eleven',
-  'w-midnight',
-  'w-one',
-  'w-three',
-  'w-four',
-  'w-five',
-]
-/** Turns of each dial from unturned to the founders' crests (tower, leaf, star, moon). */
-const DIAL_TURNS = [2, 4, 3, 1]
-const found = async (page: Page, caseId: string) => (await caseState(page)).cases[caseId].found
+/** What each fresh grave should be marked in the register: only Arthur Finch's was robbed. */
+const REGISTER_MARKS = [
+  ['cobb', 'The grave agrees'],
+  ['reade', 'The grave agrees'],
+  ['finch', 'It doesn’t match'],
+] as const
+/** Clicks of "Turn on" from the first crest (owl on a book) to the Vane raven on a coffin. */
+const RAVEN_TURNS = 2
+const case2 = async (page: Page) =>
+  (await caseState(page)).cases[CASE2] as unknown as { gravesSeen: string[]; printTaken: boolean }
 
 export async function stage2(page: Page): Promise<void> {
-  await expectObjective(page, /Craft a weapon|crest lock|watch log|boot prints/)
+  await expectObjective(page, /Craft a weapon|Find the key to the Mausoleum Row gate/)
 
   // Case 1's reward: the Rusted Crypt Key lies in Pell's grave.
   await useProp(page, 'fixed:fx-crypt-key', async () => {
@@ -384,37 +381,45 @@ export async function stage2(page: Page): Promise<void> {
     )
   await useProp(page, 'gate-mausoleum-row', gateOpen, { reach: 1.6 })
 
-  // The surgeon's receipt on the lodge table.
-  await useProp(page, 'case-clue-surgeon-receipt', async () =>
-    (await found(page, CASE2)).includes('surgeon-receipt'),
-  )
-  await relock(page)
-
-  // 2b: the watch log, put in order with clicks on a page and the Earlier button.
-  await openMinigame(page, 'watch-logbook')
-  const order = () =>
-    page
-      .locator('[data-page]')
-      .evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.page ?? ''))
-  for (let i = 0; i < WATCH_ORDER.length; i++) {
-    const from = (await order()).indexOf(WATCH_ORDER[i])
-    if (from === i) continue
-    await click(page, page.locator(`[data-page="${WATCH_ORDER[i]}"]`))
-    for (let k = from; k > i; k--) await click(page, page.getByRole('button', { name: 'Earlier' }))
+  // The three fresh graves by the lodge: E looks at each one.
+  for (const grave of ['cobb', 'reade', 'finch']) {
+    await useProp(page, `fresh-grave-${grave}`, async () => (await case2(page)).gravesSeen.includes(grave))
   }
-  expect(await order()).toEqual(WATCH_ORDER)
-  await click(page, page.getByRole('button', { name: /Judge the log/ }))
+
+  // 2a: the burial register on the lodge table. Each grave is marked against its line.
+  await openMinigame(page, 'burial-register')
+  await expect(page.getByRole('dialog', { name: 'The burial register' })).toBeVisible()
+  for (const [grave, mark] of REGISTER_MARKS) {
+    const row = page.locator(`.register__row[data-grave="${grave}"]`)
+    await click(page, row.getByRole('button', { name: mark }))
+    await expect(row.locator('.register__verdict')).toBeVisible()
+  }
+  await expect.poll(() => solved(page, CASE2)).toContain('2a')
+  await closeMinigame(page)
+
+  // 2b: the watch log for the 14th. Clicking an empty countersign box solves it.
+  await openMinigame(page, 'watch-logbook')
+  await click(page, page.locator('.watch__sign--empty').first())
   await expect.poll(() => solved(page, CASE2)).toContain('2b')
   await closeMinigame(page)
 
-  // 2a: the sexton's crest lock, then the whistle from the opened niche.
+  // The print at the foot of Arthur Finch's grave goes into the journal.
+  await useProp(page, 'boot-print', async () => (await case2(page)).printTaken)
+
+  // 2c: the boots by the lodge table. Kerr's match the print.
+  await openMinigame(page, 'lodge-boots')
+  await click(page, page.getByRole('button', { name: "Dale's porter's shoes" }))
+  await click(page, page.getByRole('button', { name: "Kerr's work boots" }))
+  await expect.poll(() => solved(page, CASE2)).toContain('2c')
+  await closeMinigame(page)
+
+  // 2d: Kerr's locker. The dial turns to the Vane crest, then the key; the whistle is inside.
   await openMinigame(page, 'crest-lock')
-  for (let i = 0; i < 4; i++) {
-    for (let k = 0; k < DIAL_TURNS[i]; k++)
-      await click(page, page.getByRole('button', { name: `Turn dial ${i + 1} up` }))
-  }
-  await click(page, page.getByRole('button', { name: /Try the lock/ }))
-  await expect.poll(() => solved(page, CASE2)).toContain('2a')
+  for (let k = 0; k < RAVEN_TURNS; k++) await click(page, page.getByRole('button', { name: 'Turn on' }))
+  await expect(page.locator('.crestlock__now')).toHaveText(/raven on a coffin/i)
+  await click(page, page.getByRole('button', { name: 'Turn the key' }))
+  await expect.poll(() => solved(page, CASE2)).toContain('2d')
+  await expect(page.locator('.crestlock__receipt')).toContainText('Vane & Sons')
   await closeMinigame(page)
   await useProp(page, 'fixed:fx-bone-whistle', async () => {
     if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
@@ -423,24 +428,10 @@ export async function stage2(page: Page): Promise<void> {
   })
   await relock(page)
 
-  // 2c: the boot casts in the east grounds.
-  await openMinigame(page, 'boot-cast-cast-full')
-  await click(page, page.locator('[data-cast="cast-full"]'))
-  await click(page, page.locator('[data-boot="lodge-keeper"]'))
-  await click(page, page.getByRole('button', { name: /Pair them/ }))
-  await expect.poll(() => solved(page, CASE2)).toContain('2c')
-  await closeMinigame(page)
-
-  // Night: the lodge keeper, with motive, means and opportunity.
+  // Night: who paid for the bodies is typed at the altar.
   await waitPhase(page, 'night')
-  await expectObjective(page, 'The curse holds. Solve the case at the altar.')
   const panel = await openAltar(page, 'The Altar')
-  await answerAltar(page, panel, [
-    'the lodge keeper',
-    "the surgeon's receipt in his hand",
-    'the matching boots',
-    'the gap on his watch',
-  ])
+  await typeAltarAnswer(page, panel, 'vane and sons')
   await page.waitForFunction(
     () => (window.__lastRites!.stageState() as { caseSolved: boolean }).caseSolved,
     undefined,
@@ -448,6 +439,12 @@ export async function stage2(page: Page): Promise<void> {
       timeout: 30_000,
     },
   )
+  await expect(panel.locator('.handwritten')).toBeVisible()
+  await click(page, panel.getByRole('button', { name: 'Show it all' }))
+  await expect(panel.locator('.handwritten')).toContainText('Vane & Sons paid Kerr')
+  await click(page, panel.getByRole('button', { name: /Close/ }))
+  await expect(panel).toHaveCount(0)
+  await relock(page)
   await waitPhase(page, 'dawn', 60_000)
   await pickBoon(page)
   await page.waitForFunction(
@@ -464,14 +461,8 @@ export async function stage2(page: Page): Promise<void> {
 // ---------------------------------------------------------------------------
 
 const CASE3 = 'sealed-catacombs'
-const TIMELINE_ORDER = [
-  'dry-boots',
-  'unsent-letter',
-  'cart-ruts',
-  'spilled-oil',
-  'hearse-pin',
-  'nail-marks',
-]
+/** The four handwriting samples compared in the journal (3d). */
+const HAND_SAMPLES = ['ledger', 'receipt', 'note', 'signature']
 /** Clicks of "Letter on" from an empty tile to B, E, L, O, W. */
 const BELOW_STEPS = [2, 5, 12, 15, 23]
 export const RITE_ORDER = [
@@ -482,7 +473,7 @@ export const RITE_ORDER = [
   'Reliquary Heart',
 ]
 
-const evidence = async (page: Page) => (await caseState(page)).cases[CASE3].evidenceFound ?? []
+const found3 = async (page: Page) => (await caseState(page)).cases[CASE3].found ?? []
 const relics = (page: Page) =>
   page.evaluate(
     () =>
@@ -508,7 +499,7 @@ const hasKey = (page: Page, id: string) => async () => (await keyItems(page)).in
 const hasRelic = (page: Page, id: string) => async () => (await relics(page)).includes(id)
 
 export async function stage3Day(page: Page): Promise<void> {
-  await expectObjective(page, /Craft a weapon|hymn tiles/)
+  await expectObjective(page, /Craft a weapon|hymn board/)
   log(`stage 3 keys: ${(await keyItems(page)).join(', ')}`)
 
   // 3a: the hymn board in the chapel, set to BELOW, then the whistle blown (by day: the stair opens).
@@ -524,42 +515,26 @@ export async function stage3Day(page: Page): Promise<void> {
   await expect.poll(() => solved(page, CASE3)).toContain('3a')
   await closeMinigame(page)
 
-  // 3b evidence: the letter in the hut, then the Row (ruts, oil, pin, nails), with the ledger and
-  // the rosary on the way; the boots in the hut need the ledger to compare against.
-  const examine = (card: string) =>
-    useProp(page, `evidence-${card}`, async () => (await evidence(page)).includes(card)).then(() =>
-      relock(page),
-    )
-  await examine('unsent-letter')
-  await examine('cart-ruts')
+  // The cart ruts at the Row gate, with the ledger and the rosary on the way down the avenue.
+  await useProp(page, 'case-clue-hearse-cart-ruts', async () => (await found3(page)).includes('hearse-cart-ruts'))
+  await relock(page)
   if (!(await hasKey(page, 'parish-ledger')()))
     await pickUp(page, 'fx-ledger', hasKey(page, 'parish-ledger'))
   await pickUp(page, 'fx-rosary', hasRelic(page, 'crane-rosary'))
-  for (const card of ['spilled-oil', 'hearse-pin', 'nail-marks']) await examine(card)
-  await useProp(page, 'clue-clue-hut-boots', async () => {
-    if ((await page.getByRole('button', { name: /Put away|Close/ }).count()) > 0)
-      await page.keyboard.press('Escape')
-    return (await clues(page)).includes('clue-hut-boots')
-  })
-  await relock(page)
 
-  // 3b: the slate at the crypt, its cards sorted with clicks and the Earlier button.
-  await openMinigame(page, 'timeline-slate')
-  await expect(page.locator('.timeline__card')).toHaveCount(6)
-  const order = () =>
-    page
-      .locator('.timeline__card')
-      .evaluateAll((els) => els.map((e) => (e as HTMLElement).dataset.card ?? ''))
-  for (let i = 0; i < TIMELINE_ORDER.length; i++) {
-    const from = (await order()).indexOf(TIMELINE_ORDER[i])
-    if (from === i) continue
-    await click(page, page.locator(`.timeline__card[data-card="${TIMELINE_ORDER[i]}"]`))
-    for (let k = from; k > i; k--) await click(page, page.getByRole('button', { name: 'Earlier' }))
-  }
-  expect(await order()).toEqual(TIMELINE_ORDER)
-  await click(page, page.getByRole('button', { name: /Judge the night/ }))
-  await expect.poll(() => solved(page, CASE3)).toContain('3b')
-  await closeMinigame(page)
+  // 3b: the hearse pin out of the Crane crypt door; 3c: Elias searched.
+  await expectObjective(page, /Open the Crane crypt door|Craft a weapon/)
+  await useProp(page, 'crypt-pin', async () => (await solved(page, CASE3)).includes('3b'))
+  await useProp(page, 'elias', async () => (await solved(page, CASE3)).includes('3c'))
+
+  // 3d: the four hands compared in the journal, with clicks.
+  await expectObjective(page, /compare the handwriting|Craft a weapon/)
+  await page.keyboard.press('KeyJ')
+  await click(page, page.getByRole('tab', { name: 'Case board' }))
+  for (const id of HAND_SAMPLES) await click(page, page.locator(`.hand__sample[data-sample="${id}"]`))
+  await expect.poll(() => solved(page, CASE3)).toContain('3d')
+  await page.keyboard.press('Escape')
+  await relock(page)
 
   // The crypt opens on Elias, and the ossuary key with him.
   await pickUp(page, 'fx-ossuary-key', hasKey(page, 'iron-ossuary-key'))
@@ -637,25 +612,20 @@ export async function stage3Night(page: Page): Promise<void> {
   expect(await relics(page)).toHaveLength(5)
   await expectObjective(page, 'Finish the rite at the altar (5/5)')
 
-  // The rite, relic by relic, with real clicks; Crane rises after the first.
+  // First the name: a bare "Vane" is asked again, then Silas. Then the rite, relic by relic, with
+  // real clicks; Crane rises after the first.
   const panel = await openAltar(page, 'The Rite of Rest')
+  await typeAltarAnswer(page, panel, 'Vane')
+  await expect(panel.locator('.altar-panel__result')).toContainText('Which Vane?')
+  await panel.locator('.altar-panel__input').fill('')
+  await typeAltarAnswer(page, panel, 'Silas Vane')
+  await expect(panel.locator('.altar-panel__summary')).toBeVisible()
   const slot = (n: number) => panel.locator('.rite-panel__slot').nth(n)
   for (const [i, name] of RITE_ORDER.entries()) {
     await choose(page, slot(i).locator('select'), name)
     await click(page, slot(i).getByRole('button', { name: 'Lay it here' }))
     await expect(slot(i).locator('.rite-panel__done')).toBeVisible({ timeout: 10_000 })
   }
-  // The Accusation (optional, but it earns the epilogue).
-  for (const [label, pick] of [
-    ['Who', 'Silas Vane'],
-    ['Motive', 'the handwriting'],
-    ['Means', 'the hearse-pin'],
-    ['Opportunity', 'the cart ruts'],
-  ]) {
-    await choose(page, panel.getByLabel(new RegExp(`Accusation, ${label},`)), pick)
-  }
-  await click(page, panel.getByRole('button', { name: 'Accuse' }))
-  await expect(panel.locator('.altar-panel__result').last()).toContainText('altar holds the name')
   await page.keyboard.press('Escape')
   await expect(panel).toHaveCount(0)
   await relock(page)

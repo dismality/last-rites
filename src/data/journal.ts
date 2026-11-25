@@ -32,12 +32,10 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
   {
     id: 2,
     location: 'fx-page-2',
-    title: 'The Marsh plot',
+    title: 'The fresh graves',
     text:
-      'Found this beneath the Marsh family stone, wrapped in oilcloth. The ledger records ' +
-      'thirty-one burials in a single week of 1849, and not one death certificate among them. ' +
-      'Thirty-one graves, and I have dug beside half of them. They are empty. ' +
-      'Whoever was laid here did not stay, or was never laid here at all.',
+      'Vane’s men are taking the dead too. Watch the fresh graves. ' +
+      'They are being emptied, and the lodge keeper sees everything and says nothing.',
   },
   {
     id: 3,

@@ -10,6 +10,10 @@ import { useStageStore } from '../game/state/stageStore'
 import { useWorldStore } from '../game/state/worldStore'
 import { freshCaseSave } from '../game/systems/caseSave'
 import { giveAllClues, giveClue, linkClues, placeAllRelics, setAltarPanel, solveCurrentMinigame, solveMinigame, unsolvedMinigames } from './devActions'
+import { lendFixtureNotes } from '../../tests/helpers/caseNotes'
+
+// No story case links clues any more; the linking rules are tested on lent notes.
+lendFixtureNotes()
 
 const case1 = CASE_MAP['saved-by-the-bell']
 
@@ -63,9 +67,9 @@ describe('solveCurrentMinigame', () => {
 
 describe('linkClues and giveClue', () => {
   it('links a deduction pair once both clues are found', () => {
-    // Case 1 has no links (its journal asks one question); Case 2 does.
-    useStageStore.setState({ stage: 2 })
-    const case2 = CASE_MAP['resurrection-men']
+    // Cases 1 and 2 have no links (their journals ask one question); Case 3 does.
+    useStageStore.setState({ stage: 3 })
+    const case2 = CASE_MAP['sealed-catacombs']
     const n = case2.notes[0]
     expect(linkClues(n.a, n.b)).toContain('Could not')
     giveClue(n.a)
