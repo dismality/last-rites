@@ -2486,3 +2486,27 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - The boon screen is switched off, not deleted, so it can come back if it is given a purpose. (2026-11-27)
   - The changed voice lines (intro-2 to intro-5, keeper-page-1, page-1) need re-recording. Until they are, the old recordings play under the new text. (2026-11-27)
+
+### 2026-11-28: Playtest fixes: stair waits for stage 3, Pell's bell first, Space skips, journal close, relic marker
+- **Started:** Outside Kiro
+- **What happened:**
+  - **The catacomb stair:** in a story run the sexton's whistle (from Kerr's locker in stage 2) no longer opens the stair at the altar before stage 3. The stair opens with stage 3's hymn board (BELOW), and the altar takes the case answer as usual until then. The catacombs stay: they hold journal page 4, the shroud and the heart for the rite. Endless runs keep the whistle working at once.
+  - **Pell's bell first:** pulling John Pell's cut cord opens the journal's "Which bell was cut?" at once. The objective goes straight to the question without the other two bells.
+  - **Space skips the keeper:** the Skip key (Space) cuts the keeper's line on screen short, voice and all, and shows the next one. It is ignored while typing or with a button focused, during the intro and while paused. The line shows "Space: skip".
+  - **Journal close button:** a long Case tab no longer shrinks to the window and spills under the "Close journal (J)" button. The page's rows keep their full height and the page scrolls.
+  - **Relic marker:** "Gather the relics of the rite" now points at the nearest relic still lying out, explored or not. Before, only relics on explored map squares counted, so a fresh map gave no marker at all.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's whistle gate, bell posts, narration box, journal and relic guidance are kept.
+- **Decisions made unattended:**
+  - Space does nothing to the keeper's line while a button has keyboard focus, so keyboard players can still press buttons with it. A click on the line still skips. (2026-11-28)
+
+### 2026-11-28: Normal and Developer mode only, smaller waves, quieter zombies
+- **Started:** Outside Kiro
+- **What happened:**
+  - **New Game menu:** the picker offers two choices, Normal and Developer mode. Both play the Normal vigil; Developer mode also turns the developer tools on (] skips the current step, ` opens the dev panel) and Normal turns them off. Easy, Hard, Short Vigil and Endless are off the menu. Their data stays in data/modes.ts so older saves still load.
+  - **Smaller story waves:** each zombie kind in a wave is a third smaller (never below one where the ladder has any), and hounds and crawlers together are capped at two a wave, hounds first. The alive caps drop by a third too: 8 / 11 / 13 (were 12 / 16 / 20). Waves still never shrink from one to the next.
+  - **Quieter zombies:** the groans, growls, wails, breaths and grunts of the creatures play at 45% of the sound-effects level, recorded or synthesised.
+  - Unit tests updated to the new counts and caps, plus a test that no wave holds more than two hounds and crawlers.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's wave ladder, stage data, mode data and audio manager are kept; the trim sits on top of the ladder.
+- **Decisions made unattended:**
+  - Hounds take the two small slots before crawlers, since the ladder brings hounds in first; so story waves now hold no crawlers. (2026-11-28)
+  - The e2e specs that pick Short Vigil on the menu are left for the later e2e pass. (2026-11-28)

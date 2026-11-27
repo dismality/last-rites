@@ -1,47 +1,34 @@
-import { describe, expect, it, vi } from 'vitest'
-import { MODES, MODE_IDS } from '../../data/modes'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { useSettingsStore } from '../../game/state/settingsStore'
 import { beginMode, initialChoice, modeOptions, moveChoice } from './modeSelectModel'
 
 describe('modeSelect', () => {
+  afterEach(() => useSettingsStore.getState().setSetting('developerMode', false))
+
   it('checks Normal by default', () => {
     expect(initialChoice()).toBe('normal')
   })
 
-  it('offers five options in order, Short Vigil with the story modes', () => {
-    expect(modeOptions().map((o) => o.id)).toEqual(['easy', 'normal', 'hard', 'short-vigil', 'endless'])
-    expect(modeOptions().find((o) => o.id === 'short-vigil')!.lines).toContain(
-      '3 stages, 2-minute days, 100% oil: about 15 minutes',
-    )
+  it('offers Normal and Developer mode only', () => {
+    expect(modeOptions().map((o) => o.id)).toEqual(['normal', 'developer'])
+    expect(modeOptions().map((o) => o.label)).toEqual(['Normal', 'Developer mode'])
+    for (const o of modeOptions()) expect(o.lines.length).toBeGreaterThan(0)
   })
 
   it('arrows move the choice and wrap', () => {
-    expect(moveChoice('normal', 'ArrowDown')).toBe('hard')
-    expect(moveChoice('normal', 'ArrowUp')).toBe('easy')
-    expect(moveChoice('endless', 'ArrowRight')).toBe('easy')
-    expect(moveChoice('easy', 'ArrowLeft')).toBe('endless')
-    expect(moveChoice('easy', 'a')).toBe('easy')
+    expect(moveChoice('normal', 'ArrowDown')).toBe('developer')
+    expect(moveChoice('developer', 'ArrowRight')).toBe('normal')
+    expect(moveChoice('normal', 'ArrowUp')).toBe('developer')
+    expect(moveChoice('normal', 'a')).toBe('normal')
   })
 
-  it('Begin passes the chosen mode', () => {
+  it('both play Normal; Developer mode turns the developer tools on, Normal turns them off', () => {
     const onBegin = vi.fn()
-    beginMode('hard', onBegin)
-    expect(onBegin).toHaveBeenCalledWith('hard')
-  })
-
-  it('option text matches MODES', () => {
-    for (const id of MODE_IDS) {
-      const m = MODES[id]
-      const o = modeOptions().find((x) => x.id === id)!
-      expect(o.label).toBe(m.label)
-      expect(o.lines).toContain(`Zombie HP ×${m.hpMult}`)
-      expect(o.lines).toContain(`Zombie damage ×${m.damageMult}`)
-      expect(o.lines).toContain(`Lantern drain ×${m.lanternDrainMult}`)
-      expect(o.lines).toContain(`Elite chance ${Math.round(m.eliteChance * 100)}%`)
-      expect(o.lines).toContain(`Score ×${m.scoreMult}`)
-    }
-    expect(modeOptions().find((o) => o.id === 'endless')!.lines).toContain(
-      '120 s day, no relics or rite, no Retry Night',
-    )
-    expect(modeOptions().find((o) => o.id === 'easy')!.lines).toHaveLength(5)
+    beginMode('developer', onBegin)
+    expect(onBegin).toHaveBeenLastCalledWith('normal')
+    expect(useSettingsStore.getState().developerMode).toBe(true)
+    beginMode('normal', onBegin)
+    expect(onBegin).toHaveBeenLastCalledWith('normal')
+    expect(useSettingsStore.getState().developerMode).toBe(false)
   })
 })

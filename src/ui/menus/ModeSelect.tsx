@@ -1,17 +1,17 @@
 import { useId, useState } from 'react'
 import type { ModeId } from '../../game/types'
 import { MenuDialog } from './MenuDialog'
-import { beginMode, initialChoice, modeOptions } from './modeSelectModel'
+import { beginMode, initialChoice, modeOptions, type VigilChoice } from './modeSelectModel'
 
 interface ModeSelectProps {
   onBegin: (mode: ModeId) => void
   onBack: () => void
 }
 
-/** New Game mode picker. Native radios give arrow-key selection for free. */
+/** New Game picker: Normal or Developer mode. Native radios give arrow-key selection for free. */
 export function ModeSelect({ onBegin, onBack }: ModeSelectProps) {
   const titleId = useId()
-  const [choice, setChoice] = useState<ModeId>(initialChoice())
+  const [choice, setChoice] = useState<VigilChoice>(initialChoice())
   const options = modeOptions()
 
   return (

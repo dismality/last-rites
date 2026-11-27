@@ -158,11 +158,17 @@ const cueFile = (cue: AudioCueId): string => CUE_FILE[cue] ?? cue
 /** The cue can be heard: it has a synth voice or a recorded file. */
 const cueAudible = (cue: AudioCueId): boolean => CUE_SOUND[cue] !== undefined || hasSample(cueFile(cue))
 
+/**
+ * Loudness of the creatures' groans, growls, wails and the like, under the rest of the sound
+ * effects: a horde at full volume drowned everything else (playtest, 2026-11-28).
+ */
+export const ENEMY_CUE_VOLUME = 0.45
+
 /** Play a cue at a spot: its recorded file first, else its synth voice. */
 function voiceCue(cue: AudioCueId, at: SoundPosition): void {
-  if (playRecorded(cueFile(cue), at, 1, CUE_MAX_DISTANCE[cue])) return
+  if (playRecorded(cueFile(cue), at, ENEMY_CUE_VOLUME, CUE_MAX_DISTANCE[cue])) return
   const sound = CUE_SOUND[cue]
-  if (sound) playSound(sound, at)
+  if (sound) playSound(sound, at, ENEMY_CUE_VOLUME)
 }
 
 /** Next due time (seconds) per enemy uid. A uid missing from the latest sync is dropped. */

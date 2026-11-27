@@ -308,7 +308,7 @@ describe('Story nights are endless until the case is solved', () => {
   it('begins the next wave 20 s after the last zombie falls', () => {
     const rng = createRng(1)
     let r = tickWaves(startStageNight(1), 1, { playerPos: FAR, liveCount: 0, rng, phase: 'night' })
-    expect(r.spawns).toHaveLength(4)
+    expect(r.spawns).toHaveLength(3)
     r = tickWaves(r.state, 1, { playerPos: FAR, liveCount: 0, rng, phase: 'night' })
     expect(r.events.map((e) => e.type)).toEqual(['waveCleared'])
     let started = false
@@ -345,10 +345,10 @@ describe('Story nights are endless until the case is solved', () => {
   })
 
   it('Doubt joins the first wave; a wrong altar answer queues a wave at once', () => {
-    expect(startStageNight(1, 2).pending).toHaveLength(6)
+    expect(startStageNight(1, 2).pending).toHaveLength(5)
     const s = queueWaveNow(startStageNight(1))
     expect(s.waveIndex).toBe(1)
-    expect(s.pending).toHaveLength(4 + 4)
+    expect(s.pending).toHaveLength(3 + 3)
     expect(queueWaveNow(createWaveState())).toEqual(createWaveState())
   })
 
@@ -417,8 +417,8 @@ describe('Property 12: wave and elite tables stay on the curve (spec 11)', () =>
     )
   })
 
-  it('keeps the alive caps at 12 / 16 / 20 and never rolls a crawler, hound or bride as an elite', () => {
-    expect([1, 2, 3].map((s) => aliveCap(s as StageNumber))).toEqual([12, 16, 20])
+  it('keeps the alive caps at 8 / 11 / 13 and never rolls a crawler, hound or bride as an elite', () => {
+    expect([1, 2, 3].map((s) => aliveCap(s as StageNumber))).toEqual([8, 11, 13])
     expect(ELITE.eligible).not.toContain('bride')
     expect(ELITE.eligible).not.toContain('crawler')
     expect(ELITE.eligible).not.toContain('hound')

@@ -17,7 +17,7 @@ import { NIGHTS } from './waves'
 describe('stage data (design bible §8, §13)', () => {
   it('has three stages with the bible cap, stamina and case', () => {
     expect(STAGES).toHaveLength(STAGE_COUNT)
-    expect(STAGES.map((s) => s.aliveCap)).toEqual([12, 16, 20])
+    expect(STAGES.map((s) => s.aliveCap)).toEqual([8, 11, 13])
     expect(STAGES.map((s) => s.maxStamina)).toEqual([100, 90, 80])
     expect(STAGES.map((s) => s.caseId)).toEqual([
       'saved-by-the-bell',

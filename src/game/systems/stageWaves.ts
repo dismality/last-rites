@@ -61,6 +61,29 @@ export function stageWaveComposition(stage: StageNumber, waveIndex: number): Wav
       if (most > 0 || k in out) out[k] = most
     }
   }
+  return trimWave(out)
+}
+
+/** Most low, quick ones (Corpse Hounds and Pale Crawlers together) in one wave. */
+export const SMALL_PER_WAVE_MAX = 2
+/** Share of the other zombies a story wave keeps: a third fewer than the ladder (playtest, 2026-11-28). */
+export const ZOMBIE_SHARE = 2 / 3
+
+/**
+ * The playtest trim: a third fewer of each zombie kind (never below one where the ladder has any)
+ * and at most SMALL_PER_WAVE_MAX hounds and crawlers, hounds first. Both only shrink counts and
+ * never reorder them, so a wave is still never smaller than the one before it.
+ */
+function trimWave(c: WaveComposition): WaveComposition {
+  const out = { ...c }
+  for (const k of ['shambler', 'wailer', 'lurker', 'bloater', 'brute'] as const) {
+    if (out[k] > 0) out[k] = Math.max(1, Math.round(out[k] * ZOMBIE_SHARE))
+  }
+  // Hounds come first: the ladder brings them in rows before any crawler, so the split never shifts.
+  const hound = Math.min(out.hound ?? 0, SMALL_PER_WAVE_MAX)
+  const crawler = Math.min(out.crawler ?? 0, SMALL_PER_WAVE_MAX - hound)
+  if ('crawler' in out) out.crawler = crawler
+  if ('hound' in out) out.hound = hound
   return out
 }
 

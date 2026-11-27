@@ -1,48 +1,53 @@
-import { DEFAULT_MODE, ENDLESS, MODE_IDS, MODES, SHORT_VIGIL } from '../../data/modes'
-import { STAGE_COUNT } from '../../data/stages'
+import { DEFAULT_MODE } from '../../data/modes'
+import { useSettingsStore } from '../../game/state/settingsStore'
 import type { ModeId } from '../../game/types'
 
+/**
+ * The New Game choices (playtest, 2026-11-28): Normal, or Normal with the developer tools on.
+ * Easy, Hard, Short Vigil and Endless are off the menu; their data stays in data/modes.ts so
+ * older saves still load.
+ */
+export type VigilChoice = 'normal' | 'developer'
+
 export interface ModeOption {
-  id: ModeId
+  id: VigilChoice
   label: string
-  /** One text line per modifier, so no value is conveyed by colour alone. */
+  /** One text line per point, so nothing is conveyed by colour alone. */
   lines: string[]
 }
 
-function mult(n: number): string {
-  return `×${n}`
-}
+const CHOICES: readonly VigilChoice[] = ['normal', 'developer']
 
 export function modeOptions(): ModeOption[] {
-  return MODE_IDS.map((id) => {
-    const m = MODES[id]
-    const lines = [
-      `Zombie HP ${mult(m.hpMult)}`,
-      `Zombie damage ${mult(m.damageMult)}`,
-      `Lantern drain ${mult(m.lanternDrainMult)}`,
-      `Elite chance ${Math.round(m.eliteChance * 100)}%`,
-      `Score ${mult(m.scoreMult)}`,
-    ]
-    if (!m.story) lines.push(`${ENDLESS.dayS} s day, no relics or rite, no Retry Night`)
-    else if (m.dayLengthS !== null)
-      lines.push(`${STAGE_COUNT} stages, ${m.dayLengthS / 60}-minute days, ${SHORT_VIGIL.startOilPct}% oil: about 15 minutes`)
-    return { id, label: m.label, lines }
-  })
+  return [
+    {
+      id: 'normal',
+      label: 'Normal',
+      lines: ['The three stages and the rite', 'Developer tools off'],
+    },
+    {
+      id: 'developer',
+      label: 'Developer mode',
+      lines: ['The same game as Normal', '] skips the current step, ` opens the dev panel'],
+    },
+  ]
 }
 
-export function initialChoice(): ModeId {
-  return DEFAULT_MODE
+export function initialChoice(): VigilChoice {
+  return 'normal'
 }
 
 /** Mirrors native radio-group arrow behaviour (wraps at both ends). */
-export function moveChoice(current: ModeId, key: string): ModeId {
-  const i = MODE_IDS.indexOf(current)
-  const n = MODE_IDS.length
-  if (key === 'ArrowDown' || key === 'ArrowRight') return MODE_IDS[(i + 1) % n]
-  if (key === 'ArrowUp' || key === 'ArrowLeft') return MODE_IDS[(i - 1 + n) % n]
+export function moveChoice(current: VigilChoice, key: string): VigilChoice {
+  const i = CHOICES.indexOf(current)
+  const n = CHOICES.length
+  if (key === 'ArrowDown' || key === 'ArrowRight') return CHOICES[(i + 1) % n]
+  if (key === 'ArrowUp' || key === 'ArrowLeft') return CHOICES[(i - 1 + n) % n]
   return current
 }
 
-export function beginMode(chosen: ModeId, onBegin: (mode: ModeId) => void): void {
-  onBegin(chosen)
+/** Both choices play Normal; Developer mode also switches the developer tools on (and Normal off). */
+export function beginMode(chosen: VigilChoice, onBegin: (mode: ModeId) => void): void {
+  useSettingsStore.getState().setSetting('developerMode', chosen === 'developer')
+  onBegin(DEFAULT_MODE)
 }

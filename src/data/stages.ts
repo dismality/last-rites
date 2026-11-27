@@ -43,7 +43,8 @@ export const STAGES: readonly StageDef[] = [
     caseTitle: 'Saved by the Bell',
     ladderRows: [1, 2],
     fog: [0.02, 0.03],
-    aliveCap: 12,
+    // A third fewer at once than before (12, 16, 20; playtest, 2026-11-28).
+    aliveCap: 8,
     maxStamina: 100,
     // Tier 2 arrives with its components (spec 10 task 10).
     dawnUnlocks: ['r-sharpened-shovel', 'r-holy-water-flask', 'r-lantern-trap', 'r-iron-head', 'r-oil-wick'],
@@ -54,7 +55,7 @@ export const STAGES: readonly StageDef[] = [
     caseTitle: 'The Resurrection Men',
     ladderRows: [3, 4],
     fog: [0.04, 0.05],
-    aliveCap: 16,
+    aliveCap: 11,
     maxStamina: 90,
     dawnUnlocks: ['r-nail-bomb', 'r-blessed-rounds'],
   },
@@ -64,7 +65,7 @@ export const STAGES: readonly StageDef[] = [
     caseTitle: 'The Sealed Catacombs',
     ladderRows: [5],
     fog: [0.06],
-    aliveCap: 20,
+    aliveCap: 13,
     maxStamina: 80,
     dawnUnlocks: [],
   },

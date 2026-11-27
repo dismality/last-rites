@@ -19,22 +19,31 @@ const stageArb = fc.constantFrom<StageNumber>(1, 2, 3)
 const KINDS = ['shambler', 'wailer', 'lurker', 'bloater', 'brute'] as const
 
 describe('stageWaveComposition', () => {
+  // Counts are the ladder's with a third fewer of each kind (playtest, 2026-11-28).
   it('stage 1 uses row 1 for waves 1-3 and row 2 from wave 4', () => {
-    expect(stageWaveComposition(1, 0)).toMatchObject({ shambler: 4, wailer: 0 })
-    expect(stageWaveComposition(1, 2)).toMatchObject({ shambler: 4, wailer: 0 })
-    expect(stageWaveComposition(1, 3)).toMatchObject({ shambler: 5, wailer: 0 })
-    expect(stageWaveComposition(1, 5)).toMatchObject({ shambler: 5, wailer: 1 })
+    expect(stageWaveComposition(1, 0)).toMatchObject({ shambler: 3, wailer: 0 })
+    expect(stageWaveComposition(1, 2)).toMatchObject({ shambler: 3, wailer: 0 })
+    expect(stageWaveComposition(1, 3)).toMatchObject({ shambler: 3, wailer: 0 })
+    expect(stageWaveComposition(1, 5)).toMatchObject({ shambler: 3, wailer: 1 })
   })
 
   it('stage 3 starts on the row 5 composition', () => {
-    expect(stageWaveComposition(3, 0)).toMatchObject({ shambler: 8, wailer: 2, lurker: 2 })
+    expect(stageWaveComposition(3, 0)).toMatchObject({ shambler: 5, wailer: 1, lurker: 1 })
   })
 
   it('past the last row adds a shambler a wave and a wailer/lurker every third wave', () => {
     // Stage 3 row 5 has 5 waves; wave index 5 is the first further wave.
-    expect(stageWaveComposition(3, 5).shambler).toBe(9)
-    expect(stageWaveComposition(3, 7)).toMatchObject({ shambler: 11, wailer: 3, lurker: 2 })
-    expect(stageWaveComposition(3, 10)).toMatchObject({ shambler: 14, wailer: 3, lurker: 3 })
+    expect(stageWaveComposition(3, 5).shambler).toBe(6)
+    expect(stageWaveComposition(3, 7)).toMatchObject({ shambler: 7, wailer: 2, lurker: 1 })
+    expect(stageWaveComposition(3, 10)).toMatchObject({ shambler: 9, wailer: 2, lurker: 2 })
+  })
+
+  it('a wave holds at most two hounds and crawlers together', () => {
+    for (const stage of [1, 2, 3] as const)
+      for (let n = 0; n < 40; n++) {
+        const c = stageWaveComposition(stage, n)
+        expect((c.hound ?? 0) + (c.crawler ?? 0)).toBeLessThanOrEqual(2)
+      }
   })
 
   it('Property 2: wave difficulty never decreases', () => {
@@ -54,10 +63,10 @@ describe('stageWaveComposition', () => {
 })
 
 describe('stage helpers', () => {
-  it('Property 3: the alive cap is 12 / 16 / 20', () => {
+  it('Property 3: the alive cap is 8 / 11 / 13 (a third under the bible: 12 / 16 / 20)', () => {
     // Feature: 10-curse-stages, Property 3: Alive cap holds
     // **Validates: Requirements 2.6**
-    expect([1, 2, 3].map((s) => aliveCap(s as StageNumber))).toEqual([12, 16, 20])
+    expect([1, 2, 3].map((s) => aliveCap(s as StageNumber))).toEqual([8, 11, 13])
   })
 
   it('weighs enemies shambler 1, wailer 2, lurker 2, bloater 3, brute 6', () => {
