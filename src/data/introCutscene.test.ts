@@ -28,10 +28,10 @@ describe('introCutscene data', () => {
   it('uses the exact section 11 card texts', () => {
     expect(INTRO_SHOTS.map((s) => s.card.text)).toEqual([
       'Hollowmere, October 1891.',
-      'Elias Thorne, keeper of this cemetery, has been missing for three weeks.',
-      'The parish has sent you to take his place, and to find out what became of him.',
-      'By day, follow his trail. By night, hold the grounds until dawn.',
-      'He left a page on the table. Start there.',
+      'Three weeks ago, the keeper Elias Thorne walked out into these graves.',
+      'He never came back. Now the keeping falls to you.',
+      'Find what happened to him. And when night falls, keep the dead in the ground.',
+      'Whatever he knew, he wrote it down.',
     ])
   })
 

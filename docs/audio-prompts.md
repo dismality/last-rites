@@ -29,10 +29,10 @@ download, put the file in `tools/audio/raw/<folder>/<name>.mp3`, and run
 | `sfx/revolver-shot.ogg` | sfx | single 1880s black powder revolver gunshot, sharp crack with short outdoor echo | 1.5 s | yes |
 | `ambience/rain.ogg` | sfx | steady light rain on grass and gravestones, distant drips, seamless loop (loop) | 30 s | yes |
 | `voice/intro-1.ogg` | voice | *narrator:* Hollowmere, October 1891. |  | yes |
-| `voice/intro-2.ogg` | voice | *narrator:* Elias Thorne, keeper of this cemetery, has been missing for three weeks. |  | yes |
-| `voice/intro-3.ogg` | voice | *narrator:* The parish has sent you to take his place, and to find out what became of him. |  | yes |
-| `voice/intro-4.ogg` | voice | *narrator:* By day, follow his trail. By night, hold the grounds until dawn. |  | yes |
-| `voice/intro-5.ogg` | voice | *narrator:* He left a page on the table. Start there. |  | yes |
+| `voice/intro-2.ogg` | voice | *narrator:* Three weeks ago, the keeper Elias Thorne walked out into these graves. |  | yes |
+| `voice/intro-3.ogg` | voice | *narrator:* He never came back. Now the keeping falls to you. |  | yes |
+| `voice/intro-4.ogg` | voice | *narrator:* Find what happened to him. And when night falls, keep the dead in the ground. |  | yes |
+| `voice/intro-5.ogg` | voice | *narrator:* Whatever he knew, he wrote it down. |  | yes |
 
 ## Sound effects
 

@@ -52,10 +52,10 @@ export const AUDIO = [
   sfx('revolver-shot', 'single 1880s black powder revolver gunshot, sharp crack with short outdoor echo', 1.5, { batch: 'first' }),
   amb('rain', 'steady light rain on grass and gravestones, distant drips, seamless loop', 30, { wired: true, batch: 'first' }),
   say('intro-1', 'narrator', 'Hollowmere, October 1891.', { wired: true, batch: 'first' }),
-  say('intro-2', 'narrator', 'Elias Thorne, keeper of this cemetery, has been missing for three weeks.', { wired: true, batch: 'first' }),
-  say('intro-3', 'narrator', 'The parish has sent you to take his place, and to find out what became of him.', { wired: true, batch: 'first' }),
-  say('intro-4', 'narrator', 'By day, follow his trail. By night, hold the grounds until dawn.', { wired: true, batch: 'first' }),
-  say('intro-5', 'narrator', 'He left a page on the table. Start there.', { wired: true, batch: 'first' }),
+  say('intro-2', 'narrator', 'Three weeks ago, the keeper Elias Thorne walked out into these graves.', { wired: true, batch: 'first' }),
+  say('intro-3', 'narrator', 'He never came back. Now the keeping falls to you.', { wired: true, batch: 'first' }),
+  say('intro-4', 'narrator', 'Find what happened to him. And when night falls, keep the dead in the ground.', { wired: true, batch: 'first' }),
+  say('intro-5', 'narrator', 'Whatever he knew, he wrote it down.', { wired: true, batch: 'first' }),
 
   // ── Footsteps ────────────────────────────────────────────────────────────────
   sfx('step-stone', 'single footstep on old flagstone floor in a stone chapel, leather boot, slight echo', 0.6, { variants: 4 }),

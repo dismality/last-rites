@@ -682,10 +682,10 @@ Plays once on New Game: about 20 s in-engine **(09, B15)** (was about 35 s), fiv
 | Shot | Camera | Card |
 |---|---|---|
 | 1 | Outside the south fence, rising over the railings towards the hut's lit window | "Hollowmere, October 1891." |
-| 2 | On up the path, still on the hut: where the missing keeper lived | "Elias Thorne, keeper of this cemetery, has been missing for three weeks." |
-| 3 | Drawn off the path, west across the untended headstones towards the oak hollow | "The parish has sent you to take his place, and to find out what became of him." |
-| 4 | Slows to a stop over the oak-hollow grave; dips to ink | "By day, follow his trail. By night, hold the grounds until dawn." |
-| 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "He left a page on the table. Start there." **(09)** |
+| 2 | On up the path, still on the hut: where the missing keeper lived | "Three weeks ago, the keeper Elias Thorne walked out into these graves." |
+| 3 | Drawn off the path, west across the untended headstones towards the oak hollow | "He never came back. Now the keeping falls to you." |
+| 4 | Slows to a stop over the oak-hollow grave; dips to ink | "Find what happened to him. And when night falls, keep the dead in the ground." |
+| 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "Whatever he knew, he wrote it down." **(09)** |
 
 It ends with the first objective appearing in the tracker.
 

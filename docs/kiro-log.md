@@ -2472,11 +2472,11 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What happened:**
   - **Intro:** the cards now set up the goal instead of the dead rising. They read:
     - "Hollowmere, October 1891."
-    - "Elias Thorne, keeper of this cemetery, has been missing for three weeks."
-    - "The parish has sent you to take his place, and to find out what became of him."
-    - "By day, follow his trail. By night, hold the grounds until dawn."
-    - "He left a page on the table. Start there."
-  - The oak-hollow grave no longer bursts in shot 4. Shot 3 is 5 s to fit its longer card, so the intro runs 22 s.
+    - "Three weeks ago, the keeper Elias Thorne walked out into these graves."
+    - "He never came back. Now the keeping falls to you."
+    - "Find what happened to him. And when night falls, keep the dead in the ground."
+    - "Whatever he knew, he wrote it down."
+  - The oak-hollow grave no longer bursts in shot 4. Shot 4 is 5 s to fit its longer card, so the intro runs 22 s.
   - **Grave mounds:** the objective marker no longer points at the nearest mound during the dig tutorial. Digging is not an objective. The tutorial hint still names it, and the mound glyph still shows from 16 m by day while that hint is up.
   - **Journal page 1:** Elias no longer names Pell. He writes that one of three graves is wrong and that the ledger was changed to hide it. The keeper's spoken line follows.
   - **Dawn boon:** no boon is offered at dawn. The dawn summary stays, and Kiro's boon data and pick code are kept, unused.
