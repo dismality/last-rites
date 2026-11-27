@@ -23,7 +23,7 @@ The game also guides you: the line at the top left is always your current object
    - Done early? The altar's bell calls the dusk at once.
 7. **Hints.** Each case has 3 hints bought with Grave Coins (5 / 10 / 20): where to look, what to check, then the answer. The third hint becomes **free** once the night has run 3 minutes, so you can never be stuck for good.
 8. **Surviving the night.** Stay near the chapel. Board up its doors (front and vestry) so the dead can't pour in. Every scare is warned of first. If you die, **Retry Night** starts the same night again.
-9. **Dawn.** After each night you pick an upgrade, and **Silas Vane**, the travelling undertaker, sells supplies by the south gate. **Buy something from him at least once**: his receipt is a clue later.
+9. **Dawn.** After each night **Silas Vane**, the travelling undertaker, sells supplies by the south gate. **Buy something from him at least once**: his receipt is a clue later.
 10. **Too scary?** Settings has scare intensity Full / Reduced / Off, Jumpscares, Flashing lights, Camera shake, Head bob and subtitles.
 
 ---
@@ -54,7 +54,7 @@ The game also guides you: the line at the top left is always your current object
 
 **Dawn 1**
 
-10. Pick an upgrade. **Buy something from Silas Vane** and keep his receipt.
+10. **Buy something from Silas Vane** and keep his receipt.
 
 ---
 
@@ -79,7 +79,7 @@ The game also guides you: the line at the top left is always your current object
 
 **Dawn 2**
 
-11. Upgrade, and visit Silas if you haven't bought from him yet.
+11. Visit Silas if you haven't bought from him yet.
 
 ---
 

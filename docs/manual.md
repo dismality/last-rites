@@ -69,7 +69,6 @@ The game has **three stages**. Each stage is one day, one night and a dawn.
 - **Stay near the chapel.** Nail boards over its doors to keep the dead out. Damaged boards can be repaired between waves.
 
 ### Dawn
-- **Pick one upgrade** from three on offer. Dawn waits until you choose.
 - **Silas Vane, a travelling undertaker,** parks his cart by the south gate for the first 90 seconds. He sells supplies for Grave Coins.
 - **New recipes** unlock, and fresh side contracts are dealt.
 
@@ -171,11 +170,10 @@ Look in disturbed graves, broken coffins, fences, the hut, the chapel, crypt she
 ### Scares
 Hollowmere is a horror game. Each scare is **telegraphed**: you get a warning sound or sign before it happens. Every important sound also shows a subtitle. You can turn scares down or off in Settings (see section 11).
 
-## 9. Coins, upgrades and extras
+## 9. Coins and extras
 
 - **Grave Coins:** the dead drop them. Spend them on hints, at Silas Vane's cart, and at the vending machine in the hut.
 - **Side contracts:** small goals such as "Dig 3 graves" or "Nail 3 barricade boards", paid in coins. New ones are dealt each dawn.
-- **Upgrades:** one at each dawn. They include more health, faster reloads, slower oil burn, a bigger satchel, faster digging and stronger boards.
 - **Score:** each kill scores points. Kills close together build a **combo** up to ×3. Clearing a night unhurt earns a bonus.
 - **Achievements:** listed on the title screen.
 - **Saving:** the game saves itself at every dawn and every dusk.

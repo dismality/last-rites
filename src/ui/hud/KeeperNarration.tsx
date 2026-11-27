@@ -4,13 +4,14 @@
 // Skip key (Space), cuts it short and moves on to the next line. Lines with a recording (voice/keeper-*.ogg, keeperVoiceFor) are read aloud; a new line, a
 // click or leaving the game cuts the one playing. With no file the line is silent, as before. It
 // is part of the story, so it shows even with Subtitles off.
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { playRecorded } from '../../audio/AudioManager'
 import { sampleBuffer } from '../../audio/samples'
 import { keeperVoiceFor } from '../../data/keeperVoice'
 import { useGameStore } from '../../game/state/gameStore'
 import { useSettingsStore } from '../../game/state'
 import { useIntroStore } from '../../game/state/introStore'
+import { isMenuOpen } from '../../game/state/menuState'
 import { keyLabel } from '../../game/systems/interaction'
 import { lineSeconds, useNarrationStore } from '../../game/state/narrationStore'
 import './keeperNarration.css'
@@ -28,6 +29,20 @@ export function KeeperNarration() {
   const left = useNarrationStore((s) => s.queue.length)
   const screen = useGameStore((s) => s.screen)
   const skipKey = useSettingsStore((s) => s.bindings.Skip)
+  // Over a menu or panel (the journal, the altar, a minigame) the line still reads, but clicks go
+  // through it to the buttons below; Space still skips it (playtest, 2026-11-28: it sat over the
+  // altar panel's Close button).
+  const [overUi, setOverUi] = useState(false)
+  useEffect(() => {
+    if (line === null) return
+    let id = 0
+    const tick = () => {
+      setOverUi(isMenuOpen())
+      id = requestAnimationFrame(tick)
+    }
+    tick()
+    return () => cancelAnimationFrame(id)
+  }, [line])
 
   useEffect(() => {
     if (line === null || screen !== 'game') return
@@ -65,10 +80,11 @@ export function KeeperNarration() {
 
   if (line === null || screen !== 'game') return null
   return (
-    <div className="keeper-say" role="status" aria-live="polite">
+    <div className={`keeper-say${overUi ? ' keeper-say--over-ui' : ''}`} role="status" aria-live="polite">
       <button
         type="button"
         className="keeper-say__line"
+        tabIndex={overUi ? -1 : undefined}
         onClick={() => useNarrationStore.getState().next()}
       >
         <span className="keeper-say__who">The keeper</span>

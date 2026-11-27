@@ -2530,3 +2530,29 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - With no links to make, a wrong answer still costs a wave and 30 seconds of silence, but never locks the altar for good. (2026-11-28)
   - The playthrough test now waits up to 8 minutes per phase and 75 minutes in all, for Normal's longer days. (2026-11-28)
   - The physics engine is still one 2.1 MB file; making it load later would need a bigger change, left for after the hackathon. (2026-11-28)
+
+### 2026-11-28: Case board e2e rewritten for the journal write-ups; keeper line lets clicks through
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Case board e2e:** the two tests for red-string linking (mouse and keyboard) are rewritten for how Case 3 now plays: the Case tab writes the case up step by step (hymn board, ruts, crypt door, Elias, handwriting, altar), the four handwriting samples are compared by real clicks or by Tab and Enter, then the rite slots and a hint tier. They also check there is no red string and no curse meter.
+  - **Altar e2e:** the dawn no longer offers a boon (playtest, 2026-11-27), so the test checks the picker stays away instead of picking a card.
+  - **Keeper's line over panels:** raised above the hotbar earlier today, it sat over the altar panel's Close button and caught the click. Over any menu or panel (journal, altar, minigame) the line still shows, but clicks pass through it; Space still skips it.
+  - **Docs:** the manual and walkthrough no longer mention a dawn upgrade.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's case board, findings, altar panel and narration are kept.
+- **Decisions made unattended:**
+  - Over a panel the keeper's line is click-through rather than moved, so it stays where the eye expects it. (2026-11-28)
+  - `dawn-picker.spec.ts` still tests the switched-off boon screen; left for the user to decide (delete it, or keep it for when the boon returns). (2026-11-28)
+
+### 2026-11-28: Dawn picker e2e removed; a narrated trailer cut from live game shots
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Dawn picker e2e:** `e2e/dawn-picker.spec.ts` and its screenshots are deleted, since the dawn boon is switched off. This settles the note in the entry above.
+  - **Trailer tools (`tools/video/`):**
+    - `shots.spec.ts` films the shots headless on the GPU through the debug hook: the camera glides, the scene is set (night, the dead, Father Crane, a screen scare), and Chrome's screencast saves the frames. `VIDEO_PLAN=1` saves only each shot's first and last frame, to check the framing.
+    - `trailer.mjs` cuts them to the narration, with big subtitles and the title and closing question ("Can you lift the curse?") drawn in the game's own fonts. Under it is a bed of the game's own wind, rain, bells and stingers. `--kiro` adds a slate listing the real `.kiro` specs, hooks and steering docs, with a requirement from spec 10.
+    - `voiceover.mjs` now holds the trailer's lines by name. Lines not made yet get a Windows-voice stand-in, marked "placeholder voice" on screen.
+- **What Kiro caught or sped up:** Nothing; done by hand. The shots use the debug hook from Kiro's e2e work, and the Kiro slate shows Kiro's specs and hooks as they are.
+- **Decisions made unattended:**
+  - The trailer reuses the narrator's recorded intro lines and two lines from the first demo cut. Its three new lines were made in ElevenLabs by accident: `trailer.mjs` imported `voiceover.mjs`, which ran its generator on import with the key already in the environment. `voiceover.mjs` now only sends when run directly. (2026-11-28)
+  - **Whisper:** the dead's whispered "keeper" (`voice/whisper-keeper.ogg`) is replaced with the user's own recording, cleaned of hiss and converted like every voice file. The trailer plays it just before the scare. (2026-11-28)
+  - The shots are filmed headless, so recording never takes over the screen, and the sound is built from the game's files rather than recorded. (2026-11-28)
