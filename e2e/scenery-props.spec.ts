@@ -100,12 +100,11 @@ test.describe('swapped props in place (11n-d)', () => {
     await page.evaluate(() => window.__lastRites!.skipToDawn())
     await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as { phase: string }).phase !== 'night')
     await frames(page, 30)
-    // Dawn waits for a boon; pick the first (key 1), then Silas stands at his cart for the
-    // first part of the new day.
-    await page.getByText('Choose a boon').waitFor({ timeout: 60_000 })
-    await page.keyboard.press('Digit1')
+    // Dawn offers no boon (switched off, playtest 2026-11-27): it runs into the new day, and Silas
+    // stands at his cart for the first part of it.
+    await expect(page.getByText('Choose a boon')).toHaveCount(0)
     await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as { phase: string }).phase === 'day', undefined, {
-      timeout: 60_000,
+      timeout: 120_000,
     })
     await page.waitForFunction(() => window.__lastRites!.interactableCentre('merchant') !== null, undefined, { timeout: 30_000 })
     await frames(page, 30)

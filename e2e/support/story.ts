@@ -645,3 +645,15 @@ export async function stage3(page: Page): Promise<void> {
 }
 
 export { lookAt, pressE, body }
+
+/**
+ * Where the whistle can open the chapel stair: Stage 3 by day with the hymn tiles set (3a). In
+ * Story the altar ignores the whistle before then (playtest 2026-11-28), and with the tiles unset
+ * it opens the hymn board instead of the stair.
+ */
+export async function readyForWhistle(page: Page): Promise<void> {
+  await page.evaluate(() => window.__lastRites!.skipToStage(3))
+  await page.waitForFunction(() => (window.__lastRites!.stageState() as { stage: number }).stage === 3)
+  await page.evaluate(() => window.__lastRites!.solveCurrentMinigame())
+  await page.evaluate(() => window.__lastRites!.give('bone-whistle'))
+}

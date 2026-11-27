@@ -7,7 +7,7 @@ import { test, expect, type Page } from '@playwright/test'
 // 800x600 in e2e/screenshots/info-dots/.
 
 const DIR = 'e2e/screenshots/info-dots'
-const TABS = ['Pages', 'Clues', 'Case', 'Closed cases', 'Relics', 'Contracts', 'Map']
+const TABS = ['Pages', 'Clues', 'Case board', 'Closed cases', 'Relics', 'Contracts', 'Map']
 
 async function startRun(page: Page): Promise<void> {
   await page.goto('/?dev=1')
@@ -83,7 +83,7 @@ test('journal dots open on hover and Tab with the tooltip inside an 800x600 view
     await expectTipInside(page)
     await expect(dot).toHaveAttribute('aria-describedby', /.+/)
     if (label === 'Pages') await shoot(page, 'journal-pages-tooltip')
-    if (label === 'Case') await shoot(page, 'journal-case-tooltip')
+    if (label === 'Case board') await shoot(page, 'journal-case-tooltip')
     await dot.evaluate((el) => (el as HTMLElement).blur())
     await expect(page.getByRole('tooltip')).toHaveCount(0)
   }

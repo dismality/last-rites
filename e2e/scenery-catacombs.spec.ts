@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
+import { readyForWhistle } from './support/story'
 
 // Spec 09 task 11n-c: the catacombs, the gates, the ossuary door and the avenue rails from the
 // Blender models. Screenshots at 1280x720 into e2e/screenshots/scenery/. Yaw 0 faces -Z, PI faces
@@ -97,10 +98,8 @@ test.describe('catacombs scenery (11n-c)', () => {
     await page.waitForTimeout(1500)
     await shot(page, 'gate-row-open-rails', { x: -20, z: -38.5, yaw: 0, pitch: 0 })
     // Catacombs: the whistle, at the corridor gate.
-    await page.evaluate(() => {
-      window.__lastRites!.give('bone-whistle')
-      window.__lastRites!.teleport(25, 38.4, { yaw: Math.PI, pitch: 0 })
-    })
+    await readyForWhistle(page)
+    await page.evaluate(() => window.__lastRites!.teleport(25, 38.4, { yaw: Math.PI, pitch: 0 }))
     await page.waitForTimeout(2500)
     await page.screenshot({ path: `${DIR}/gate-catacombs-closed.png` })
     // The whistle works at the chapel altar, not at the gate (gateHints site: altar), so the lift

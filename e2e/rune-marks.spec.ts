@@ -2,8 +2,8 @@ import { test, expect, type Page } from '@playwright/test'
 import { BENCH_Z, CHAPEL_CENTER, CORRIDORS } from '../src/data/cemeteryLayout'
 import { LANDMARKS } from '../src/data/mapLandmarks'
 
-// Task 11j: the rune and mark images are wired in (interaction prompt, dawn picker, HUD compass and
-// minimap, journal map) and each has a screenshot. Headless Chrome on SwiftShader, so slow frames.
+// Task 11j: the rune and mark images are wired in (interaction prompt, HUD compass and
+// minimap, journal map) and each has a screenshot. The dawn picker is switched off, so its test went. Headless Chrome on SwiftShader, so slow frames.
 
 const SHOTS = 'e2e/screenshots'
 
@@ -138,27 +138,4 @@ test('prompt rune, HUD marks and journal map use the images', async ({ page }) =
   await page.waitForTimeout(3500) // ink animation and image load
   await expect(page.locator('.journal-map__legend')).toContainText('Workbench')
   await page.screenshot({ path: `${SHOTS}/journal-map-marks.png` })
-})
-
-test('dawn picker shows the boon rune image beside the boon icon', async ({ page }) => {
-  test.setTimeout(240_000)
-  await startRun(page)
-  await page.evaluate(() => {
-    window.__lastRites!.keepAlive(true)
-    window.__lastRites!.skipToDawn()
-  })
-  await page.waitForFunction(
-    () => (window.__lastRites!.snapshot('progression') as { pendingPick: string[] | null }).pendingPick !== null,
-    undefined,
-    { timeout: 60_000 },
-  )
-  await expect(page.locator('.dawn-picker__card')).toHaveCount(3)
-  await page.waitForTimeout(500)
-  const art = await loadedAt(page, '.dawn-picker__art')
-  const runes = await loadedAt(page, '.dawn-picker__rune-img')
-  expect(art).toHaveLength(3)
-  expect(runes).toHaveLength(3)
-  for (const a of art) expect(a).toEqual({ loaded: true, w: 64, h: 64, rendering: 'pixelated' })
-  for (const r of runes) expect(r).toEqual({ loaded: true, w: 32, h: 32, rendering: 'pixelated' })
-  await page.screenshot({ path: `${SHOTS}/dawn-picker-runes.png` })
 })

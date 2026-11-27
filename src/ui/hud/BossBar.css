@@ -1,7 +1,8 @@
 /* Top centre, below the compass. Hud.tsx (5.7) places it in .hud-top-stack. */
 .boss-bar {
   box-sizing: border-box;
-  width: min(640px, 60vw);
+  /* The compass's column, which the objective tracker on the left already keeps clear of. */
+  width: min(34rem, 60vw);
   margin: 0.5rem auto 0;
   color: var(--parchment);
   text-align: center;

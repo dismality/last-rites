@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
+import { readyForWhistle } from './support/story'
 import { CHAPEL_CUPBOARD_POSITION } from '../src/data/cemeteryLayout'
 
 // Spec 09 task 11n-a: the chapel's Blender scene in the browser. Screenshots at 1280x720 into
@@ -158,8 +159,8 @@ test.describe('chapel scenery (11n-a)', () => {
     await page.evaluate(() => {
       const h = window.__lastRites!
       h.setLantern(true, 100)
-      h.give('bone-whistle')
     })
+    await readyForWhistle(page)
     // The cover lies behind the altar (world z 9.75..10.85): look down at it from the altar's east end.
     const view = { x: 11.75, z: 10.4, yaw: Math.PI / 2 + 0.25, pitch: -0.75 }
     await shot(page, 'chapel-stair-sealed', view)
@@ -201,16 +202,23 @@ test.describe('chapel scenery (11n-a)', () => {
     // Stop short of the descent trigger (spec 09 task 11n-f: the steps' surface below y -0.5 takes
     // the player down to the catacombs; e2e/chapel-stair.spec.ts covers that).
     let lowest = 0
-    for (let i = 0; i < 8 && (await feet(page))[2] < 10.2; i++) {
-      await walkFor(page, 'MoveForward', 120) // +z, down the steps
-      lowest = Math.min(lowest, (await feet(page))[1])
+    // The trigger fires by position (world z past 10.46, where the steps' surface is 0.5 m down), and
+    // one 60 ms step moves the keeper about 0.13 m, so stop at z 10.3: a full step short of it.
+    const samples: string[] = []
+    for (let i = 0; i < 20 && (await feet(page))[2] < 10.3; i++) {
+      await walkFor(page, 'MoveForward', 60) // +z, down the steps
+      const f = await feet(page)
+      samples.push(`${f[2].toFixed(2)}:${f[1].toFixed(2)}`)
+      lowest = Math.min(lowest, f[1])
     }
+    console.log('stair samples z:y', samples.join(' '))
     await page.waitForTimeout(600)
     await page.screenshot({ path: `${DIR}/chapel-stair-down.png` })
     const down = await feet(page)
     console.log('stair bottom feet', JSON.stringify(down), 'lowest', lowest)
-    // The end wall stops the player at about z 10.5, where the ramp is 0.44 m down; a short walk on a\n    // slow frame stops higher, so the check only asks that the player went down.
-    expect(lowest, 'went down the steps').toBeLessThan(-0.15)
+    // On the steps the capsule's feet settle about 0.1 to 0.16 m down (the floor is at +0.05), so the
+    // check asks only that the keeper went plainly below the floor.
+    expect(lowest, 'went down the steps').toBeLessThan(-0.08)
     expect(down[1], 'did not fall through').toBeGreaterThan(-1.3)
     expect(down[0], 'stayed in the shaft').toBeGreaterThan(9.3)
     expect(down[0], 'stayed in the shaft').toBeLessThan(10.7)

@@ -121,7 +121,8 @@ test('the vending machine sells by day and at night, refuses, sells out and rest
   expect(s.stockLeft['brisk-draught']).toBe(0)
   expect(s.lastPurchase).toMatchObject({ row: 'brisk-draught', handle: 4 })
   await expect(row(page, 'brisk-draught')).toContainText('Sold out')
-  await expect(page.getByTestId('vending-coins')).toHaveText('Grave Coins: 85')
+  // The line ends in an info dot ("i"), so match the number alone.
+  await expect(page.getByTestId('vending-coins')).toHaveText(/^Grave Coins: 85(?!\d)/)
   await shoot(page, 'panel-day')
   await page.waitForFunction(() => window.__lastRites!.vendingState().handleOffsets.every((o) => Math.abs(o) < 0.005), undefined, { timeout: 3000 })
 

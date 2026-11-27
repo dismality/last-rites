@@ -2556,3 +2556,16 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
   - The trailer reuses the narrator's recorded intro lines and two lines from the first demo cut. Its three new lines were made in ElevenLabs by accident: `trailer.mjs` imported `voiceover.mjs`, which ran its generator on import with the key already in the environment. `voiceover.mjs` now only sends when run directly. (2026-11-28)
   - **Whisper:** the dead's whispered "keeper" (`voice/whisper-keeper.ogg`) is replaced with the user's own recording, cleaned of hiss and converted like every voice file. The trailer plays it just before the scare. (2026-11-28)
   - The shots are filmed headless, so recording never takes over the screen, and the sound is built from the game's files rather than recorded. (2026-11-28)
+
+### 2026-11-28: The last e2e failures fixed; the boss bar keeps to the compass column
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Whistle tests (chapel stair, chapel and catacomb scenery):** since the playtest fix, the altar answers the whistle only in Stage 3, once the hymn tiles are set. A new helper, `readyForWhistle` in `e2e/support/story.ts`, starts Stage 3 by day with the tiles set before the whistle is blown.
+  - **Chapel stair walk:** in Stage 3 one short step carries the keeper about 0.13 m, and the descent trigger fires by position (past world z 10.46), not by the feet's height. The walk now stops at z 10.3 and checks the feet went below the floor (-0.08 m; they settle at -0.1 to -0.2 on the steps). The old comment about the end wall at 0.44 m down was wrong and is replaced.
+  - **Dawn:** the boon picker is off, so the rune test for its cards is removed. The props test lets dawn run into day by itself, and the stage-nights test checks that no pick is pending.
+  - **Journal tooltips:** the tab is now called "Case board".
+  - **Vending:** the coin line ends in an info dot, so the test matches the number alone.
+  - **Boss bar (a real overlap):** at 1280x720 the bar was 640 px wide and ran under the objective tracker. It is now as wide as the compass, `min(34rem, 60vw)`, the column the tracker already keeps clear of.
+- **What Kiro caught or sped up:** Kiro's HUD overlap test found the boss bar overlap. Kiro's tests are kept, updated only where the game changed.
+- **Decisions made unattended:**
+  - The boss bar is narrowed rather than the objective tracker, since the tracker's width rule already reserves the compass column. (2026-11-28)

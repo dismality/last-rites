@@ -128,7 +128,7 @@ test('item 1: stage nights 1 and 2 in a row', async ({ page }) => {
     log(`item1 night ${n}: totalWaves=${r.startWave.totalWaves} waveNight=${r.startWave.waves.night} ` +
       `phaseAfter3s=${r.early.phase} dawnsBeforeClear=${r.dawnsSoFar} wavesSeen=${r.seenWaves} ` +
       `violations=${r.violations.length} pendingPick=${r.dawn.pendingPick?.length} ` +
-      `banished=${r.dawn.dawnSummary?.zombiesBanished} dawnHeldWhilePicking=${r.stillDawn}`)
+      `banished=${r.dawn.dawnSummary?.zombiesBanished} stillDawnAfter2.5s=${r.stillDawn}`)
     // Spec 10: waves are endless, so there is no wave count to match (the case ends the night).
     expect(r.startWave.waves.night).toBe(n)
     // Night n+1 must not start in dawn because the previous night left wavesCleared set.
@@ -136,7 +136,8 @@ test('item 1: stage nights 1 and 2 in a row', async ({ page }) => {
     expect(r.early.wavesCleared).toBe(false)
     expect(r.dawnsSoFar).toBe(n - 1)
     expect(r.violations).toEqual([])
-    expect(r.dawn.pendingPick).not.toBeNull()
+    // Dawn offers no boon (switched off, playtest 2026-11-27), and it still lasts its full length.
+    expect(r.dawn.pendingPick ?? null).toBeNull()
     expect(r.stillDawn).toBe(true)
     // By day the tally must be gone and the flag cleared.
     expect((await snap<World>(page, 'world')).wavesCleared).toBe(false)

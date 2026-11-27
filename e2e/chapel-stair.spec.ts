@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test'
 import { mkdirSync } from 'node:fs'
+import { readyForWhistle } from './support/story'
 import { zoneAt } from '../src/game/systems/zoneAt'
 
 // Spec 09 task 11n-f: the chapel stair never traps the player and leads to the catacombs.
@@ -58,7 +59,7 @@ async function walkUntil(page: Page, action: 'MoveForward' | 'MoveBackward' | 'M
 
 /** Opens the stair with the whistle from `from`, as the player does: aim at the altar hotspot and press E. */
 async function blowWhistle(page: Page, from: { x: number; z: number }): Promise<void> {
-  await page.evaluate(() => window.__lastRites!.give('bone-whistle'))
+  await readyForWhistle(page)
   const c = await page.evaluate(() => window.__lastRites!.interactableCentre('altar-whistle'))
   expect(c, 'altar-whistle hotspot mounted').not.toBeNull()
   const pitch = -Math.atan2(1.6 - c![1], c![2] - from.z)
