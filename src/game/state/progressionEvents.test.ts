@@ -138,7 +138,7 @@ describe('progressionEvents: contracts, dawn, storms and achievements', () => {
     const second = run()
     expect(second).toEqual(first)
     expect(first.storm).toBe(true) // night 5 always storms
-    expect(first.offer).toHaveLength(3)
+    expect(first.offer).toBeNull() // no dawn boon is offered
     expect(first.stock).not.toBeNull()
   })
 

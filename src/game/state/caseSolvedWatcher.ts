@@ -13,7 +13,9 @@ import type { RecipeId } from '../types'
 import { emitCombatSound } from './combatSounds'
 import { useCraftingStore } from './craftingStore'
 import { useProgressionStore } from './progressionStore'
-import { usePinStore } from './pinStore'
+import { FIXED_SPAWNS } from '../../data/zones'
+import { useInventoryStore } from './inventoryStore'
+import { useSpawnStore } from './spawnStore'
 import { useToastStore } from './toastStore'
 import { updateRunStats } from './statsPort'
 import { stageOfNight, useStageStore } from './stageStore'
@@ -32,13 +34,17 @@ export function unlockStageRecipes(nightNumber: number): void {
 }
 
 /**
- * Case 1 reward (Req 14.4): the key now lies in Pell's grave (the case's closed flag reveals the
- * fixed spawn) and a map pin marks the mound. The Row gate opens with that key, as before.
+ * Case 1 reward (Req 14.4): the altar hands over the Rusted Crypt Key the moment the name is
+ * accepted (playtest, 2026-11-27: no search). It goes straight into the journal's key items, and
+ * its world copy in Pell's grave is marked taken so it never lies there too.
  */
 export function markCase1Reward(): void {
-  const [x, , z] = CASE_1_REWARD.position
-  usePinStore.getState().place({ x, z, name: "Pell's grave" })
-  useToastStore.getState().push("Something glints in Pell's grave. The Row gate will open to that key.")
+  useInventoryStore.getState().addKeyItem(CASE_1_REWARD.item)
+  const spawns = useSpawnStore.getState()
+  const id = FIXED_SPAWNS.find((f) => f.item === CASE_1_REWARD.item)?.id
+  if (id && !spawns.world.collectedFixed.includes(id))
+    spawns.setWorld({ ...spawns.world, collectedFixed: [...spawns.world.collectedFixed, id] })
+  useToastStore.getState().push('The altar gives up the Rusted Crypt Key. It opens the Mausoleum Row gate.')
 }
 
 /** Returns the unsubscribe function. Install once, next to the other watchers. */

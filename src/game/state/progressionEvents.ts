@@ -21,7 +21,6 @@ import {
   type ContractEvent,
   type ContractResult,
 } from '../systems/contracts'
-import { offerUpgrades } from '../systems/dawnUpgrades'
 import { dealStock } from '../systems/merchant'
 import {
   recordBoard,
@@ -288,7 +287,6 @@ function onDawn(night: number): void {
   const pages = useMysteryStore.getState().mystery.pages
   // Chapter n makes page n + 1 readable (page 1 is in the hut from the start).
   const pageWaiting = [1, 2, 3, 4, 5].slice(0, Math.min(5, night + 1)).some((p) => !pages.has(p as 1))
-  const offer = offerUpgrades(pr.ranks, createRng(deriveSeed(pr.seed, 'offer', night)))
   pr.patch({
     contracts: dealt,
     dawnSummary: {
@@ -302,7 +300,8 @@ function onDawn(night: number): void {
       noDamageBonus: parts.noDamage,
       nightScore: sc.nightKillPoints + parts.clear + parts.noDamage,
     },
-    pendingPick: offer.length > 0 ? offer : null,
+    // No dawn boon is offered: the pick added nothing to the story (playtest, 2026-11-27).
+    pendingPick: null,
   })
 }
 

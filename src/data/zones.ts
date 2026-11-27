@@ -168,7 +168,8 @@ export interface FixedSpawn {
 
 export const FIXED_SPAWNS: readonly FixedSpawn[] = [
   { id: 'fx-page-1', zone: 'grounds', position: [2.6, 0.78, -1.3], item: 'journal-page-1' },
-  // In Pell's grave (CASE_1_REWARD.position in cases.ts) once case 1 is solved.
+  // Pell's grave (CASE_1_REWARD in cases.ts). Story runs never see it: solving case 1 hands the key
+  // over at the altar and marks this copy taken.
   {
     id: 'fx-crypt-key',
     zone: 'grounds',

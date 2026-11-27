@@ -28,16 +28,15 @@ describe('introCutscene data', () => {
   it('uses the exact section 11 card texts', () => {
     expect(INTRO_SHOTS.map((s) => s.card.text)).toEqual([
       'Hollowmere, October 1891.',
-      'The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks.',
-      'They need someone to tend the dead.',
-      'The graves here are opening. From the inside.',
-      'Elias left a page on the table.',
+      'Elias Thorne, keeper of this cemetery, has been missing for three weeks.',
+      'The parish has sent you to take his place, and to find out what became of him.',
+      'By day, follow his trail. By night, hold the grounds until dawn.',
+      'He left a page on the table. Start there.',
     ])
   })
 
-  it('has a burst on shot 4 only, inside its duration', () => {
-    expect(INTRO_SHOTS.filter((s) => s.burst).map((s) => s.id)).toEqual([4])
-    expect(INTRO_SHOTS[3].burst!.at).toBeLessThan(INTRO_SHOTS[3].duration)
+  it('bursts no grave: the intro sets up the search for Elias, not the dead rising', () => {
+    expect(INTRO_SHOTS.filter((s) => s.burst)).toEqual([])
   })
 
   it('enters the hut through the +Z door line and ends at the spawn eye', () => {

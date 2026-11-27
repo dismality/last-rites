@@ -2466,3 +2466,23 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Elias is stylised, not realistic: a code-built figure can't match a sculpted or generated model. He reads as a slumped man in a dark coat at play distance. (2026-11-26)
   - The e2e case 3 spec fails at the cart ruts ("crosshair reaches case-clue-hearse-cart-ruts") with and without this change, so that failure is older than this work. It is left for its own fix. (2026-11-26)
+
+### 2026-11-27: Playtest fixes: intro hook, no mound marker, page 1, no boon, key from the altar
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Intro:** the cards now set up the goal instead of the dead rising. They read:
+    - "Hollowmere, October 1891."
+    - "Elias Thorne, keeper of this cemetery, has been missing for three weeks."
+    - "The parish has sent you to take his place, and to find out what became of him."
+    - "By day, follow his trail. By night, hold the grounds until dawn."
+    - "He left a page on the table. Start there."
+  - The oak-hollow grave no longer bursts in shot 4. Shot 3 is 5 s to fit its longer card, so the intro runs 22 s.
+  - **Grave mounds:** the objective marker no longer points at the nearest mound during the dig tutorial. Digging is not an objective. The tutorial hint still names it, and the mound glyph still shows from 16 m by day while that hint is up.
+  - **Journal page 1:** Elias no longer names Pell. He writes that one of three graves is wrong and that the ledger was changed to hide it. The keeper's spoken line follows.
+  - **Dawn boon:** no boon is offered at dawn. The dawn summary stays, and Kiro's boon data and pick code are kept, unused.
+  - **Crypt key:** the altar hands over the Rusted Crypt Key the moment Case 1's answer is accepted. It goes into the journal's key items, and its copy in Pell's grave is marked taken. Stage 2 now opens on "Open the Mausoleum Row gate"; the search step and its search circle are gone.
+  - The e2e playthrough helper checks that the key is already held instead of walking to Pell's grave.
+- **What Kiro caught or sped up:** Nothing; done by hand. Kiro's tutorial steps, objective rules, beacon, dawn summary and boon system are kept.
+- **Decisions made unattended:**
+  - The boon screen is switched off, not deleted, so it can come back if it is given a purpose. (2026-11-27)
+  - The changed voice lines (intro-2 to intro-5, keeper-page-1, page-1) need re-recording. Until they are, the old recordings play under the new text. (2026-11-27)

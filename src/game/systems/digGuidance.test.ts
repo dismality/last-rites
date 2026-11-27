@@ -8,12 +8,10 @@ import {
   digNeed,
   impliesDigFindsCryptKey,
   MOUND_DAY_RUNE_RANGE_M,
-  nearestMound,
-  withDigTutorialMarker,
 } from './digGuidance'
 import { createInventory } from './inventory'
 import { isRuneVisible } from './interaction'
-import type { Objective, Vec3 } from './objective'
+import type { Vec3 } from './objective'
 
 const MOUNDS: Vec3[] = SPAWN_POINTS.filter((p) => p.lootTable === 'grave-dig').map((p) => p.position)
 const bindings = { Hotbar1: 'Digit1', Hotbar2: 'Digit2' }
@@ -69,24 +67,8 @@ describe('crypt key copy', () => {
   })
 })
 
-describe('dig tutorial marker', () => {
-  const objective: Objective = {
-    rule: 6,
-    main: 'Find the Rusted Crypt Key (0/1)',
-    second: 'Dusk in 5:00',
-    position: [-12, 0, -18],
-    marker: 'Crypt key',
-  }
-  it('has three mounds and picks the nearest', () => {
+describe('grave mounds', () => {
+  it('has three mounds', () => {
     expect(MOUNDS).toHaveLength(3)
-    expect(nearestMound([20, 0, 20], MOUNDS)).toEqual([22, 0, 24])
-  })
-  it('points at the nearest mound while the dig step is active', () => {
-    const o = withDigTutorialMarker(objective, true, [-14, 0, 10], MOUNDS)
-    expect(o.position).toEqual([-15, 0, 12])
-    expect(o.marker).toBe('Grave mound')
-  })
-  it('leaves the objective alone otherwise', () => {
-    expect(withDigTutorialMarker(objective, false, [0, 0, 0], MOUNDS)).toBe(objective)
   })
 })

@@ -52,7 +52,7 @@ After the stage 3 sunrise, a **15–20 s skippable cutscene** plays: the keeper 
 | Zone | Access | Feel | Contents |
 |---|---|---|---|
 | **Keeper's Hut and Grounds** | Start | Open, foggy, crooked headstones, dead oaks | Workbench, most materials, 2 relics, the chapel exterior, the woodpile with the **Wood Axe (07)** |
-| **Mausoleum Row** | **Rusted Crypt Key** (**(10)** in Pell's grave once case 1 is solved; before spec 10, found on day 1 in the Marsh grave) | Narrow stone alleys, dark, echoing, statues | Scare alleys, Crane crypt (with the **Silver Sabre (07)**), the gatekeeper's lodge with the **Double-Barrel Shotgun (07)**, 1 relic |
+| **Mausoleum Row** | **Rusted Crypt Key** (given by the altar when case 1 is solved; before that, in Pell's grave, and before spec 10, found on day 1 in the Marsh grave) | Narrow stone alleys, dark, echoing, statues | Scare alleys, Crane crypt (with the **Silver Sabre (07)**), the gatekeeper's lodge with the **Double-Barrel Shotgun (07)**, 1 relic |
 | **Chapel** | Always (repair to make it a safe zone) | Ruined, candlelit | Altar, bell, repairs, front door and **vestry door (07)**, the vestry cupboard with the **Service Revolver (07)** |
 | **Catacombs** | **Sexton's Bone Whistle** (Mausoleum Row) opens the hidden stair behind the altar | Tight tunnels, bone walls, drips, near-total dark | Ossuary, 2 relics; **Iron Ossuary Key** (on Elias's body in the Crane crypt) opens the deepest chamber |
 
@@ -570,7 +570,7 @@ Always visible at the top left: one main goal with a progress count, plus a smal
 
 ### Objective tracker in the 3-stage design (10)
 - **Rules 5–10 per stage** (by day): the first unfinished step of the current case, from §13 (`STAGE_DAY_RULES`). Stage 1: "Cross-check the ledger against the stones (0/1)", then "Examine the three bells (0/3)". Stage 2: "Find the key to the Mausoleum Row gate (0/1)" (a search area), "Open the Mausoleum Row gate (0/1)", "Read the crypt tablets (n/6)", "Open the sexton's crest lock (0/1)", "Put the watch log in order (0/1)", "Compare the boot prints (0/1)". Stage 3: "Set the hymn tiles at the altar (0/1)", "Find what happened to Elias (n/6)" (a search area), "Reconstruct Elias's last night (0/1)", "Gather the relics of the rite (R/5)". A step with several things to do points at the nearest one not yet done.
-- **Why and done lines (playtest 11r):** every step shows one italic line under the objective saying why it matters. When a step finishes, its done line (what was learned and where it points) shows once as a centred reveal. A new stage opens with its own line ("Something glints in Pell’s grave."). Neither replays on a load or Continue.
+- **Why and done lines (playtest 11r):** every step shows one italic line under the objective saying why it matters. When a step finishes, its done line (what was learned and where it points) shows once as a centred reveal. A new stage opens with its own line ("The altar gave up the Rusted Crypt Key. It opens the Mausoleum Row gate."). Neither replays on a load or Continue.
 - **After the steps:** "Link the clues in the journal's Case tab (n/m)", then "At dusk, give your answer at the chapel altar" with the altar marker.
 - **Early dusk (playtest 11r):** by day, once every step is done and every clue linked, the altar's prompt reads "E: Ring the bell, call the dusk now". It ends the day at once, rings the bell and gives +150 score. Otherwise the altar keeps its usual prompt.
 - **Dusk warnings (playtest 11r):** a far bell tolls with 2:00 of day left ("[a far bell tolls: two minutes to dusk]") and the graves tremble with a low rumble at 0:30 ("[the graves tremble: dusk is close]"). Data in `src/data/duskWarnings.ts`; the rule is `duskWarningsCrossed`.
@@ -682,10 +682,10 @@ Plays once on New Game: about 20 s in-engine **(09, B15)** (was about 35 s), fiv
 | Shot | Camera | Card |
 |---|---|---|
 | 1 | Outside the south fence, rising over the railings towards the hut's lit window | "Hollowmere, October 1891." |
-| 2 | On up the path, still on the hut: where the missing keeper lived | "The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks." |
-| 3 | Drawn off the path, west across the untended headstones towards the oak hollow | "They need someone to tend the dead." |
-| 4 | Slows to a stop over the oak-hollow grave as the soil bursts; dips to ink | "The graves here are opening. From the inside." |
-| 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "Elias left a page on the table." **(09)** |
+| 2 | On up the path, still on the hut: where the missing keeper lived | "Elias Thorne, keeper of this cemetery, has been missing for three weeks." |
+| 3 | Drawn off the path, west across the untended headstones towards the oak hollow | "The parish has sent you to take his place, and to find out what became of him." |
+| 4 | Slows to a stop over the oak-hollow grave; dips to ink | "By day, follow his trail. By night, hold the grounds until dawn." |
+| 5 | Into the hut, turning to the side table with page 1, where the player's view begins **(09)** | "He left a page on the table. Start there." **(09)** |
 
 It ends with the first objective appearing in the tracker.
 
@@ -895,7 +895,7 @@ Safety coffins had a bell on a rope so someone wrongly buried could signal.
 - **Minigame 1b, The Bells (the 3 candidate graves):** each has a safety-bell post, with an examine view (turn the bell, inspect the rope, read the tag). One rope is cut clean (a knife, not rot); one bell is rusted solid (it never rang); one tag carries the hurried certificate's date, a day *before* the ledger says the person died.
 - **Red herrings:** fresh flowers on Hale (a widow still visits) and a toppled Marsh stone (frost heave).
 - **Final answer:** "The one buried alive lies in **Pell's grave** because **the bell rope was cut and the certificate was signed before the death**."
-- **Reward:** sunrise; Pell's grave then holds the **Rusted Crypt Key** (the dig mound marks once solved), and the Mausoleum Row gate opens for stage 2. The tutorial and journal page 1 remain the first-day entry points.
+- **Reward:** sunrise; the altar hands over the **Rusted Crypt Key** the moment the name is accepted (no search), and the Mausoleum Row gate opens to it for stage 2. The tutorial and journal page 1 remain the first-day entry points.
 
 ### Case 2: "The Resurrection Men" (body snatchers), stage 2
 Graves were robbed for anatomy schools; iron mortsafes and watch-houses were built against it. **Suspects:** the sexton, the doctor, the lodge keeper, the gravedigger.

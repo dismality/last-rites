@@ -120,9 +120,8 @@ describe('progression checkpoint: night 1 to dawn', () => {
     })
     expect(pr.score).toBe(kills + 600)
 
-    // Dawn waits for a pick; the seeded offer is three different upgrades.
-    expect(pr.pendingPick).toHaveLength(3)
-    expect(new Set(pr.pendingPick).size).toBe(3)
+    // No boon is offered at dawn; a pick still applies if one is ever set (old saves).
+    expect(pr.pendingPick).toBeNull()
     useProgressionStore.getState().patch({ pendingPick: ['iron-constitution', 'steady-hands', 'long-wick'] })
     const hpBefore = usePlayerStore.getState().health
     expect(pickUpgrade('iron-constitution')).toBe(true)

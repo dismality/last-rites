@@ -10,8 +10,8 @@ import { useClueRevealStore } from './clueRevealStore'
 import { ITEM_MAP } from '../../data/items'
 import { ENDLESS } from '../../data/modes'
 import { RELICS } from '../../data/relics'
-import { DIG_STEP_ID, TUTORIAL_PICKUP_ITEM, type TutorialAction } from '../../data/tutorialSteps'
-import { FIXED_SPAWNS, SPAWN_POINTS } from '../../data/zones'
+import { TUTORIAL_PICKUP_ITEM, type TutorialAction } from '../../data/tutorialSteps'
+import { FIXED_SPAWNS } from '../../data/zones'
 import { ZONE_CARD_SHOW_S } from '../../data/zoneCards'
 import { subscribeToType } from '../events'
 import { craneFighting } from '../systems/bossDirector'
@@ -26,11 +26,9 @@ import {
   type ObjectiveInput,
   type Vec3,
 } from '../systems/objective'
-import { withDigTutorialMarker } from '../systems/digGuidance'
 import { hintNear, hintPlacePosition } from '../systems/objectiveHint'
 import {
   currentTutorialPlace,
-  currentTutorialStep,
   markActionDone,
   isWalkComplete,
   tutorialPrompt,
@@ -225,17 +223,15 @@ const readStageDaySteps = (stage: 1 | 2 | 3): DayStep[] => {
     ]
   }
   if (stage === 2) {
-    // First the Row gate (its key is in Pell's grave), then the fresh graves by the lodge, the
-    // register, the watch log, the print, the boots and Kerr's locker.
+    // First the Row gate (the altar gave its key when Case 1 was solved), then the fresh graves by
+    // the lodge, the register, the watch log, the print, the boots and Kerr's locker.
     const gateOpen = useMysteryStore.getState().mystery.gates['mausoleum-row']
-    const hasKey = gateOpen || useInventoryStore.getState().inventory.keyItems.includes('rusted-crypt-key')
     const flag = (done: boolean) => ({ count: done ? 1 : 0, done })
     const c2 = cases['resurrection-men']
     const graves = CASE_2_FRESH_GRAVES
     const unseen = graves.filter((g) => !c2.gravesSeen.includes(g.id))
     const gravesDone = solved('2a') || unseen.length === 0
     return [
-      flag(hasKey),
       flag(gateOpen),
       {
         count: gravesDone ? graves.length : graves.length - unseen.length,
@@ -292,14 +288,6 @@ const sameObjective = (a: Objective | null, b: Objective): boolean =>
   a.position?.[0] === b.position?.[0] &&
   a.position?.[2] === b.position?.[2]
 
-/** True while the dig tutorial prompt is the one on screen. */
-const digTutorialActive = (): boolean => {
-  const s = useSettingsStore.getState()
-  const world = useWorldStore.getState()
-  if (!s.tutorialPrompts || world.phase !== 'day' || world.nightNumber !== 1) return false
-  return currentTutorialStep(useGuidanceStore.getState().tutorialDone) === DIG_STEP_ID
-}
-
 /** Recomputes the objective now; writes only on change so subscribers stay quiet. */
 export const refreshGuidance = (): void => {
   const input = readObjectiveInput()
@@ -307,13 +295,8 @@ export const refreshGuidance = (): void => {
   const selected = selectObjective(input)
   // Once the chapel stair is open it is the way into the catacombs, not the corridor gate.
   const via = redirectViaStair(selected.position, input.playerPos, input.progress.stairRevealed)
-  const next = withDigTutorialMarker(
-    via && via !== selected.position ? { ...selected, position: via } : selected,
-    digTutorialActive(),
-    input.playerPos,
-    // Read from data (not digStore) to keep guidance free of the progression import cycle.
-    SPAWN_POINTS.filter((p) => p.lootTable === 'grave-dig').map((p) => p.position),
-  )
+  // Grave mounds are never the objective: the dig tutorial is a hint, and the marker stays on the story.
+  const next = via && via !== selected.position ? { ...selected, position: via } : selected
   const store = useGuidanceStore.getState()
   if (!sameObjective(store.objective, next)) store.setObjective(next)
 }

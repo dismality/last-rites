@@ -455,32 +455,28 @@ describe('selectObjective in story stages (spec 10)', () => {
       selectObjective({ ...day, stage: { stage, curseLinks: 0, altarLockedS: 0, clues: { found: 1, total: 6 }, day: steps } })
     const open = { count: 0, done: false }
     const done = { count: 1, done: true }
-    // Stage 2: the Row gate's key first, as a search area, then the gate.
-    const o8 = () => [open, open, open, open, open, open, open, open]
-    const upTo = (n: number) => o8().map((x, i) => (i < n ? done : x))
-    const key = st(2, o8())
-    expect(key.main).toBe('Find the key to the Mausoleum Row gate (0/1)')
-    expect(key.areaM).toBeGreaterThan(0)
-    expect(key.why).toMatch(/Pell/)
-    const gate = st(2, upTo(1))
+    // Stage 2: the Row gate first (the altar gave its key at the end of Case 1).
+    const o7 = () => [open, open, open, open, open, open, open]
+    const upTo = (n: number) => o7().map((x, i) => (i < n ? done : x))
+    const gate = st(2, o7())
     expect(gate.main).toBe('Open the Mausoleum Row gate (0/1)')
     expect(gate.areaM).toBeUndefined()
     // Then the three fresh graves, pointing at the nearest one not yet seen.
     const far: [number, number, number] = [99, 0, 99]
-    const s3 = upTo(2)
-    s3[2] = { count: 1, done: false, at: [far, base.playerPos] } as never
-    const graves = st(2, s3)
+    const s2 = upTo(1)
+    s2[1] = { count: 1, done: false, at: [far, base.playerPos] } as never
+    const graves = st(2, s2)
     expect(graves.main).toBe('Look at the three fresh graves by the lodge (1/3)')
     expect(graves.position).toEqual(base.playerPos)
-    expect(st(2, upTo(3)).main).toBe('Check the fresh graves against the register (0/3)')
-    expect(st(2, upTo(4)).main).toBe('Read the watch log for the night of the 14th (0/1)')
-    expect(st(2, upTo(5)).main).toBe('Take the boot print at Arthur Finch’s grave (0/1)')
-    expect(st(2, upTo(6)).main).toBe('Compare the boots by the lodge with the print (0/1)')
-    const o = st(2, upTo(7))
+    expect(st(2, upTo(2)).main).toBe('Check the fresh graves against the register (0/3)')
+    expect(st(2, upTo(3)).main).toBe('Read the watch log for the night of the 14th (0/1)')
+    expect(st(2, upTo(4)).main).toBe('Take the boot print at Arthur Finch’s grave (0/1)')
+    expect(st(2, upTo(5)).main).toBe('Compare the boots by the lodge with the print (0/1)')
+    const o = st(2, upTo(6))
     expect(o.main).toBe('Open Kerr’s locker (0/1)')
     expect(o.marker).toBe('Locker')
     expect(o.position).toEqual(CASE_2_LOCKER_POSITION)
-    expect(st(2, upTo(8)).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
+    expect(st(2, upTo(7)).main).toBe('Solve the case: The Resurrection Men, clues 1/6')
     // Stage 1: the three stones, the ledger, then the bell cords.
     expect(st(1, [{ count: 1, done: false }, open, open]).main).toBe('Read the stones of Pell, Ames and Hale (1/3)')
     expect(st(1, [done, { count: 2, done: false }, open]).main).toBe('Check the ledger against the stones (2/3)')
@@ -500,7 +496,7 @@ describe('selectObjective in story stages (spec 10)', () => {
       ...day,
       needsWeapon: true,
       secondsLeft: 30,
-      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, done, open, open, open, open, open] },
+      stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [done, done, open, open, open, open, open] },
     })
     expect(armed.second).toBe('Check the fresh graves against the register (0/3)')
     const night = selectObjective({ ...day, phase: 'night', stage: { stage: 2, curseLinks: 0, altarLockedS: 0, day: [open, open, open] } })

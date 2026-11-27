@@ -361,7 +361,8 @@ export const CASE_1_BELLS: readonly BellPostDef[] = [
   },
 ]
 
-/** Pell's grave gives up the Rusted Crypt Key once case 1 is solved (design bible §2). */
+/** Case 1's reward: the altar hands over the Rusted Crypt Key when the case is solved (design bible §2).
+ * Its world copy in Pell's grave is marked taken then, so it is never searched for. */
 export const CASE_1_REWARD = {
   item: 'rusted-crypt-key',
   stone: 'pell',

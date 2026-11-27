@@ -52,10 +52,10 @@ export const AUDIO = [
   sfx('revolver-shot', 'single 1880s black powder revolver gunshot, sharp crack with short outdoor echo', 1.5, { batch: 'first' }),
   amb('rain', 'steady light rain on grass and gravestones, distant drips, seamless loop', 30, { wired: true, batch: 'first' }),
   say('intro-1', 'narrator', 'Hollowmere, October 1891.', { wired: true, batch: 'first' }),
-  say('intro-2', 'narrator', 'The parish wrote: the keeper, Elias Thorne, has not been seen in three weeks.', { wired: true, batch: 'first' }),
-  say('intro-3', 'narrator', 'They need someone to tend the dead.', { wired: true, batch: 'first' }),
-  say('intro-4', 'narrator', 'The graves here are opening. From the inside.', { wired: true, batch: 'first' }),
-  say('intro-5', 'narrator', 'Elias left a page on the table.', { wired: true, batch: 'first' }),
+  say('intro-2', 'narrator', 'Elias Thorne, keeper of this cemetery, has been missing for three weeks.', { wired: true, batch: 'first' }),
+  say('intro-3', 'narrator', 'The parish has sent you to take his place, and to find out what became of him.', { wired: true, batch: 'first' }),
+  say('intro-4', 'narrator', 'By day, follow his trail. By night, hold the grounds until dawn.', { wired: true, batch: 'first' }),
+  say('intro-5', 'narrator', 'He left a page on the table. Start there.', { wired: true, batch: 'first' }),
 
   // ── Footsteps ────────────────────────────────────────────────────────────────
   sfx('step-stone', 'single footstep on old flagstone floor in a stone chapel, leather boot, slight echo', 0.6, { variants: 4 }),
@@ -172,7 +172,7 @@ export const AUDIO = [
   song('ending-taken', 'bleak funeral dirge, low organ and a single tolling bell, D minor, hopeless', 60, { loop: false }),
 
   // ── Elias's journal pages (not played by the game yet) ───────────────────────
-  say('page-1', 'elias', "Whoever finds this: you should know how the dead are kept here. Doctors cannot always tell a deep sleep from death, and people have been buried alive. So every grave at Hollowmere has a safety bell. A cord runs from the dead man’s hand, up a pipe through the soil, to a little bell on a post above him. If he wakes below, he pulls the cord, the bell rings, and the watchman digs him out. Now listen. Pell’s grave is wrong. Someone has changed the parish ledger on the hut shelf. Read the stones of John Pell, Esther Ames and Tobias Hale, and check each one against its entry. If I am not back, do not trust the ink. Trust the stones.", { wired: false, source: 'page:1' }),
+  say('page-1', 'elias', "Whoever finds this: you should know how the dead are kept here. Doctors cannot always tell a deep sleep from death, and people have been buried alive. So every grave at Hollowmere has a safety bell. A cord runs from the dead man’s hand, up a pipe through the soil, to a little bell on a post above him. If he wakes below, he pulls the cord, the bell rings, and the watchman digs him out. Now listen. One of three graves here is wrong, and someone has changed the parish ledger on the hut shelf to hide it. Read the stones of John Pell, Esther Ames and Tobias Hale, and check each one against its entry. If I am not back, do not trust the ink. Trust the stones.", { wired: false, source: 'page:1' }),
   say('page-2', 'elias', 'Vane’s men are taking the dead too. Watch the fresh graves. They are being emptied, and the lodge keeper sees everything and says nothing.', { wired: false, source: 'page:2' }),
   say('page-3', 'elias', 'The Crane crypt gave up a fragment in the priest’s own hand. "They were not dead. God forgive me, they were not yet dead, and I could not bear the fever to spread." He sealed them below the chapel and wrote them into the ledger as buried. At the foot of the page is a ring of salt and a note: grave salt and holy water, drawn as a circle, and nothing foul will cross it. I have copied it out. Further down, smudged: "What I hid, I hid beneath the Word." He prayed first, then rang the bell, then named the smallest of them, then covered the rest, and last he sealed the heart away.', { wired: false, source: 'page:3' }),
   say('page-4', 'elias', 'Scratches on every stone, low down, where a seated man could reach. Names, hundreds of small marks, and the same names again and again. Beside the sealed door, five relics are listed for the Rite of Rest, in the order Crane confessed it: the rosary, the clapper, the locket, the shroud, the heart. Crane meant to lay them on the altar in that order and finish what guilt began. He died with the words half said. I mean to say the rest.', { wired: false, source: 'page:4' }),
@@ -191,7 +191,7 @@ export const AUDIO = [
   say('walkout-2', 'narrator', 'Behind you, the graves are only graves again.', { wired: false, source: 'walkout:1' }),
   say('walkout-3', 'narrator', 'The lane is empty. You do not look back.', { wired: false, source: 'walkout:2' }),
   // ── The keeper thinking aloud, Cases 1 and 2 (src/data/case1Narration.ts, case2Narration.ts, word for word) ──
-  say("keeper-page-1", 'keeper', "Elias says Pell’s grave is wrong, and that someone changed the parish ledger.", { wired: true, batch: 'keeper' }),
+  say("keeper-page-1", 'keeper', "Elias says one of three graves is wrong, and that someone changed the parish ledger to hide it.", { wired: true, batch: 'keeper' }),
   say("keeper-page-2", 'keeper', "I’ll read the stones of John Pell, Esther Ames and Tobias Hale, then check each one against the ledger in the hut.", { wired: true, batch: 'keeper' }),
   say("keeper-stone-pell", 'keeper', "John Pell’s stone: died the 12th of March 1862, north row, plot 3, struck down by apoplexy. I’ll check that against his entry in the ledger.", { wired: true, batch: 'keeper' }),
   say("keeper-stone-ames", 'keeper', "Esther Ames: died the 7th of November 1849, east row, plot 1, taken by fever. Now to see what the ledger says about her.", { wired: true, batch: 'keeper' }),

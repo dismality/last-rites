@@ -25,7 +25,7 @@ export const JOURNAL_PAGES: readonly JournalPage[] = [
       'So every grave at Hollowmere has a safety bell. A cord runs from the dead man’s hand, ' +
       'up a pipe through the soil, to a little bell on a post above him. If he wakes below, ' +
       'he pulls the cord, the bell rings, and the watchman digs him out. ' +
-      'Now listen. Pell’s grave is wrong. Someone has changed the parish ledger on the hut shelf. ' +
+      'Now listen. One of three graves here is wrong, and someone has changed the parish ledger on the hut shelf to hide it. ' +
       'Read the stones of John Pell, Esther Ames and Tobias Hale, and check each one against its entry. ' +
       'If I am not back, do not trust the ink. Trust the stones.',
   },

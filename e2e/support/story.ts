@@ -362,15 +362,10 @@ const case2 = async (page: Page) =>
   (await caseState(page)).cases[CASE2] as unknown as { gravesSeen: string[]; printTaken: boolean }
 
 export async function stage2(page: Page): Promise<void> {
-  await expectObjective(page, /Craft a weapon|Find the key to the Mausoleum Row gate/)
+  await expectObjective(page, /Craft a weapon|Open the Mausoleum Row gate/)
 
-  // Case 1's reward: the Rusted Crypt Key lies in Pell's grave.
-  await useProp(page, 'fixed:fx-crypt-key', async () => {
-    if ((await page.getByRole('button', { name: /Put away/ }).count()) > 0)
-      await page.keyboard.press('Escape')
-    return (await keyItems(page)).includes('rusted-crypt-key')
-  })
-  await relock(page)
+  // Case 1's reward: the altar handed over the Rusted Crypt Key when the name was accepted.
+  expect(await keyItems(page)).toContain('rusted-crypt-key')
 
   // The Row gate opens to the key.
   const gateOpen = () =>

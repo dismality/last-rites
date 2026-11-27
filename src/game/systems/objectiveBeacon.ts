@@ -1,9 +1,8 @@
 // Objective beacon rules: the amber light pillar and name label over the current objective's
-// place, and when grave mounds may show their glyph by day. Pure: no React, three.js or stores.
+// place. Pure: no React, three.js or stores.
 
 import { isInsideHut } from '../../data/cemeteryLayout'
-import type { Objective, Vec3 } from './objective'
-import { DIG_TUTORIAL_MARKER } from './digGuidance'
+import type { Vec3 } from './objective'
 
 /** Closer than this (m) the beacon is gone, so it never stands in the player's face. */
 export const BEACON_HIDE_M = 2
@@ -35,9 +34,4 @@ export function objectiveBeaconLabel(marker: string | undefined, distanceM: numb
 /** The objective is inside the hut and the player is outside it. */
 export function objectiveInHutFromOutside(player: Vec3, target: Vec3): boolean {
   return isInsideHut(target[0], target[2]) && !isInsideHut(player[0], player[2])
-}
-
-/** Grave mounds show their dig glyph by day only while digging is the objective. */
-export function moundsAreObjective(objective: Objective | null): boolean {
-  return objective?.marker === DIG_TUTORIAL_MARKER
 }

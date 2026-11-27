@@ -6,8 +6,8 @@ import { advanceIntro, introDuration, introStateAt } from './introTimeline'
 const TOTAL_MS = Math.round(introDuration() * 1000)
 
 describe('introTimeline', () => {
-  it('lasts about 20 s (21 s) with five shots', () => {
-    expect(introDuration()).toBe(21)
+  it('lasts about 20 s (22 s) with five shots', () => {
+    expect(introDuration()).toBe(22)
     expect(INTRO_SHOTS).toHaveLength(5)
   })
 
@@ -54,7 +54,7 @@ describe('introTimeline', () => {
 
   it('does not advance while paused and caps at the total', () => {
     expect(advanceIntro(3.2, 0.5, true)).toBe(3.2)
-    expect(advanceIntro(20.9, 5, false)).toBe(21)
+    expect(advanceIntro(21.9, 5, false)).toBe(22)
   })
 
   // Feature: 06-clarity-and-hud, Property 27: Intro timeline

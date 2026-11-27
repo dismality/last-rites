@@ -7,7 +7,7 @@ import type { BellPostId, LedgerFlagKind } from './cases'
 export const CASE1_SAY = {
   /** Reading Elias's first page. */
   page: [
-    'Elias says Pell’s grave is wrong, and that someone changed the parish ledger.',
+    'Elias says one of three graves is wrong, and that someone changed the parish ledger to hide it.',
     'I’ll read the stones of John Pell, Esther Ames and Tobias Hale, then check each one against the ledger in the hut.',
   ],
   /** Reading one of the three stones, before the ledger is checked. */

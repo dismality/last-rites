@@ -215,12 +215,6 @@ export interface StageDayRule {
   readonly done: string
 }
 
-/**
- * Stage 2 opens behind the Mausoleum Row gate, so the day starts with its key: Pell's grave gives
- * it up once case 1 is solved. The search circle sits a few metres off the grave so it says "around
- * here", not "exactly here".
- */
-const CRYPT_KEY_SEARCH: StageDayPlace = { kind: 'area', at: [-11, 0, -19.5], radiusM: 7 }
 /** The Mausoleum Row gate across the avenue mouth on the north fence (Gates.tsx). */
 export const ROW_GATE_POSITION: Point = [MAUSOLEUM_ROW.centerX, 0, MAUSOLEUM_ROW.entranceZ]
 
@@ -262,14 +256,6 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
     },
   ],
   2: [
-    {
-      main: 'Find the key to the Mausoleum Row gate',
-      target: 1,
-      marker: 'Search here',
-      place: CRYPT_KEY_SEARCH,
-      why: 'With the curse lifted, Pell’s grave gave something up.',
-      done: 'The Rusted Crypt Key. It fits the Mausoleum Row gate on the north fence.',
-    },
     {
       main: 'Open the Mausoleum Row gate',
       target: 1,
@@ -389,7 +375,7 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
 
 /** Shown once when a stage's first day begins (not on a load): where the new case starts. */
 export const STAGE_OPENING: Readonly<Partial<Record<1 | 2 | 3, string>>> = {
-  2: 'Something glints in Pell’s grave.',
+  2: 'The altar gave up the Rusted Crypt Key. It opens the Mausoleum Row gate.',
   3: 'Two cases closed. Elias’s last page says to look for the Crane crypt.',
 }
 

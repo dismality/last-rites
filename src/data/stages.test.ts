@@ -63,10 +63,10 @@ describe('stage data (design bible §8, §13)', () => {
   it('has day rules for every stage and altar captions', () => {
     // Stage 1: read the three stones, check the ledger, pull the bell cords.
     expect(STAGE_DAY_RULES[1]).toHaveLength(3)
-    // Stage 2: the Row gate's key and the gate, the fresh graves, the register, the watch log, the
-    // print, the boots and Kerr's locker.
-    expect(STAGE_DAY_RULES[2]).toHaveLength(8)
-    expect(STAGE_DAY_RULES[2][0].place.kind).toBe('area')
+    // Stage 2: the Row gate (its key came from the altar), the fresh graves, the register, the watch
+    // log, the print, the boots and Kerr's locker.
+    expect(STAGE_DAY_RULES[2]).toHaveLength(7)
+    expect(STAGE_DAY_RULES[2][0].marker).toBe('Row gate')
     for (const stage of [1, 2, 3] as const) {
       const ms = STAGE_DAY_RULES[stage].flatMap((r) => (r.minigame ? [r.minigame] : []))
       expect(new Set(ms).size).toBe(ms.length)

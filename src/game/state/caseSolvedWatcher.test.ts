@@ -3,7 +3,8 @@ import { CASE_1_REWARD } from '../../data/cases'
 import { FIXED_SPAWNS } from '../../data/zones'
 import { availableFixedSpawns, createSpawnWorld } from '../systems/spawns'
 import { useCaseStore } from './caseStore'
-import { usePinStore } from './pinStore'
+import { useInventoryStore } from './inventoryStore'
+import { useSpawnStore } from './spawnStore'
 import { markCase1Reward } from './caseSolvedWatcher'
 import { installCaseSolvedWatcher } from './caseSolvedWatcher'
 import { useChapelStore } from './chapelStore'
@@ -22,15 +23,13 @@ describe('caseSolvedWatcher: daily chapel reset', () => {
 })
 
 describe('case 1 reward (Req 14.4)', () => {
-  it('lies in Pell\'s grave only after the case closes, and the mound is pinned', () => {
-    const key = (closed: readonly ('saved-by-the-bell')[]) =>
-      availableFixedSpawns(createSpawnWorld(), 'day', FIXED_SPAWNS, closed).find((s) => s.item === 'rusted-crypt-key')
-    expect(key([])).toBeUndefined()
-    expect(key(['saved-by-the-bell'])?.position).toEqual([...CASE_1_REWARD.position])
-    usePinStore.getState().clear()
+  it('the altar hands over the key, and it never lies in Pell\'s grave as well', () => {
+    useSpawnStore.getState().setWorld(createSpawnWorld())
+    useInventoryStore.getState().setInventory({ ...useInventoryStore.getState().inventory, keyItems: [] })
     useCaseStore.getState().closeCase('saved-by-the-bell')
     markCase1Reward()
-    const pin = usePinStore.getState().pins[0]
-    expect([pin.x, pin.z]).toEqual([CASE_1_REWARD.position[0], CASE_1_REWARD.position[2]])
+    expect(useInventoryStore.getState().inventory.keyItems).toContain(CASE_1_REWARD.item)
+    const lying = availableFixedSpawns(useSpawnStore.getState().world, 'day', FIXED_SPAWNS, ['saved-by-the-bell'])
+    expect(lying.find((s) => s.item === CASE_1_REWARD.item)).toBeUndefined()
   })
 })

@@ -1,18 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import fc from 'fast-check'
-import { DIG_TUTORIAL_MARKER } from './digGuidance'
-import type { Objective } from './objective'
 import {
   BEACON_FULL_M,
   BEACON_HIDE_M,
   flatDistance,
-  moundsAreObjective,
   objectiveInHutFromOutside,
   objectiveBeaconFade,
   objectiveBeaconLabel,
 } from './objectiveBeacon'
-
-const obj = (marker?: string): Objective => ({ rule: 6, main: 'x', second: '', position: [0, 0, 0], marker })
 
 describe('objectiveBeaconFade', () => {
   it('is gone up close and full from afar', () => {
@@ -61,14 +56,5 @@ describe('objectiveInHutFromOutside', () => {
 describe('flatDistance', () => {
   it('ignores height', () => {
     expect(flatDistance([0, 0, 0], [3, 9, 4])).toBe(5)
-  })
-})
-
-describe('moundsAreObjective', () => {
-  it('is true only while the objective points at a grave mound', () => {
-    expect(moundsAreObjective(obj(DIG_TUTORIAL_MARKER))).toBe(true)
-    expect(moundsAreObjective(obj('Ledger'))).toBe(false)
-    expect(moundsAreObjective(obj())).toBe(false)
-    expect(moundsAreObjective(null)).toBe(false)
   })
 })

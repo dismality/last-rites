@@ -1,8 +1,7 @@
 // Diggable grave mounds. Each is an Interactable "dig" target; the hold-E dig itself runs in
 // digStore at the fixed step. A mound shows nothing on top: loot appears only after the dig.
-// By day the dig glyph shows from afar only while digging is the objective; otherwise it shows
-// in lantern range like any other target. The objective beacon (ObjectiveBeacon.tsx) marks the
-// mound the objective points at.
+// By day the dig glyph shows from afar while the dig tutorial hint is up; otherwise it shows in
+// lantern range like any other target. Digging is never the objective, so no beacon marks a mound.
 
 import { useEffect } from 'react'
 import { Clone, useGLTF } from '@react-three/drei'
@@ -11,7 +10,9 @@ import { DRACO_PATH, propModelUrl } from '../../data/assets'
 import '../assets/preloadModels'
 import { useGuidanceStore } from '../../game/state/guidanceStore'
 import { MOUND_DAY_RUNE_RANGE_M } from '../../game/systems/digGuidance'
-import { moundsAreObjective } from '../../game/systems/objectiveBeacon'
+import { currentTutorialStep } from '../../game/systems/tutorial'
+import { DIG_STEP_ID } from '../../data/tutorialSteps'
+import { useSettingsStore } from '../../game/state/settingsStore'
 import { useDigStore, diggableGraves, DIG_ID_PREFIX } from '../../game/state/digStore'
 import { useWorldStore } from '../../game/state/worldStore'
 import { useToastStore } from '../../game/state/toastStore'
@@ -42,7 +43,10 @@ export function GraveMounds() {
     [],
   )
 
-  const digObjective = useGuidanceStore((s) => moundsAreObjective(s.objective))
+  const digStep = useGuidanceStore((s) => currentTutorialStep(s.tutorialDone) === DIG_STEP_ID)
+  const prompts = useSettingsStore((s) => s.tutorialPrompts)
+  const firstDay = useWorldStore((s) => s.phase === 'day' && s.nightNumber === 1)
+  const digHint = digStep && prompts && firstDay
 
   return (
     <>
@@ -54,7 +58,7 @@ export function GraveMounds() {
             subject={g.id}
             runeHeight={1.9}
             runeScale={0.5}
-            dayRuneRange={digObjective ? MOUND_DAY_RUNE_RANGE_M : undefined}
+            dayRuneRange={digHint ? MOUND_DAY_RUNE_RANGE_M : undefined}
             onInteract={() => {
               // Holding E digs (digStore); this rising edge only explains why it can't start.
               const why = useDigStore.getState().blockedReason(g.id)
