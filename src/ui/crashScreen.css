@@ -1,0 +1,50 @@
+/* The crash and no-WebGL card (CrashScreen.tsx): parchment on ink, like the journal. */
+.crash {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: radial-gradient(ellipse at 50% 40%, var(--ink-mid) 0%, var(--ink) 75%);
+  z-index: 1000;
+}
+
+.crash__card {
+  max-width: 34rem;
+  padding: 1.75rem 2rem;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 2px solid var(--parchment-dark);
+  box-shadow: 0 0 40px rgba(232, 145, 58, 0.25);
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  line-height: 1.45;
+}
+
+.crash__title {
+  margin: 0 0 0.75rem;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  color: var(--blood);
+}
+
+.crash__line {
+  margin: 0 0 0.75rem;
+}
+
+.crash__button {
+  margin-top: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  font: inherit;
+  color: var(--parchment);
+  background: var(--ink);
+  border: 2px solid var(--ember);
+  cursor: pointer;
+}
+
+.crash__button:hover,
+.crash__button:focus-visible {
+  background: var(--ink-mid);
+  outline: 2px solid var(--ember-glow);
+  outline-offset: 2px;
+}

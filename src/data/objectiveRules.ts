@@ -375,8 +375,9 @@ export const STAGE_DAY_RULES: Readonly<Record<1 | 2 | 3, readonly StageDayRule[]
 
 /** Shown once when a stage's first day begins (not on a load): where the new case starts. */
 export const STAGE_OPENING: Readonly<Partial<Record<1 | 2 | 3, string>>> = {
-  2: 'The altar gave up the Rusted Crypt Key. It opens the Mausoleum Row gate.',
-  3: 'Two cases closed. Elias’s last page says to look for the Crane crypt.',
+  // The three answers are all Vanes by design; these say so, so it never reads as a bug (playtest, 2026-11-28).
+  2: 'The altar gave up the Rusted Crypt Key. It opens the Mausoleum Row gate. Josiah Vane signed Pell into the ground; mind where else that name turns up.',
+  3: 'Two cases closed, and both ended at a Vane. That is no accident. Elias’s last page says to look for the Crane crypt.',
 }
 
 /** Both tracker lines are cut to this many characters. */

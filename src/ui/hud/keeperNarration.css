@@ -1,9 +1,12 @@
 .keeper-say {
   position: fixed;
   left: 50%;
-  bottom: 20px;
+  /* Above the hotbar and the stamina bar, between the side panels: at the old bottom: 20px and
+     760px wide it covered hotbar slot 1 and the stamina bar at 1024 and 1280 wide (playtest, 2026-11-28). */
+  bottom: 128px;
   transform: translateX(-50%);
-  width: min(760px, calc(100vw - 32px));
+  width: clamp(420px, calc(100vw - 620px), 720px);
+  max-width: calc(100vw - 32px);
   display: flex;
   justify-content: center;
   /* Above every overlay (minigames 236, journal, altar), so the keeper is heard over them. */

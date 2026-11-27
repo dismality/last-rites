@@ -71,6 +71,17 @@ const exploredRelicSites = (): Vec3[] => {
   return sites
 }
 
+/** Night-only relic sites not yet collected (the Child's Locket's grave). */
+const nightRelicSites = (): Vec3[] => {
+  const inv = useInventoryStore.getState().inventory
+  const mystery = useMysteryStore.getState().mystery
+  const taken = useSpawnStore.getState().world.collectedFixed
+  return RELICS.filter((r) => !inv.relics.includes(r.id) && !mystery.relics.has(r.id))
+    .map((r) => FIXED_SPAWNS.find((f) => f.id === r.location))
+    .filter((s): s is NonNullable<typeof s> => s !== undefined && s.nightOnly === true && !taken.includes(s.id))
+    .map((s) => s.position)
+}
+
 export const readObjectiveInput = (): ObjectiveInput => {
   const world = useWorldStore.getState()
   const inv = useInventoryStore.getState().inventory
@@ -120,6 +131,7 @@ export const readObjectiveInput = (): ObjectiveInput => {
       relics,
     },
     relicSites: exploredRelicSites(),
+    nightRelicSites: nightRelicSites(),
     playerPos: player.position,
     story,
     ...(story ? { stage: readStageInput() } : {}),

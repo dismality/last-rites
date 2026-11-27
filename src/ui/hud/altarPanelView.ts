@@ -23,8 +23,14 @@ export const LINK_MESSAGE =
   'The altar wants more than a guess. Link one more clue on the case board (Journal, Case board tab), then answer again.'
 export const READY_MESSAGE = 'Check each blank, then give your answer. A wrong one wakes the dead.'
 
-export function altarStatus(altar: AltarState, now: number, phase: Phase, links: number): AltarStatus {
-  const v = giveAnswer(altar, now, phase, links, true, 'case')
+export function altarStatus(
+  altar: AltarState,
+  now: number,
+  phase: Phase,
+  links: number,
+  linksLeft = Number.POSITIVE_INFINITY,
+): AltarStatus {
+  const v = giveAnswer(altar, now, phase, links, true, 'case', linksLeft)
   switch (v.kind) {
     case 'day':
       return { kind: 'day', text: phase === 'day' ? DAY_MESSAGE : EARLY_MESSAGE }
@@ -41,13 +47,13 @@ export function altarStatus(altar: AltarState, now: number, phase: Phase, links:
 export function verdictMessage(v: AltarVerdict | { kind: 'incomplete' }): string | null {
   switch (v.kind) {
     case 'incomplete':
-      return 'Fill every blank before you answer.'
+      return 'The altar does not do blanks. Fill every one, then answer.'
     case 'solved':
       return null
     case 'wrong':
-      return 'A sour note. The dead are rising and the altar is silent for 30 seconds.'
+      return 'A sour note, and the dead take it personally. They are rising, and the altar sulks for 30 seconds. Check your blanks against the case board.'
     case 'wrong-accusation':
-      return 'The accusation rings false, but nothing stirs.'
+      return 'The accusation rings false. Nothing stirs, not even out of politeness.'
     case 'locked':
       return `The altar is silent: ${clock(v.secondsLeft)}`
     case 'needs-link':
@@ -70,7 +76,7 @@ export function accusationMessage(
     case 'ask':
       return v.reply
     case 'incomplete':
-      return 'Type a name before you answer.'
+      return 'The altar cannot hear a name you have not typed.'
     case 'closed':
       return 'The altar hears the name only at night.'
     default:

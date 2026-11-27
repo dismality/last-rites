@@ -4,6 +4,7 @@
 // Pure zustand: no React / three.js imports.
 
 import { create } from 'zustand'
+import { caseOfStage } from '../../data/cases'
 import { STAGE_COUNT, type StageNumber } from '../../data/stages'
 import { giveAnswer, INITIAL_ALTAR_STATE, type AltarState, type AltarVerdict } from '../systems/altarAnswer'
 import { markCaseSolved, startStage, tickStageNight } from '../systems/stage'
@@ -77,7 +78,8 @@ export const useStageStore = create<StageStoreState>((set, get) => ({
   giveAltarAnswer: (correct, linksNow, kind) => {
     const s = get()
     const phase = useWorldStore.getState().phase
-    const verdict = giveAnswer(s.altar, s.nightElapsed, phase, linksNow, correct, kind)
+    const linksLeft = Math.max(0, caseOfStage(s.stage).notes.length - linksNow)
+    const verdict = giveAnswer(s.altar, s.nightElapsed, phase, linksNow, correct, kind, linksLeft)
     // A right accusation never ends the night: it does not change whether the run is won (Req 18.5).
     if (verdict.kind === 'solved') {
       if (kind === 'case') get().solveCase()

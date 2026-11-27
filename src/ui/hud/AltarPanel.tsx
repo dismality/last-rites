@@ -52,7 +52,7 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
     () => correctLinkCount({ links: progress.links }, def),
     [progress.links, def],
   )
-  const status = altarStatus(altar, now, phase, links)
+  const status = altarStatus(altar, now, phase, links, Math.max(0, def.notes.length - links))
 
   // Focus the first blank so the keyboard works at once.
   useEffect(() => {
@@ -94,7 +94,7 @@ function AltarPanelBody({ onClose }: { onClose: () => void }) {
 
   const answer = () => {
     const verdict = useCaseStore.getState().giveAnswer(typed)
-    setResult(verdict.kind === 'incomplete' && typedQuestion ? 'Type a name before you answer.' : (verdictMessage(verdict) ?? ''))
+    setResult(verdict.kind === 'incomplete' && typedQuestion ? 'The altar cannot hear a name you have not typed.' : (verdictMessage(verdict) ?? ''))
   }
 
   return (

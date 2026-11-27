@@ -23,4 +23,21 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['@react-three/rapier'],
   },
+  // The libraries in their own files (playtest, 2026-11-28): one 4.3 MB file became several, so the
+  // browser fetches them side by side and a redeploy of the game code leaves the libraries cached.
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            { name: 'vendor-three', test: /node_modules[\/]three[\/]/ },
+            { name: 'vendor-physics', test: /node_modules[\/]@dimforge[\/]/ },
+            { name: 'vendor-r3f', test: /node_modules[\/](@react-three|three-stdlib|postprocessing|maath|troika)/ },
+            { name: 'vendor-react', test: /node_modules[\/](react|react-dom|scheduler|zustand)[\/]/ },
+            { name: 'vendor', test: /node_modules[\/]/ },
+          ],
+        },
+      },
+    },
+  },
 })

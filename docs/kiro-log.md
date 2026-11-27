@@ -2510,3 +2510,23 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **Decisions made unattended:**
   - Hounds take the two small slots before crawlers, since the ladder brings hounds in first; so story waves now hold no crawlers. (2026-11-28)
   - The e2e specs that pick Short Vigil on the menu are left for the later e2e pass. (2026-11-28)
+
+### 2026-11-28: Judge-readiness pass: altar softlock, guidance, e2e, mischief, docs
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Altar softlock fixed:** after two wrong answers the altar asked for "one more link on the case board", but the playtest cases have no links, so it could never take an answer again. The link rule now applies only while a case still has links to make. Unit tests cover both.
+  - **Cart ruts clue:** its hidden hit box covered only the first 45 cm of the 1.4 m ruts, so a look between the wheel lines found nothing. The box now covers the whole ruts. The Case 3 e2e (mouse and keyboard) passes again.
+  - **Night relic marker:** when only the Child's Locket (night-only) is left, the relic step by day points at its grave and says "The smallest grave keeps its gift for the dark. Come back after dusk." Before, the step had no marker.
+  - **Guidance property test:** a new fast-check property checks that no day step of any stage is left without a marker, and that a finished day says what to do next.
+  - **Stage openings:** stages 2 and 3 now say the repeated Vane name is on purpose.
+  - **Mode picker text:** Developer mode says it is for players short on time ("jump to any stage").
+  - **Mischief in the keeper's voice:** new wrong-answer, blank-answer and ledger lines, and a new crash card and no-WebGL card (before, both left a blank page), each with one clear thing to do next.
+  - **Keeper's line box:** raised above the hotbar and the stamina bar and narrowed to fit between the side panels; it covered hotbar slot 1 at 1024 and 1280 wide.
+  - **Download split:** the libraries are built into their own files (three.js, physics, React Three Fiber, others), so the browser fetches them side by side and a redeploy leaves them cached.
+  - **E2E specs:** the help, playthrough and story specs pick Normal or Developer mode instead of Short Vigil, wait for Normal's 6-minute day, and find the ledger dialog by its current title.
+  - **Docs:** the walkthrough is rewritten for the current cases (Josiah Vane, Vane & Sons, the handwriting and Silas Vane); the manual's case and mode sections and the README match the game; the README gains a "Built with Kiro" table, a "Learn from it" section and a quick path for judges; the submission kit has new numbers, a description, write-up drafts and a new video script.
+- **What Kiro caught or sped up:** The Kiro specs and their correctness properties gave the shape of the new guidance property. Kiro's cases, altar rules, guidance, HUD, e2e walker and docs are kept; these changes sit on top.
+- **Decisions made unattended:**
+  - With no links to make, a wrong answer still costs a wave and 30 seconds of silence, but never locks the altar for good. (2026-11-28)
+  - The playthrough test now waits up to 8 minutes per phase and 75 minutes in all, for Normal's longer days. (2026-11-28)
+  - The physics engine is still one 2.1 MB file; making it load later would need a bigger change, left for after the hackathon. (2026-11-28)

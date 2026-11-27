@@ -30,7 +30,7 @@ describe('altarStatus', () => {
 describe('verdictMessage', () => {
   it('has words for every verdict and none for a solved case', () => {
     expect(verdictMessage({ kind: 'solved' })).toBeNull()
-    expect(verdictMessage({ kind: 'incomplete' })).toMatch(/Fill every blank/)
+    expect(verdictMessage({ kind: 'incomplete' })).toMatch(/Fill every one/)
     expect(verdictMessage({ kind: 'locked', secondsLeft: 61 })).toBe('The altar is silent: 1:01')
     expect(verdictMessage({ kind: 'needs-link' })).toBe(LINK_MESSAGE)
     expect(verdictMessage({ kind: 'day' })).toBe(DAY_MESSAGE)

@@ -179,7 +179,7 @@ export interface BellPostDef {
 }
 
 /** Shown when a ledger flag is wrong (requirement 12.4). */
-export const LEDGER_WRONG_FLAG_MESSAGE = 'These two agree'
+export const LEDGER_WRONG_FLAG_MESSAGE = 'These two agree. The ledger is innocent on this one'
 
 /** Shown when the wrong post is named as the cut bell (requirement 13.4). */
 export const BELL_WRONG_POST_MESSAGE = 'That bell rang when you pulled it. Which one stayed silent?'

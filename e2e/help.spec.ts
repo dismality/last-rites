@@ -2,9 +2,10 @@ import { test, expect, type Page } from '@playwright/test'
 import { mkdirSync, writeFileSync } from 'node:fs'
 
 // Spec 10 task 7.3 (Req 24.1-24.8): help for stuck players and judges, in real Chrome.
-// - A new Short Vigil game from the real mode select (keyboard only) reaches the first Minigame
-//   within 3 minutes of pressing Begin; the time is logged.
-// - Its day lasts 2 minutes.
+// - A new game in Developer mode from the real mode select (keyboard only) reaches the first
+//   Minigame within 3 minutes of pressing Begin; the time is logged. (Playtest 2026-11-28: the
+//   menu offers Normal and Developer mode only; both play Normal.)
+// - Its day lasts the Normal 6 minutes.
 // - After 2 minutes of day play without a clue the lantern flame leans toward the nearest unfound
 //   clue, to the side it lies on.
 // - The dawn card shows the next case's clue count (screenshot pair).
@@ -92,20 +93,20 @@ async function useProp(page: Page, id: string): Promise<void> {
   await expect(shell, `E at ${id} opens its Minigame`).toBeVisible()
 }
 
-/** Title -> New Game -> Short Vigil (arrow keys) -> Begin (Enter) -> intro skipped (Enter). */
-async function beginShortVigil(page: Page): Promise<{ errors: string[]; begun: number }> {
+/** Title -> New Game -> Developer mode (arrow keys) -> Begin (Enter) -> intro skipped (Enter). */
+async function beginDeveloperMode(page: Page): Promise<{ errors: string[]; begun: number }> {
   const errors: string[] = []
   page.on('pageerror', (e) => errors.push(e.message))
   await page.goto('/?dev=1')
   await page.waitForFunction(() => window.__lastRites !== undefined)
   await page.evaluate(() => window.__lastRites!.setScreen('title'))
   await page.getByRole('button', { name: 'New Game' }).click()
-  const radio = page.getByRole('radio', { name: /Short Vigil/ })
+  const radio = page.getByRole('radio', { name: /Developer mode/ })
   await expect(radio).toBeVisible()
   await page.getByRole('radio', { checked: true }).focus()
   for (let i = 0; i < 4 && !(await radio.isChecked()); i++) await page.keyboard.press('ArrowDown')
   await expect(radio).toBeChecked()
-  await expect(page.getByText('3 stages, 2-minute days, 100% oil')).toBeVisible()
+  await expect(page.getByText('The same game as Normal')).toBeVisible()
   await page.keyboard.press('Tab')
   await expect(page.getByRole('button', { name: 'Begin' })).toBeFocused()
   const begun = Date.now()
@@ -120,13 +121,13 @@ async function beginShortVigil(page: Page): Promise<{ errors: string[]; begun: n
     { timeout: 90_000 },
   )
   await page.evaluate(() => window.__lastRites!.keepAlive(true))
-  expect(await page.evaluate(() => (window.__lastRites!.snapshot('progression') as { mode: string }).mode)).toBe('short-vigil')
+  expect(await page.evaluate(() => (window.__lastRites!.snapshot('progression') as { mode: string }).mode)).toBe('normal')
   return { errors, begun }
 }
 
-test('Short Vigil from the mode select: the first Minigame within 3 minutes, and a 2-minute day', async ({ page }) => {
+test('Developer mode from the mode select: the first Minigame within 3 minutes, and a 6-minute day', async ({ page }) => {
   test.setTimeout(240_000)
-  const { errors, begun } = await beginShortVigil(page)
+  const { errors, begun } = await beginDeveloperMode(page)
   const spawn = (await page.evaluate(() => window.__lastRites!.body()!.feet)) as number[]
   const shelf = (await page.evaluate(() => window.__lastRites!.interactableCentre('ledger-shelf')))!
 
@@ -139,25 +140,27 @@ test('Short Vigil from the mode select: the first Minigame within 3 minutes, and
   const walkSeconds = metres / 3.0
   mkdirSync(LOGS, { recursive: true })
   writeFileSync(
-    `${LOGS}/short-vigil-first-minigame.json`,
+    `${LOGS}/first-minigame.json`,
     JSON.stringify(
-      { mode: 'short-vigil', wallSecondsFromBegin: wall, gameSecondsIntoDay: gameSeconds, spawnToShelfMetres: metres, walkSeconds, limitSeconds: 180 },
+      { mode: 'normal', wallSecondsFromBegin: wall, gameSecondsIntoDay: gameSeconds, spawnToShelfMetres: metres, walkSeconds, limitSeconds: 180 },
       null,
       2,
     ),
   )
   console.log(
-    `[help] Short Vigil: first Minigame open ${wall.toFixed(1)} s after Begin (${gameSeconds.toFixed(1)} s into the day); ` +
+    `[help] Developer mode: first Minigame open ${wall.toFixed(1)} s after Begin (${gameSeconds.toFixed(1)} s into the day); ` +
       `walk from spawn ${metres.toFixed(1)} m = ${walkSeconds.toFixed(1)} s`,
   )
   expect(wall + walkSeconds).toBeLessThan(180)
-  await expect(page.getByRole('dialog', { name: 'Ledger Cross-check' })).toBeVisible()
+  await expect(page.getByRole('dialog', { name: 'The parish ledger' })).toBeVisible()
   await page.keyboard.press('Escape')
   await expect(page.locator('.minigame-shell')).toHaveCount(0)
 
-  // The day is 120 s: put the clock at 115 s and dusk arrives within a few real seconds
-  // (a Normal day would run on to 360 s).
-  await page.evaluate(() => window.__lastRites!.setClock({ phaseTime: 115 }))
+  // The Normal day is 360 s: at 350 s dusk is still to come, at 355 s it arrives within seconds.
+  await page.evaluate(() => window.__lastRites!.setClock({ phaseTime: 350 }))
+  await page.waitForTimeout(1000)
+  expect((await world(page)).phase).toBe('day')
+  await page.evaluate(() => window.__lastRites!.setClock({ phaseTime: 355 }))
   await page.waitForFunction(() => (window.__lastRites!.snapshot('world') as WorldSnap).phase === 'dusk', undefined, {
     timeout: 20_000,
   })

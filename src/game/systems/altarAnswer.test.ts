@@ -103,3 +103,25 @@ describe('giveAnswer properties', () => {
     )
   })
 })
+
+describe('a case with no links to make (playtest, 2026-11-28)', () => {
+  it('never asks for a link, so wrong answers can never lock the altar for good', () => {
+    let a = INITIAL_ALTAR_STATE
+    for (let k = 0; k < 6; k++) {
+      const now = 1000 * (k + 1)
+      const v = giveAnswer(a, now, 'night', 0, false, 'case', 0)
+      expect(v.kind).toBe('wrong')
+      if (v.kind === 'wrong') a = v.state
+    }
+    expect(giveAnswer(a, 1e6, 'night', 0, true, 'case', 0).kind).toBe('solved')
+  })
+
+  it('with links still to make, the old rule holds after two wrong answers', () => {
+    let a = INITIAL_ALTAR_STATE
+    for (let k = 0; k < 2; k++) {
+      const v = giveAnswer(a, 1000 * (k + 1), 'night', 0, false, 'case', 3)
+      if (v.kind === 'wrong') a = v.state
+    }
+    expect(giveAnswer(a, 1e6, 'night', 0, true, 'case', 3).kind).toBe('needs-link')
+  })
+})

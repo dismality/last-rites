@@ -270,10 +270,18 @@ function WalkClue({ clue }: { clue: WalkClueDef }) {
         }}
       >
         <WalkClueShape look={walkLook(clue)} />
-        {/* A flat prop is thin, so a hidden box gives the crosshair something to land on. */}
-        <mesh visible={false} position={[0, 0.12, 0]}>
-          <boxGeometry args={[0.45, 0.3, 0.45]} />
-        </mesh>
+        {/* A flat prop is thin, so a hidden box gives the crosshair something to land on. The ruts
+            run 1.4 m back from their start, two wheels 0.9 m apart: the box covers all of them, or a
+            look between the wheel lines would find nothing (playtest, 2026-11-28). */}
+        {walkLook(clue) === 'ruts' ? (
+          <mesh visible={false} position={[0, 0.12, -0.7]}>
+            <boxGeometry args={[1.2, 0.3, 1.5]} />
+          </mesh>
+        ) : (
+          <mesh visible={false} position={[0, 0.12, 0]}>
+            <boxGeometry args={[0.45, 0.3, 0.45]} />
+          </mesh>
+        )}
       </Interactable>
     </group>
   )

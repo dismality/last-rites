@@ -50,6 +50,11 @@ export interface ObjectiveInput {
    * the tracker can never point at a site the player has not discovered (pillar 3).
    */
   relicSites: readonly Vec3[]
+  /**
+   * Uncollected relics that only lie out at night (the Child's Locket). By day, once they are all
+   * that is left, the relic step points at their spot and says to come back after dusk. Absent: none.
+   */
+  nightRelicSites?: readonly Vec3[]
   playerPos: Vec3
   /** False for Endless: no story rules (5-10) and no rite rules (2-3). Absent means story. */
   story?: boolean
@@ -325,10 +330,19 @@ const stageDayObjective = (i: ObjectiveInput): Objective | null => {
     marker: rule.marker,
     why: rule.why,
   }
+  if (place.kind === 'nearest-relic' && !position && (i.nightRelicSites?.length ?? 0) > 0) {
+    // Only a night relic left (playtest, 2026-11-28): before, the step had no marker at all.
+    o.position = nearest(i.nightRelicSites!, i.playerPos)
+    o.why = NIGHT_RELIC_WHY
+    return o
+  }
   if (position) o.position = position
   if (place.kind === 'area') o.areaM = place.radiusM
   return o
 }
+
+/** The relic step's line when only a relic that shows itself at night is left. */
+export const NIGHT_RELIC_WHY = 'The smallest grave keeps its gift for the dark. Come back after dusk.'
 
 export const selectObjective = (i: ObjectiveInput): Objective => {
   const matched = matchRule(i)

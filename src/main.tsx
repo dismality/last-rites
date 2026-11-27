@@ -4,6 +4,8 @@ import { useSettingsStore } from './game/state/settingsStore'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './ui/theme/tokens.css'
+import { CrashBoundary, CrashCard } from './ui/CrashScreen'
+import { hasWebGL, NO_WEBGL_LINES, NO_WEBGL_TITLE } from './ui/crashScreenText'
 import App from './App'
 import { installAutosave, installNewDaySave } from './game/state/gameSave'
 import { installRunStats } from './game/state/endingStore'
@@ -61,6 +63,12 @@ if (!root) throw new Error('Root element not found')
 
 createRoot(root).render(
   <StrictMode>
-    <App />
+    {hasWebGL() ? (
+      <CrashBoundary>
+        <App />
+      </CrashBoundary>
+    ) : (
+      <CrashCard title={NO_WEBGL_TITLE} lines={NO_WEBGL_LINES} />
+    )}
   </StrictMode>,
 )

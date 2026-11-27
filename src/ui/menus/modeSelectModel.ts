@@ -23,12 +23,15 @@ export function modeOptions(): ModeOption[] {
     {
       id: 'normal',
       label: 'Normal',
-      lines: ['The three stages and the rite', 'Developer tools off'],
+      lines: ['The three stages and the rite, as the keeper lived them', 'Nothing can hurt you by day: take your time'],
     },
     {
       id: 'developer',
       label: 'Developer mode',
-      lines: ['The same game as Normal', '] skips the current step, ` opens the dev panel'],
+      lines: [
+        'The same game as Normal',
+        'Short on time? ] skips the current step, ` opens the dev panel to jump to any stage',
+      ],
     },
   ]
 }

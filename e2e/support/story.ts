@@ -1,4 +1,4 @@
-// The full Short Vigil story for the playthrough test (spec 10 task 12), one function per stage.
+// The full Normal story for the playthrough test (spec 10 task 12), one function per stage.
 // Only `page.mouse` and `page.keyboard` act; the debug hook is read for state. See walker.ts.
 
 import { expect, type Locator, type Page } from '@playwright/test'
@@ -121,14 +121,14 @@ export async function openMinigame(page: Page, id: string): Promise<void> {
 // Start, god mode, the clock
 // ---------------------------------------------------------------------------
 
-/** New Game in Short Vigil through the real menus; returns the wall-clock time Begin was clicked. */
+/** New Game in Normal through the real menus; returns the wall-clock time Begin was clicked. */
 export async function newGame(page: Page): Promise<number> {
   await page.goto('/?dev=1')
   await page.waitForFunction(() => window.__lastRites !== undefined)
   const cont = page.getByRole('button', { name: 'Continue' })
   if (await cont.isVisible().catch(() => false)) await click(page, cont)
   await click(page, page.getByRole('button', { name: 'New Game' }))
-  await click(page, page.getByRole('radio', { name: /Short Vigil/ }))
+  await click(page, page.getByRole('radio', { name: /^Normal/ }))
   const begun = Date.now()
   await click(page, page.getByRole('button', { name: 'Begin' }))
   // The intro: Space skips it.
@@ -148,7 +148,7 @@ export async function newGame(page: Page): Promise<number> {
   expect(
     (await page.evaluate(() => window.__lastRites!.snapshot('progression') as { mode: string }))
       .mode,
-  ).toBe('short-vigil')
+  ).toBe('normal')
   await relock(page)
   return begun
 }
@@ -170,7 +170,7 @@ export async function godMode(page: Page): Promise<void> {
 }
 
 /** Waits (playing nothing) until the given phase arrives: the real clock, no skip. */
-export async function waitPhase(page: Page, phase: string, timeoutMs = 300_000): Promise<void> {
+export async function waitPhase(page: Page, phase: string, timeoutMs = 480_000): Promise<void> {
   await page.waitForFunction(
     (p) => (window.__lastRites!.snapshot('world') as { phase: string }).phase === p,
     phase,

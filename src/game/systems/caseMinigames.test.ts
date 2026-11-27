@@ -45,7 +45,7 @@ describe('ledgerFlags (1a)', () => {
 
   it('rejects a flag on two lines that agree with the message', () => {
     const v = ledgerFlags([{ stoneId: 'marsh', ledgerId: 'l-marsh', kind: 'date' }])
-    expect(v).toEqual({ ok: false, firstWrong: 0, message: 'These two agree' })
+    expect(v).toEqual({ ok: false, firstWrong: 0, message: 'These two agree. The ledger is innocent on this one' })
   })
 
   // Feature: 10-curse-stages, Property 16: Right answers accepted, wrong answers rejected

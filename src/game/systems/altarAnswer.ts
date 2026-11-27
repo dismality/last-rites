@@ -38,12 +38,16 @@ export function giveAnswer(
   linksNow: number,
   correct: boolean,
   kind: 'case' | 'accusation',
+  /** Right links still to make on the case board. With none left the link rule cannot apply. */
+  linksLeft = Number.POSITIVE_INFINITY,
 ): AltarVerdict {
   if (phase !== 'night') return { kind: 'day' }
   if (now < a.lockedUntil) return { kind: 'locked', secondsLeft: Math.ceil(a.lockedUntil - now) }
   // The link rule guards the case answer only; an accusation is not brute-forceable the same way
   // and costs nothing when wrong.
-  if (kind === 'case' && a.wrong >= WRONG_BEFORE_LINK && linksNow <= a.linksAtLastWrong) {
+  // A case with no links left to make (the playtest cases have none) never asks for one: it would
+  // lock the altar for good after two wrong answers (playtest, 2026-11-28).
+  if (kind === 'case' && linksLeft > 0 && a.wrong >= WRONG_BEFORE_LINK && linksNow <= a.linksAtLastWrong) {
     return { kind: 'needs-link' }
   }
   if (correct) return { kind: 'solved' }

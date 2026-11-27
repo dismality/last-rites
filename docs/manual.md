@@ -12,7 +12,7 @@ You are the new gravekeeper. The last keeper, Elias Thorne, vanished, and the de
 
 - **Play** in a desktop browser with a keyboard and mouse.
 - **Click the game** to lock the mouse. Press **Esc** to free it and pause.
-- **New Game** asks you to pick a mode (see section 10). **Continue** loads your latest save.
+- **New Game** asks for **Normal** or **Developer mode** (see section 10). **Continue** loads your latest save.
 - **The intro** can be skipped with **Space** or **Enter**.
 - **On your first day**, a short tutorial teaches the basics as you play.
 
@@ -50,7 +50,8 @@ You can rebind every key except Pause in **Settings → Controls**.
 - **Stamina.** Sprinting and kicking use it.
 - **Clock.** By day it counts down: "Dusk in m:ss".
 - **Controls hint.** A small panel above the health bar teaches the controls a few at a time: first moving, looking, sprinting, the lantern and using things; then the journal, satchel, items, map and pause; at dusk, the fighting keys. Each line fades once you've used it.
-- **Journal key.** When an objective needs the journal (linking clues, filling in the question, the rite's order), its key shows under the objective.
+- **Journal key.** When an objective needs the journal (a question to answer, the handwriting to compare, the rite's order), its key shows under the objective.
+- **The keeper speaks.** Short lines in the keeper's voice say what a find means. Press **Space** (or click the line) to skip to the next one.
 - **Outlines.** Things you can use or pick up get an outline when you look at them.
 
 ## 4. How a run works
@@ -74,20 +75,18 @@ The game has **three stages**. Each stage is one day, one night and a dawn.
 
 ## 5. Solving a case
 
-1. **Find clues.** Read gravestones, examine objects and pick up papers. Each clue becomes a pinned card in your journal (**J**, the **Case** tab).
-   - A clue you haven't found yet shows as a **face-down card** saying roughly where to look. Click it to drop a map pin there.
-2. **Solve the puzzles.** Some clues open small puzzles, such as checking records against the stones. The objective tells you where to go next, and the italic line under it tells you why. When a step is done, a short line says what you learned.
-3. **Link the evidence.** On the case board, join two cards that belong together with **red string**. Drag from one card to the other, or select one card, then the other, and press Enter.
-   - **A right pair** gets a solid string, a ✓ tag and a short note, and it lowers the **Curse meter**.
-   - **A wrong pair** costs nothing. Its string sags and falls away.
-4. **Fill in the answer.** The final question sits at the bottom of the board as a sentence with blanks. You can fill it in at any time.
-5. **Give the answer at the altar.** Go to the chapel altar **at night** and press **E**.
-   - Done early? Once every step is finished and every clue is linked, the altar's bell can **call the dusk now** for a small score bonus.
+1. **Follow the objective.** Each stage is a short chain of steps: read these stones, check this record, pull these bell cords. The objective names the step and a **pillar of lantern light** marks the place. The italic line under it says why it matters, and when a step is done a short line says what you learned.
+2. **Solve the puzzles.** Some steps open small puzzles, such as checking the parish ledger against the stones or putting a torn watch log in order. Everything you learn is written up in your journal (**J**, the **Case** tab).
+3. **Answer the question.** Once the steps are done, the Case tab asks the case's question, such as "Who silenced John Pell?". Type a name.
+4. **Give the answer at the altar.** Go to the chapel altar **at night** and press **E**.
+   - Done early? Once every step is finished, the altar's bell can **call the dusk now** for a small score bonus.
    - Listen for the warnings: a far bell tolls two minutes before dusk, and the graves tremble at thirty seconds.
    - **Right:** the waves stop, the dead fall to dust and the sun rises.
-   - **Wrong:** a wave arrives at once and the altar falls silent for 30 seconds. After two wrong answers, you must link one more pair of clues before trying again.
+   - **Wrong:** a wave arrives at once and the altar sulks, silent, for 30 seconds. Then you can try again.
 
-**Some things are red herrings.** Not every clue points at the truth. The deduction notes on linked pairs help you tell which ones do.
+**Some things are red herrings.** Not every clue points at the truth. A few things lie about the grounds to mislead you; the journal's write-up says which finds matter.
+
+**A name keeps turning up?** It is meant to. Hollowmere's three cases are one family's story.
 
 ### Hints
 Each case has three hints that you buy with Grave Coins: which cards matter, then the rule, then the answer. In the story modes, the last hint becomes **free** after the night has run for 3 minutes, so you can never be stuck for good.
@@ -185,11 +184,10 @@ Hollowmere is a horror game. Each scare is **telegraphed**: you get a warning so
 
 | Mode | What it's like |
 |---|---|
-| **Easy** | Weaker dead, slower oil burn. For the story. |
-| **Normal** | The intended experience. |
-| **Hard** | Tougher dead that hit harder. |
-| **Short Vigil** | The full story with 2-minute days and a full lantern. A run takes about 15 minutes. |
-| **Endless** | No story: survive as many nights as you can. No Retry Night. |
+| **Normal** | The three stages and the rite, as intended. |
+| **Developer mode** | The same game, with two helpers: **]** skips the current step, and **`** opens the developer panel, where you can jump to any stage. Handy if you only have a few minutes and want to see the later stages. |
+
+Developer mode can also be switched on or off any time in **Settings**.
 
 ## 11. Settings
 
