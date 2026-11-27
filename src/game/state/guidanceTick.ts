@@ -17,7 +17,6 @@ import { subscribeToType } from '../events'
 import { craneFighting } from '../systems/bossDirector'
 import { installControlHintWatchers } from './controlHintState'
 import { countRelics, riteAvailability } from '../systems/finalRite'
-import { cellAt, isExplored } from '../systems/mapReveal'
 import { redirectViaStair } from '../systems/stairDescent'
 import {
   selectObjective,
@@ -27,6 +26,7 @@ import {
   type Vec3,
 } from '../systems/objective'
 import { hintNear, hintPlacePosition } from '../systems/objectiveHint'
+import { bellQuestionOpen } from '../systems/caseMinigames'
 import {
   currentTutorialPlace,
   markActionDone,
@@ -42,7 +42,6 @@ import { useEndingStore } from './endingStore'
 import { useEnemyStore } from './enemyStore'
 import { isStoryRun, modeDayLengthS, useGuidanceStore } from './guidanceStore'
 import { useInventoryStore } from './inventoryStore'
-import { useMapStore } from './mapStore'
 import { useMysteryStore } from './mysteryStore'
 import { usePlayerStore } from './playerStore'
 import { useSettingsStore } from './settingsStore'
@@ -54,20 +53,20 @@ import { selectCorrectLinks, useCaseStore } from './caseStore'
 import { useWaveStore } from './waveStore'
 import { useWorldStore } from './worldStore'
 
-/** Relic sites not yet collected whose map cell is explored (no spoilers, pillar 3). */
+/** Relic sites not yet collected that can be picked up now (night-only ones are left out by day). */
 const exploredRelicSites = (): Vec3[] => {
   const inv = useInventoryStore.getState().inventory
   const mystery = useMysteryStore.getState().mystery
   const taken = useSpawnStore.getState().world.collectedFixed
-  const map = useMapStore.getState().map
   const sites: Vec3[] = []
   for (const relic of RELICS) {
     if (inv.relics.includes(relic.id) || mystery.relics.has(relic.id)) continue
     const spawn = FIXED_SPAWNS.find((f) => f.id === relic.location)
     // Night-only relics cannot be found by day, so they are never a day objective.
     if (!spawn || spawn.nightOnly || taken.includes(spawn.id)) continue
-    const c = cellAt(spawn.position[0], spawn.position[2])
-    if (isExplored(map, c.cx, c.cz)) sites.push(spawn.position)
+    // Every relic still lying out is a target, explored or not (playtest, 2026-11-27: with only
+    // explored ones counted, an unexplored map left the step with no marker at all).
+    sites.push(spawn.position)
   }
   return sites
 }
@@ -219,7 +218,10 @@ const readStageDaySteps = (stage: 1 | 2 | 3): DayStep[] => {
         ...(unread.length > 0 && !stonesDone ? { at: unread.map((g) => g.position) } : {}),
       },
       { count: solved('1a') ? graves.length : Math.min(graves.length, marked), done: solved('1a') },
-      { count: solved('1b') ? 3 : Math.min(3, examined.length), done: solved('1b'), ...(left.length > 0 ? { at: left } : {}) },
+      // Pell's cut cord found: the step jumps to the journal question, with no other bell to find.
+      bellQuestionOpen(examined)
+        ? { count: 3, done: solved('1b') }
+        : { count: Math.min(3, examined.length), done: solved('1b'), ...(left.length > 0 ? { at: left } : {}) },
     ]
   }
   if (stage === 2) {

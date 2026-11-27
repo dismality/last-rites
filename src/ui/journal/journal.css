@@ -73,6 +73,9 @@
 
 /* ---- Tabbed journal ---- */
 .journal__page--book { width: min(60rem, 94vw); align-items: stretch; }
+/* The page scrolls; its rows keep their full height. Without this a long Case tab shrank to the
+   window, spilled past its box and the Close button sat on top of it (playtest, 2026-11-27). */
+.journal__page > * { flex-shrink: 0; }
 .journal__panel { min-height: 20rem; padding: 0.75rem 0; }
 .journal__subtitle { margin: 0 0 0.5rem; font-family: var(--font-heading); font-size: 1.25rem; }
 .journal__count { margin: 0 0 0.75rem; font-family: var(--font-num); font-variant-numeric: tabular-nums; }

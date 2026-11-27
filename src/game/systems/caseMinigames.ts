@@ -82,8 +82,17 @@ export function bellClues(examined: readonly BellPostId[]): Case1ClueId[] {
 }
 
 /**
+ * The journal's "Which bell was cut?" opens once all three cords are pulled, or as soon as the cut
+ * one is: finding Pell's silent bell first skips the other two (playtest, 2026-11-27).
+ */
+export function bellQuestionOpen(examined: readonly BellPostId[]): boolean {
+  const cut = CASE_1_BELLS.find((p) => p.condition === 'rope-cut')
+  return CASE_1_BELLS.every((p) => examined.includes(p.id)) || (cut !== undefined && examined.includes(cut.id))
+}
+
+/**
  * Minigame 1b. A wrong "which bell was cut?" answer is rejected (`firstWrong` 0). With the right
- * answer, `ok` also needs all three posts examined, so all three clue cards are pinned.
+ * answer, `ok` also needs the question open (all three posts pulled, or the cut one).
  */
 export function bellPosts(input: BellPostsInput): MinigameVerdict {
   if (input.cutAnswer !== undefined) {
@@ -92,8 +101,7 @@ export function bellPosts(input: BellPostsInput): MinigameVerdict {
       return { ok: false, firstWrong: 0, message: BELL_WRONG_POST_MESSAGE }
     }
   }
-  const allExamined = CASE_1_BELLS.every((p) => input.examined.includes(p.id))
-  return { ok: allExamined && input.cutAnswer !== undefined }
+  return { ok: bellQuestionOpen(input.examined) && input.cutAnswer !== undefined }
 }
 
 /** The letters the five tiles must show: the first letter of each hymn the board names. */

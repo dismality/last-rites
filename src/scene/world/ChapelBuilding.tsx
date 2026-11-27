@@ -41,6 +41,8 @@ import { useStageStore } from '../../game/state/stageStore'
 import { useInventoryStore } from '../../game/state/inventoryStore'
 import { useMysteryStore } from '../../game/state/mysteryStore'
 import { useOverlayStore } from '../../game/state/overlayStore'
+import { useProgressionStore } from '../../game/state/progressionStore'
+import { MODES } from '../../data/modes'
 import { useWorldStore } from '../../game/state/worldStore'
 import '../assets/preloadModels'
 import { Slab } from './buildingParts'
@@ -58,12 +60,25 @@ const DOOR_HEIGHT = 2.5
 const DOOR_LANTERN = { color: '#e8913a', intensity: 3, distance: 9 } as const
 
 /**
+ * The whistle answers at the altar only once the stair matters. A story run finds the whistle in
+ * Kerr's locker in stage 2, but nothing leads below until stage 3's hymn board spells BELOW, so
+ * before stage 3 the whistle stays quiet and the altar takes the case as usual (playtest,
+ * 2026-11-27). Endless runs keep the whistle working at once.
+ */
+function useWhistleAtAltar(): boolean {
+  const hasWhistle = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
+  const story = useProgressionStore((s) => MODES[s.mode].story)
+  const stage = useStageStore((s) => s.stage)
+  return hasWhistle && (!story || stage >= 3)
+}
+
+/**
  * The whistle answers at the altar: stone shifts and the catacomb stair opens. The hotspot only
- * exists while the whistle is held and shows cues only while the stair is sealed, so ordinary
+ * exists while the whistle can be used and shows cues only while the stair is sealed, so ordinary
  * altar use is untouched.
  */
 function AltarStairReveal({ z }: { z: number }) {
-  const hasWhistle = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
+  const hasWhistle = useWhistleAtAltar()
   const day = useWorldStore((s) => s.phase === 'day')
   // Stays mounted after the stair opens so its cues fade; then it is used up and not targetable.
   // By day only: at dusk and night the same spot answers the case (CaseAltar), and the stair
@@ -98,7 +113,7 @@ function AltarStairReveal({ z }: { z: number }) {
  * spot, so this hotspot steps aside for it.
  */
 function CaseAltar({ z }: { z: number }) {
-  const whistleTurn = useInventoryStore((s) => s.inventory.keyItems.includes('bone-whistle'))
+  const whistleTurn = useWhistleAtAltar()
   const sealed = useMysteryStore((s) => !s.mystery.gates.catacombs)
   const day = useWorldStore((s) => s.phase === 'day')
   if (whistleTurn && sealed && day) return null

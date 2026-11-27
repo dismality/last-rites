@@ -5,7 +5,7 @@
 
 import { CASE_1_BELLS, type BellPostId } from '../../data/cases'
 import { CASE1_SAY } from '../../data/case1Narration'
-import { bellPosts, candidateGraves } from '../systems/caseMinigames'
+import { bellPosts, bellQuestionOpen, candidateGraves } from '../systems/caseMinigames'
 import { useCaseStore } from './caseStore'
 import { narrate } from './narrationStore'
 import { useGameStore } from './gameStore'
@@ -52,12 +52,12 @@ export function pullBellCord(id: BellPostId, sound?: BellSound): void {
 export type CutAnswer = { kind: 'right' } | { kind: 'wrong'; text: string } | { kind: 'not-yet' }
 
 /**
- * The journal's "Which bell was cut?". Opens once every cord is pulled. A wrong pick costs nothing
+ * The journal's "Which bell was cut?". Opens once every cord is pulled, or the cut one. A wrong pick costs nothing
  * (playtest); the right one solves minigame 1b, which pins its clue cards.
  */
 export function answerCutBell(id: BellPostId): CutAnswer {
   const p = progress()
-  if (!CASE_1_BELLS.every((b) => p.bellsExamined.includes(b.id))) return { kind: 'not-yet' }
+  if (!bellQuestionOpen(p.bellsExamined)) return { kind: 'not-yet' }
   const v = bellPosts({ examined: p.bellsExamined, cutAnswer: id })
   if (!v.ok) {
     const text = CASE1_SAY.cutWrong[id] || (v.message ?? '')

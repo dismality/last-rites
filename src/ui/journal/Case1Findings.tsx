@@ -8,7 +8,7 @@ import { CrestBadge } from '../minigames/case2Drawings'
 import '../minigames/case2.css'
 import { answerCutBell } from '../../game/state/case1Story'
 import { useCaseStore } from '../../game/state/caseStore'
-import { candidateGraves } from '../../game/systems/caseMinigames'
+import { bellQuestionOpen, candidateGraves } from '../../game/systems/caseMinigames'
 
 const CASE_ID = 'saved-by-the-bell'
 const nameOf = (stoneId: string) => CASE_1_STONES.find((s) => s.id === stoneId)?.name ?? stoneId
@@ -21,7 +21,8 @@ export function Case1Findings() {
   const graves = candidateGraves()
   const ledgerDone = p.minigames.includes('1a')
   const bellsDone = p.minigames.includes('1b')
-  const allPulled = CASE_1_BELLS.every((b) => p.bellsExamined.includes(b.id))
+  // Pulling Pell's cut cord opens the question at once; the other two need not be pulled.
+  const allPulled = bellQuestionOpen(p.bellsExamined)
 
   const pick = (id: BellPostId) => {
     const r = answerCutBell(id)

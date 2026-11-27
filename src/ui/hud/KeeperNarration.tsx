@@ -1,7 +1,7 @@
 // The keeper thinking aloud (narrationStore): one line at a time, low in the middle of the screen,
 // above every overlay so it reads over the ledger, the journal and the altar too. Each line stays
-// for `lineSeconds`, or for as long as its recording runs if that is longer; a click on it moves
-// on. Lines with a recording (voice/keeper-*.ogg, keeperVoiceFor) are read aloud; a new line, a
+// for `lineSeconds`, or for as long as its recording runs if that is longer; a click on it, or the
+// Skip key (Space), cuts it short and moves on to the next line. Lines with a recording (voice/keeper-*.ogg, keeperVoiceFor) are read aloud; a new line, a
 // click or leaving the game cuts the one playing. With no file the line is silent, as before. It
 // is part of the story, so it shows even with Subtitles off.
 import { useEffect } from 'react'
@@ -9,16 +9,25 @@ import { playRecorded } from '../../audio/AudioManager'
 import { sampleBuffer } from '../../audio/samples'
 import { keeperVoiceFor } from '../../data/keeperVoice'
 import { useGameStore } from '../../game/state/gameStore'
+import { useSettingsStore } from '../../game/state'
+import { useIntroStore } from '../../game/state/introStore'
+import { keyLabel } from '../../game/systems/interaction'
 import { lineSeconds, useNarrationStore } from '../../game/state/narrationStore'
 import './keeperNarration.css'
 
 /** Breath left after a recording ends before the next line. */
 const AFTER_VOICE_S = 0.5
 
+/** Keys pressed here belong to the control: typing a name, or a focused button or select. */
+const ownsKeys = (t: EventTarget | null): boolean =>
+  t instanceof HTMLElement &&
+  (t.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON'].includes(t.tagName))
+
 export function KeeperNarration() {
   const line = useNarrationStore((s) => s.queue[0] ?? null)
   const left = useNarrationStore((s) => s.queue.length)
   const screen = useGameStore((s) => s.screen)
+  const skipKey = useSettingsStore((s) => s.bindings.Skip)
 
   useEffect(() => {
     if (line === null || screen !== 'game') return
@@ -33,6 +42,20 @@ export function KeeperNarration() {
       window.clearTimeout(t)
       voice?.stop()
     }
+  }, [line, screen])
+
+  // The Skip key cuts the line on screen short (and its recording) and goes to the next one.
+  useEffect(() => {
+    if (line === null || screen !== 'game') return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.code !== useSettingsStore.getState().bindings.Skip) return
+      // The intro and the pause menu own the key while they are up; so does a focused control.
+      if (useIntroStore.getState().playing || useGameStore.getState().paused || ownsKeys(e.target)) return
+      e.preventDefault()
+      useNarrationStore.getState().next()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
   }, [line, screen])
 
   // A new run or leaving the game drops what was waiting.
@@ -57,6 +80,7 @@ export function KeeperNarration() {
             …
           </span>
         )}
+        <span className="keeper-say__skip">{keyLabel(skipKey)}: skip</span>
       </button>
     </div>
   )

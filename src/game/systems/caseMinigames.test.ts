@@ -99,7 +99,7 @@ describe('bellPosts (1b)', () => {
   })
 
   // Feature: 10-curse-stages, Property 16: Right answers accepted, wrong answers rejected
-  it('Property 16 (1b): accepted only with the cut post named and all posts examined', () => {
+  it('Property 16 (1b): accepted only with the cut post named, once all posts or the cut one are examined', () => {
     // Validates: Requirements 13.2, 13.4
     fc.assert(
       fc.property(
@@ -109,7 +109,7 @@ describe('bellPosts (1b)', () => {
           const v = bellPosts({ examined, cutAnswer })
           const wrongAnswer = cutAnswer !== undefined && cutAnswer !== cutId
           expect(v.ok).toBe(
-            !wrongAnswer && cutAnswer === cutId && examined.length === postIds.length,
+            !wrongAnswer && cutAnswer === cutId && (examined.length === postIds.length || examined.includes(cutId)),
           )
           if (wrongAnswer) expect(v.firstWrong).toBe(0)
         },
