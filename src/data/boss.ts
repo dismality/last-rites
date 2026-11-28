@@ -2,6 +2,10 @@
 // Pure data: no logic, no side effects.
 
 export const BOSS = {
+  /** Father Crane has no finished model yet, so he does not rise: the rite ends the case once the
+   *  five relics are laid, and the director goes straight to 'dead' (combatTick.stepBoss). The
+   *  rules below stay for when a model exists; set this back to true then. */
+  inPlay: false as boolean,
   /** Sim seconds after the first relic is placed before he rises. */
   riseAfterS: 10,
   riseTelegraphS: 1.5,

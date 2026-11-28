@@ -608,7 +608,7 @@ export async function stage3Night(page: Page): Promise<void> {
   await expectObjective(page, 'Finish the rite at the altar (5/5)')
 
   // First the name: a bare "Vane" is asked again, then Silas. Then the rite, relic by relic, with
-  // real clicks; Crane rises after the first.
+  // real clicks. Father Crane is out of play (BOSS.inPlay), so the last relic ends the case.
   const panel = await openAltar(page, 'The Rite of Rest')
   await typeAltarAnswer(page, panel, 'Vane')
   await expect(panel.locator('.altar-panel__result')).toContainText('Which Vane?')
@@ -619,15 +619,18 @@ export async function stage3Night(page: Page): Promise<void> {
   for (const [i, name] of RITE_ORDER.entries()) {
     await choose(page, slot(i).locator('select'), name)
     await click(page, slot(i).getByRole('button', { name: 'Lay it here' }))
-    await expect(slot(i).locator('.rite-panel__done')).toBeVisible({ timeout: 10_000 })
+    if (i < RITE_ORDER.length - 1) await expect(slot(i).locator('.rite-panel__done')).toBeVisible({ timeout: 10_000 })
   }
-  await page.keyboard.press('Escape')
-  await expect(panel).toHaveCount(0)
-  await relock(page)
-
-  await expect.poll(() => bossStage(page), { timeout: 45_000 }).toBe('risen')
-  await expectObjective(page, 'Put Father Crane to rest')
-  await fightCrane(page)
+  if ((await ended(page)) === null && (await panel.count()) > 0) {
+    await page.keyboard.press('Escape')
+    await relock(page)
+  }
+  // Only if Crane is switched back on: he rises after the first relic and must fall first.
+  if ((await bossStage(page)) !== 'dead' && (await ended(page)) === null) {
+    await expect.poll(() => bossStage(page), { timeout: 45_000 }).toBe('risen')
+    await expectObjective(page, 'Put Father Crane to rest')
+    await fightCrane(page)
+  }
 
   // The rite finishes: Justice for Elias, the walk out, the ending card.
   await expect.poll(() => ended(page), { timeout: 60_000 }).toBe('rest')

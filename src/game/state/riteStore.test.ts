@@ -1,4 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { BOSS } from '../../data/boss'
+import { RITE_SURGE } from '../../data/cemeteryLayout'
+import { useEnemyStore } from './enemyStore'
 import { RITE_ORDER } from '../../data/relics'
 import { initialBoss } from '../systems/bossDirector'
 import { useBossStore } from './bossStore'
@@ -65,7 +68,26 @@ describe('riteStore', () => {
     expect(useRiteStore.getState().place(0, RITE_ORDER[0]).kind).toBe('placed')
   })
 
+  it('with Father Crane out of play, the first relic wakes a surge of the ordinary dead', () => {
+    toStage3Night()
+    giveAll()
+    useEnemyStore.getState().setEnemies([])
+    useRiteStore.getState().place(0, RITE_ORDER[0])
+    const risen = useEnemyStore.getState().enemies
+    expect(risen.length).toBe(RITE_SURGE.length)
+    expect(risen.some((e) => e.type === 'father-crane')).toBe(false)
+  })
+
+  it('with Father Crane out of play, the five relics alone end the case in Rest', () => {
+    toStage3Night()
+    giveAll()
+    RITE_ORDER.forEach((r, slot) => useRiteStore.getState().place(slot, r))
+    // The ending clears the night (the boss with it), so the ending itself is the proof.
+    expect(useEndingStore.getState().ending).toBe('rest')
+  })
+
   it('holds five placed relics while Crane lives, then ends in Rest once he has fallen (Req 17.4, 17.5)', () => {
+    ;(BOSS as { inPlay: boolean }).inPlay = true
     toStage3Night()
     giveAll()
     RITE_ORDER.forEach((r, slot) => useRiteStore.getState().place(slot, r))
@@ -81,6 +103,7 @@ describe('riteStore', () => {
     expect(useEndingStore.getState().ending).toBe('rest')
     // The night's state, the altar included, is cleared with the ending.
     expect(useRiteStore.getState().rite.placed).toEqual({})
+    ;(BOSS as { inPlay: boolean }).inPlay = false
   })
 
   it('does not finish with fewer than five relics placed, even with Crane fallen', () => {

@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { CASE_MAP } from '../data/cases'
 import { useCaseStore } from '../game/state/caseStore'
 import { RITE_ORDER } from '../data/relics'
+import { useEndingStore } from '../game/state/endingStore'
 import { useInventoryStore } from '../game/state/inventoryStore'
 import { useOverlayStore } from '../game/state/overlayStore'
 import { useRiteStore } from '../game/state/riteStore'
@@ -114,7 +115,7 @@ describe('Stage 3 helpers', () => {
   it('lays the relics on the altar in rite order at the stage 3 night', () => {
     useWorldStore.setState({ phase: 'night' })
     expect(placeAllRelics()).toContain(`placed ${RITE_ORDER.length}`)
-    const placed = useRiteStore.getState().rite.placed
-    RITE_ORDER.forEach((r, i) => expect(placed[i]).toBe(r))
+    // Father Crane is out of play (BOSS.inPlay), so the last relic ends the case in Rest.
+    expect(useEndingStore.getState().ending).toBe('rest')
   })
 })

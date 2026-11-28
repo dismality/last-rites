@@ -1,4 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { BOSS } from '../../data/boss'
 import fc from 'fast-check'
 import { countItem } from '../systems/inventory'
 import type { Inventory } from '../types'
@@ -227,6 +228,13 @@ describe('tickCombat nailing', () => {
 
 describe('tickCombat: boss world effects', () => {
   const STEP = 1 / 60
+  // These cover Father Crane's fight, which is switched off until he has a model (BOSS.inPlay).
+  beforeEach(() => {
+    ;(BOSS as { inPlay: boolean }).inPlay = true
+  })
+  afterEach(() => {
+    ;(BOSS as { inPlay: boolean }).inPlay = false
+  })
   const run = (seconds: number, pos: readonly [number, number, number] = [0, 0, 0]) => {
     for (let i = 0; i < Math.round(seconds / STEP); i++) {
       tickCombat(STEP, { interactHeld: false, moving: false, playerPos: pos })

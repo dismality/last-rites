@@ -5,8 +5,8 @@ import { test, expect, type Page } from '@playwright/test'
 // Row gate, the hearse pin out of the Crane crypt door (3b) and Elias searched (3c), each by a real
 // E press at the real prop, and the four hands compared in the journal (3d) by clicks or keys. At
 // night the altar takes the name first ("Vane" is asked again, a wrong name costs nothing), then the
-// rite (a wrong relic, then the right order with Crane rising on the first); killing Crane finishes
-// it and the Justice for Elias epilogue plays. The dev hook only sets up (start, stage, positioning,
+// rite (a wrong relic, then the right order); the fifth relic finishes it (Father Crane is out of
+// play until he has a model) and the Justice for Elias epilogue plays. The dev hook only sets up (start, stage, positioning,
 // clock, relics in the satchel, kill stragglers) and reads state; no Dev_Panel solve action touches
 // an answer. Waits are polled state or rendered frame counts, never fixed sleeps (apart from the
 // held E key).
@@ -38,16 +38,12 @@ interface EndingSnap {
   ending: string | null
   stage: string
 }
-interface BossSnap {
-  stage: string
-}
 
 const stage = (page: Page) => page.evaluate(() => window.__lastRites!.stageState() as StageSnap)
 const caseState = (page: Page) => page.evaluate(() => window.__lastRites!.caseState() as CaseSnap)
 const solved = async (page: Page) => (await caseState(page)).cases[CASE_ID].minigames
 const mystery = (page: Page) => page.evaluate(() => window.__lastRites!.snapshot('mystery') as MysterySnap)
 const ending = (page: Page) => page.evaluate(() => window.__lastRites!.snapshot('ending') as EndingSnap)
-const boss = (page: Page) => page.evaluate(() => window.__lastRites!.snapshot('boss') as BossSnap)
 const enemyCount = (page: Page) =>
   page.evaluate(() => (window.__lastRites!.snapshot('enemies') as unknown[]).length)
 
@@ -309,16 +305,17 @@ test('mouse: hymn board wrong then right, the crypt, the handwriting, the name a
   await page.evaluate(() => window.__lastRites!.killAll())
   await expect(panel.locator('.altar-panel__status')).not.toContainText('silent', { timeout: 60_000 })
 
-  // The rite in order. The first relic starts Crane's 10 s clock.
+  // The rite in order. Father Crane is out of play (BOSS.inPlay), so the fifth relic ends the case.
   await pick(0, RITE[0])
   await expect(slot(0)).toContainText('First the prayer')
-  await expect.poll(async () => (await boss(page)).stage, { timeout: 45_000 }).toBe('risen')
-  for (let i = 1; i < RITE.length; i++) await pick(i, RITE[i])
-  await expect(panel.locator('.altar-panel__status')).not.toContainText('sour note')
-  expect((await stage(page)).caseSolved).toBe(false) // Crane lives: the placed relics wait for him
+  for (let i = 1; i < RITE.length - 1; i++) await pick(i, RITE[i])
+  await expect(slot(RITE.length - 2).locator('.rite-panel__done')).toBeVisible({ timeout: 10_000 })
+  expect((await stage(page)).altar.wrong).toBe(1) // only the wrong first try
+  expect((await stage(page)).caseSolved).toBe(false) // four of five: the rite waits for the last
   await shoot(page, 'case3-rite')
+  await pick(RITE.length - 1, RITE[RITE.length - 1])
 
-  // Crane falls, the rite finishes, and the name given adds the epilogue before the walk-out.
+  // The rite finishes, and the name given adds the epilogue before the walk-out.
   await finishRun(page, 'Space')
   expect(errors).toEqual([])
 })
@@ -377,15 +374,21 @@ test('keyboard only: hymn tiles, the crypt by E, the handwriting, the name and t
 
   // Relics by select type-ahead, Tab and Enter; focus must come back after each placement.
   const placedNames = ['Crane', 'Sexton', 'Child', 'Burial', 'Reliquary']
-  for (const name of placedNames) {
+  for (const name of placedNames.slice(0, -1)) {
     await expect(panel.locator('select').first()).toBeFocused()
     await page.keyboard.type(name)
     await key('Tab')
     await key('Enter')
     await expect(panel.locator('.rite-panel__done')).toHaveCount(placedNames.indexOf(name) + 1, { timeout: 10_000 })
   }
-  expect(Object.keys(((await page.evaluate(() => window.__lastRites!.riteState())) as { placed: object }).placed)).toHaveLength(5)
+  expect(Object.keys(((await page.evaluate(() => window.__lastRites!.riteState())) as { placed: object }).placed)).toHaveLength(4)
   expect((await stage(page)).altar.wrong).toBe(0)
+  // The fifth ends the case (Father Crane is out of play).
+  await expect(panel.locator('select').first()).toBeFocused()
+  await page.keyboard.type(placedNames[placedNames.length - 1])
+  await key('Tab')
+  await key('Enter')
+  await expect.poll(async () => (await ending(page)).ending, { timeout: 30_000 }).toBe('rest')
 
   await finishRun(page, 'Enter')
   expect(errors).toEqual([])

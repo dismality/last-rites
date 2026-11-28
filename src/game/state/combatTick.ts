@@ -345,6 +345,8 @@ function applyBossEvent(e: BossEvent, player: Vec2): void {
 /** Step 8: the boss director. Crane is read from the enemy store; a missing body holds state. */
 function stepBoss(dt: number, input: CombatTickInput): void {
   const bossStore = useBossStore.getState()
+  // No Father Crane yet: riteStore lays him to rest as the rite starts (BOSS.inPlay).
+  if (!BOSS.inPlay) return
   const crane = useEnemyStore.getState().enemies.find((z) => z.type === 'father-crane')
   const player: Vec2 = { x: input.playerPos[0], z: input.playerPos[2] }
   const r = tickBoss(bossStore.boss, {

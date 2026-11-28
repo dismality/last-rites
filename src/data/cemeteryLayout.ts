@@ -479,6 +479,21 @@ export const CRANE_SPAWN = {
   floorBreak: [11.7, 0, 9.6] as Vec3,
 } as const
 
+/**
+ * With Father Crane out of play (BOSS.inPlay), the first relic laid wakes a surge of the ordinary
+ * dead instead: up through the chapel floor behind the altar's keeper, and in at the front door.
+ */
+export const RITE_SURGE: readonly { type: 'shambler' | 'brute' | 'crawler'; at: Vec3 }[] = [
+  { type: 'shambler', at: [9, 0, 3] },
+  { type: 'shambler', at: [11, 0, 3] },
+  { type: 'crawler', at: [10, 0, 1.5] },
+  { type: 'shambler', at: [8, 0, 5] },
+  { type: 'shambler', at: [12, 0, 5] },
+  { type: 'brute', at: [10, 0, -5] },
+  { type: 'shambler', at: [8, 0, -4] },
+  { type: 'shambler', at: [12, 0, -4] },
+]
+
 /** Where the Congregation rises from the chapel floor. */
 export const CONGREGATION_POINTS: readonly Vec3[] = [
   [9, 0, 3],

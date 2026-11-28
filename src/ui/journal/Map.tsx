@@ -43,6 +43,9 @@ export function JournalMap() {
 
   // Snapshot what is new at open time; the store clears it once the animation ends.
   const pendingKeys = useRef<string[]>(useMapStore.getState().unseen.map((c) => cellKey(c.cx, c.cz)))
+  // The ink-in is timed from when the map opened. A redraw (the keeper turning or stepping, a new
+  // objective) must not start it over, or a steady stream of them keeps the sketch from ever drawing.
+  const inkStart = useRef<number | null>(null)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -51,7 +54,8 @@ export function JournalMap() {
     const reduced = prefersReducedMotion()
     const cells = exploredCells(map)
     const order = new Map(pendingKeys.current.map((k, i) => [k, i]))
-    const start = performance.now()
+    inkStart.current ??= performance.now()
+    const start = inkStart.current
     let raf = 0
 
     const frame = (now: number) => {

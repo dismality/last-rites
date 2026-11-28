@@ -7,6 +7,10 @@
 // Pure zustand: no React / three.js imports.
 
 import { create } from 'zustand'
+import { BOSS } from '../../data/boss'
+import { RITE_SURGE } from '../../data/cemeteryLayout'
+import { createEnemy } from '../systems/enemyAI'
+import { useEnemyStore } from './enemyStore'
 import { RITE_ORDER } from '../../data/relics'
 import type { RelicId } from '../types'
 import type { AltarVerdict } from '../systems/altarAnswer'
@@ -14,6 +18,7 @@ import { riteBlocked } from '../systems/bossDirector'
 import { riteAvailability } from '../systems/finalRite'
 import { EMPTY_RITE, isRiteDone, placeRelic, type RiteState } from '../systems/rite'
 import { useBossStore } from './bossStore'
+import { emit } from '../events'
 import { useCaseStore } from './caseStore'
 import { useChapelStore } from './chapelStore'
 import { emitCombatSound } from './combatSounds'
@@ -69,6 +74,23 @@ export function riteOpen(): boolean {
   )
 }
 
+let surgeUid = 0
+
+/** With Father Crane out of play (no model yet), he counts as rested when the rite starts, so the
+ *  five relics alone finish it (scored and recorded as his defeat was). In his place the dead come
+ *  in a surge (RITE_SURGE), on top of the night's waves. */
+function restCraneAtOnce(): void {
+  const boss = useBossStore.getState()
+  if (boss.boss.stage === 'dead') return
+  boss.setBoss({ ...boss.boss, stage: 'dead', stageClock: 0 })
+  emit({ type: 'bossDefeated' })
+  useMysteryStore.getState().recordCraneRested()
+  const enemies = useEnemyStore.getState()
+  const risen = RITE_SURGE.map((z) => createEnemy(`surge-${surgeUid++}`, z.type, { x: z.at[0], z: z.at[2] }))
+  enemies.setEnemies([...enemies.enemies, ...risen])
+  emitCombatSound('congregation')
+}
+
 export const useRiteStore = create<RiteStoreState>((set, get) => ({
   rite: EMPTY_RITE,
 
@@ -94,6 +116,7 @@ export const useRiteStore = create<RiteStoreState>((set, get) => ({
       // the chapel doors stop holding, as in the old rite.
       useEndingStore.getState().setRiteStarted(true)
       useChapelStore.getState().setFinalRiteActive(true)
+      if (!BOSS.inPlay) restCraneAtOnce()
     }
     return { kind: 'placed', startsRisingClock: res.startsRisingClock, complete: get().tryComplete() }
   },

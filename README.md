@@ -4,6 +4,8 @@
 
 **▶ Play:** https://last-rites.vercel.app (desktop browser, keyboard and mouse)
 
+**💻 PC and laptop only.** Last Rites needs a keyboard and a mouse (or trackpad) and a desktop browser such as Chrome, Edge or Firefox. It does not work on phones or tablets.
+
 **New here?** [Instruction manual](docs/manual.md) (no spoilers).
 
 **Stuck?** [Full walkthrough](docs/walkthrough.md) (Part A is spoiler-free; the rest gives every answer).
@@ -22,7 +24,7 @@ You are the new gravekeeper of Hollowmere Cemetery, October 1891. The last keepe
 - **A keeper who guides you, with a little mischief:** the objective is a pillar of lantern light with an italic line saying why it matters; after two quiet minutes your lantern flame leans toward the nearest clue you missed; and the game talks back in the keeper's dry voice (a wrong answer at the altar: *"A sour note, and the dead take it personally"*)
 - **First-person survival:** a lantern that runs on oil, melee and black-powder guns, blocking, dodging and kicking, boarding up the chapel doors
 - **Crafting** at the hut's workbench, where what you can make glows
-- **The dead:** shamblers, lurkers in dark alleys, wailers, bloaters, brutes, corpse hounds and Father Crane
+- **The dead:** shamblers, lurkers in dark alleys, wailers, bloaters, brutes and corpse hounds
 - **Fair horror:** a scare director with telegraphed jumpscares, recorded sound effects and narration
 - **Two ways in:** Normal, or Developer mode (the same game with a skip key and a stage-jump panel)
 - **Comfort settings:** scare intensity (Full/Reduced/Off), no-flash mode, FOV, head bob, subtitles for every important sound, plain journal font, rebindable keys

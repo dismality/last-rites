@@ -2569,3 +2569,47 @@ How Kiro was used to build Last Rites. Entries are added as work happens (see `.
 - **What Kiro caught or sped up:** Kiro's HUD overlap test found the boss bar overlap. Kiro's tests are kept, updated only where the game changed.
 - **Decisions made unattended:**
   - The boss bar is narrowed rather than the objective tracker, since the tracker's width rule already reserves the compass column. (2026-11-28)
+
+
+### 2026-11-28: A two-minute video of the game played in story order
+- **Started:** Outside Kiro
+- **What happened:** the trailer tools now cut a two-minute video of the game played in order, from the cold open through Stages 1, 2 and 3, ending on a LAST RITES slide with a warning at exactly 2:00 (`tools/video/out/last-rites.mp4`).
+  - **Filming (`tools/video/shots.spec.ts`, `tools/video/director.ts`):** each objective is walked up to with the HUD and beacon on, used with E, and its screen shown: the journal page, the gravestone rubbing, the ledger marks, the bell, the case board, the altar, the register, the boots, the crest lock, the hymn tiles, the crypt pin, Elias, the handwriting samples, the fully revealed journal map and the Rite of Rest. A fake cursor shows the clicks. The keeper's lines are recorded with their times (`lines.json`) so the cut can play each one where it was said.
+  - **Opening:** the first three shots are spectator flights over the gate, the graves and the hut, with no hands, lantern or tool in shot. `spectator()` in `tools/video/director.ts` poses the camera inside the renderer's own render call and skips drawing the first-person hands meanwhile.
+  - **Cutting (`tools/video/trailer.mjs`):** beats in story order with chapter titles, and big subtitles that break only between sentences or clauses. The keeper says only what he sees, trimmed at his pauses, and each clue ends on a question on screen ("Who cut his bell cord?", "Why is Elias here? Who was he meeting?"). No answer is given: the altar and the Rite of Rest stop on their own question before a name is typed. The hymn clicking is sped up, and the last slide is sized so the video ends at 120.0 s.
+  - **Warning text:** "The dead do not stop coming until you name the truth." with a smaller line about the lights, the sound, and turning scares down in Settings.
+- **What Kiro caught or sped up:** the dev hook Kiro built (`window.__lastRites`) let every shot jump straight to its stage, night and objective.
+- **Decisions made unattended:**
+  - Crane's rise uses the earlier cinematic clip, since the boss was not found in the new run.
+  - The Kiro slate is left out of this video; it belongs in the separate backend video. (2026-11-28)
+
+### 2026-11-28: Father Crane out of play until he has a model; the video re-cut around the objectives
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Father Crane:** he had no finished model (a tinted brute rig), so he no longer rises. `BOSS.inPlay` in `src/data/boss.ts` is false; `riteStore` counts him as rested when the first relic is laid (scored and recorded as before), so the five relics alone finish the case, and `stepBoss` in `combatTick.ts` does nothing. His rules and tests stay; the boss tests switch him on for themselves. The e2e rite steps (`e2e/case3.spec.ts`, `e2e/support/story.ts`) expect the fifth relic to end the case, and fight him only if he is switched back on. README no longer lists him.
+  - **Video (`tools/video/shots.spec.ts`, `tools/video/trailer.mjs`):**
+    - The dead rising is now a spectator view among the graves.
+    - The fight has two held zombies in reach, so every swing lands.
+    - Over every 2D screen the faked pointer lock is let go (`freeMouse`), so clicks on a screen no longer swing at the air behind it.
+    - The altar beats show the name going in, blurred (`veilAnswers` in `director.ts`), with objective banners: enter the name at the altar, and the right name starts the next stage. Chapter titles read "Stage I of III".
+    - Stage III follows the game's order: the objective (Find Elias Thorne) on the walk up Mausoleum Row, a wordless spectator approach to his body, his coat searched, the hymn board, the stair, and the walk down into the catacombs.
+    - The crypt-pin shot, the bone-whistle question and the Crane shot are gone.
+    - The last slide asks "Three graves. Three lies. Can you solve the mystery?", then where to play, with the content warning in small print at the bottom (jump scares, loud sounds and flashing light; not advised for players with epilepsy, photosensitivity, heart conditions or anxiety disorders; turned down in Settings).
+- **What Kiro caught or sped up:** the boss director, the rite rules and their tests were Kiro's, kept whole behind one flag, so the boss can come back with a model.
+- **Decisions made unattended:**
+  - "Put Father Crane to rest" still counts as earned when the rite starts, so the achievement and the 1000 points stay reachable.
+  - The typed names are blurred rather than cut, to show the action without the answer. (2026-11-28)
+
+### 2026-11-28: The journal map inks in properly, a zombie surge at the rite, and a slower video
+- **Started:** Outside Kiro
+- **What happened:**
+  - **Journal map (`src/ui/journal/Map.tsx`):** the ink-in of newly explored cells restarted from nothing on every redraw (the keeper turning or stepping, a new objective), so with the journal open while moving the sketch could stay blank and flicker. It is now timed from when the map opened.
+  - **The final rite (`src/game/state/riteStore.ts`, `RITE_SURGE` in `src/data/cemeteryLayout.ts`):** with Father Crane out of play, the first relic laid wakes eight of the ordinary dead (shamblers, a crawler and a brute), up through the chapel floor and in at the front door, on top of the night's waves.
+  - **README:** says the game is for PC and laptop only (keyboard and mouse or trackpad, a desktop browser), not phones or tablets.
+  - **Video (`tools/video/trailer.mjs`, `shots.spec.ts`, `director.ts`):**
+    - No longer squeezed into 2:00: the later scenes (hymn board, stair, catacombs, hands, map, rite, relics) play long enough to follow, about 2:18 in all.
+    - Every scene fades out and the next fades in, through black.
+    - The map shot reveals only the ground the keeper walked, not every cell.
+    - Each shot waits for its prop to mount, and a missed E is aimed and pressed again.
+- **What Kiro caught or sped up:** the Congregation points from Kiro's boss work gave the surge its spawn places inside the chapel.
+- **Decisions made unattended:** the surge is a fixed eight, not scaled by mode, as the Congregation was. (2026-11-28)
